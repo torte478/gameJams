@@ -1,5 +1,6 @@
 import Phaser from '../lib/phaser.js';
 
+import Consts from '../game/Consts.js';
 import Player from '../game/Player.js';
 
 export default class Game extends Phaser.Scene {
@@ -15,14 +16,25 @@ export default class Game extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('player', 'assets/player.png');
+        this.load.spritesheet('player', 'assets/player.png', {
+            frameWidth: 64,
+            frameHeight: 64
+        });
+        this.load.image('background', 'assets/background.png');
+        this.load.image('player_hands', 'assets/player_hands.png');
 
         this.cursorKeys = this.input.keyboard.createCursorKeys();
     }
 
     create() {
+        this.add.image(512, 368, 'background');
+
         this.player = new Player(
-            this.physics.add.sprite(512, 368, 'player'));
+            this,
+            Consts.playerSpawn.x,
+            Consts.playerSpawn.y,
+            this.add.sprite(0, 0, 'player'),
+            this.add.sprite(0, 0, 'player_hands'));
     }
 
     update() {

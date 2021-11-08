@@ -4,11 +4,38 @@ import Consts from './Consts.js';
 
 export default class Player {
 
-    /** @type {Phaser.Physics.Arcade.Sprite} */
-    sprite;
+    /** @type {Phaser.GameObjects.Image} */
+    body;
 
-    constructor(sprite) {
-        this.sprite = sprite;
+    /** @type {Phaser.GameObjects.Image} */
+    hands;
+
+    /** @type {Phaser.GameObjects.Container} */
+    container;
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Phaser.GameObjects.Sprite} body 
+     * @param {Phaser.GameObjects.Sprite} hands 
+     */
+    constructor(scene, x, y, body, hands) {
+        this.body = body;
+        this.hands = hands;
+
+        this.container = scene.add.container(x, y, [ body, hands]);
+        this.container.setSize(body.width, body.height);
+        scene.physics.world.enable(this.container);
+
+        scene.anims.create({
+            key: 'player',
+            frames: 'player',
+            frameRate: 5,
+            repeat: -1
+        });
+
+        this.body.play('player');
     }
 
     /**
@@ -30,7 +57,7 @@ export default class Player {
         else if (cursorKeys.right.isDown)
             sign.x = 1;
 
-        this.sprite.setVelocity(
+        this.container.body.setVelocity(
             sign.x * Consts.playerVelocity, 
             sign.y * Consts.playerVelocity);
     }
