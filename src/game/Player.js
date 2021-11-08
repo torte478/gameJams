@@ -1,6 +1,7 @@
 import Phaser from '../lib/phaser.js';
 
 import Consts from './Consts.js';
+import Keyboard from './Keyboard.js';
 
 export default class Player {
 
@@ -13,20 +14,30 @@ export default class Player {
     /** @type {Phaser.GameObjects.Container} */
     container;
 
+    /** @type {Boolean} */
+    donkey = false;
+
+    /** @type {Keyboard} */
+    keyboard;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} x
      * @param {Number} y
      * @param {Phaser.GameObjects.Sprite} body 
      * @param {Phaser.GameObjects.Sprite} hands 
+     * @param {Keyboard} keyboard
      */
-    constructor(scene, x, y, body, hands) {
-        this.body = body;
-        this.hands = hands;
+    constructor(scene, x, y, body, hands, keyboard) {
+        const me = this;
 
-        this.container = scene.add.container(x, y, [ body, hands]);
-        this.container.setSize(body.width, body.height);
-        scene.physics.world.enable(this.container);
+        me.body = body;
+        me.hands = hands;
+        me.keyboard = keyboard;
+
+        me.container = scene.add.container(x, y, [ body, hands]);
+        me.container.setSize(body.width, body.height);
+        scene.physics.world.enable(me.container);
 
         scene.anims.create({
             key: 'player',
@@ -35,30 +46,31 @@ export default class Player {
             repeat: -1
         });
 
-        this.body.play('player');
+        me.body.play('player');
     }
 
-    /**
-     * @param {Phaser.Types.Input.Keyboard.CursorKeys} cursorKeys 
-     */
-    update(cursorKeys) {
+    update() {
+        const me = this;
+    
         let sign = {
             x: 0,
             y: 0
         };
 
-        if (cursorKeys.up.isDown) 
+        if (me.keyboard.isDown(Phaser.Input.Keyboard.KeyCodes.UP)) 
             sign.y = -1;
-        else if (cursorKeys.down.isDown)
+        else if (me.keyboard.isDown(Phaser.Input.Keyboard.KeyCodes.DOWN)) 
             sign.y = 1;
 
-        if (cursorKeys.left.isDown)
+        if (me.keyboard.isDown(Phaser.Input.Keyboard.KeyCodes.LEFT)) 
             sign.x = -1;
-        else if (cursorKeys.right.isDown)
+        else if (me.keyboard.isDown(Phaser.Input.Keyboard.KeyCodes.RIGHT)) 
             sign.x = 1;
 
-        this.container.body.setVelocity(
-            sign.x * Consts.playerVelocity, 
-            sign.y * Consts.playerVelocity);
+        const velocity = me.donkey ? Consts.donkeyVelocity : Consts.playerVelocity;
+
+        me.container.body.setVelocity(
+            sign.x * velocity, 
+            sign.y * velocity);
     }
 }

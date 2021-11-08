@@ -1,15 +1,22 @@
 import Phaser from '../lib/phaser.js';
 
 import Consts from '../game/Consts.js';
+import Keyboard from '../game/Keyboard.js';
 import Player from '../game/Player.js';
 
 export default class Game extends Phaser.Scene {
+
+    /** @type {Boolean} */
+    debug = true;
 
     /** @type {Player} */
     player;
 
     /** @type {Phaser.Types.Input.Keyboard.CursorKeys} */
     cursorKeys;
+
+    /** @type {Keyboard} */
+    keyboard;
 
     constructor() {
         super('game');
@@ -27,17 +34,40 @@ export default class Game extends Phaser.Scene {
     }
 
     create() {
-        this.add.image(512, 368, 'background');
+        const me = this;
+        me.add.image(512, 368, 'background');
 
-        this.player = new Player(
-            this,
+        me.keyboard = new Keyboard(me.input.keyboard);
+        me.keyboard.emitter.on('keyDown', me.onKeyDown, me);
+
+        me.player = new Player(
+            me,
+            // TODO : to point
             Consts.playerSpawn.x,
             Consts.playerSpawn.y,
-            this.add.sprite(0, 0, 'player'),
-            this.add.sprite(0, 0, 'player_hands'));
+            me.add.sprite(0, 0, 'player'),
+            me.add.sprite(0, 0, 'player_hands'),
+            me.keyboard);
     }
 
     update() {
-        this.player.update(this.cursorKeys);
+        const me = this;
+
+        me.player.update();
+        me.keyboard.update();
+    }
+
+    /**
+     * @param {String} key 
+     * @param {Boolean} just 
+     */
+    onKeyDown(key, just) {
+        const me = this;
+
+        if (me.debug) {
+            if (key === '1' && just) {
+                me.player.donkey = !me.player.donkey;
+            }
+        }
     }
 }
