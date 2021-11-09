@@ -27,7 +27,7 @@ export default class Timeline {
     update() {
         const me = this;
 
-        me.current = new Date().getTime() - me.start;
+        me.current = (new Date().getTime() - me.start) / 1000;
         me.remain = me.duration - me.current;
     }
 }

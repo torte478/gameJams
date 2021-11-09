@@ -16,10 +16,11 @@ export default class Cameras {
 
         me.main = scene.cameras.main;
         me.main.startFollow(scene.player.container); // TODO: player?
-        me.main.setDeadzone(1500); // TODO
+        // me.main.setDeadzone(1500); // TODO
 
         const size = 200;
         me.second = scene.cameras.add(0, 768 - size, size, size); // TODO
-        me.second.setZoom(0.01); // TODO
+        me.second.setZoom(0.005); // TODO
+        me.second.startFollow(scene.player.container);
     }
 }

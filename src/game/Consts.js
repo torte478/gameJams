@@ -8,5 +8,5 @@ export default class Consts {
         y: 0
     };
 
-    static duration = 60 * 1000;
+    static duration = 60;
 }
