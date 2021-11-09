@@ -1,5 +1,6 @@
 import Phaser from '../lib/phaser.js';
 
+import Cameras from '../game/Cameras.js';
 import Consts from '../game/Consts.js';
 import Keyboard from '../game/Keyboard.js';
 import Player from '../game/Player.js';
@@ -21,6 +22,9 @@ export default class Game extends Phaser.Scene {
 
     /** @type {Timeline} */
     timeline;
+
+    /** @type {Cameras} */
+    cameras;
 
     constructor() {
         super('game');
@@ -60,8 +64,7 @@ export default class Game extends Phaser.Scene {
 
         me.timeline = new Timeline(Consts.duration);
 
-        me.cameras.main.startFollow(me.player.container);
-        me.cameras.main.setDeadzone(1024); // TODO
+        me.cameras = new Cameras(me);
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
