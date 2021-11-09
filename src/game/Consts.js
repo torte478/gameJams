@@ -4,7 +4,9 @@ export default class Consts {
     static donkeyVelocity = 640;
 
     static playerSpawn = {
-        x: 512,
-        y: 368
+        x: 0,
+        y: 0
     };
+
+    static duration = 60 * 1000;
 }
