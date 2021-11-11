@@ -9,4 +9,8 @@ export default class Consts {
     };
 
     static duration = 60;
+
+    static cameraOffset = 100;
+    static backgroundCount = 4;
+    static backgroundSize = 8000;
 }

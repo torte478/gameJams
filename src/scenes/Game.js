@@ -3,6 +3,7 @@ import Phaser from '../lib/phaser.js';
 import Cameras from '../game/Cameras.js';
 import Clock from '../game/Clock.js';
 import Consts from '../game/Consts.js';
+import {Rectangle} from '../game/Geometry.js';
 import Keyboard from '../game/Keyboard.js';
 import Player from '../game/Player.js';
 import Timeline from '../game/Timeline.js';
@@ -37,22 +38,12 @@ export default class Game extends Phaser.Scene {
     preload() {
         const me = this;
 
-        me.load.image('background_0_0', 'assets/background_0_0.png');
-        me.load.image('background_0_1', 'assets/background_0_1.png');
-        me.load.image('background_0_2', 'assets/background_0_2.png');
-        me.load.image('background_0_3', 'assets/background_0_3.png');
-        me.load.image('background_1_0', 'assets/background_1_0.png');
-        me.load.image('background_1_1', 'assets/background_1_1.png');
-        me.load.image('background_1_2', 'assets/background_1_2.png');
-        me.load.image('background_1_3', 'assets/background_1_3.png');
-        me.load.image('background_2_0', 'assets/background_2_0.png');
-        me.load.image('background_2_1', 'assets/background_2_1.png');
-        me.load.image('background_2_2', 'assets/background_2_2.png');
-        me.load.image('background_2_3', 'assets/background_2_3.png');
-        me.load.image('background_3_0', 'assets/background_3_0.png');
-        me.load.image('background_3_1', 'assets/background_3_1.png');
-        me.load.image('background_3_2', 'assets/background_3_2.png');
-        me.load.image('background_3_3', 'assets/background_3_3.png');
+        const side = 4; // TODO
+        for (let i = 0; i < side; ++i) 
+        for (let j = 0; j < side; ++j) {
+            const name = `background_${i}_${j}`;
+            me.load.image(name, `assets/${name}.png`);
+        }
 
         me.load.spritesheet('player', 'assets/player.png', {
             frameWidth: 64,
@@ -66,7 +57,7 @@ export default class Game extends Phaser.Scene {
     create() {
         const me = this;
 
-        me.clock = new Clock(me);
+        me.clock = new Clock(me, Consts.backgroundCount, Consts.backgroundSize);
 
         me.keyboard = new Keyboard(me.input.keyboard);
         me.keyboard.emitter.on('keyDown', me.onKeyDown, me);
@@ -98,13 +89,29 @@ export default class Game extends Phaser.Scene {
         me.timeline.update();
         me.player.update();
         me.keyboard.update();
-        me.clock.update(me.timeline.current);
+        me.clock.update(
+            me.timeline.current,
+            me.convertMainCameraToRectangle());
 
         if (me.debug) {
             me.log.text = 
                 `pos: ${me.player.container.x | 0} ${me.player.container.y | 0}\n` +
                 `time: ${(me.timeline.current).toFixed(1)} (${(me.timeline.remain).toFixed(1)})`;
         }
+    }
+
+    convertMainCameraToRectangle() {
+        const me = this;
+        const camera = me.cameras.main;
+
+        return Rectangle.build(
+            new Phaser.Math.Vector2(
+                camera.scrollX - Consts.cameraOffset,
+                camera.scrollY - Consts.cameraOffset),
+            new Phaser.Math.Vector2(
+                camera.scrollX + camera.width + Consts.cameraOffset,
+                camera.scrollY + camera.height + Consts.cameraOffset)
+            );
     }
 
     /**

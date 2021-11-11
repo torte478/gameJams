@@ -21,7 +21,7 @@ export default class Keyboard {
             Phaser.Input.Keyboard.KeyCodes.UP,
             Phaser.Input.Keyboard.KeyCodes.DOWN,
 
-            Phaser.Input.Keyboard.KeyCodes.ONE,
+            Phaser.Input.Keyboard.KeyCodes.ONE
         ]
             .map((key) => keyboard.addKey(key));
     }
