@@ -39,7 +39,7 @@ class Segment {
     }
 
     rotatePoint(p, angle) {
-        const point = Phaser.Math.Rotate(new Phaser.Geom.Point(p.x, p.y), angle);
+        const point = Phaser.Math.Rotate(new Phaser.Geom.Point(p.x, p.y), Phaser.Math.DegToRad(angle));
         return new Phaser.Math.Vector2(Math.round(point.x), Math.round(point.y));
     }
 }
@@ -101,7 +101,7 @@ export default class Clock {
             // TODO: combine rotation methods
             segment.image.angle = angle;
 
-            const visible = Geometry.isRectanglesIntersects(segment.rotate(time), camera);
+            const visible = Geometry.isRectanglesIntersects(segment.rotate(angle), camera);
             segment.image.setVisible(visible);
         });
     }

@@ -12,13 +12,18 @@ export default class Timeline {
     /** @type {Number} */
     remain;
 
+    /** @type {Number} */
+    offset;
+
     /**
      * @param {Number} duration 
+     * @param {Number} startTime
      */
-    constructor(duration) {
+    constructor(duration, startTime) {
         const me = this;
 
         me.duration = duration;
+        me.offset = startTime;
         me.start = new Date().getTime();
 
         me.update();
@@ -27,7 +32,7 @@ export default class Timeline {
     update() {
         const me = this;
 
-        me.current = (new Date().getTime() - me.start) / 1000;
+        me.current = me.offset + (new Date().getTime() - me.start) / 1000;
         me.remain = me.duration - me.current;
     }
 }

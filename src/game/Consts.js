@@ -5,10 +5,11 @@ export default class Consts {
 
     static playerSpawn = {
         x: 0,
-        y: 0
+        y: -1000
     };
 
     static duration = 60;
+    static startTime = 0;
 
     static cameraOffset = 100;
     static backgroundCount = 4;

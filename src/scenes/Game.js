@@ -71,7 +71,7 @@ export default class Game extends Phaser.Scene {
             me.add.sprite(0, 0, 'player_hands'),
             me.keyboard);
 
-        me.timeline = new Timeline(Consts.duration);
+        me.timeline = new Timeline(Consts.duration, Consts.startTime);
 
         me.cameras = new Cameras(me);
 
