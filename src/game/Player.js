@@ -22,20 +22,19 @@ export default class Player {
 
     /**
      * @param {Phaser.Scene} scene 
-     * @param {Number} x
-     * @param {Number} y
+     * @param {Phaser.Geom.Point} point
      * @param {Phaser.GameObjects.Sprite} body 
      * @param {Phaser.GameObjects.Sprite} hands 
      * @param {Keyboard} keyboard
      */
-    constructor(scene, x, y, body, hands, keyboard) {
+    constructor(scene, pos, body, hands, keyboard) {
         const me = this;
 
         me.body = body;
         me.hands = hands;
         me.keyboard = keyboard;
 
-        me.container = scene.add.container(x, y, [ body, hands]);
+        me.container = scene.add.container(pos.x, pos.y, [ body, hands]);
         me.container.setSize(body.width, body.height);
         scene.physics.world.enable(me.container);
 
@@ -57,14 +56,14 @@ export default class Player {
             y: 0
         };
 
-        if (me.keyboard.isDown(Phaser.Input.Keyboard.KeyCodes.UP)) 
+        if (me.keyboard.isPressed(Phaser.Input.Keyboard.KeyCodes.UP)) 
             sign.y = -1;
-        else if (me.keyboard.isDown(Phaser.Input.Keyboard.KeyCodes.DOWN)) 
+        else if (me.keyboard.isPressed(Phaser.Input.Keyboard.KeyCodes.DOWN)) 
             sign.y = 1;
 
-        if (me.keyboard.isDown(Phaser.Input.Keyboard.KeyCodes.LEFT)) 
+        if (me.keyboard.isPressed(Phaser.Input.Keyboard.KeyCodes.LEFT)) 
             sign.x = -1;
-        else if (me.keyboard.isDown(Phaser.Input.Keyboard.KeyCodes.RIGHT)) 
+        else if (me.keyboard.isPressed(Phaser.Input.Keyboard.KeyCodes.RIGHT)) 
             sign.x = 1;
 
         const velocity = me.donkey ? Consts.donkeyVelocity : Consts.playerVelocity;

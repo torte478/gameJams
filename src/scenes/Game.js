@@ -87,9 +87,7 @@ export default class Game extends Phaser.Scene {
 
         me.player = new Player(
             me,
-            // TODO : to point
-            Consts.playerSpawn.x,
-            Consts.playerSpawn.y,
+            Consts.playerSpawn,
             me.add.sprite(0, 0, 'player'),
             me.add.sprite(0, 0, 'player_hands'),
             me.keyboard);
@@ -143,17 +141,16 @@ export default class Game extends Phaser.Scene {
 
     /**
      * @param {String} key 
-     * @param {Boolean} just 
      */
-    onKeyDown(key, just) {
+    onKeyDown(key) {
         const me = this;
 
         if (me.debug) {
-            if (key === '1' && just) {
+            if (key === '1') {
                 me.player.donkey = !me.player.donkey;
             }
 
-            if (key === '2' && just) {
+            if (key === '2') {
                 me.scene.pause();
             }
         }

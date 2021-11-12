@@ -16,13 +16,12 @@ export default class CameraViews {
         const me = this;
 
         me.main = scene.cameras.main;
-        me.main.startFollow(scene.player.container); // TODO: player?
-        // me.main.setDeadzone(1500); // TODO
+        me.main.startFollow(scene.player.container);
 
         if (secondCamera) {
             const size = 200;
-            me.second = scene.cameras.add(0, 768 - size, size, size); // TODO
-            me.second.setZoom(0.005); // TODO
+            me.second = scene.cameras.add(0, scene.scale.height - size, size, size);
+            me.second.setZoom(0.005);
             me.second.startFollow(scene.player.container);
         }
     }

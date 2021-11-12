@@ -1,15 +1,16 @@
+import Phaser from "../lib/phaser.js";
+
 export default class Consts {
 
     static playerVelocity = 320;
     static donkeyVelocity = 640;
 
-    static playerSpawn = {
-        x: 0,
-        y: -5000
-    };
+    static playerSpawn = new Phaser.Geom.Point(
+        0,
+        -5000);
 
     static duration = 60;
-    static startTime = 57;
+    static startTime = 0;
 
     static cameraOffset = 100;
     static backgroundCount = 4;

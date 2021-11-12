@@ -34,12 +34,16 @@ export default class Keyboard {
             /** @type {Phaser.Input.Keyboard.Key} */
             const key = value;
 
-            if (key.isDown)
-                //  TODO : split to keyDown and ketPressed
+            if (Phaser.Input.Keyboard.JustDown(key)) {
                 me.emitter.emit(
-                    'keyDown', 
-                    key.originalEvent.key, 
-                    Phaser.Input.Keyboard.JustDown(key));
+                    'keyDown',
+                    key.originalEvent.key);
+            }
+
+            if (key.isDown)
+                me.emitter.emit(
+                    'keyPressed', 
+                    key.originalEvent.key);
         });
     }    
 
@@ -47,7 +51,7 @@ export default class Keyboard {
      * @param {Number} keyCode 
      * @returns {Boolean}
      */
-    isDown(keyCode) {
+    isPressed(keyCode) {
         const me = this;
         const keys = me.keys.filter((key) => key.keyCode === keyCode);
 
