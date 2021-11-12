@@ -7,7 +7,7 @@ export default class Consts {
 
     static playerSpawn = new Phaser.Geom.Point(
         0,
-        -5000);
+        -13000);
 
     static duration = 60;
     static startTime = 0;
@@ -19,8 +19,11 @@ export default class Consts {
     static arrowCountX = 1;
     static arrowCountY = 4;
 
-    static enableSecondCamera = true;
+    static enableSecondCamera = false;
     static renderClock = false;
 
     static gameOverTime = 60;
+
+    static levelStartX = -384;
+    static cityStartY = -13000;
 }

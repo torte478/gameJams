@@ -28,9 +28,9 @@
      showgrid="false"
      height="32000mm"
      units="px"
-     inkscape:zoom="0.01"
-     inkscape:cx="-18350"
-     inkscape:cy="1150"
+     inkscape:zoom="0.02"
+     inkscape:cx="9825"
+     inkscape:cy="16725"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1912"
@@ -57,13 +57,16 @@
        width="8466.4023"
        height="8466.4023"
        x="0.1322065"
-       y="0.1322065" />
+       y="0.1322065"
+       inkscape:export-filename="D:\Work\oneMinuteStory\temp\big_image_test.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer6"
      inkscape:label="secret"
-     style="display:none"
+     style="display:inline"
      sodipodi:insensitive="true">
     <ellipse
        style="fill:#00ffff;stroke:#000000;stroke-width:4.47105"
@@ -78,7 +81,7 @@
      id="layer5"
      inkscape:label="castle"
      sodipodi:insensitive="true"
-     style="display:none">
+     style="display:inline">
     <ellipse
        style="fill:#ff7f2a;stroke:#000000;stroke-width:0.589371"
        id="path928"
@@ -91,7 +94,7 @@
      inkscape:groupmode="layer"
      id="layer8"
      inkscape:label="arrows"
-     style="display:inline">
+     style="display:none">
     <path
        id="rect2108"
        style="fill:#ff0000;stroke:#000000;stroke-width:0.196001"
@@ -109,7 +112,7 @@
      id="layer4"
      inkscape:label="town"
      sodipodi:insensitive="true"
-     style="display:none">
+     style="display:inline">
     <circle
        style="fill:#ac9d93;stroke:#000000;stroke-width:0.349378"
        id="path769"
@@ -122,7 +125,7 @@
      id="layer3"
      inkscape:label="desert"
      sodipodi:insensitive="true"
-     style="display:none">
+     style="display:inline">
     <ellipse
        style="fill:#ffcc00;stroke:#000000;stroke-width:0.356672"
        id="path628"
@@ -149,7 +152,7 @@
      id="layer9"
      inkscape:label="texture"
      sodipodi:insensitive="true"
-     style="display:none">
+     style="display:inline">
     <rect
        style="fill:#000000;stroke:#000000;stroke-width:0.2668"
        id="rect4411"

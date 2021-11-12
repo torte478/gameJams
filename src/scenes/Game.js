@@ -58,6 +58,9 @@ export default class Game extends Phaser.Scene {
         });
         me.load.image('player_hands', 'assets/player_hands.png');
 
+        me.load.tilemapCSV('main_tilemap_map', 'assets/main_tilemap.csv');
+        me.load.image('main_tilemap', 'assets/main_tilemap.png');
+
         me.cursorKeys = this.input.keyboard.createCursorKeys();
     }
 
@@ -84,6 +87,18 @@ export default class Game extends Phaser.Scene {
 
         me.keyboard = new Keyboard(me.input.keyboard);
         me.keyboard.emitter.on('keyDown', me.onKeyDown, me);
+
+        const map = me.make.tilemap({
+            key: 'main_tilemap_map',
+            tileWidth: 32, //TODO
+            tileHeight: 32
+        });
+        const tileset = map.addTilesetImage('main_tilemap');
+        const layer = map.createLayer(
+            0, 
+            tileset,
+            Consts.levelStartX, 
+            Consts.cityStartY);
 
         me.player = new Player(
             me,
