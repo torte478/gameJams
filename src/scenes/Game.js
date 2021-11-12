@@ -39,10 +39,15 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         if (Consts.renderClock) {
-            const side = Consts.backgroundCount; // TODO
-            for (let i = 0; i < side; ++i) 
-            for (let j = 0; j < side; ++j) {
+            for (let i = 0; i < Consts.backgroundCount; ++i) 
+            for (let j = 0; j < Consts.backgroundCount; ++j) {
                 const name = `background_${i}_${j}`;
+                me.load.image(name, `assets/${name}.png`);
+            }
+
+            for (let i = 0; i < Consts.arrowCountY; ++i)
+            for (let j = 0; j < Consts.arrowCountX; ++j) {
+                const name = `arrows_${i}_${j}`;
                 me.load.image(name, `assets/${name}.png`);
             }
         }
@@ -64,8 +69,17 @@ export default class Game extends Phaser.Scene {
         if (Consts.renderClock) {
             me.clock.addTiles(
                 Consts.backgroundCount, 
+                Consts.backgroundCount,
                 Consts.backgroundSize, 
-                'background');
+                'background',
+                0);
+
+            me.clock.addTiles(
+                Consts.arrowCountX,
+                Consts.arrowCountY,
+                Consts.backgroundSize,
+                'arrows',
+                1000);
         }
 
         me.keyboard = new Keyboard(me.input.keyboard);

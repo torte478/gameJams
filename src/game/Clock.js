@@ -23,20 +23,30 @@ export default class Clock {
         me.segments = [];
     }
 
-    addTiles(count, size, format) {
+    /**
+     * 
+     * @param {Number} countX 
+     * @param {Number} countY 
+     * @param {Number} size 
+     * @param {String} format 
+     * @param {Number} depth 
+     * @returns 
+     */
+    addTiles(countX, countY, size, format, depth) {
         const me = this;
 
-        for (let i = 0; i < count; ++i) 
-        for (let j = 0; j < count; ++j) {
+        for (let i = 0; i < countY; ++i) 
+        for (let j = 0; j < countX; ++j) {
             const origin = new Phaser.Geom.Point(
-                size * (count / 2 - j),
-                size * (count / 2 - i));
+                countX > 1 ? size * (countX / 2 - j) : size / 2,
+                countY > 1 ? size * (countY / 2 - i) : size / 2);
 
             const image = me.scene.add.image(
                     0, 
                     0, 
                     `${format}_${i}_${j}`)
                 .setDisplayOrigin(origin.x, origin.y)
+                .setDepth(depth)
                 .setVisible(false);
 
             me.segments.push(new Segment(

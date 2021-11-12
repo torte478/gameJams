@@ -15,6 +15,9 @@ export default class Consts {
     static backgroundCount = 4;
     static backgroundSize = 8000;
 
+    static arrowCountX = 1;
+    static arrowCountY = 4;
+
     static enableSecondCamera = true;
-    static renderClock = false;
+    static renderClock = true;
 }
