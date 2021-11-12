@@ -38,11 +38,13 @@ export default class Game extends Phaser.Scene {
     preload() {
         const me = this;
 
-        const side = 4; // TODO
-        for (let i = 0; i < side; ++i) 
-        for (let j = 0; j < side; ++j) {
-            const name = `background_${i}_${j}`;
-            me.load.image(name, `assets/${name}.png`);
+        if (Consts.renderClock) {
+            const side = Consts.backgroundCount; // TODO
+            for (let i = 0; i < side; ++i) 
+            for (let j = 0; j < side; ++j) {
+                const name = `background_${i}_${j}`;
+                me.load.image(name, `assets/${name}.png`);
+            }
         }
 
         me.load.spritesheet('player', 'assets/player.png', {
@@ -57,7 +59,14 @@ export default class Game extends Phaser.Scene {
     create() {
         const me = this;
 
-        me.clock = new Clock(me, Consts.backgroundCount, Consts.backgroundSize);
+        me.clock = new Clock(me);
+
+        if (Consts.renderClock) {
+            me.clock.addTiles(
+                Consts.backgroundCount, 
+                Consts.backgroundSize, 
+                'background');
+        }
 
         me.keyboard = new Keyboard(me.input.keyboard);
         me.keyboard.emitter.on('keyDown', me.onKeyDown, me);
@@ -73,7 +82,7 @@ export default class Game extends Phaser.Scene {
 
         me.timeline = new Timeline(Consts.duration, Consts.startTime);
 
-        me.cameras = new Cameras(me);
+        me.cameras = new Cameras(me, Consts.enableSecondCamera);
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
@@ -105,10 +114,10 @@ export default class Game extends Phaser.Scene {
         const camera = me.cameras.main;
 
         return Rectangle.build(
-            new Phaser.Math.Vector2(
+            new Phaser.Geom.Point(
                 camera.scrollX - Consts.cameraOffset,
                 camera.scrollY - Consts.cameraOffset),
-            new Phaser.Math.Vector2(
+            new Phaser.Geom.Point(
                 camera.scrollX + camera.width + Consts.cameraOffset,
                 camera.scrollY + camera.height + Consts.cameraOffset)
             );
@@ -124,6 +133,10 @@ export default class Game extends Phaser.Scene {
         if (me.debug) {
             if (key === '1' && just) {
                 me.player.donkey = !me.player.donkey;
+            }
+
+            if (key === '2' && just) {
+                me.scene.pause();
             }
         }
     }

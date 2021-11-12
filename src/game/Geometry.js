@@ -1,35 +1,35 @@
 import Phaser from '../lib/phaser.js';
 
 export class Rectangle {
-    /** @type {Phaser.Math.Vector2} */
+    /** @type {Phaser.Geom.Point} */
     a;
 
-    /** @type {Phaser.Math.Vector2} */
+    /** @type {Phaser.Geom.Point} */
     b;
 
-    /** @type {Phaser.Math.Vector2} */
+    /** @type {Phaser.Geom.Point} */
     c;
 
-    /** @type {Phaser.Math.Vector2} */
+    /** @type {Phaser.Geom.Point} */
     d;
 
     /**
-     * @param {Phaser.Math.Vector2} a 
-     * @param {Phaser.Math.Vector2} b 
+     * @param {Phaser.Geom.Point} a 
+     * @param {Phaser.Geom.Point} b 
      */
     static build(a, b) {
         return new Rectangle(
             a,
-            new Phaser.Math.Vector2(b.x, a.y),
+            new Phaser.Geom.Point(b.x, a.y),
             b,
-            new Phaser.Math.Vector2(a.x, b.y));
+            new Phaser.Geom.Point(a.x, b.y));
     }
 
     /**
-     * @param {Phaser.Math.Vector2} a 
-     * @param {Phaser.Math.Vector2} b 
-     * @param {Phaser.Math.Vector2} c 
-     * @param {Phaser.Math.Vector2} d 
+     * @param {Phaser.Geom.Point} a 
+     * @param {Phaser.Geom.Point} b 
+     * @param {Phaser.Geom.Point} c 
+     * @param {Phaser.Geom.Point} d 
      */
      constructor(a, b, c, d) {
         const me = this;
@@ -72,9 +72,9 @@ export class Rectangle {
 export class Geometry {
 
     /**
-     * @param {Phaser.Math.Vector2} a 
-     * @param {Phaser.Math.Vector2} b 
-     * @param {Phaser.Math.Vector2} c 
+     * @param {Phaser.Geom.Point} a 
+     * @param {Phaser.Geom.Point} b 
+     * @param {Phaser.Geom.Point} c 
      */
     static area(a, b, c) {
         return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
@@ -97,10 +97,10 @@ export class Geometry {
     }
 
     /**
-     * @param {Phaser.Math.Vector2} a 
-     * @param {Phaser.Math.Vector2} b 
-     * @param {Phaser.Math.Vector2} c 
-     * @param {Phaser.Math.Vector2} d 
+     * @param {Phaser.Geom.Point} a 
+     * @param {Phaser.Geom.Point} b 
+     * @param {Phaser.Geom.Point} c 
+     * @param {Phaser.Geom.Point} d 
      */
     static isSegmentsIntersects(a, b, c, d) {
         return Geometry.intersect1(a.x, b.x, c.x, d.x)
@@ -109,7 +109,7 @@ export class Geometry {
             && Geometry.area(c, d, a) * Geometry.area(c, d, b) <= 0
     }
 
-    static inside2(point, vs) {        
+    static isPointInsidePolygon(point, vs) {        
         var x = point[0], y = point[1];
         
         var inside = false;
@@ -125,74 +125,16 @@ export class Geometry {
         return inside;
     };
 
-    static isPointInside(p, N, x, y) {
-        let flag = false;
-        let i1, i2, S, S1, S2, S3 = 0;
-
-        for (let n = 0; n < N; n++)
-        {
-            flag = false;
-            i1 = n < N-1 ? n + 1 : 0;
-
-            while (flag === false)
-            {
-                i2 = i1 + 1;
-
-                if (i2 >= N)
-                    i2 = 0;
-
-                if (i2 === (n < N-1 ? n + 1 : 0))
-                    break;
-
-                S = Math.abs(
-                        p[i1].x * (p[i2].y - p[n ].y) +
-                        p[i2].x * (p[n ].y - p[i1].y) +
-                        p[n].x  * (p[i1].y - p[i2].y));
-                S1 = Math.abs(
-                        p[i1].x * (p[i2].y - y) +
-                        p[i2].x * (y       - p[i1].y) +
-                        x       * (p[i1].y - p[i2].y));
-                S2 = Math.abs(
-                        p[n ].x * (p[i2].y - y) +
-                        p[i2].x * (y       - p[n ].y) +
-                        x       * (p[n ].y - p[i2].y));
-                S3 = Math.abs(
-                        p[i1].x * (p[n ].y - y) +
-                        p[n ].x * (y       - p[i1].y) +
-                        x       * (p[i1].y - p[n ].y));
-
-                if (S === S1 + S2 + S3)
-                {
-                    flag = true;
-                    break;
-                }
-
-                i1 = i1 + 1;
-
-                if (i1 >= N)
-                    i1 = 0;
-
-                break;
-            }
-
-            if (flag === false)
-                break;
-        }
-
-        return flag;
-    }
-
     /**
      * @param {Rectangle} first 
      * @param {Rectangle} second 
      */
      static isVertexInside(first, second) {
         const points = first.toPoints();
-        const size = first.length;
 
         const insideCount = second
             .toPoints()
-            .filter((point) => Geometry.inside2(point, points)) // (points, size, point.x, point.y))
+            .filter((point) => Geometry.isPointInsidePolygon(point, points))
             .length;
 
         return insideCount > 0;

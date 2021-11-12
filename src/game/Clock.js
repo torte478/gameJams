@@ -1,87 +1,51 @@
 import Phaser from "../lib/phaser.js";
 
-import {Rectangle, Geometry } from "./Geometry.js";
-
-class Segment {
-    /** @type {Phaser.GameObjects.Image} */
-    image;
-
-    /** @type {Rectangle} */
-    rectangle;
-
-    /**
-     * @param {Phaser.GameObjects.Image} image 
-     * @param {Phaser.Math.Vector2} center 
-     * @param {Number} size
-     */
-    constructor(image, center, size) {
-        const me = this;
-
-        me.image = image;
-        me.rectangle = Rectangle.build(
-            new Phaser.Math.Vector2(-center.x, -center.y),
-            new Phaser.Math.Vector2(-center.x + size, -center.y + size)
-        );
-    }
-
-    /**
-     * @param @type {Number} angle
-     * @returns @type {Rectangle}
-     */
-    rotate(angle) {
-        const me = this;
-
-        return new Rectangle(
-            me.rotatePoint(me.rectangle.a, angle),
-            me.rotatePoint(me.rectangle.b, angle),
-            me.rotatePoint(me.rectangle.c, angle),
-            me.rotatePoint(me.rectangle.d, angle));
-    }
-
-    rotatePoint(p, angle) {
-        const point = Phaser.Math.Rotate(new Phaser.Geom.Point(p.x, p.y), Phaser.Math.DegToRad(angle));
-        return new Phaser.Math.Vector2(Math.round(point.x), Math.round(point.y));
-    }
-}
+import { Rectangle } from "./Geometry.js";
+import Segment from "./Segment.js";
 
 export default class Clock {
 
+    /** @type {Phaser.Scene} */
+    scene;
+
     /** @type {Array} */
-    background;
-
-    /** @type {Number} */
-    count;
-
-    /** @type {Number} */
-    size;
+    segments;
 
     /**
      * @param {Phaser.Scene} scene
      * @param {Number} count
      * @param {Number} size
      */
-    constructor(scene, count, size) {
+    constructor(scene) {
         const me = this;
 
-        me.count = count;
-        me.size = size;
+        me.scene = scene;
+        me.segments = [];
+    }
 
-        me.background = [];
+    addTiles(count, size, format) {
+        const me = this;
+
         for (let i = 0; i < count; ++i) 
         for (let j = 0; j < count; ++j) {
-            const origin = new Phaser.Math.Vector2(
+            const origin = new Phaser.Geom.Point(
                 size * (count / 2 - j),
                 size * (count / 2 - i));
 
-            const image = scene.add.image(0, 0, `background_${i}_${j}`)
+            const image = me.scene.add.image(
+                    0, 
+                    0, 
+                    `${format}_${i}_${j}`)
                 .setDisplayOrigin(origin.x, origin.y)
                 .setVisible(false);
 
-            me.background.push(new Segment(
+            me.segments.push(new Segment(
                 image,
                 origin,
                 size));
         }
+
+        return me;
     }
 
     /**
@@ -93,16 +57,12 @@ export default class Clock {
 
         const angle = -6 * time;
 
-        me.background.forEach((value) => {
+        me.segments.forEach((value) => {
 
             /** @type {Segment} */
             const segment = value;
 
-            // TODO: combine rotation methods
-            segment.image.angle = angle;
-
-            const visible = Geometry.isRectanglesIntersects(segment.rotate(angle), camera);
-            segment.image.setVisible(visible);
+            segment.rotate(camera, angle);
         });
     }
 }

@@ -14,4 +14,7 @@ export default class Consts {
     static cameraOffset = 100;
     static backgroundCount = 4;
     static backgroundSize = 8000;
+
+    static enableSecondCamera = true;
+    static renderClock = false;
 }
