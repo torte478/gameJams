@@ -1,6 +1,6 @@
 import Phaser from '../lib/phaser.js';
 
-export default class Cameras {
+export default class CameraViews {
 
     /** @type {Phaser.Cameras.Scene2D.Camera} */
     main;

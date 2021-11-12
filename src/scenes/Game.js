@@ -1,6 +1,6 @@
 import Phaser from '../lib/phaser.js';
 
-import Cameras from '../game/Cameras.js';
+import CameraViews from '../game/CameraViews.js';
 import Clock from '../game/Clock.js';
 import Consts from '../game/Consts.js';
 import {Rectangle} from '../game/Geometry.js';
@@ -25,8 +25,8 @@ export default class Game extends Phaser.Scene {
     /** @type {Timeline} */
     timeline;
 
-    /** @type {Cameras} */
-    cameras;
+    /** @type {CameraViews} */
+    cameraViews;
 
     /** @type {Clock} */
     clock;
@@ -96,7 +96,7 @@ export default class Game extends Phaser.Scene {
 
         me.timeline = new Timeline(Consts.duration, Consts.startTime);
 
-        me.cameras = new Cameras(me, Consts.enableSecondCamera);
+        me.cameraViews = new CameraViews(me, Consts.enableSecondCamera);
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
@@ -116,6 +116,10 @@ export default class Game extends Phaser.Scene {
             me.timeline.current,
             me.convertMainCameraToRectangle());
 
+        if (me.timeline.current >= Consts.gameOverTime) {
+            me.scene.start('game_over');
+        }
+
         if (me.debug) {
             me.log.text = 
                 `pos: ${me.player.container.x | 0} ${me.player.container.y | 0}\n` +
@@ -125,7 +129,7 @@ export default class Game extends Phaser.Scene {
 
     convertMainCameraToRectangle() {
         const me = this;
-        const camera = me.cameras.main;
+        const camera = me.cameraViews.main;
 
         return Rectangle.build(
             new Phaser.Geom.Point(
