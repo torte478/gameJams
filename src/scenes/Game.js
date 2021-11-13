@@ -101,6 +101,9 @@ export default class Game extends Phaser.Scene {
             Consts.cityStartY);
 
         map.setCollisionBetween(1, 7);
+        map.setCollisionBetween(9, 10);
+        map.setCollisionBetween(12, 13);
+        map.setCollisionBetween(17, 18);
 
         me.player = new Player(
             me,
