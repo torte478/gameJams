@@ -17,6 +17,7 @@ export default class CameraViews {
 
         me.main = scene.cameras.main;
         me.main.startFollow(scene.player.container);
+        me.main.roundPixels = true;
 
         if (secondCamera) {
             const size = 200;

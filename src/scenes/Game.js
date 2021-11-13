@@ -100,6 +100,8 @@ export default class Game extends Phaser.Scene {
             Consts.levelStartX, 
             Consts.cityStartY);
 
+        map.setCollisionBetween(1, 7);
+
         me.player = new Player(
             me,
             Consts.playerSpawn,
@@ -110,6 +112,9 @@ export default class Game extends Phaser.Scene {
         me.timeline = new Timeline(Consts.duration, Consts.startTime);
 
         me.cameraViews = new CameraViews(me, Consts.enableSecondCamera);
+
+        me.physics.add.collider(me.player.container, layer);
+
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
