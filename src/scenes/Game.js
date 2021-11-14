@@ -70,6 +70,8 @@ export default class Game extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 64
         });
+
+        me.load.image('guard', 'assets/guard.png');
     }
 
     create() {
@@ -145,6 +147,9 @@ export default class Game extends Phaser.Scene {
                     { x: 0, y: -11840}
                 ])
         ]
+
+        me.add.image(-40, -9140, 'guard');
+        me.add.image(40, -9140, 'guard').setFlipX(true);
 
         me.player = new Player(
             me,
