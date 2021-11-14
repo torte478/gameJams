@@ -66,6 +66,7 @@ export default class Game extends Phaser.Scene {
         me.load.tilemapCSV('main_tilemap_map', 'assets/main_tilemap.csv');
         me.load.tilemapCSV('castle_tilemap_map', 'assets/castle_tilemap.csv');
         me.load.tilemapCSV('secret_tilemap_map', 'assets/secret_tilemap.csv');
+        me.load.tilemapCSV('desert_tilemap_map', 'assets/desert_tilemap.csv');
         me.load.image('main_tilemap', 'assets/main_tilemap.png');
 
         me.load.spritesheet('bot_cit_0', 'assets/bot_cit_0.png', {
@@ -104,6 +105,7 @@ export default class Game extends Phaser.Scene {
         const city = me.createTilemap('main_tilemap_map', Consts.cityStartY);
         const castle = me.createTilemap('castle_tilemap_map', Consts.castleStartY);
         const secret = me.createTilemap('secret_tilemap_map', Consts.secretStartY);
+        const desert = me.createTilemap('desert_tilemap_map', Consts.desertStartY);
 
         me.anims.create({
             key: 'bot_cit_0_walk',
