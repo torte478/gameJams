@@ -1,5 +1,6 @@
 import Phaser from '../lib/phaser.js';
 
+import Actions from '../game/Actions.js';
 import Bot from '../game/Bot.js';
 import CameraViews from '../game/CameraViews.js';
 import Clock from '../game/Clock.js';
@@ -114,20 +115,28 @@ export default class Game extends Phaser.Scene {
 
         me.anims.create({
             key: 'bot_cit_0_walk',
-            frames: 'bot_cit_0',
+            frames: me.anims.generateFrameNumbers('bot_cit_0', { frames: [ 0, 1, 2, 3 ] }),
             frameRate: 4,
-            repeat: -1
+            repeat: -1,
+        });
+
+        me.anims.create({
+            key: 'bot_cit_0_dance',
+            frames: me.anims.generateFrameNumbers('bot_cit_0', { frames: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ] }),
+            frameRate: 8,
+            repeat: -1,
         });
 
         me.bots = 
         [
             new Bot(
                 me, 
-                'bot_cit_0',
-                 
+                'bot_cit_0',   
                 [
                     { x: -288, y: -11840},
+                    { action: Actions.DANCE },
                     { x: 288, y: -11840},
+                    { action: Actions.DANCE },
                     { x: 0, y: -11840},
                     { x: 0, y: -12256},
                     { x: -288, y: -12256},
@@ -136,7 +145,6 @@ export default class Game extends Phaser.Scene {
                     { x: 0, y: -11840}
                 ])
         ]
-        me.bots.forEach((bot) => { bot.image.play('bot_cit_0_walk')});
 
         me.player = new Player(
             me,

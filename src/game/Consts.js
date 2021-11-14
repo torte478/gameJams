@@ -20,7 +20,7 @@ export default class Consts {
     static arrowCountY = 4;
 
     static enableSecondCamera = false;
-    static renderClock = true;
+    static renderClock = false;
 
     static gameOverTime = 60;
 
@@ -31,4 +31,5 @@ export default class Consts {
     static botSpeed = 200; //64;
 
     static unit = 32;
+    static danceLength = 3;
 }
