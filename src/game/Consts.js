@@ -6,8 +6,10 @@ export default class Consts {
     static donkeyVelocity = 640;
 
     static playerSpawn = new Phaser.Geom.Point(
-        0, // -218,
-        -12950); //-12056);
+        // 0,
+        // -12950); 
+        -218,
+        -12056);
 
     static duration = 60;
     static startTime = 0;
@@ -27,6 +29,7 @@ export default class Consts {
     static levelStartX = -384;
     static cityStartY = -13000;
     static castleStartY = -14024;
+    static secretStartY = -14984;
 
     static distanceEps = 10;
     static botSpeed = 200; //64;
