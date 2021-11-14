@@ -7,7 +7,7 @@ export default class Consts {
 
     static playerSpawn = new Phaser.Geom.Point(
         0, // -218,
-        -9200); //-12056);
+        -12950); //-12056);
 
     static duration = 60;
     static startTime = 0;
@@ -26,6 +26,7 @@ export default class Consts {
 
     static levelStartX = -384;
     static cityStartY = -13000;
+    static castleStartY = -14024;
 
     static distanceEps = 10;
     static botSpeed = 200; //64;

@@ -64,6 +64,7 @@ export default class Game extends Phaser.Scene {
         me.load.image('player_hands', 'assets/player_hands.png');
 
         me.load.tilemapCSV('main_tilemap_map', 'assets/main_tilemap.csv');
+        me.load.tilemapCSV('castle_tilemap_map', 'assets/castle_tilemap.csv');
         me.load.image('main_tilemap', 'assets/main_tilemap.png');
 
         me.load.spritesheet('bot_cit_0', 'assets/bot_cit_0.png', {
@@ -72,6 +73,7 @@ export default class Game extends Phaser.Scene {
         });
 
         me.load.image('guard', 'assets/guard.png');
+        me.load.image('king', 'assets/king.png');
     }
 
     create() {
@@ -98,22 +100,8 @@ export default class Game extends Phaser.Scene {
         me.keyboard = new Keyboard(me.input.keyboard);
         me.keyboard.emitter.on('keyDown', me.onKeyDown, me);
 
-        const map = me.make.tilemap({
-            key: 'main_tilemap_map',
-            tileWidth: 32, //TODO
-            tileHeight: 32
-        });
-        const tileset = map.addTilesetImage('main_tilemap');
-        const layer = map.createLayer(
-            0, 
-            tileset,
-            Consts.levelStartX, 
-            Consts.cityStartY);
-
-        map.setCollisionBetween(1, 7);
-        map.setCollisionBetween(9, 10);
-        map.setCollisionBetween(12, 13);
-        map.setCollisionBetween(17, 18);
+        const city = me.createTilemap('main_tilemap_map', Consts.cityStartY);
+        const castle = me.createTilemap('castle_tilemap_map', Consts.castleStartY);
 
         me.anims.create({
             key: 'bot_cit_0_walk',
@@ -151,6 +139,8 @@ export default class Game extends Phaser.Scene {
         me.add.image(-40, -9140, 'guard');
         me.add.image(40, -9140, 'guard').setFlipX(true);
 
+        me.add.image(0, -13837, 'king');
+
         me.player = new Player(
             me,
             Consts.playerSpawn,
@@ -162,7 +152,8 @@ export default class Game extends Phaser.Scene {
 
         me.cameraViews = new CameraViews(me, Consts.enableSecondCamera);
 
-        me.physics.add.collider(me.player.container, layer);
+        me.physics.add.collider(me.player.container, city);
+        me.physics.add.collider(me.player.container, castle);
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
@@ -227,5 +218,38 @@ export default class Game extends Phaser.Scene {
                 me.scene.pause();
             }
         }
+    }
+
+    /**
+     * 
+     * @param {String} name 
+     * @param {Numer} startY 
+     * @returns {Phaser.Tilemaps.TilemapLayer}
+     */
+    createTilemap(name, startY) {
+        const me = this;
+
+        const map = me.make.tilemap({
+            key: name,
+            tileWidth: Consts.unit,
+            tileHeight: Consts.unit
+        });
+
+        const image = map.addTilesetImage('main_tilemap');
+        const layer = map.createLayer(
+            0,
+            image,
+            Consts.levelStartX,
+            startY
+        );
+
+        map.setCollisionBetween(1, 7);
+        map.setCollisionBetween(9, 10);
+        map.setCollisionBetween(12, 13);
+        map.setCollisionBetween(17, 18);
+        map.setCollisionBetween(28, 29);
+        map.setCollisionBetween(36, 37);
+
+        return layer;
     }
 }
