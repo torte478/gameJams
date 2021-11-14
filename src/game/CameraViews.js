@@ -8,6 +8,10 @@ export default class CameraViews {
     /** @type {Phaser.Cameras.Scene2D.Camera} */
     second;
 
+    // TODO : types
+    target;
+    offsetY;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Boolean} secondCamera
@@ -16,7 +20,9 @@ export default class CameraViews {
         const me = this;
 
         me.main = scene.cameras.main;
-        me.main.startFollow(scene.player.container);
+        me.main.scrollX = scene.scale.width / -2;
+        me.offsetY = scene.scale.height / -2
+        me.target = scene.player.container; // TODO : to arg
         me.main.roundPixels = true;
 
         if (secondCamera) {
@@ -25,5 +31,11 @@ export default class CameraViews {
             me.second.setZoom(0.005);
             me.second.startFollow(scene.player.container);
         }
+    }
+
+    update() {
+        const me = this;
+
+        me.main.scrollY = me.target.y + me.offsetY;
     }
 }

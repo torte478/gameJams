@@ -1,5 +1,6 @@
 import Phaser from '../lib/phaser.js';
 
+import Bot from '../game/Bot.js';
 import CameraViews from '../game/CameraViews.js';
 import Clock from '../game/Clock.js';
 import Consts from '../game/Consts.js';
@@ -31,6 +32,9 @@ export default class Game extends Phaser.Scene {
     /** @type {Clock} */
     clock;
 
+    /** @type {Array} */
+    bots;
+
     constructor() {
         super('game');
     }
@@ -61,7 +65,10 @@ export default class Game extends Phaser.Scene {
         me.load.tilemapCSV('main_tilemap_map', 'assets/main_tilemap.csv');
         me.load.image('main_tilemap', 'assets/main_tilemap.png');
 
-        me.cursorKeys = this.input.keyboard.createCursorKeys();
+        me.load.spritesheet('bot_cit_0', 'assets/bot_cit_0.png', {
+            frameWidth: 64,
+            frameHeight: 64
+        });
     }
 
     create() {
@@ -105,6 +112,32 @@ export default class Game extends Phaser.Scene {
         map.setCollisionBetween(12, 13);
         map.setCollisionBetween(17, 18);
 
+        me.anims.create({
+            key: 'bot_cit_0_walk',
+            frames: 'bot_cit_0',
+            frameRate: 4,
+            repeat: -1
+        });
+
+        me.bots = 
+        [
+            new Bot(
+                me, 
+                'bot_cit_0',
+                 
+                [
+                    { x: -288, y: -11840},
+                    { x: 288, y: -11840},
+                    { x: 0, y: -11840},
+                    { x: 0, y: -12256},
+                    { x: -288, y: -12256},
+                    { x: 288, y: -12256},
+                    { x: 0, y: -12256},
+                    { x: 0, y: -11840}
+                ])
+        ]
+        me.bots.forEach((bot) => { bot.image.play('bot_cit_0_walk')});
+
         me.player = new Player(
             me,
             Consts.playerSpawn,
@@ -117,7 +150,6 @@ export default class Game extends Phaser.Scene {
         me.cameraViews = new CameraViews(me, Consts.enableSecondCamera);
 
         me.physics.add.collider(me.player.container, layer);
-
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
@@ -132,10 +164,13 @@ export default class Game extends Phaser.Scene {
 
         me.timeline.update();
         me.player.update();
+        me.cameraViews.update();
         me.keyboard.update();
         me.clock.update(
             me.timeline.current,
             me.convertMainCameraToRectangle());
+
+        me.bots.forEach((bot) => bot.update());
 
         if (me.timeline.current >= Consts.gameOverTime) {
             me.scene.start('game_over');
@@ -143,7 +178,9 @@ export default class Game extends Phaser.Scene {
 
         if (me.debug) {
             me.log.text = 
-                `pos: ${me.player.container.x | 0} ${me.player.container.y | 0}\n` +
+                `${me.player.container.x | 0} ${me.player.container.y | 0}\n` + 
+                `${me.player.container.x / Consts.unit | 0} ${me.player.container.y / Consts.unit | 0}\n` +
+                `${(me.player.container.x / Consts.unit | 0) * Consts.unit} ${(me.player.container.y / Consts.unit | 0) * Consts.unit}\n` +
                 `time: ${(me.timeline.current).toFixed(1)} (${(me.timeline.remain).toFixed(1)})`;
         }
     }

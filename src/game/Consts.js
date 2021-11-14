@@ -20,10 +20,15 @@ export default class Consts {
     static arrowCountY = 4;
 
     static enableSecondCamera = false;
-    static renderClock = false;
+    static renderClock = true;
 
     static gameOverTime = 60;
 
     static levelStartX = -384;
     static cityStartY = -13000;
+
+    static distanceEps = 10;
+    static botSpeed = 200; //64;
+
+    static unit = 32;
 }
