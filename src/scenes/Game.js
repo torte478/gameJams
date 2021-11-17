@@ -46,15 +46,15 @@ export default class Game extends Phaser.Scene {
         if (Consts.renderClock) {
             for (let i = 0; i < Consts.backgroundCount; ++i) 
             for (let j = 0; j < Consts.backgroundCount; ++j) {
-                const name = `background_${i}_${j}`;
-                me.load.image(name, `assets/${name}.png`);
+                const name = `bg_${i}_${j}`;
+                me.load.image(name, `assets/background/${name}.png`);
             }
 
-            for (let i = 0; i < Consts.arrowCountY; ++i)
-            for (let j = 0; j < Consts.arrowCountX; ++j) {
-                const name = `arrows_${i}_${j}`;
-                me.load.image(name, `assets/${name}.png`);
-            }
+            // for (let i = 0; i < Consts.arrowCountY; ++i)
+            // for (let j = 0; j < Consts.arrowCountX; ++j) {
+            //     const name = `arrows_${i}_${j}`;
+            //     me.load.image(name, `assets/${name}.png`);
+            // }
         }
 
         me.load.spritesheet('player', 'assets/player.png', {
@@ -88,15 +88,15 @@ export default class Game extends Phaser.Scene {
                 Consts.backgroundCount, 
                 Consts.backgroundCount,
                 Consts.backgroundSize, 
-                'background',
+                'bg',
                 0);
 
-            me.clock.addTiles(
-                Consts.arrowCountX,
-                Consts.arrowCountY,
-                Consts.backgroundSize,
-                'arrows',
-                1000);
+            // me.clock.addTiles(
+            //     Consts.arrowCountX,
+            //     Consts.arrowCountY,
+            //     Consts.backgroundSize,
+            //     'arrows',
+            //     1000);
         }
 
         me.keyboard = new Keyboard(me.input.keyboard);

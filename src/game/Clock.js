@@ -10,6 +10,12 @@ export default class Clock {
 
     /** @type {Array} */
     segments;
+    
+    /** @type {Phaser.GameObjects.Group} */
+    spritePool;
+
+    /** @type {Array} */
+    sprites;
 
     /**
      * @param {Phaser.Scene} scene
@@ -21,6 +27,8 @@ export default class Clock {
 
         me.scene = scene;
         me.segments = [];
+        me.spritePool = scene.add.group();
+        me.sprites = [];
     }
 
     /**
@@ -41,16 +49,8 @@ export default class Clock {
                 countX > 1 ? size * (countX / 2 - j) : size / 2,
                 countY > 1 ? size * (countY / 2 - i) : size / 2);
 
-            const image = me.scene.add.image(
-                    0, 
-                    0, 
-                    `${format}_${i}_${j}`)
-                .setDisplayOrigin(origin.x, origin.y)
-                .setDepth(depth)
-                .setVisible(false);
-
             me.segments.push(new Segment(
-                image,
+                `${format}_${i}_${j}`,
                 origin,
                 size));
         }
@@ -72,7 +72,34 @@ export default class Clock {
             /** @type {Segment} */
             const segment = value;
 
-            segment.rotate(camera, angle);
+            const visible = segment.rotate(camera, angle);
+            const active = !!segment.view;
+
+            if (visible && !active){
+
+                /** @type {Phaser.GameObjects.Sprite} */
+                const image = me.spritePool.get(0 , 0, segment.imageName);
+                image
+                    .setTexture(segment.imageName)
+                    .setDisplayOrigin(segment.origin.x, segment.origin.y)
+                    .setDepth(-100) //TODO : to consts
+                    .setActive(true)
+                    .setVisible(true);
+                    
+                me.sprites.push(image);
+                segment.view = image;
+            } 
+            else if (!visible && active) {
+                me.spritePool.killAndHide(segment.view);
+                segment.view = null;
+            }
         });
+
+        me.sprites.forEach((item) => {
+
+            /** @type {Phaser.GameObjects.Sprite} */
+            const sprite = item;
+            sprite.angle = angle;
+        })
     }
 }

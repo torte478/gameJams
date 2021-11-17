@@ -3,25 +3,35 @@ import Phaser from "../lib/phaser.js";
 import {Rectangle, Geometry } from "./Geometry.js";
 
 export default class Segment {
-    /** @type {Phaser.GameObjects.Image} */
-    image;
+    /** @type {String} */
+    imageName;
 
     /** @type {Rectangle} */
     rectangle;
 
+    /** @type {Phaser.Geom.Point} */
+    origin;
+
+    /** @type {Phaser.GameObjects.Sprite} */
+    view;
+
     /**
-     * @param {Phaser.GameObjects.Image} image 
+     * @param {String} image 
      * @param {Phaser.Geom.Point} center 
      * @param {Number} size
      */
     constructor(image, center, size) {
         const me = this;
 
-        me.image = image;
+        me.imageName = image;
+        me.origin = center;
+
         me.rectangle = Rectangle.build(
             new Phaser.Geom.Point(-center.x, -center.y),
             new Phaser.Geom.Point(-center.x + size, -center.y + size)
         );
+
+        me.view = null;
     }
 
     /**
@@ -31,7 +41,6 @@ export default class Segment {
     rotate(camera, angle) {
         const me = this;
 
-        me.image.angle = angle;
         const rotation = Phaser.Math.DegToRad(angle);
 
         const coords = new Rectangle(
@@ -41,7 +50,8 @@ export default class Segment {
             me.rotatePoint(me.rectangle.d, rotation));
 
         const visible = Geometry.isRectanglesIntersects(coords, camera);
-        me.image.setVisible(visible);
+
+        return visible;
     }
 
     /**

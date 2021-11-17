@@ -6,23 +6,23 @@ export default class Consts {
     static donkeyVelocity = 640;
 
     static playerSpawn = new Phaser.Geom.Point(
-        0,
-        -9000); 
-        // -218,
-        // -12056);
+        // 0,
+        // 0); 
+        -218,
+        -12056);
 
     static duration = 60;
     static startTime = 0;
 
     static cameraOffset = 100;
-    static backgroundCount = 4;
-    static backgroundSize = 8000;
+    static backgroundCount = 32;
+    static backgroundSize = 1000;
 
     static arrowCountX = 1;
     static arrowCountY = 4;
 
     static enableSecondCamera = false;
-    static renderClock = false;
+    static renderClock = true;
 
     static gameOverTime = 60;
 
