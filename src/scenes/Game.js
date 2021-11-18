@@ -5,6 +5,7 @@ import Bot from '../game/Bot.js';
 import CameraViews from '../game/CameraViews.js';
 import Clock from '../game/Clock.js';
 import Consts from '../game/Consts.js';
+import Field from '../game/Field.js';
 import {Rectangle} from '../game/Geometry.js';
 import Keyboard from '../game/Keyboard.js';
 import Player from '../game/Player.js';
@@ -35,6 +36,9 @@ export default class Game extends Phaser.Scene {
 
     /** @type {Array} */
     bots;
+
+    /** @type {Field} */
+    field;
 
     constructor() {
         super('game');
@@ -75,6 +79,11 @@ export default class Game extends Phaser.Scene {
 
         me.load.image('guard', 'assets/guard.png');
         me.load.image('king', 'assets/king.png');
+
+        me.load.spritesheet('items', 'assets/items.png', {
+            frameWidth: 64,
+            frameHeight: 64
+        });
     }
 
     create() {
@@ -105,6 +114,8 @@ export default class Game extends Phaser.Scene {
         const secret = me.createTilemap('secret_tilemap_map', Consts.secretStartY);
         const desert = me.createTilemap('desert_tilemap_map', Consts.desertStartY);
 
+        me.field = new Field(me);
+
         me.anims.create({
             key: 'bot_cit_0_walk',
             frames: me.anims.generateFrameNumbers('bot_cit_0', { frames: [ 0, 1, 2, 3 ] }),
@@ -132,7 +143,9 @@ export default class Game extends Phaser.Scene {
                     { x: 0, y: -4618},
                     { x: 0, y: -5034},
                     { x: -288, y: -5034},
+                    { action: Actions.DANCE },
                     { x: 288, y: -5034},
+                    { action: Actions.DANCE },
                     { x: 0, y: -5034},
                     { x: 0, y: -4618}
                 ])
