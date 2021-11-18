@@ -10,7 +10,6 @@ import {Rectangle} from '../game/Geometry.js';
 import Keyboard from '../game/Keyboard.js';
 import Player from '../game/Player.js';
 import Timeline from '../game/Timeline.js';
-import phaser from '../lib/phaser.js';
 
 export default class Game extends Phaser.Scene {
 
@@ -202,7 +201,6 @@ export default class Game extends Phaser.Scene {
             Consts.unit * 4,
             Consts.unit * 2);
         me.physics.world.enable(me.invisibleWalls.guard, Phaser.Physics.Arcade.STATIC_BODY);
-        me.invisibleWalls.guard.body.sta
 
         me.add.image(0, -1152, 'king');
 
@@ -255,6 +253,21 @@ export default class Game extends Phaser.Scene {
             'guard',
             () => me.invisibleWalls.guard.active === false);
 
+        // TODO: duplicate call
+        const cameraTrigger = me.add.zone(0, Consts.cityStartY - 32, 128, 64);
+        me.physics.world.enable(cameraTrigger);
+        me.physics.add.overlap(me.player.container, cameraTrigger,  function() {
+                const camera = me.cameraViews.main;
+                const bounds = camera.getBounds();
+                camera.setBounds(
+                    bounds.x, 
+                    Consts.secretStartY, 
+                    bounds.width,
+                    bounds.height + (console.secretStartY - bounds.y));
+            },
+            null,
+            me)
+
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
                 fontSize: 14
@@ -268,7 +281,6 @@ export default class Game extends Phaser.Scene {
 
         me.timeline.update();
         me.player.update();
-        me.cameraViews.update();
         me.keyboard.update();
         me.clock.update(
             me.timeline.current,

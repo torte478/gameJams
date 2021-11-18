@@ -1,5 +1,8 @@
 import Phaser from '../lib/phaser.js';
 
+import Consts from './Consts.js';
+import Game from '../scenes/Game.js';
+
 export default class CameraViews {
 
     /** @type {Phaser.Cameras.Scene2D.Camera} */
@@ -13,7 +16,7 @@ export default class CameraViews {
     offsetY;
 
     /**
-     * @param {Phaser.Scene} scene 
+     * @param {Game} scene 
      * @param {Boolean} secondCamera
      */
     constructor(scene, secondCamera) {
@@ -22,8 +25,13 @@ export default class CameraViews {
         me.main = scene.cameras.main;
         me.main.scrollX = scene.scale.width / -2;
         me.offsetY = scene.scale.height / -2
-        me.target = scene.player.container; // TODO : to arg
-        me.main.roundPixels = true;
+        me.main.startFollow(scene.player.container, true, 1, 0.25);
+
+        me.main.setBounds(
+            scene.scale.width / -2, 
+            Consts.cityStartY,
+            scene.scale.width,
+            4864);
 
         if (secondCamera) {
             const size = 200;
@@ -31,11 +39,5 @@ export default class CameraViews {
             me.second.setZoom(0.005);
             me.second.startFollow(scene.player.container);
         }
-    }
-
-    update() {
-        const me = this;
-
-        me.main.scrollY = me.target.y + me.offsetY;
     }
 }
