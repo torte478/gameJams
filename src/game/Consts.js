@@ -9,7 +9,7 @@ export default class Consts {
         // 0,
         // 0); 
         -218,
-        -12056);
+        -4810);
 
     static duration = 60;
     static startTime = 0;
@@ -22,15 +22,14 @@ export default class Consts {
     static arrowCountY = 4;
 
     static enableSecondCamera = false;
-    static renderClock = true;
+    static renderClock = false;
 
     static gameOverTime = 60;
 
     static levelStartX = -384;
-    static cityStartY = -13000;
-    static castleStartY = -14024;
-    static secretStartY = -14984;
-    static desertStartY = -9000;
+    static secretStartY = -14688;
+    static desertStartY = -13728;
+    static cityStartY = -5760;
 
     static distanceEps = 10;
     static botSpeed = 200; //64;

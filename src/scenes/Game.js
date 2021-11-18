@@ -64,7 +64,6 @@ export default class Game extends Phaser.Scene {
         me.load.image('player_hands', 'assets/player_hands.png');
 
         me.load.tilemapCSV('main_tilemap_map', 'assets/main_tilemap.csv');
-        me.load.tilemapCSV('castle_tilemap_map', 'assets/castle_tilemap.csv');
         me.load.tilemapCSV('secret_tilemap_map', 'assets/secret_tilemap.csv');
         me.load.tilemapCSV('desert_tilemap_map', 'assets/desert_tilemap.csv');
         me.load.image('main_tilemap', 'assets/main_tilemap.png');
@@ -103,7 +102,6 @@ export default class Game extends Phaser.Scene {
         me.keyboard.emitter.on('keyDown', me.onKeyDown, me);
 
         const city = me.createTilemap('main_tilemap_map', Consts.cityStartY);
-        const castle = me.createTilemap('castle_tilemap_map', Consts.castleStartY);
         const secret = me.createTilemap('secret_tilemap_map', Consts.secretStartY);
         const desert = me.createTilemap('desert_tilemap_map', Consts.desertStartY);
 
@@ -127,23 +125,23 @@ export default class Game extends Phaser.Scene {
                 me, 
                 'bot_cit_0',   
                 [
-                    { x: -288, y: -11840},
+                    { x: -288, y: -4618},
                     { action: Actions.DANCE },
-                    { x: 288, y: -11840},
+                    { x: 288, y: -4618},
                     { action: Actions.DANCE },
-                    { x: 0, y: -11840},
-                    { x: 0, y: -12256},
-                    { x: -288, y: -12256},
-                    { x: 288, y: -12256},
-                    { x: 0, y: -12256},
-                    { x: 0, y: -11840}
+                    { x: 0, y: -4618},
+                    { x: 0, y: -5034},
+                    { x: -288, y: -5034},
+                    { x: 288, y: -5034},
+                    { x: 0, y: -5034},
+                    { x: 0, y: -4618}
                 ])
         ]
 
-        me.add.image(-40, -9140, 'guard');
-        me.add.image(40, -9140, 'guard').setFlipX(true);
+        me.add.image(-40, -5674, 'guard');
+        me.add.image(40, -5674, 'guard').setFlipX(true);
 
-        me.add.image(0, -13837, 'king');
+        me.add.image(0, -1152, 'king');
 
         me.player = new Player(
             me,
@@ -157,7 +155,6 @@ export default class Game extends Phaser.Scene {
         me.cameraViews = new CameraViews(me, Consts.enableSecondCamera);
 
         me.physics.add.collider(me.player.container, city);
-        me.physics.add.collider(me.player.container, castle);
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
