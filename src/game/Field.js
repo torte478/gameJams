@@ -1,4 +1,5 @@
 import Phaser from '../lib/phaser.js';
+import Consts from './Consts.js';
 
 export default class Field {
 
@@ -69,7 +70,26 @@ export default class Field {
         }
 
         for (let i = Field.grownCount; i < positions.length; ++i) {
-            scene.add.sprite(positions[i].x, positions[i].y, 'items', Phaser.Math.Between(0, 1));
+            scene.add.sprite(positions[i].x, positions[i].y, 'items', 0);
         }
+    }
+
+    checkCarrot(x, y) {
+        const me = this;
+
+        const nearests = me.carrots.filter(
+            (carrot) => carrot.active && Phaser.Math.Distance.Between(carrot.x, carrot.y, x, y) < Consts.unit);
+
+        if (nearests.length === 0) {
+            return null;
+        }
+
+        /** @type {Phaser.GameObjects.Sprite} */
+        const carrot = nearests[0];
+        const result = { x: carrot.x, y: carrot.y };
+
+        carrot.destroy();
+
+        return result;
     }
 }

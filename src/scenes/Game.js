@@ -40,6 +40,9 @@ export default class Game extends Phaser.Scene {
     /** @type {Field} */
     field;
 
+    /** @type {Phaser.GameObjects.Group} */
+    floorItems;
+
     constructor() {
         super('game');
     }
@@ -65,7 +68,11 @@ export default class Game extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 64
         });
-        me.load.image('player_hands', 'assets/player_hands.png');
+
+        me.load.spritesheet('player_hands', 'assets/player_hands.png', {
+            frameWidth: 64,
+            frameHeight: 64
+        });
 
         me.load.tilemapCSV('main_tilemap_map', 'assets/main_tilemap.csv');
         me.load.tilemapCSV('secret_tilemap_map', 'assets/secret_tilemap.csv');
@@ -111,6 +118,7 @@ export default class Game extends Phaser.Scene {
         me.keyboard.emitter.on('keyDown', me.onKeyDown, me);
 
         const city = me.createTilemap('main_tilemap_map', Consts.cityStartY);
+        city.setDepth(-100);
         const secret = me.createTilemap('secret_tilemap_map', Consts.secretStartY);
         const desert = me.createTilemap('desert_tilemap_map', Consts.desertStartY);
 
@@ -160,7 +168,7 @@ export default class Game extends Phaser.Scene {
             me,
             Consts.playerSpawn,
             me.add.sprite(0, 0, 'player'),
-            me.add.sprite(0, 0, 'player_hands'),
+            me.add.sprite(0, 0, 'player_hands', 0),
             me.keyboard);
 
         me.timeline = new Timeline(Consts.duration, Consts.startTime);
@@ -168,6 +176,8 @@ export default class Game extends Phaser.Scene {
         me.cameraViews = new CameraViews(me, Consts.enableSecondCamera);
 
         me.physics.add.collider(me.player.container, city);
+
+        me.floorItems = me.add.group();
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
@@ -222,6 +232,40 @@ export default class Game extends Phaser.Scene {
      */
     onKeyDown(key) {
         const me = this;
+
+        // TODO : refactor
+        if (key === 'e') {
+            // TODO : switch
+            if (me.player.handsFrame === Consts.PlayerHandState.EMPTY) {
+                const items = me.floorItems.getChildren().filter(
+                    (item) => Phaser.Math.Distance.Between(item.x, item.y, me.player.container.x, me.player.container.y) < Consts.unit);
+
+                if (items.length > 0) {
+                    /** @type {Phaser.GameObjects.Sprite} */
+                    const item = items[0];
+
+                    if (item.frame.name === 3) { // TODO : magic number
+                        me.player.take(Consts.PlayerHandState.CARROT);
+                    }
+                    
+                    me.floorItems.killAndHide(item);
+                }
+                else {
+                    const carrot = me.field.checkCarrot(me.player.container.x, me.player.container.y);
+                    if (!!carrot) {
+                        me.player.startKeepCarrot(carrot.x, carrot.y);
+                    }
+                }
+            } else if (me.player.handsFrame === Consts.PlayerHandState.CARROT) {
+                /** @type {Phaser.GameObjects.Sprite} */
+                const carrot = me.floorItems.get(me.player.container.x, me.player.container.y, 'items', 3) // TODO : magic number
+                carrot
+                    .setActive(true)
+                    .setVisible(true)
+                    .setDepth(-10);
+                me.player.take(Consts.PlayerHandState.EMPTY);
+            }
+        }
 
         if (me.debug) {
             if (key === '1') {

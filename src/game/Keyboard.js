@@ -20,6 +20,7 @@ export default class Keyboard {
             Phaser.Input.Keyboard.KeyCodes.RIGHT,
             Phaser.Input.Keyboard.KeyCodes.UP,
             Phaser.Input.Keyboard.KeyCodes.DOWN,
+            Phaser.Input.Keyboard.KeyCodes.E,
 
             Phaser.Input.Keyboard.KeyCodes.ONE,
             Phaser.Input.Keyboard.KeyCodes.TWO

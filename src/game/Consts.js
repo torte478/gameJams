@@ -36,4 +36,9 @@ export default class Consts {
 
     static unit = 32;
     static danceLength = 3;
+
+    static PlayerHandState = {
+        EMPTY: 0,
+        CARROT: 1
+    }
 }

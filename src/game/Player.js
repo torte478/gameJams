@@ -5,10 +5,10 @@ import Keyboard from './Keyboard.js';
 
 export default class Player {
 
-    /** @type {Phaser.GameObjects.Image} */
+    /** @type {Phaser.GameObjects.Sprite} */
     body;
 
-    /** @type {Phaser.GameObjects.Image} */
+    /** @type {Phaser.GameObjects.Sprite} */
     hands;
 
     /** @type {Phaser.GameObjects.Container} */
@@ -19,6 +19,12 @@ export default class Player {
 
     /** @type {Keyboard} */
     keyboard;
+
+    /** @type {Boolean} */
+    busy = false;
+
+    /** @type {Number} */
+    handsFrame = Consts.PlayerHandState.EMPTY;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -39,17 +45,30 @@ export default class Player {
         scene.physics.world.enable(me.container);
 
         scene.anims.create({
-            key: 'player',
-            frames: 'player',
+            key: 'player_walk',
+            frames: scene.anims.generateFrameNumbers('player', { frames: [0, 1, 2, 3, 2, 1 ] }),
             frameRate: 5,
             repeat: -1
         });
 
-        me.body.play('player');
+        scene.anims.create({
+            key: 'player_carrot',
+            frames: scene.anims.generateFrameNumbers('player', { frames: [4, 5 ] }),
+            frameRate: 5,
+            repeat: 4,
+        });
+
+        me.body.on(Phaser.Animations.Events.ANIMATION_COMPLETE, me.onAnimationComplete, me);
+
+        me.body.play('player_walk');
     }
 
     update() {
         const me = this;
+
+        if (me.busy) {
+            return;
+        }
     
         let sign = {
             x: 0,
@@ -71,5 +90,42 @@ export default class Player {
         me.container.body.setVelocity(
             sign.x * velocity, 
             sign.y * velocity);
+    }
+
+    /**
+     * 
+     * @param {Phaser.Animations.Animation} animation 
+     */
+    onAnimationComplete(animation) {
+        const me = this;
+
+        if (animation.key === 'player_carrot') {
+            me.hands.setVisible(true);
+            me.body.play('player_walk');
+            me.take(Consts.PlayerHandState.CARROT);
+            me.busy = false;
+        }
+    }
+
+    /**
+     * 
+     * @param {Number} x 
+     * @param {Number} y 
+     */
+    startKeepCarrot(x, y) {
+        const me = this;
+
+        me.container.setPosition(x, y - 10);
+
+        me.hands.setVisible(false);
+        me.body.play('player_carrot');
+        me.busy = true;
+    }
+
+    take(frame) {
+        const me = this;
+
+        me.handsFrame = frame;
+        me.hands.setFrame(me.handsFrame);
     }
 }
