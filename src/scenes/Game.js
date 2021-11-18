@@ -64,6 +64,7 @@ export default class Game extends Phaser.Scene {
             // }
         }
 
+        //TODO: to helper methods
         me.load.spritesheet('player', 'assets/player.png', {
             frameWidth: 64,
             frameHeight: 64
@@ -86,6 +87,10 @@ export default class Game extends Phaser.Scene {
 
         me.load.image('guard', 'assets/guard.png');
         me.load.image('king', 'assets/king.png');
+        me.load.spritesheet('saler', 'assets/saler.png', {
+            frameWidth: 64,
+            frameHeight: 64
+        });
 
         me.load.spritesheet('items', 'assets/items.png', {
             frameWidth: 64,
@@ -163,6 +168,16 @@ export default class Game extends Phaser.Scene {
         me.add.image(40, -5674, 'guard').setFlipX(true);
 
         me.add.image(0, -1152, 'king');
+
+        //-289 -1909
+        me.anims.create({
+            key: 'saler',
+            frames: 'saler',
+            frameRate: 3,
+            repeat: -1,
+        });
+
+        me.add.sprite(Consts.CarrotSalerPos.x, Consts.CarrotSalerPos.y, 'saler').play('saler');
 
         me.player = new Player(
             me,
@@ -244,8 +259,11 @@ export default class Game extends Phaser.Scene {
                     /** @type {Phaser.GameObjects.Sprite} */
                     const item = items[0];
 
-                    if (item.frame.name === 3) { // TODO : magic number
+                    if (item.frame.name === Consts.ItemsFrame.CARROT) {
                         me.player.take(Consts.PlayerHandState.CARROT);
+                    }
+                    else if (item.frame.name === Consts.ItemsFrame.MONEY) {
+                        me.player.take(Consts.PlayerHandState.MONEY);
                     }
                     
                     me.floorItems.killAndHide(item);
@@ -257,9 +275,40 @@ export default class Game extends Phaser.Scene {
                     }
                 }
             } else if (me.player.handsFrame === Consts.PlayerHandState.CARROT) {
+                const dist = Phaser.Math.Distance.Between(
+                    Consts.CarrotSalerPos.x, 
+                    Consts.CarrotSalerPos.y, 
+                    me.player.container.x, 
+                    me.player.container.y);
+                if (dist < Consts.unit * 2) {
+                    me.player.take(Consts.PlayerHandState.EMPTY);
+                    /** @type {Phaser.GameObjects.Sprite} */
+                    const money = me.floorItems.get(
+                        Consts.CarrotSalerPos.x + 64, 
+                        Consts.CarrotSalerPos.y + 16, 
+                        'items', 
+                        Consts.ItemsFrame.MONEY)
+                    money
+                        .setFrame(Consts.ItemsFrame.MONEY)
+                        .setActive(true)
+                        .setVisible(true)
+                        .setDepth(-10);
+                } 
+                else {
+                    /** @type {Phaser.GameObjects.Sprite} */
+                    const carrot = me.floorItems.get(me.player.container.x, me.player.container.y, 'items')
+                    carrot
+                        .setFrame(Consts.ItemsFrame.CARROT)
+                        .setActive(true)
+                        .setVisible(true)
+                        .setDepth(-10);
+                    me.player.take(Consts.PlayerHandState.EMPTY);
+                }
+            } else if (me.player.handsFrame === Consts.PlayerHandState.MONEY) {
                 /** @type {Phaser.GameObjects.Sprite} */
-                const carrot = me.floorItems.get(me.player.container.x, me.player.container.y, 'items', 3) // TODO : magic number
-                carrot
+                const money = me.floorItems.get(me.player.container.x, me.player.container.y, 'items')
+                money
+                    .setFrame(Consts.ItemsFrame.MONEY)
                     .setActive(true)
                     .setVisible(true)
                     .setDepth(-10);

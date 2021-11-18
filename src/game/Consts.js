@@ -39,6 +39,17 @@ export default class Consts {
 
     static PlayerHandState = {
         EMPTY: 0,
-        CARROT: 1
-    }
+        CARROT: 1,
+        MONEY: 2
+    };
+
+    static ItemsFrame = {
+        CARROT: 3,
+        MONEY: 4
+    };
+
+    static CarrotSalerPos = {
+        x: -289,
+        y: -1909
+    };
 }
