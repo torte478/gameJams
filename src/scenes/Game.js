@@ -10,6 +10,7 @@ import {Rectangle} from '../game/Geometry.js';
 import Keyboard from '../game/Keyboard.js';
 import Player from '../game/Player.js';
 import Timeline from '../game/Timeline.js';
+import phaser from '../lib/phaser.js';
 
 export default class Game extends Phaser.Scene {
 
@@ -42,6 +43,13 @@ export default class Game extends Phaser.Scene {
 
     /** @type {Phaser.GameObjects.Group} */
     floorItems;
+
+    /** @type {Phaser.GameObjects.Group} */
+    tips;
+
+    tipsConfig = {
+        carrotSaleman: false
+    };
 
     constructor() {
         super('game');
@@ -190,9 +198,43 @@ export default class Game extends Phaser.Scene {
 
         me.cameraViews = new CameraViews(me, Consts.enableSecondCamera);
 
+        me.floorItems = me.add.group();
+        me.tips = me.add.group();
+
         me.physics.add.collider(me.player.container, city);
 
-        me.floorItems = me.add.group();
+        const zone = me.add.zone(
+            Consts.CarrotSalerPos.x,
+            Consts.CarrotSalerPos.y,
+            Consts.unit * 2,
+            Consts.unit * 2);
+        me.physics.world.enable(zone);
+
+        me.physics.add.overlap(
+            me.player.container, 
+            zone,
+            function() {
+                if (me.tipsConfig.carrotSaleman) {
+                    return;
+                }
+
+                me.tipsConfig.carrotSaleman = true;
+                const tip = me.showTip(
+                    Consts.CarrotSalerPos.x + Consts.unit,
+                    Consts.CarrotSalerPos.y - Consts.unit,
+                    8); // TODO : magic number
+
+                me.time.delayedCall(
+                    3000, 
+                    function() {
+                        me.tips.killAndHide(tip); 
+                        me.tipsConfig.carrotSaleman = false;
+                    },
+                    null,
+                    me);
+            }, 
+            null, 
+            me);
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
@@ -200,6 +242,25 @@ export default class Game extends Phaser.Scene {
             })
                 .setScrollFactor(0);
         }
+    }
+
+    /**
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {Number} frame 
+     * @returns {Phaser.GameObjects.Sprite}
+     */
+    showTip(x, y, frame) {
+        const me = this;
+
+        const tip = me.tips.get(x, y, 'items');
+        tip
+            .setFrame(frame)
+            .setDepth(10)
+            .setActive(true)
+            .setVisible(true);
+
+            return tip;
     }
 
     update() {
@@ -356,7 +417,7 @@ export default class Game extends Phaser.Scene {
 
         /** @type {Phaser.GameObjects.Sprite} */
         const item = me.floorItems.get(x, y, 'items')
-        
+
         item
             .setFrame(frame)
             .setActive(true)
