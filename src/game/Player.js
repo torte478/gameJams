@@ -128,4 +128,15 @@ export default class Player {
         me.handsFrame = frame;
         me.hands.setFrame(me.handsFrame);
     }
+
+    takeFromFloor(itemFrame) {
+        const me = this;
+
+        if (itemFrame === Consts.ItemsFrame.CARROT) {
+            me.take(Consts.PlayerHandState.CARROT);
+        }
+        else if (itemFrame === Consts.ItemsFrame.MONEY) {
+            me.take(Consts.PlayerHandState.MONEY);
+        }
+    }
 }

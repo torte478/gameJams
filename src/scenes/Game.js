@@ -250,69 +250,10 @@ export default class Game extends Phaser.Scene {
 
         // TODO : refactor
         if (key === 'e') {
-            // TODO : switch
             if (me.player.handsFrame === Consts.PlayerHandState.EMPTY) {
-                const items = me.floorItems.getChildren().filter(
-                    (item) => Phaser.Math.Distance.Between(item.x, item.y, me.player.container.x, me.player.container.y) < Consts.unit);
-
-                if (items.length > 0) {
-                    /** @type {Phaser.GameObjects.Sprite} */
-                    const item = items[0];
-
-                    if (item.frame.name === Consts.ItemsFrame.CARROT) {
-                        me.player.take(Consts.PlayerHandState.CARROT);
-                    }
-                    else if (item.frame.name === Consts.ItemsFrame.MONEY) {
-                        me.player.take(Consts.PlayerHandState.MONEY);
-                    }
-                    
-                    me.floorItems.killAndHide(item);
-                }
-                else {
-                    const carrot = me.field.checkCarrot(me.player.container.x, me.player.container.y);
-                    if (!!carrot) {
-                        me.player.startKeepCarrot(carrot.x, carrot.y);
-                    }
-                }
-            } else if (me.player.handsFrame === Consts.PlayerHandState.CARROT) {
-                const dist = Phaser.Math.Distance.Between(
-                    Consts.CarrotSalerPos.x, 
-                    Consts.CarrotSalerPos.y, 
-                    me.player.container.x, 
-                    me.player.container.y);
-                if (dist < Consts.unit * 2) {
-                    me.player.take(Consts.PlayerHandState.EMPTY);
-                    /** @type {Phaser.GameObjects.Sprite} */
-                    const money = me.floorItems.get(
-                        Consts.CarrotSalerPos.x + 64, 
-                        Consts.CarrotSalerPos.y + 16, 
-                        'items', 
-                        Consts.ItemsFrame.MONEY)
-                    money
-                        .setFrame(Consts.ItemsFrame.MONEY)
-                        .setActive(true)
-                        .setVisible(true)
-                        .setDepth(-10);
-                } 
-                else {
-                    /** @type {Phaser.GameObjects.Sprite} */
-                    const carrot = me.floorItems.get(me.player.container.x, me.player.container.y, 'items')
-                    carrot
-                        .setFrame(Consts.ItemsFrame.CARROT)
-                        .setActive(true)
-                        .setVisible(true)
-                        .setDepth(-10);
-                    me.player.take(Consts.PlayerHandState.EMPTY);
-                }
-            } else if (me.player.handsFrame === Consts.PlayerHandState.MONEY) {
-                /** @type {Phaser.GameObjects.Sprite} */
-                const money = me.floorItems.get(me.player.container.x, me.player.container.y, 'items')
-                money
-                    .setFrame(Consts.ItemsFrame.MONEY)
-                    .setActive(true)
-                    .setVisible(true)
-                    .setDepth(-10);
-                me.player.take(Consts.PlayerHandState.EMPTY);
+                me.checkPlayerTake();   
+            } else {
+                me.checkPlayerHandsAction();
             }
         }
 
@@ -358,5 +299,68 @@ export default class Game extends Phaser.Scene {
         map.setCollisionBetween(36, 37);
 
         return layer;
+    }
+
+    checkPlayerTake() {
+        const me = this;
+
+        const items = me.floorItems.getChildren().filter(
+            (item) => Phaser.Math.Distance.Between(item.x, item.y, me.player.container.x, me.player.container.y) < Consts.unit);
+
+        if (items.length > 0) {
+            const item = items[0];
+            me.player.takeFromFloor(item.frame.name)
+            me.floorItems.killAndHide(item);
+        }
+        else {
+            const carrot = me.field.checkCarrot(me.player.container.x, me.player.container.y);
+            if (!!carrot) {
+                me.player.startKeepCarrot(carrot.x, carrot.y);
+            }
+        }
+    }
+
+    checkPlayerHandsAction() {
+        const me = this;
+
+        // sale carrot
+        if (me.player.handsFrame === Consts.PlayerHandState.CARROT) {
+            const dist = Phaser.Math.Distance.Between(
+                Consts.CarrotSalerPos.x, 
+                Consts.CarrotSalerPos.y, 
+                me.player.container.x, 
+                me.player.container.y);
+
+            if (dist < Consts.unit * 2) {
+                me.player.take(Consts.PlayerHandState.EMPTY);
+                me.putItemToGround(
+                    Consts.CarrotSalerPos.x + 64, 
+                    Consts.CarrotSalerPos.y + 16, 
+                    Consts.ItemsFrame.MONEY);
+
+                return;
+            } 
+        }
+
+        // TODO : to switch
+        const itemFrame = me.player.handsFrame === Consts.PlayerHandState.CARROT
+            ? Consts.ItemsFrame.CARROT
+            : Consts.ItemsFrame.MONEY;
+        
+        me.putItemToGround(me.player.container.x, me.player.container.y, itemFrame);
+        me.player.take(Consts.PlayerHandState.EMPTY);
+    }
+    
+    putItemToGround(x, y, frame) {
+        const me = this;
+
+        /** @type {Phaser.GameObjects.Sprite} */
+        const item = me.floorItems.get(x, y, 'items')
+        
+        item
+            .setFrame(frame)
+            .setActive(true)
+            .setVisible(true)
+            .setDepth(-10);
     }
 }
