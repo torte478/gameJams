@@ -48,8 +48,17 @@ export default class Game extends Phaser.Scene {
     tips;
 
     tipsConfig = {
-        carrotSaleman: false
+        'carrotSaleman': false,
+        'guard': false
     };
+
+    /** @type {Array} */
+    guards;
+
+    invisibleWalls = {
+        /** @type {Phaser.GameObjects.Zone} */
+        guard: null
+    }
 
     constructor() {
         super('game');
@@ -93,7 +102,10 @@ export default class Game extends Phaser.Scene {
             frameHeight: 64
         });
 
-        me.load.image('guard', 'assets/guard.png');
+        me.load.spritesheet('guard', 'assets/guard.png', {
+            frameWidth: 128,
+            frameHeight: 64
+        });
         me.load.image('king', 'assets/king.png');
         me.load.spritesheet('saler', 'assets/saler.png', {
             frameWidth: 64,
@@ -172,12 +184,28 @@ export default class Game extends Phaser.Scene {
                 ])
         ]
 
-        me.add.image(-40, -5674, 'guard');
-        me.add.image(40, -5674, 'guard').setFlipX(true);
+        me.anims.create({
+            key: 'guard_open',
+            frames: 'guard',
+            frameRate: 8,
+            repeat: 0
+        })
+
+        me.guards = [
+            me.add.sprite(Consts.guardPos.x, Consts.guardPos.y, 'guard', 0),
+            me.add.sprite(-Consts.guardPos.x, Consts.guardPos.y, 'guard', 0).setFlipX(true)
+        ];
+
+        me.invisibleWalls.guard = me.add.zone(
+            0,
+            -5728,
+            Consts.unit * 4,
+            Consts.unit * 2);
+        me.physics.world.enable(me.invisibleWalls.guard, Phaser.Physics.Arcade.STATIC_BODY);
+        me.invisibleWalls.guard.body.sta
 
         me.add.image(0, -1152, 'king');
 
-        //-289 -1909
         me.anims.create({
             key: 'saler',
             frames: 'saler',
@@ -185,7 +213,7 @@ export default class Game extends Phaser.Scene {
             repeat: -1,
         });
 
-        me.add.sprite(Consts.CarrotSalerPos.x, Consts.CarrotSalerPos.y, 'saler').play('saler');
+        me.add.sprite(Consts.carrotSalerPos.x, Consts.carrotSalerPos.y, 'saler').play('saler');
 
         me.player = new Player(
             me,
@@ -202,39 +230,30 @@ export default class Game extends Phaser.Scene {
         me.tips = me.add.group();
 
         me.physics.add.collider(me.player.container, city);
+        me.physics.add.collider(me.player.container, me.invisibleWalls.guard);
 
-        const zone = me.add.zone(
-            Consts.CarrotSalerPos.x,
-            Consts.CarrotSalerPos.y,
-            Consts.unit * 2,
-            Consts.unit * 2);
-        me.physics.world.enable(zone);
+        me.createTip(
+            me.add.zone(
+                Consts.carrotSalerPos.x,
+                Consts.carrotSalerPos.y,
+                Consts.unit * 2,
+                Consts.unit * 2),
+            Consts.carrotSalerPos.x + Consts.unit,
+            Consts.carrotSalerPos.y - Consts.unit,
+            8, // TODO
+            'carrotSaleman');
 
-        me.physics.add.overlap(
-            me.player.container, 
-            zone,
-            function() {
-                if (me.tipsConfig.carrotSaleman) {
-                    return;
-                }
-
-                me.tipsConfig.carrotSaleman = true;
-                const tip = me.showTip(
-                    Consts.CarrotSalerPos.x + Consts.unit,
-                    Consts.CarrotSalerPos.y - Consts.unit,
-                    8); // TODO : magic number
-
-                me.time.delayedCall(
-                    3000, 
-                    function() {
-                        me.tips.killAndHide(tip); 
-                        me.tipsConfig.carrotSaleman = false;
-                    },
-                    null,
-                    me);
-            }, 
-            null, 
-            me);
+        me.createTip(
+            me.add.zone(
+                Consts.guardPos.x + 40,
+                Consts.guardPos.y,
+                Consts.unit * 7,
+                Consts.unit * 2),
+            Consts.guardPos.x + 16,
+            Consts.guardPos.y - 55,
+            9, // TODO
+            'guard',
+            () => me.invisibleWalls.guard.active === false);
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
@@ -242,25 +261,6 @@ export default class Game extends Phaser.Scene {
             })
                 .setScrollFactor(0);
         }
-    }
-
-    /**
-     * @param {Number} x 
-     * @param {Number} y 
-     * @param {Number} frame 
-     * @returns {Phaser.GameObjects.Sprite}
-     */
-    showTip(x, y, frame) {
-        const me = this;
-
-        const tip = me.tips.get(x, y, 'items');
-        tip
-            .setFrame(frame)
-            .setDepth(10)
-            .setActive(true)
-            .setVisible(true);
-
-            return tip;
     }
 
     update() {
@@ -311,7 +311,7 @@ export default class Game extends Phaser.Scene {
 
         // TODO : refactor
         if (key === 'e') {
-            if (me.player.handsFrame === Consts.PlayerHandState.EMPTY) {
+            if (me.player.handsFrame === Consts.playerHandState.EMPTY) {
                 me.checkPlayerTake();   
             } else {
                 me.checkPlayerHandsAction();
@@ -385,31 +385,52 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         // sale carrot
-        if (me.player.handsFrame === Consts.PlayerHandState.CARROT) {
+        if (me.player.handsFrame === Consts.playerHandState.CARROT) {
             const dist = Phaser.Math.Distance.Between(
-                Consts.CarrotSalerPos.x, 
-                Consts.CarrotSalerPos.y, 
+                Consts.carrotSalerPos.x, 
+                Consts.carrotSalerPos.y, 
                 me.player.container.x, 
                 me.player.container.y);
 
             if (dist < Consts.unit * 2) {
-                me.player.take(Consts.PlayerHandState.EMPTY);
+                me.player.take(Consts.playerHandState.EMPTY);
                 me.putItemToGround(
-                    Consts.CarrotSalerPos.x + 64, 
-                    Consts.CarrotSalerPos.y + 16, 
-                    Consts.ItemsFrame.MONEY);
+                    Consts.carrotSalerPos.x + 64, 
+                    Consts.carrotSalerPos.y + 16, 
+                    Consts.itemsFrame.MONEY);
 
                 return;
             } 
+        } else if (me.player.handsFrame === Consts.playerHandState.MONEY) {
+            const dist = Phaser.Math.Distance.Between(
+                Consts.guardPos.x,
+                Consts.guardPos.y,
+                me.player.container.x,
+                me.player.container.y);
+
+            if (dist < Consts.unit * 2 && me.invisibleWalls.guard.active) {
+                me.player.take(Consts.playerHandState.EMPTY);
+                
+                me.guards.forEach(x => {
+                    /** @type {Phaser.GameObjects.Sprite} */
+                    const guard = x;
+                    guard.play('guard_open');
+                })
+
+                me.invisibleWalls.guard.destroy();
+                me.tipsConfig['guard'] = true;
+
+                return;
+            }
         }
 
         // TODO : to switch
-        const itemFrame = me.player.handsFrame === Consts.PlayerHandState.CARROT
-            ? Consts.ItemsFrame.CARROT
-            : Consts.ItemsFrame.MONEY;
+        const itemFrame = me.player.handsFrame === Consts.playerHandState.CARROT
+            ? Consts.itemsFrame.CARROT
+            : Consts.itemsFrame.MONEY;
         
         me.putItemToGround(me.player.container.x, me.player.container.y, itemFrame);
-        me.player.take(Consts.PlayerHandState.EMPTY);
+        me.player.take(Consts.playerHandState.EMPTY);
     }
     
     putItemToGround(x, y, frame) {
@@ -423,5 +444,55 @@ export default class Game extends Phaser.Scene {
             .setActive(true)
             .setVisible(true)
             .setDepth(-10);
+    }
+
+    createTip(zone, x, y, frame, key, predicate) {
+        const me = this;
+
+        me.physics.world.enable(zone);
+
+        me.physics.add.overlap(
+            me.player.container, 
+            zone,
+            function() {
+                if (me.tipsConfig[key] || (!!predicate && predicate())) {
+                    return;
+                }
+
+                me.tipsConfig[key] = true;
+                const tip = me.showTip(x, y, frame);
+
+                me.time.delayedCall(
+                    3000, 
+                    function() {
+                        me.tips.killAndHide(tip); 
+                        me.tipsConfig[key] = false;
+                    },
+                    null,
+                    me);
+            }, 
+            null, 
+            me);
+
+        return zone;
+    }
+
+    /**
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {Number} frame 
+     * @returns {Phaser.GameObjects.Sprite}
+     */
+    showTip(x, y, frame) {
+        const me = this;
+
+        const tip = me.tips.get(x, y, 'items');
+        tip
+            .setFrame(frame)
+            .setDepth(10)
+            .setActive(true)
+            .setVisible(true);
+
+            return tip;
     }
 }

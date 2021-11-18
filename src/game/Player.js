@@ -24,7 +24,7 @@ export default class Player {
     busy = false;
 
     /** @type {Number} */
-    handsFrame = Consts.PlayerHandState.EMPTY;
+    handsFrame = Consts.playerHandState.MONEY;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -61,6 +61,7 @@ export default class Player {
         me.body.on(Phaser.Animations.Events.ANIMATION_COMPLETE, me.onAnimationComplete, me);
 
         me.body.play('player_walk');
+        me.take(me.handsFrame);
     }
 
     update() {
@@ -102,7 +103,7 @@ export default class Player {
         if (animation.key === 'player_carrot') {
             me.hands.setVisible(true);
             me.body.play('player_walk');
-            me.take(Consts.PlayerHandState.CARROT);
+            me.take(Consts.playerHandState.CARROT);
             me.busy = false;
         }
     }
@@ -132,11 +133,11 @@ export default class Player {
     takeFromFloor(itemFrame) {
         const me = this;
 
-        if (itemFrame === Consts.ItemsFrame.CARROT) {
-            me.take(Consts.PlayerHandState.CARROT);
+        if (itemFrame === Consts.itemsFrame.CARROT) {
+            me.take(Consts.playerHandState.CARROT);
         }
-        else if (itemFrame === Consts.ItemsFrame.MONEY) {
-            me.take(Consts.PlayerHandState.MONEY);
+        else if (itemFrame === Consts.itemsFrame.MONEY) {
+            me.take(Consts.playerHandState.MONEY);
         }
     }
 }
