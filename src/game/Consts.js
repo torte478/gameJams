@@ -7,7 +7,7 @@ export default class Consts {
 
     static playerSpawn = new Phaser.Geom.Point(
         0, 
-        -5400); 
+        -1000); 
         // -218,
         // -4810);
 
@@ -23,7 +23,7 @@ export default class Consts {
     static enableSecondCamera = false;
     static renderClock = false;
     static renderArrows = false;
-    static playTheme = false;
+    static playTheme = true;
 
     static levelStartX = -384;
     static secretStartY = -14688;

@@ -135,6 +135,12 @@ export default class Game extends Phaser.Scene {
         me.load.audio('tick', 'assets/sfx/tick.mp3');
         me.load.audio('earthquake', 'assets/sfx/earthquake.wav');
         me.load.image('castle_door', 'assets/castle_door.png');
+        me.load.image('castle_drawing', 'assets/castle_drawing.png');
+
+        me.load.spritesheet('details', 'assets/details.png', {
+            frameWidth: 256,
+            frameHeight: 128
+        });
     }
 
     create() {
@@ -255,12 +261,26 @@ export default class Game extends Phaser.Scene {
         me.add.sprite(-320, -4860, 'items', 5);
         me.add.sprite(-132, -4860, 'items', 6);
 
+        me.add.sprite(-256, -672, 'castle_drawing');
+
         me.timeline = new Timeline(Consts.duration, Consts.times.start);
 
         me.floorItems = me.add.group();
         me.tips = me.add.group();
 
-        me.putItemToGround(288, -2229, 10);
+        me.putItemToGround(288, -2229, Consts.itemsFrame.DONKEY);
+        me.putItemToGround(288, -2368, Consts.itemsFrame.KEY);
+
+        me.anims.create({
+            key: 'details',
+            frames: me.anims.generateFrameNumbers('details', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ] }),
+            frameRate: 12,
+            repeat: -1,
+        });
+        const details = me.add.sprite(0, -472, 'details');
+        details.play('details');
+
+        me.add.sprite(256, -480, 'items', 7);
 
         me.player = new Player(
             me,
@@ -275,6 +295,8 @@ export default class Game extends Phaser.Scene {
         me.physics.add.collider(me.player.container, desert);
 
         me.physics.add.collider(me.player.container, me.invisibleWalls.guard);
+        me.physics.world.enable(details, Phaser.Physics.Arcade.STATIC_BODY);
+        me.physics.add.collider(me.player.container, details);
 
         me.castleDoor = me.add.sprite(288, -896, 'castle_door');
         me.physics.world.enable(me.castleDoor, Phaser.Physics.Arcade.STATIC_BODY);
