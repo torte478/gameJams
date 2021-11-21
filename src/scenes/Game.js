@@ -63,6 +63,8 @@ export default class Game extends Phaser.Scene {
         guard: null
     }
 
+    playerOnSecretPlace = false;
+
     constructor() {
         super('game');
     }
@@ -126,6 +128,8 @@ export default class Game extends Phaser.Scene {
         me.load.audio('main_theme', 'assets/sfx/main_theme.mp3');
         me.load.audio('sfx', 'assets/sfx/sfx.wav');
         me.load.image('roof_donkey', 'assets/roof_donkey.png');
+        me.load.audio('tick', 'assets/sfx/tick.mp3');
+        me.load.audio('earthquake', 'assets/sfx/earthquake.wav');
     }
 
     create() {
@@ -229,7 +233,7 @@ export default class Game extends Phaser.Scene {
         me.add.sprite(-320, -4860, 'items', 5);
         me.add.sprite(-132, -4860, 'items', 6);
 
-        me.timeline = new Timeline(Consts.duration, Consts.startTime);
+        me.timeline = new Timeline(Consts.duration, Consts.times.start);
 
         me.floorItems = me.add.group();
         me.tips = me.add.group();
@@ -306,8 +310,12 @@ export default class Game extends Phaser.Scene {
             }
         )
 
-        if (Consts.playTheme)
+
+        me.tick = me.sound.add('tick');
+        if (Consts.playTheme) {
             me.sound.play('main_theme', { volume: 0.5 });
+            me.tick.play();
+        }
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
@@ -329,9 +337,47 @@ export default class Game extends Phaser.Scene {
 
         me.bots.forEach((bot) => bot.update());
 
-        if (me.timeline.current >= Consts.gameOverTime) {
+        const up = -3000;
+        const down = -600;
+        const total = -(up - down)
+        const volume = me.player.container.y < up
+            ? 0
+            : me.player.container.y > down
+                ? 1
+                : (total + me.player.container.y - down) / total;
+        me.tick.volume = 0.5 * volume;
+
+        const time = me.timeline.current;
+
+        if (time >= Consts.times.gameEnd) {
             me.sound.stopAll();
             me.scene.start('game_over');
+        }
+
+        if (time >= Consts.times.startFade) {
+            if (!me.cameraViews.fade && !me.playerOnSecretPlace) {
+                me.cameraViews.fade = true;
+                me.cameraViews.main.fade((Consts.times.stopFade - Consts.times.startFade) * 1000);
+            }
+        }
+
+        if (time >= Consts.times.startShaking) {
+            if (!me.cameraViews.shake) {
+                me.cameraViews.main.stopFollow();
+                me.cameraViews.main.removeBounds();
+                me.cameraViews.shake = true;
+                me.cameraViews.beforeShakeX = me.cameraViews.main.scrollX;
+                me.cameraViews.beforeShakeY = me.cameraViews.main.scrollY;
+                me.sound.play('earthquake');
+
+                if (Phaser.Math.Distance.Between(me.player.container.x, me.player.container.y, 0, -14590) < 32) {
+                    me.player.busy = true;
+                    me.playerOnSecretPlace = true;
+                }
+            }
+
+            me.cameraViews.main.scrollX = me.cameraViews.beforeShakeX + Phaser.Math.Between(-5, 5);
+            me.cameraViews.main.scrollY = me.cameraViews.beforeShakeY + Phaser.Math.Between(-5, 5);
         }
 
         if (me.debug) {

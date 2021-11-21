@@ -12,7 +12,6 @@ export default class Consts {
         // -4810);
 
     static duration = 60;
-    static startTime = 0;
 
     static cameraOffset = 100;
     static backgroundCount = 32;
@@ -21,12 +20,10 @@ export default class Consts {
     static arrowCountX = 1;
     static arrowCountY = 4;
   
-    static enableSecondCamera = true;
+    static enableSecondCamera = false;
     static renderClock = false;
-    static renderArrows = false;
-    static playTheme = false;
-
-    static gameOverTime = 63;
+    static renderArrows = true;
+    static playTheme = true;
 
     static levelStartX = -384;
     static secretStartY = -14688;
@@ -60,5 +57,13 @@ export default class Consts {
     static guardPos = {
         x: -40, 
         y: -5674
+    }
+
+    static times = {
+        start: 50,
+        startShaking: 54,
+        startFade: 57,
+        stopFade: 60,
+        gameEnd: 63
     }
 }

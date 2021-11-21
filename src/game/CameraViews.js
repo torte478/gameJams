@@ -15,6 +15,9 @@ export default class CameraViews {
     target;
     offsetY;
 
+    shake = false;
+    fade = false;
+
     /**
      * @param {Game} scene 
      * @param {Boolean} secondCamera
