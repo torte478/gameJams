@@ -29,6 +29,9 @@ export default class Player {
     /** @type {time} */
     desertStartTime = null;
 
+    /** @type {Phaser.Scene} */
+    scene;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Geom.Point} point
@@ -42,6 +45,7 @@ export default class Player {
         me.body = body;
         me.hands = hands;
         me.keyboard = keyboard;
+        me.scene = scene;
 
         me.container = scene.add.container(pos.x, pos.y, [ body, hands]);
         me.container.setSize(body.width, body.height);
@@ -136,6 +140,7 @@ export default class Player {
             me.body.play('player_walk');
             me.take(Consts.playerHandState.CARROT);
             me.busy = false;
+            me.scene.sound.play('sfx');
         }
     }
 

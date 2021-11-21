@@ -118,6 +118,8 @@ export default class Game extends Phaser.Scene {
 
         me.load.image('roof', 'assets/roof.png');
         me.load.image('desert_drawing', 'assets/desert_drawing.png');
+        me.load.audio('main_theme', 'assets/sfx/main_theme.mp3');
+        me.load.audio('sfx', 'assets/sfx/sfx.wav');
     }
 
     create() {
@@ -282,6 +284,9 @@ export default class Game extends Phaser.Scene {
         me.add.sprite(288, -5690, 'roof');
         me.add.sprite(-288, -5690, 'roof');
 
+        if (Consts.playTheme)
+            me.sound.play('main_theme', { volume: 0.5 });
+
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
                 fontSize: 14
@@ -303,6 +308,7 @@ export default class Game extends Phaser.Scene {
         me.bots.forEach((bot) => bot.update());
 
         if (me.timeline.current >= Consts.gameOverTime) {
+            me.sound.stopAll();
             me.scene.start('game_over');
         }
 
@@ -350,6 +356,7 @@ export default class Game extends Phaser.Scene {
             }
 
             if (key === '2') {
+                me.sound.stopAll();
                 me.scene.pause();
             }
         }
@@ -397,6 +404,7 @@ export default class Game extends Phaser.Scene {
 
         if (items.length > 0) {
             const item = items[0];
+            me.sound.play('sfx');
             me.player.takeFromFloor(item.frame.name)
             me.floorItems.killAndHide(item);
         }
@@ -425,6 +433,7 @@ export default class Game extends Phaser.Scene {
                     Consts.carrotSalerPos.x + 64, 
                     Consts.carrotSalerPos.y + 16, 
                     Consts.itemsFrame.MONEY);
+                me.sound.play('sfx');
 
                 return;
             } 
@@ -437,7 +446,8 @@ export default class Game extends Phaser.Scene {
 
             if (dist < Consts.unit * 2 && me.invisibleWalls.guard.active) {
                 me.player.take(Consts.playerHandState.EMPTY);
-                
+                me.sound.play('sfx');
+
                 me.guards.forEach(x => {
                     /** @type {Phaser.GameObjects.Sprite} */
                     const guard = x;
@@ -458,6 +468,7 @@ export default class Game extends Phaser.Scene {
         
         me.putItemToGround(me.player.container.x, me.player.container.y, itemFrame);
         me.player.take(Consts.playerHandState.EMPTY);
+        me.sound.play('sfx');
     }
     
     putItemToGround(x, y, frame) {
