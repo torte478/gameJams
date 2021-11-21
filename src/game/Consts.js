@@ -6,10 +6,10 @@ export default class Consts {
     static donkeyVelocity = 640;
 
     static playerSpawn = new Phaser.Geom.Point(
-        0, 
-        -1000); 
-        // -218,
-        // -4810);
+        // 0, 
+        // -1000); 
+        -218,
+        -4810);
 
     static duration = 60;
 
@@ -22,8 +22,8 @@ export default class Consts {
   
     static enableSecondCamera = false;
     static renderClock = false;
-    static renderArrows = false;
-    static playTheme = false;
+    static renderArrows = true;
+    static playTheme = true;
 
     static levelStartX = -384;
     static secretStartY = -14688;
@@ -79,6 +79,7 @@ export default class Consts {
         startShaking: 54,
         startFade: 57,
         stopFade: 60,
-        gameEnd: 63
+        gameEnd: 63,
+        win: 3
     }
 }

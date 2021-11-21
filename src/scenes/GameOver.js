@@ -19,6 +19,10 @@ export default class GameOver extends Phaser.Scene {
             frameWidth: 512,
             frameHeight: 384
         });
+        me.load.spritesheet('final', 'assets/final.png', {
+            frameWidth: 512,
+            frameHeight: 384
+        });
     }
 
     create() {
@@ -30,7 +34,10 @@ export default class GameOver extends Phaser.Scene {
 
         
         if (me.state === 'secret') {
-            me.createComics();
+            me.createComics('comics', '');
+        }
+        else if (me.state === 'win') {
+            me.createComics('final', 'You win!')
         }
         else {
             me.add.text(me.scale.width * 0.5, me.scale.height * 0.5, 'Game Over', { fontSize: 52 })
@@ -38,33 +45,37 @@ export default class GameOver extends Phaser.Scene {
         }
     }
     
-    createComics() {
+    createComics(name, text) {
         const me = this;
 
         const duration = 3000;
 
         me.add.tween({
-            targets:  me.add.sprite(256, 192, 'comics', 0).setAlpha(0),
+            targets:  me.add.sprite(256, 192, name, 0).setAlpha(0),
             props: {
                 alpha: { value: 1, duration: duration }
             },
             onComplete: () => { 
                 me.add.tween({
-                    targets:  me.add.sprite(512 + 256, 192, 'comics', 1).setAlpha(0),
+                    targets:  me.add.sprite(512 + 256, 192, name, 1).setAlpha(0),
                     props: {
                         alpha: { value: 1, duration: duration }
                     },
                     onComplete: () => {
                         me.add.tween({
-                            targets:  me.add.sprite(256, 384 + 192, 'comics', 2).setAlpha(0),
+                            targets:  me.add.sprite(256, 384 + 192, name, 2).setAlpha(0),
                             props: {
                                 alpha: { value: 1, duration: duration }
                             },
                             onComplete: () => {
                                 me.add.tween({
-                                    targets:  me.add.sprite(512 + 256, 384 + 192, 'comics', 3).setAlpha(0),
+                                    targets:  me.add.sprite(512 + 256, 384 + 192, name, 3).setAlpha(0),
                                     props: {
                                         alpha: { value: 1, duration: duration }
+                                    },
+                                    onComplete: () => {
+                                        me.add.text(me.scale.width * 0.5, me.scale.height * 0.5, text, { fontSize: 52 })
+                                            .setOrigin(0.5);
                                     }
                                 });        
                             }

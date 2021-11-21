@@ -21,7 +21,7 @@ export default class Player {
     busy = false;
 
     /** @type {Number} */
-    handsFrame = Consts.playerHandState.KEY;
+    handsFrame = Consts.playerHandState.EMPTY;
 
     /** @type {time} */
     desertStartTime = null;
@@ -33,6 +33,8 @@ export default class Player {
 
     /** @type {Phaser.GameObjects.Group} */
     lightnings;
+
+    electricityStart;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -105,10 +107,10 @@ export default class Player {
         }
 
         if (me.keyboard.isPressed(Phaser.Input.Keyboard.KeyCodes.J)) {
-            if (!me.electricity) {
+            if (!me.electricity && me.handsFrame === Consts.playerHandState.EMPTY) {
                 me.body.play('player_electricity');
                 me.electricity = true;
-                me.scene.sound.play('lightning');
+                me.scene.sound.play('lightning', { loop: true });
                 me.hands.setVisible(false);
                 me.container.body.setVelocity(0);
 
@@ -123,10 +125,28 @@ export default class Player {
                         .setAngle(startAngle + 360 / count * i)
                         .play('lightning');
                 }
+
+                if (me.container.body.y > -700) {
+                    me.scene.cameraViews.main.stopFollow();
+                    me.scene.cameraViews.beforeShakeX = me.scene.cameraViews.main.scrollX;
+                    me.scene.cameraViews.beforeShakeY = me.scene.cameraViews.main.scrollY;
+                    me.electricityStart = new Date().getTime();
+                }
             }
 
             if (me.electricity) {
                 me.lightnings.getChildren().forEach(x => ++x.angle);
+
+                if (!!me.electricityStart) {
+                    me.scene.cameraViews.main.scrollX = me.scene.cameraViews.beforeShakeX + Phaser.Math.Between(-15, 15);
+                    me.scene.cameraViews.main.scrollY = me.scene.cameraViews.beforeShakeY + Phaser.Math.Between(-15, 15);
+                    const time = (new Date().getTime() - me.electricityStart) / 1000;
+                    if (time >= Consts.times.win) {
+                        me.scene.sound.stopAll();
+                        me.scene.scene.start('game_over', 'win');
+                    }
+                }
+                
                 return;
             }
         } 
@@ -136,6 +156,8 @@ export default class Player {
             me.body.play('player_walk');
             me.scene.sound.stopByKey('lightning');
             me.lightnings.getChildren().forEach((x) => me.lightnings.killAndHide(x));
+            me.electricityStart = null;
+            me.scene.cameraViews.main.startFollow(me.container, true, 1, 0.25);
         }
 
         const inDesert = me.handsFrame !== Consts.playerHandState.DONKEY
