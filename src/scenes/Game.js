@@ -141,6 +141,13 @@ export default class Game extends Phaser.Scene {
             frameWidth: 256,
             frameHeight: 128
         });
+
+        me.load.spritesheet('lightning', 'assets/lightning.png', {
+            frameWidth: 128,
+            frameHeight: 64
+        });
+
+        me.load.audio('lightning', 'assets/sfx/lightning.mp3');
     }
 
     create() {

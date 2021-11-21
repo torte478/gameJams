@@ -23,7 +23,7 @@ export default class Consts {
     static enableSecondCamera = false;
     static renderClock = false;
     static renderArrows = false;
-    static playTheme = true;
+    static playTheme = false;
 
     static levelStartX = -384;
     static secretStartY = -14688;

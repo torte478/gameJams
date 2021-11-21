@@ -29,6 +29,11 @@ export default class Player {
     /** @type {Phaser.Scene} */
     scene;
 
+    electricity;
+
+    /** @type {Phaser.GameObjects.Group} */
+    lightnings;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Geom.Point} point
@@ -43,6 +48,7 @@ export default class Player {
         me.hands = hands;
         me.keyboard = keyboard;
         me.scene = scene;
+        me.electricity = false;
 
         me.container = scene.add.container(pos.x, pos.y, [ body, hands]);
         me.container.setSize(body.width, body.height);
@@ -69,14 +75,68 @@ export default class Player {
             repeat: -1,
         });
 
+        scene.anims.create({
+            key: 'player_electricity',
+            frames: scene.anims.generateFrameNumbers('player', { frames: [8, 9 ] }),
+            frameRate: 16,
+            repeat: -1,
+        });
+
+        scene.anims.create({
+            key: 'lightning',
+            frames: 'lightning',
+            frameRate: 16,
+            repeat: -1,
+        });
+
         me.body.on(Phaser.Animations.Events.ANIMATION_COMPLETE, me.onAnimationComplete, me);
 
         me.body.play('player_walk');
         me.take(me.handsFrame);
+
+        me.lightnings = scene.add.group();
     }
 
     update() {
         const me = this;
+
+        if (me.busy) {
+            return;
+        }
+
+        if (me.keyboard.isPressed(Phaser.Input.Keyboard.KeyCodes.J)) {
+            if (!me.electricity) {
+                me.body.play('player_electricity');
+                me.electricity = true;
+                me.scene.sound.play('lightning');
+                me.hands.setVisible(false);
+                me.container.body.setVelocity(0);
+
+                const startAngle = Phaser.Math.Between(0, 359); 
+                const count = Phaser.Math.Between(2, 9)
+                for (let i = 0; i < count; ++i) {
+                    me.lightnings.get(me.container.body.x + 32, me.container.body.y + 32, 'lightning')
+                        .setVisible(true)
+                        .setActive(true)
+                        .setDepth(-10)
+                        .setOrigin(0.1, 0.5)
+                        .setAngle(startAngle + 360 / count * i)
+                        .play('lightning');
+                }
+            }
+
+            if (me.electricity) {
+                me.lightnings.getChildren().forEach(x => ++x.angle);
+                return;
+            }
+        } 
+        else if (me.electricity) {
+            me.hands.setVisible(true);
+            me.electricity = false;
+            me.body.play('player_walk');
+            me.scene.sound.stopByKey('lightning');
+            me.lightnings.getChildren().forEach((x) => me.lightnings.killAndHide(x));
+        }
 
         const inDesert = me.handsFrame !== Consts.playerHandState.DONKEY
             &&  me.container.y > -13728 
@@ -94,10 +154,6 @@ export default class Player {
             }
         }
 
-        if (me.busy) {
-            return;
-        }
-    
         let sign = {
             x: 0,
             y: 0
