@@ -10,7 +10,7 @@ export default class GameOver extends Phaser.Scene {
 
     init(data) {
         const me = this;
-        me.state = data;
+        me.state = 'win'; // data;
     }
 
     preload() {
@@ -28,7 +28,7 @@ export default class GameOver extends Phaser.Scene {
     create() {
         const me = this;
 
-        me.input.keyboard.once('keydown-SPACE', () => {
+        me.input.keyboard.once('keydown-E', () => {
             me.scene.start('game');
         })
 
@@ -42,13 +42,15 @@ export default class GameOver extends Phaser.Scene {
         else {
             me.add.text(me.scale.width * 0.5, me.scale.height * 0.5, 'Game Over', { fontSize: 52 })
                 .setOrigin(0.5);
+            me.add.text(me.scale.width * 0.5, me.scale.height * 0.5, 'Press E to restart', { fontSize: 32 })
+                .setOrigin(0.5);
         }
     }
     
     createComics(name, text) {
         const me = this;
 
-        const duration = 3000;
+        const duration = 2000;
 
         me.add.tween({
             targets:  me.add.sprite(256, 192, name, 0).setAlpha(0),
@@ -75,6 +77,8 @@ export default class GameOver extends Phaser.Scene {
                                     },
                                     onComplete: () => {
                                         me.add.text(me.scale.width * 0.5, me.scale.height * 0.5, text, { fontSize: 52 })
+                                            .setOrigin(0.5);
+                                        me.add.text(me.scale.width * 0.5, me.scale.height * 0.5 + 40, 'Press E to restart', { fontSize: 32 })
                                             .setOrigin(0.5);
                                     }
                                 });        

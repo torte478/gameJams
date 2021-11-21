@@ -148,10 +148,18 @@ export default class Game extends Phaser.Scene {
         });
 
         me.load.audio('lightning', 'assets/sfx/lightning.mp3');
+        me.load.image('wall', 'assets/wall.png');
     }
 
     create() {
         const me = this;
+
+        me.playerOnSecretPlace = false;
+        me.tipsConfig = {
+            'carrotSaleman': false,
+            'guard': false,
+            'icecreamSaleman': false
+        };
 
         me.clock = new Clock(me);
 
@@ -214,7 +222,35 @@ export default class Game extends Phaser.Scene {
                     { action: Actions.DANCE },
                     { x: 0, y: -5034},
                     { x: 0, y: -4618}
-                ])
+                ]),
+
+            new Bot(
+                me, 
+                'bot_cit_0',   
+                [
+                    { x: 0, y: -5455},
+                    { x: 0, y: -4228},
+                    { action: Actions.DANCE },
+                    { x: 256, y: -4228},
+                    { x: 256, y: -2986},
+                    { action: Actions.DANCE },
+                    { x: 256, y: -4228},
+                    { x: 0, y: -4228},
+                ]),
+
+                new Bot(
+                    me, 
+                    'bot_cit_0',   
+                    [
+                        { x: -288, y: -2975},
+                        { action: Actions.DANCE },
+                        { x: -288, y: -2559},
+                        { action: Actions.DANCE },
+                        { x: 288, y: -2559},
+                        { action: Actions.DANCE },
+                        { x: 288, y: -2975},
+                        { action: Actions.DANCE }
+                    ])
         ]
 
         me.anims.create({
@@ -300,6 +336,7 @@ export default class Game extends Phaser.Scene {
 
         me.physics.add.collider(me.player.container, city);
         me.physics.add.collider(me.player.container, desert);
+        me.physics.add.collider(me.player.container, secret);
 
         me.physics.add.collider(me.player.container, me.invisibleWalls.guard);
         me.physics.world.enable(details, Phaser.Physics.Arcade.STATIC_BODY);
@@ -398,6 +435,22 @@ export default class Game extends Phaser.Scene {
             me.sound.play('main_theme', { volume: 0.5 });
             me.tick.play();
         }
+
+        const z1 = me.add.zone(-384-32, -13984, 64, 600);
+        me.physics.world.enable(z1, Phaser.Physics.Arcade.STATIC_BODY);
+        me.physics.add.collider(me.player.container, z1);
+
+        const z2 = me.add.zone(384+32, -13984, 64, 600);
+        me.physics.world.enable(z2, Phaser.Physics.Arcade.STATIC_BODY);
+        me.physics.add.collider(me.player.container, z2);
+
+        const z3 = me.add.zone(0, -14600 - 64, 128, 64);
+        me.physics.world.enable(z3, Phaser.Physics.Arcade.STATIC_BODY);
+        me.physics.add.collider(me.player.container, z3);
+
+        const z4 = me.add.zone(0, -375, 1024, 64);
+        me.physics.world.enable(z4, Phaser.Physics.Arcade.STATIC_BODY);
+        me.physics.add.collider(me.player.container, z4);
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
@@ -574,8 +627,11 @@ export default class Game extends Phaser.Scene {
         map.setCollisionBetween(12, 13);
         map.setCollisionBetween(17, 18);
         map.setCollisionBetween(28, 29);
+        map.setCollisionBetween(31, 31);
+        map.setCollisionBetween(39, 39)
         map.setCollisionBetween(36, 37);
         map.setCollisionBetween(61, 61);
+
 
         return layer;
     }
