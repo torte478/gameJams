@@ -217,6 +217,8 @@ export default class Game extends Phaser.Scene {
         me.add.sprite(Consts.carrotSalerPos.x, Consts.carrotSalerPos.y, 'saler').play('saler');
 
         me.add.sprite(0, -8704, 'desert_drawing');
+        me.add.sprite(-320, -4860, 'items', 5);
+        me.add.sprite(-132, -4860, 'items', 6);
 
         me.player = new Player(
             me,
@@ -255,7 +257,7 @@ export default class Game extends Phaser.Scene {
                 Consts.unit * 7,
                 Consts.unit * 2),
             Consts.guardPos.x + 16,
-            Consts.guardPos.y - 55,
+            Consts.guardPos.y - 30,
             9, // TODO
             'guard',
             () => me.invisibleWalls.guard.active === false);
