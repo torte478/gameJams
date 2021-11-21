@@ -117,6 +117,7 @@ export default class Game extends Phaser.Scene {
         });
 
         me.load.image('roof', 'assets/roof.png');
+        me.load.image('desert_drawing', 'assets/desert_drawing.png');
     }
 
     create() {
@@ -214,6 +215,8 @@ export default class Game extends Phaser.Scene {
         });
 
         me.add.sprite(Consts.carrotSalerPos.x, Consts.carrotSalerPos.y, 'saler').play('saler');
+
+        me.add.sprite(0, -8704, 'desert_drawing');
 
         me.player = new Player(
             me,

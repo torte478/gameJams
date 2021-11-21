@@ -6,10 +6,10 @@ export default class Consts {
     static donkeyVelocity = 640;
 
     static playerSpawn = new Phaser.Geom.Point(
-        0,
-        -5500); 
-        // -218,
-        // -4810);
+        // 0,
+        // -5500); 
+        -218,
+        -4810);
 
     static duration = 60;
     static startTime = 0;

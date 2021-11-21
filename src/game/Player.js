@@ -24,7 +24,10 @@ export default class Player {
     busy = false;
 
     /** @type {Number} */
-    handsFrame = Consts.playerHandState.MONEY;
+    handsFrame = Consts.playerHandState.EMPTY;
+
+    /** @type {time} */
+    desertStartTime = null;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -58,6 +61,13 @@ export default class Player {
             repeat: 4,
         });
 
+        scene.anims.create({
+            key: 'player_walk_desert',
+            frames: scene.anims.generateFrameNumbers('player', { frames: [6, 7 ] }),
+            frameRate: 2,
+            repeat: -1,
+        });
+
         me.body.on(Phaser.Animations.Events.ANIMATION_COMPLETE, me.onAnimationComplete, me);
 
         me.body.play('player_walk');
@@ -66,6 +76,19 @@ export default class Player {
 
     update() {
         const me = this;
+
+        const inDesert = me.container.y > -13728 && me.container.y < -5760;
+        if (inDesert) {
+            if (me.desertStartTime === null) {
+                me.desertStartTime = new Date().getTime();
+                me.body.play('player_walk_desert');
+            }
+        } else {
+            if (me.desertStartTime !== null) {
+                me.desertStartTime = null;
+                me.body.play('player_walk');
+            }
+        }
 
         if (me.busy) {
             return;
@@ -86,7 +109,15 @@ export default class Player {
         else if (me.keyboard.isPressed(Phaser.Input.Keyboard.KeyCodes.RIGHT)) 
             sign.x = 1;
 
-        const velocity = me.donkey ? Consts.donkeyVelocity : Consts.playerVelocity;
+        let velocity = Consts.donkeyVelocity;
+        if (!me.donkey) {
+            velocity = Consts.playerVelocity;
+            if (me.desertStartTime !== null) {
+                const time = Math.min(10, (new Date().getTime() - me.desertStartTime) / 1000);
+                const factor = 1 - time * 0.8 / 10;
+                velocity = factor * velocity;
+            }
+        } 
 
         me.container.body.setVelocity(
             sign.x * velocity, 
