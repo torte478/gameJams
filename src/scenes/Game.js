@@ -49,7 +49,8 @@ export default class Game extends Phaser.Scene {
 
     tipsConfig = {
         'carrotSaleman': false,
-        'guard': false
+        'guard': false,
+        'icecreamSaleman': false
     };
 
     /** @type {Array} */
@@ -222,8 +223,9 @@ export default class Game extends Phaser.Scene {
             Consts.unit * 2);
         me.physics.world.enable(me.invisibleWalls.guard, Phaser.Physics.Arcade.STATIC_BODY);
 
-        me.king = me.add.sprite(0, -1152, 'king', 0);
+        me.king = me.add.sprite(Consts.kingPos.x, Consts.kingPos.y, 'king', 0);
         me.king.moving = false;
+        me.king.icecream = false;
 
         me.anims.create({
             key: 'king_walk',
@@ -247,6 +249,7 @@ export default class Game extends Phaser.Scene {
         });
 
         me.add.sprite(Consts.carrotSalerPos.x, Consts.carrotSalerPos.y, 'saler').play('saler');
+        me.add.sprite(Consts.icecreamSalerPos.x, Consts.icecreamSalerPos.y, 'saler').play('saler');
 
         me.add.sprite(0, -8704, 'desert_drawing');
         me.add.sprite(-320, -4860, 'items', 5);
@@ -290,6 +293,17 @@ export default class Game extends Phaser.Scene {
 
         me.createTip(
             me.add.zone(
+                Consts.icecreamSalerPos.x,
+                Consts.icecreamSalerPos.y,
+                Consts.unit * 2,
+                Consts.unit * 2),
+            Consts.icecreamSalerPos.x + Consts.unit,
+            Consts.icecreamSalerPos.y - Consts.unit,
+            9, // TODO
+            'icecreamSaleman');
+
+        me.createTip(
+            me.add.zone(
                 Consts.guardPos.x + 40,
                 Consts.guardPos.y,
                 Consts.unit * 7,
@@ -304,18 +318,34 @@ export default class Game extends Phaser.Scene {
         const cameraTrigger = me.add.zone(128, Consts.cityStartY - 32, 512, 64);
         me.physics.world.enable(cameraTrigger);
         me.physics.add.overlap(me.player.container, cameraTrigger,  function() {
-                cameraTrigger.destroy();
+            cameraTrigger.destroy();
 
-                const camera = me.cameraViews.main;
-                const bounds = camera.getBounds();
-                camera.setBounds(
-                    bounds.x, 
-                    Consts.secretStartY, 
-                    bounds.width,
-                    bounds.height + (console.secretStartY - bounds.y));
+            const camera = me.cameraViews.main;
+            const bounds = camera.getBounds();
+            camera.setBounds(
+                bounds.x, 
+                Consts.secretStartY, 
+                bounds.width,
+                bounds.height - (Consts.secretStartY - bounds.y));
             },
             null,
-            me)
+            me);
+
+        const kingCameraTrigger = me.add.zone(288, -842, 64, 64);
+        me.physics.world.enable(kingCameraTrigger);
+        me.physics.add.overlap(me.player.container, kingCameraTrigger,  function() {
+            kingCameraTrigger.destroy();
+
+            const camera = me.cameraViews.main;
+            const bounds = camera.getBounds();
+            camera.setBounds(
+                bounds.x, 
+                bounds.y, 
+                bounds.width,
+                bounds.height + 450);
+            },
+            null,
+            me);
 
         me.add.sprite(288, -5690, 'roof');
         me.add.sprite(-288, -5690, 'roof');
@@ -403,7 +433,7 @@ export default class Game extends Phaser.Scene {
             me.cameraViews.main.scrollY = me.cameraViews.beforeShakeY + Phaser.Math.Between(-5, 5);
         }
         
-        if (time > Consts.times.king && !me.king.moving) {
+        if (time > Consts.times.king && !me.king.moving && !me.king.icecream) {
             me.king.moving = true;
             me.king.play('king_walk')
 
@@ -565,7 +595,7 @@ export default class Game extends Phaser.Scene {
                 return;
             } 
         } else if (me.player.handsFrame === Consts.playerHandState.MONEY) {
-            const dist = Phaser.Math.Distance.Between(
+            let dist = Phaser.Math.Distance.Between(
                 Consts.guardPos.x,
                 Consts.guardPos.y,
                 me.player.container.x,
@@ -586,6 +616,60 @@ export default class Game extends Phaser.Scene {
 
                 return;
             }
+
+            dist = Phaser.Math.Distance.Between(
+                Consts.icecreamSalerPos.x,
+                Consts.icecreamSalerPos.y,
+                me.player.container.x,
+                me.player.container.y);
+
+            if (dist < Consts.unit * 2) {
+                me.player.take(Consts.playerHandState.EMPTY);
+                me.putItemToGround(
+                    Consts.icecreamSalerPos.x + 64, 
+                    Consts.icecreamSalerPos.y + 32, 
+                    Consts.itemsFrame.ICECREAM);
+                me.sound.play('sfx');
+
+                return;
+            } 
+        }
+        else if (me.player.handsFrame === Consts.playerHandState.ICECREAM) {
+            let dist = Phaser.Math.Distance.Between(
+                Consts.kingPos.x,
+                Consts.kingPos.y,
+                me.player.container.x,
+                me.player.container.y);
+
+            if (dist < Consts.unit * 4 && !me.king.moving) {
+                me.player.take(Consts.playerHandState.EMPTY);
+                me.sound.play('sfx');
+
+                me.king.play('king_icecream');
+                me.king.icecream = true;
+
+                me.putItemToGround(
+                    Consts.kingPos.x + 64,
+                    Consts.kingPos.y,
+                    Consts.itemsFrame.KEY);
+
+                return;
+            }
+        }
+        else if (me.player.handsFrame === Consts.playerHandState.KEY) {
+            let dist = Phaser.Math.Distance.Between(
+                me.castleDoor.x,
+                me.castleDoor.y,
+                me.player.container.x,
+                me.player.container.y);
+
+            if (dist < Consts.unit * 4 && !me.king.moving) {
+                me.sound.play('sfx');
+                me.castleDoor.destroy();
+                me.player.take(Consts.playerHandState.EMPTY);
+
+                return;
+            }
         }
 
         let itemFrame;
@@ -600,6 +684,14 @@ export default class Game extends Phaser.Scene {
                 
             case Consts.playerHandState.DONKEY:
                 itemFrame = Consts.itemsFrame.DONKEY;
+                break;
+
+            case Consts.playerHandState.ICECREAM:
+                itemFrame = Consts.itemsFrame.ICECREAM;
+                break;
+
+            case Consts.playerHandState.KEY:
+                itemFrame = Consts.itemsFrame.KEY;
                 break;
         }
         

@@ -6,8 +6,8 @@ export default class Consts {
     static donkeyVelocity = 640;
 
     static playerSpawn = new Phaser.Geom.Point(
-        95, 
-        -1082); 
+        0, 
+        -5400); 
         // -218,
         // -4810);
 
@@ -40,13 +40,17 @@ export default class Consts {
         EMPTY: 0,
         CARROT: 1,
         MONEY: 2,
-        DONKEY: 3
+        DONKEY: 3,
+        ICECREAM: 4,
+        KEY: 5
     };
 
     static itemsFrame = {
         CARROT: 3,
         MONEY: 4,
-        DONKEY: 10
+        DONKEY: 10,
+        ICECREAM: 11,
+        KEY: 12,
     };
 
     static carrotSalerPos = {
@@ -54,13 +58,23 @@ export default class Consts {
         y: -1909
     };
 
+    static icecreamSalerPos = {
+        x: 0,
+        y: -3264
+    }
+
     static guardPos = {
         x: -40, 
         y: -5674
     }
 
+    static kingPos = {
+        x: 0, 
+        y: -1152
+    }
+
     static times = {
-        start: 43,
+        start: 0,
         king: 45,
         startShaking: 54,
         startFade: 57,

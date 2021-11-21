@@ -21,7 +21,7 @@ export default class Player {
     busy = false;
 
     /** @type {Number} */
-    handsFrame = Consts.playerHandState.EMPTY;
+    handsFrame = Consts.playerHandState.KEY;
 
     /** @type {time} */
     desertStartTime = null;
@@ -178,6 +178,12 @@ export default class Player {
                 break;
             case Consts.itemsFrame.DONKEY:
                 me.take(Consts.playerHandState.DONKEY);
+                break;
+            case Consts.itemsFrame.ICECREAM:
+                me.take(Consts.playerHandState.ICECREAM);
+                break;
+            case Consts.itemsFrame.KEY:
+                me.take(Consts.playerHandState.KEY);
                 break;
         }
     }

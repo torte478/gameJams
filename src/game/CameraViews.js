@@ -30,11 +30,11 @@ export default class CameraViews {
         me.offsetY = scene.scale.height / -2
         me.main.startFollow(scene.player.container, true, 1, 0.25);
         
-        // me.main.setBounds(
-        //     scene.scale.width / -2, 
-        //     Consts.cityStartY + 16,
-        //     scene.scale.width,
-        //     4864);
+        me.main.setBounds(
+            scene.scale.width / -2, 
+            Consts.cityStartY + 16,
+            scene.scale.width,
+            4864);
 
         if (secondCamera) {
             const size = 200;
