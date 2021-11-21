@@ -20,12 +20,13 @@ export default class Consts {
 
     static arrowCountX = 1;
     static arrowCountY = 4;
-
-    static enableSecondCamera = false;
+  
+    static enableSecondCamera = true;
     static renderClock = false;
+    static renderArrows = false;
     static playTheme = false;
 
-    static gameOverTime = 60;
+    static gameOverTime = 63;
 
     static levelStartX = -384;
     static secretStartY = -14688;

@@ -36,7 +36,7 @@ export default class CameraViews {
         if (secondCamera) {
             const size = 200;
             me.second = scene.cameras.add(0, scene.scale.height - size, size, size);
-            me.second.setZoom(0.005);
+            me.second.setZoom(0.01);
             me.second.startFollow(scene.player.container);
         }
     }

@@ -15,16 +15,21 @@ export default class Segment {
     /** @type {Phaser.GameObjects.Sprite} */
     view;
 
+    /** @type {Number} */
+    depth;
+
     /**
      * @param {String} image 
      * @param {Phaser.Geom.Point} center 
      * @param {Number} size
+     * @param {Number} depth
      */
-    constructor(image, center, size) {
+    constructor(image, center, size, depth) {
         const me = this;
 
         me.imageName = image;
         me.origin = center;
+        me.depth = depth;
 
         me.rectangle = Rectangle.build(
             new Phaser.Geom.Point(-center.x, -center.y),

@@ -52,7 +52,8 @@ export default class Clock {
             me.segments.push(new Segment(
                 `${format}_${i}_${j}`,
                 origin,
-                size));
+                size,
+                depth));
         }
 
         return me;
@@ -72,8 +73,11 @@ export default class Clock {
             /** @type {Segment} */
             const segment = value;
 
-            const visible = segment.rotate(camera, angle);
+            let visible = segment.rotate(camera, angle);
             const active = !!segment.view;
+
+            if (segment.imageName.startsWith('arrows'))
+                visible = visible && time > 30;
 
             if (visible && !active){
 
@@ -82,7 +86,7 @@ export default class Clock {
                 image
                     .setTexture(segment.imageName)
                     .setDisplayOrigin(segment.origin.x, segment.origin.y)
-                    .setDepth(-1000) //TODO : to consts
+                    .setDepth(segment.depth) //TODO : to consts
                     .setActive(true)
                     .setVisible(true);
                     

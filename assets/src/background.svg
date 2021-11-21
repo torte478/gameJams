@@ -28,15 +28,15 @@
      showgrid="false"
      height="32000mm"
      units="px"
-     inkscape:zoom="0.02"
-     inkscape:cx="9825"
-     inkscape:cy="16725"
+     inkscape:zoom="0.11313708"
+     inkscape:cx="15127.666"
+     inkscape:cy="2081.5456"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="1912"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer8"
      inkscape:snap-grids="true">
     <inkscape:grid
        type="xygrid"
@@ -50,7 +50,8 @@
      inkscape:label="bg"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:none">
+     style="display:none"
+     sodipodi:insensitive="true">
     <rect
        style="fill:#803300;stroke:#000000;stroke-width:0.264413"
        id="rect353"
@@ -66,7 +67,7 @@
      inkscape:groupmode="layer"
      id="layer6"
      inkscape:label="secret"
-     style="display:inline"
+     style="display:none"
      sodipodi:insensitive="true">
     <ellipse
        style="fill:#00ffff;stroke:#000000;stroke-width:4.47105"
@@ -81,7 +82,7 @@
      id="layer5"
      inkscape:label="castle"
      sodipodi:insensitive="true"
-     style="display:inline">
+     style="display:none">
     <ellipse
        style="fill:#ff7f2a;stroke:#000000;stroke-width:0.589371"
        id="path928"
@@ -92,27 +93,10 @@
   </g>
   <g
      inkscape:groupmode="layer"
-     id="layer8"
-     inkscape:label="arrows"
-     style="display:none">
-    <path
-       id="rect2108"
-       style="fill:#ff0000;stroke:#000000;stroke-width:0.196001"
-       d="m 4213.9492,318.47381 23.3502,-0.33697 90.1272,207.82152 V 4235.5265 H 4125.481 l 0.3688,-3707.56478 z"
-       sodipodi:nodetypes="ccccccc" />
-    <circle
-       style="fill:#ff00ff;stroke:#000000;stroke-width:0.131995"
-       id="path3339"
-       cx="4224.7827"
-       cy="329.33908"
-       r="8.4006691" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="town"
      sodipodi:insensitive="true"
-     style="display:inline">
+     style="display:none">
     <circle
        style="fill:#ac9d93;stroke:#000000;stroke-width:0.349378"
        id="path769"
@@ -125,7 +109,7 @@
      id="layer3"
      inkscape:label="desert"
      sodipodi:insensitive="true"
-     style="display:inline">
+     style="display:none">
     <ellipse
        style="fill:#ffcc00;stroke:#000000;stroke-width:0.356672"
        id="path628"
@@ -139,7 +123,7 @@
      id="layer2"
      inkscape:label="center"
      sodipodi:insensitive="true"
-     style="display:inline">
+     style="display:none">
     <circle
        style="fill:#ff2a2a;stroke:#000000;stroke-width:0.132258"
        id="path485"
@@ -152,7 +136,7 @@
      id="layer9"
      inkscape:label="texture"
      sodipodi:insensitive="true"
-     style="display:inline">
+     style="display:none">
     <rect
        style="fill:#000000;stroke:#000000;stroke-width:0.2668"
        id="rect4411"
@@ -269,5 +253,19 @@
        style="fill:#000000;stroke:#000000;stroke-width:0.264583"
        id="path5209"
        d="m 4301.0639,1254.6821 c 26.8112,-57.4406 75.6347,-101.286 124.7069,-139.8001 -25.0878,2.0015 47.6531,-23.2269 35.7234,-17.4541 -7.9824,3.8625 -22.1831,0.6656 -25.0085,9.0711 -2.9451,8.7608 10.0713,15.5807 13.8927,23.9964 16.387,36.0865 14.2155,42.2072 21.0338,83.9741 -0.1263,18.2428 1.5082,36.5831 -0.3791,54.7285 -10.4938,100.892 -66.805,183.6249 -128.1989,260.4954 -13.4741,19.9287 -69.4367,67.0635 -63.7187,94.4255 3.2911,15.7506 16.4388,22.6638 27.6757,31.8584 34.629,24.0152 76.3765,36.8242 107.7131,65.4788 0,0 38.9515,-5.7713 38.9515,-5.7713 v 0 c -31.2073,-29.2159 -73.1321,-42.1524 -108.3234,-65.694 -9.3376,-7.1125 -23.7489,-14.7394 -26.9259,-27.9571 -5.8471,-24.326 50.2482,-74.2873 61.9845,-92.2574 60.7253,-77.5547 117.2401,-162.172 127.9412,-262.9477 1.9487,-18.3518 0.4137,-36.9076 0.6206,-55.3613 -6.7394,-44.879 -3.8499,-46.6614 -20.1008,-85.3746 -3.8358,-9.1377 -4.5889,-22.2518 -13.5628,-26.4565 -35.6861,-16.7202 -61.153,-4.6075 -87.7899,14.2726 -49.3494,39.6257 -98.4906,84.4894 -125.6981,142.6875 0,0 39.4627,-1.9142 39.4627,-1.9142 z" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer8"
+     inkscape:label="arrows"
+     style="display:inline">
+    <path
+       id="rect2108"
+       style="fill:#550000;stroke:#000000;stroke-width:0.196001"
+       d="m 4218.3427,382.7998 38.387,0.34799 93.4811,323.56837 c -1.11,267.63024 -5.8393,2568.43084 0.3426,3476.65124 l -12.3926,56.2148 -80.8861,29.0899 -135.1633,-32.0468 c -2.8684,-941.5537 -1.2402,-1592.7225 -3.2774,-3523.91352 z"
+       sodipodi:nodetypes="ccccccccc"
+       inkscape:export-filename="D:\Work\oneMinuteStory\assets\arrows_0_0.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
   </g>
 </svg>
