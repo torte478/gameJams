@@ -6,10 +6,10 @@ export default class Consts {
     static donkeyVelocity = 640;
 
     static playerSpawn = new Phaser.Geom.Point(
-        // 0,
-        // -5500); 
-        -218,
-        -4810);
+        0, 
+        -2229); 
+        // -218,
+        // -4810);
 
     static duration = 60;
     static startTime = 0;
@@ -23,6 +23,7 @@ export default class Consts {
 
     static enableSecondCamera = false;
     static renderClock = false;
+    static playTheme = false;
 
     static gameOverTime = 60;
 
@@ -40,12 +41,14 @@ export default class Consts {
     static playerHandState = {
         EMPTY: 0,
         CARROT: 1,
-        MONEY: 2
+        MONEY: 2,
+        DONKEY: 3
     };
 
     static itemsFrame = {
         CARROT: 3,
-        MONEY: 4
+        MONEY: 4,
+        DONKEY: 10
     };
 
     static carrotSalerPos = {

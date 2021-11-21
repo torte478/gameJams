@@ -10,6 +10,7 @@ import {Rectangle} from '../game/Geometry.js';
 import Keyboard from '../game/Keyboard.js';
 import Player from '../game/Player.js';
 import Timeline from '../game/Timeline.js';
+import Trigger from '../game/Trigger.js';
 
 export default class Game extends Phaser.Scene {
 
@@ -53,6 +54,9 @@ export default class Game extends Phaser.Scene {
 
     /** @type {Array} */
     guards;
+
+    /** @type {Phaser.GameObjects.Sprite} */
+    donkey;
 
     invisibleWalls = {
         /** @type {Phaser.GameObjects.Zone} */
@@ -120,6 +124,7 @@ export default class Game extends Phaser.Scene {
         me.load.image('desert_drawing', 'assets/desert_drawing.png');
         me.load.audio('main_theme', 'assets/sfx/main_theme.mp3');
         me.load.audio('sfx', 'assets/sfx/sfx.wav');
+        me.load.image('roof_donkey', 'assets/roof_donkey.png');
     }
 
     create() {
@@ -146,10 +151,9 @@ export default class Game extends Phaser.Scene {
         me.keyboard = new Keyboard(me.input.keyboard);
         me.keyboard.emitter.on('keyDown', me.onKeyDown, me);
 
-        const city = me.createTilemap('main_tilemap_map', Consts.cityStartY);
-        city.setDepth(-100);
-        const secret = me.createTilemap('secret_tilemap_map', Consts.secretStartY);
-        const desert = me.createTilemap('desert_tilemap_map', Consts.desertStartY);
+        const city = me.createTilemap('main_tilemap_map', Consts.cityStartY).setDepth(-100);
+        const secret = me.createTilemap('secret_tilemap_map', Consts.secretStartY).setDepth(-100);
+        const desert = me.createTilemap('desert_tilemap_map', Consts.desertStartY).setDepth(-100);
 
         me.field = new Field(me);
 
@@ -207,7 +211,7 @@ export default class Game extends Phaser.Scene {
             Consts.unit * 2);
         me.physics.world.enable(me.invisibleWalls.guard, Phaser.Physics.Arcade.STATIC_BODY);
 
-        me.add.image(0, -1152, 'king');
+        me.add.sprite(0, -1152, 'king');
 
         me.anims.create({
             key: 'saler',
@@ -222,6 +226,13 @@ export default class Game extends Phaser.Scene {
         me.add.sprite(-320, -4860, 'items', 5);
         me.add.sprite(-132, -4860, 'items', 6);
 
+        me.timeline = new Timeline(Consts.duration, Consts.startTime);
+
+        me.floorItems = me.add.group();
+        me.tips = me.add.group();
+
+        me.putItemToGround(288, -2229, 10);
+
         me.player = new Player(
             me,
             Consts.playerSpawn,
@@ -229,12 +240,7 @@ export default class Game extends Phaser.Scene {
             me.add.sprite(0, 0, 'player_hands', 0),
             me.keyboard);
 
-        me.timeline = new Timeline(Consts.duration, Consts.startTime);
-
         me.cameraViews = new CameraViews(me, Consts.enableSecondCamera);
-
-        me.floorItems = me.add.group();
-        me.tips = me.add.group();
 
         me.physics.add.collider(me.player.container, city);
         me.physics.add.collider(me.player.container, desert);
@@ -283,6 +289,19 @@ export default class Game extends Phaser.Scene {
 
         me.add.sprite(288, -5690, 'roof');
         me.add.sprite(-288, -5690, 'roof');
+
+        const roof = me.add.sprite(224, -2320, 'roof_donkey');
+        new Trigger(
+            me,
+            { x: 180, y: -2218, width: 64, height: 64 },
+            { x: 64, y: -2218, width: 64, height: 64 },
+            function() {
+                roof.setVisible(false);
+            },
+            function() {
+                roof.setVisible(true);
+            }
+        )
 
         if (Consts.playTheme)
             me.sound.play('main_theme', { volume: 0.5 });
@@ -352,7 +371,9 @@ export default class Game extends Phaser.Scene {
 
         if (me.debug) {
             if (key === '1') {
-                me.player.donkey = !me.player.donkey;
+                me.player.take(me.player.handsFrame !== Consts.playerHandState.DONKEY
+                    ? Consts.playerHandState.DONKEY
+                    : Consts.playerHandState.EMPTY);
             }
 
             if (key === '2') {
@@ -461,10 +482,20 @@ export default class Game extends Phaser.Scene {
             }
         }
 
-        // TODO : to switch
-        const itemFrame = me.player.handsFrame === Consts.playerHandState.CARROT
-            ? Consts.itemsFrame.CARROT
-            : Consts.itemsFrame.MONEY;
+        let itemFrame;
+        switch (me.player.handsFrame) {
+            case Consts.playerHandState.CARROT:
+                itemFrame = Consts.itemsFrame.CARROT;
+                break;
+            
+            case Consts.playerHandState.MONEY:
+                itemFrame = Consts.itemsFrame.MONEY;
+                break;
+                
+            case Consts.playerHandState.DONKEY:
+                itemFrame = Consts.itemsFrame.DONKEY;
+                break;
+        }
         
         me.putItemToGround(me.player.container.x, me.player.container.y, itemFrame);
         me.player.take(Consts.playerHandState.EMPTY);

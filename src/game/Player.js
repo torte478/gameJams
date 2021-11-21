@@ -14,9 +14,6 @@ export default class Player {
     /** @type {Phaser.GameObjects.Container} */
     container;
 
-    /** @type {Boolean} */
-    donkey = false;
-
     /** @type {Keyboard} */
     keyboard;
 
@@ -81,7 +78,10 @@ export default class Player {
     update() {
         const me = this;
 
-        const inDesert = me.container.y > -13728 && me.container.y < -5760;
+        const inDesert = me.handsFrame !== Consts.playerHandState.DONKEY
+            &&  me.container.y > -13728 
+            && me.container.y < -5760;
+
         if (inDesert) {
             if (me.desertStartTime === null) {
                 me.desertStartTime = new Date().getTime();
@@ -114,7 +114,7 @@ export default class Player {
             sign.x = 1;
 
         let velocity = Consts.donkeyVelocity;
-        if (!me.donkey) {
+        if (me.handsFrame !== Consts.playerHandState.DONKEY) {
             velocity = Consts.playerVelocity;
             if (me.desertStartTime !== null) {
                 const time = Math.min(10, (new Date().getTime() - me.desertStartTime) / 1000);
@@ -169,11 +169,16 @@ export default class Player {
     takeFromFloor(itemFrame) {
         const me = this;
 
-        if (itemFrame === Consts.itemsFrame.CARROT) {
-            me.take(Consts.playerHandState.CARROT);
-        }
-        else if (itemFrame === Consts.itemsFrame.MONEY) {
-            me.take(Consts.playerHandState.MONEY);
+        switch (itemFrame) {
+            case Consts.itemsFrame.CARROT:
+                me.take(Consts.playerHandState.CARROT);
+                break;
+            case Consts.itemsFrame.MONEY:
+                me.take(Consts.playerHandState.MONEY);
+                break;
+            case Consts.itemsFrame.DONKEY:
+                me.take(Consts.playerHandState.DONKEY);
+                break;
         }
     }
 }
