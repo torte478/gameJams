@@ -55,13 +55,13 @@ export default class Game extends Phaser.Scene {
     /** @type {Array} */
     guards;
 
-    /** @type {Phaser.GameObjects.Sprite} */
-    donkey;
-
     invisibleWalls = {
         /** @type {Phaser.GameObjects.Zone} */
         guard: null
     }
+
+    /** @type {Phaser.GameObjects.Sprite} */
+    king;
 
     playerOnSecretPlace = false;
 
@@ -112,7 +112,10 @@ export default class Game extends Phaser.Scene {
             frameWidth: 128,
             frameHeight: 64
         });
-        me.load.image('king', 'assets/king.png');
+        me.load.spritesheet('king', 'assets/king.png', {
+            frameWidth: 64,
+            frameHeight: 64,
+        });
         me.load.spritesheet('saler', 'assets/saler.png', {
             frameWidth: 64,
             frameHeight: 64
@@ -130,6 +133,7 @@ export default class Game extends Phaser.Scene {
         me.load.image('roof_donkey', 'assets/roof_donkey.png');
         me.load.audio('tick', 'assets/sfx/tick.mp3');
         me.load.audio('earthquake', 'assets/sfx/earthquake.wav');
+        me.load.image('castle_door', 'assets/castle_door.png');
     }
 
     create() {
@@ -218,7 +222,22 @@ export default class Game extends Phaser.Scene {
             Consts.unit * 2);
         me.physics.world.enable(me.invisibleWalls.guard, Phaser.Physics.Arcade.STATIC_BODY);
 
-        me.add.sprite(0, -1152, 'king');
+        me.king = me.add.sprite(0, -1152, 'king', 0);
+        me.king.moving = false;
+
+        me.anims.create({
+            key: 'king_walk',
+            frames: me.anims.generateFrameNumbers('king', { frames: [ 0, 1, 2, 1 ] }),
+            frameRate: 4,
+            repeat: -1,
+        });
+
+        me.anims.create({
+            key: 'king_icecream',
+            frames: me.anims.generateFrameNumbers('king', { frames: [ 3, 4 ] }),
+            frameRate: 2,
+            repeat: -1,
+        });
 
         me.anims.create({
             key: 'saler',
@@ -253,6 +272,10 @@ export default class Game extends Phaser.Scene {
         me.physics.add.collider(me.player.container, desert);
 
         me.physics.add.collider(me.player.container, me.invisibleWalls.guard);
+
+        me.castleDoor = me.add.sprite(288, -896, 'castle_door');
+        me.physics.world.enable(me.castleDoor, Phaser.Physics.Arcade.STATIC_BODY);
+        me.physics.add.collider(me.player.container, me.castleDoor);
 
         me.createTip(
             me.add.zone(
@@ -378,6 +401,38 @@ export default class Game extends Phaser.Scene {
 
             me.cameraViews.main.scrollX = me.cameraViews.beforeShakeX + Phaser.Math.Between(-5, 5);
             me.cameraViews.main.scrollY = me.cameraViews.beforeShakeY + Phaser.Math.Between(-5, 5);
+        }
+        
+        if (time > Consts.times.king && !me.king.moving) {
+            me.king.moving = true;
+            me.king.play('king_walk')
+
+            const kingTimeline = me.tweens.createTimeline();
+            kingTimeline
+                .add({
+                    targets: me.king,
+                    x: 288,
+                    duration: 3000,
+                })
+                .add({
+                    targets: me.king,
+                    y: -965,
+                    duration: 2000,
+                    onComplete: () => { me.castleDoor.setVisible(false)}
+                })
+                .add({
+                    targets: me.king,
+                    y: -830,
+                    duration: 1500,
+                    onComplete: () => { me.castleDoor.setVisible(true)}
+                })
+                .add({
+                    targets: me.king,
+                    x: 0,
+                    y: -600,
+                    duration: 4000,
+                })
+                .play();
         }
 
         if (me.debug) {
