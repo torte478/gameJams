@@ -14,8 +14,8 @@ export default class Consts {
     static duration = 60;
 
     static cameraOffset = 100;
-    static backgroundCount = 32;
-    static backgroundSize = 1000;
+    static backgroundCount = 16;
+    static backgroundSize = 2000;
 
     static arrowCountX = 1;
     static arrowCountY = 4;

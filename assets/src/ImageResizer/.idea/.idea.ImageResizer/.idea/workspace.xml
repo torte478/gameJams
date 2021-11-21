@@ -10,6 +10,11 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="IdeDocumentHistory">
+    <changedPaths>
+      <option value="$PROJECT_DIR$/Program.cs" />
+    </changedPaths>
+  </component>
   <component name="ProjectId" id="21EjuIru9MZ8XtwrQZ6j6L24Ju1" />
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
@@ -52,13 +57,14 @@
       <option name="presentableId" value="Default" />
       <updated>1637513380002</updated>
       <workItem from="1637513395738" duration="663000" />
+      <workItem from="1637533265182" duration="800000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="UnityProjectConfiguration" hasMinimizedUI="null" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />

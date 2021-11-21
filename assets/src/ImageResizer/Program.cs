@@ -9,10 +9,10 @@
 
     class Program
     {
-        const int Unit = 32;
+        const int Unit = 16;
         const int OriginSize = 2048;
         const int DestSize = 32000;
-        const int UnitDestSize = 1000;
+        const int UnitDestSize = 2000;
         const int Side = OriginSize / Unit;
 
         static void Main(string[] args)
