@@ -351,7 +351,7 @@ export default class Game extends Phaser.Scene {
 
         if (time >= Consts.times.gameEnd) {
             me.sound.stopAll();
-            me.scene.start('game_over');
+            me.scene.start('game_over', me.playerOnSecretPlace ? 'secret' : '');
         }
 
         if (time >= Consts.times.startFade) {
@@ -481,6 +481,8 @@ export default class Game extends Phaser.Scene {
         else {
             const carrot = me.field.checkCarrot(me.player.container.x, me.player.container.y);
             if (!!carrot) {
+                me.sound.play('sfx');
+                me.player.container.body.setVelocity(0, 0);
                 me.player.startKeepCarrot(carrot.x, carrot.y);
             }
         }
