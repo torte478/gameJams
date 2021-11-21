@@ -115,6 +115,8 @@ export default class Game extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 64
         });
+
+        me.load.image('roof', 'assets/roof.png');
     }
 
     create() {
@@ -228,6 +230,8 @@ export default class Game extends Phaser.Scene {
         me.tips = me.add.group();
 
         me.physics.add.collider(me.player.container, city);
+        me.physics.add.collider(me.player.container, desert);
+
         me.physics.add.collider(me.player.container, me.invisibleWalls.guard);
 
         me.createTip(
@@ -253,10 +257,12 @@ export default class Game extends Phaser.Scene {
             'guard',
             () => me.invisibleWalls.guard.active === false);
 
-        // TODO: duplicate call
-        const cameraTrigger = me.add.zone(0, Consts.cityStartY - 32, 128, 64);
+
+        const cameraTrigger = me.add.zone(128, Consts.cityStartY - 32, 512, 64);
         me.physics.world.enable(cameraTrigger);
         me.physics.add.overlap(me.player.container, cameraTrigger,  function() {
+                cameraTrigger.destroy();
+
                 const camera = me.cameraViews.main;
                 const bounds = camera.getBounds();
                 camera.setBounds(
@@ -267,6 +273,9 @@ export default class Game extends Phaser.Scene {
             },
             null,
             me)
+
+        me.add.sprite(288, -5690, 'roof');
+        me.add.sprite(-288, -5690, 'roof');
 
         if (me.debug) {
             me.log = me.add.text(10, 10, 'Debug', {
@@ -370,6 +379,7 @@ export default class Game extends Phaser.Scene {
         map.setCollisionBetween(17, 18);
         map.setCollisionBetween(28, 29);
         map.setCollisionBetween(36, 37);
+        map.setCollisionBetween(61, 61);
 
         return layer;
     }

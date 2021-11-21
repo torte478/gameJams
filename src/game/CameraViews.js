@@ -29,7 +29,7 @@ export default class CameraViews {
 
         me.main.setBounds(
             scene.scale.width / -2, 
-            Consts.cityStartY,
+            Consts.cityStartY + 16,
             scene.scale.width,
             4864);
 

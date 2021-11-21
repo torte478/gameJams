@@ -82,7 +82,7 @@ export default class Clock {
                 image
                     .setTexture(segment.imageName)
                     .setDisplayOrigin(segment.origin.x, segment.origin.y)
-                    .setDepth(-100) //TODO : to consts
+                    .setDepth(-1000) //TODO : to consts
                     .setActive(true)
                     .setVisible(true);
                     
