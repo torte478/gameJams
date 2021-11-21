@@ -10,7 +10,7 @@ export default class GameOver extends Phaser.Scene {
 
     init(data) {
         const me = this;
-        me.state = 'win'; // data;
+        me.state = data;
     }
 
     preload() {
@@ -42,7 +42,7 @@ export default class GameOver extends Phaser.Scene {
         else {
             me.add.text(me.scale.width * 0.5, me.scale.height * 0.5, 'Game Over', { fontSize: 52 })
                 .setOrigin(0.5);
-            me.add.text(me.scale.width * 0.5, me.scale.height * 0.5, 'Press E to restart', { fontSize: 32 })
+            me.add.text(me.scale.width * 0.5, me.scale.height * 0.5 + 64, 'Press E to restart', { fontSize: 32 })
                 .setOrigin(0.5);
         }
     }

@@ -27,7 +27,7 @@ export default class Start extends Phaser.Scene {
         me.add.text(me.scale.width * 0.5, me.scale.height * 0.5 + 64, 'Press E to start', { fontSize: 32 })
             .setOrigin(0.5);
 
-        me.add.text(me.scale.width * 0.5, me.scale.height * 0.5 + 256, 'Game will load in 30-50 sec... ', { fontSize: 24 })
+        me.add.text(me.scale.width * 0.5, me.scale.height * 0.5 + 256, 'Game will load and start in 30-50 sec... ', { fontSize: 24 })
             .setOrigin(0.5);
     }
 }

@@ -9,7 +9,7 @@ export default new Phaser.Game({
     width: 1024,
     height: 768,
     scene: [ 
-        //Start,
+        Start,
         Game,
         GameOver
         ],

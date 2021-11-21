@@ -15,7 +15,7 @@ import Trigger from '../game/Trigger.js';
 export default class Game extends Phaser.Scene {
 
     /** @type {Boolean} */
-    debug = true;
+    debug = false;
 
     /** @type {Player} */
     player;
@@ -669,7 +669,7 @@ export default class Game extends Phaser.Scene {
                 me.player.container.x, 
                 me.player.container.y);
 
-            if (dist < Consts.unit * 2) {
+            if (dist < Consts.unit * 4) {
                 me.player.take(Consts.playerHandState.EMPTY);
                 me.putItemToGround(
                     Consts.carrotSalerPos.x + 64, 
@@ -686,7 +686,7 @@ export default class Game extends Phaser.Scene {
                 me.player.container.x,
                 me.player.container.y);
 
-            if (dist < Consts.unit * 2 && me.invisibleWalls.guard.active) {
+            if (dist < Consts.unit * 4 && me.invisibleWalls.guard.active) {
                 me.player.take(Consts.playerHandState.EMPTY);
                 me.sound.play('sfx');
 
@@ -708,7 +708,7 @@ export default class Game extends Phaser.Scene {
                 me.player.container.x,
                 me.player.container.y);
 
-            if (dist < Consts.unit * 2) {
+            if (dist < Consts.unit * 4) {
                 me.player.take(Consts.playerHandState.EMPTY);
                 me.putItemToGround(
                     Consts.icecreamSalerPos.x + 64, 
