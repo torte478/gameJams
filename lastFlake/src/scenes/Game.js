@@ -1,8 +1,20 @@
 import Phaser from '../lib/phaser.js';
 
 import Consts from '../game/Consts.js';
+import Player from '../game/Player.js';
 
 export default class Game extends Phaser.Scene {
+
+    keys = {
+        left: null,
+        right: null,
+    }
+
+    /** @type {Player} */
+    player;
+
+    /** @type {Phaser.GameObjects.Text} */
+    log;
 
     constructor() {
         super('game');
@@ -11,8 +23,9 @@ export default class Game extends Phaser.Scene {
     preload() {
         const me = this;
 
-        me.load.image('background', 'assets/background.png');
-        me.load.image('sky', 'assets/sky.png');
+        me.loadImage('background')
+        me.loadImage('sky');
+        me.loadImage('player');
     }
 
     create() {
@@ -21,10 +34,37 @@ export default class Game extends Phaser.Scene {
         me.add.image(Consts.viewSize.width / 2, Consts.viewSize.height / 2, 'sky').setScrollFactor(0);
         me.add.image(Consts.worldSize.width / 2, Consts.worldSize.height / 2, 'background');
 
-        me.cameras.main.setScroll(1500, 800)
+        me.keys.left = me.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        me.keys.right = me.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+
+        me.player = new Player(me, Consts.player.startX, Consts.player.startY);
+
+        me.cameras.main.setBounds(0, 0, Consts.worldSize.width, Consts.worldSize.height);
+        me.cameras.main.startFollow(me.player.sprite);
+
+        if (Consts.debug) {
+            me.log = me.add.text(10, 10, '', { fontSize: 14}).setScrollFactor(0);
+        }
     }
 
     update() {
         const me = this;
+
+        const movement = me.keys.left.isDown || me.keys.right.isDown;
+        const direction = movement
+            ? me.keys.left.isDown ? -1 : 1
+            : 0;
+        
+        me.player.move(direction);
+
+        if (Consts.debug) {
+            me.log.text = `${me.player.sprite.x | 0} ${me.player.sprite.y | 0}`;
+        }
+    }
+
+    loadImage(name) {
+        const me = this;
+
+        return me.load.image(name, `assets/${name}.png`);
     }
 }
