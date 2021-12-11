@@ -44,15 +44,15 @@ export default class Snow {
         if (alive >= me.maxCount)
             return;
 
-        const pos = Phaser.Math.Between(1000 + 50, 2000 - 50);
+        const pos = Phaser.Math.Between(100, 2900);
         
         /** @type {Phaser.Physics.Arcade.Sprite} */
-        const flake = me.flakes.get(pos, 1000, 'snowflake');
+        const flake = me.flakes.get(pos, 700, 'snowflake');
         
         flake
             .setActive(true)
             .setVisible(true)
-            .setVelocityY(300);
+            .setVelocityY(50);
 
         me.emitter.emit('flakeCreated', pos);
 
@@ -83,8 +83,12 @@ export default class Snow {
 
         const flake = flakes && flakes[0];
 
-        if (!!flake) {
+        const eat = !!flake;
+
+        if (eat) {
             me.flakes.killAndHide(flake);
         }
+
+        return eat;
     }
 }

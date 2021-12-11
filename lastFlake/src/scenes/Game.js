@@ -93,7 +93,7 @@ export default class Game extends Phaser.Scene {
         me.toUpdate.push(me.snow);
 
         me.bots = [
-            new Bot(me, 1400, 1500)
+            new Bot(me, 400, Consts.levelType.FLOOR)
         ];
 
         me.bots.forEach((bot) => {
@@ -120,6 +120,8 @@ export default class Game extends Phaser.Scene {
         me.updateInput();
 
         me.toUpdate.forEach((x) => x.update());
+
+        me.bots.forEach((bot) => me.snow.checkEat(bot.sprite.x, bot.sprite.y));
 
         if (Consts.debug) {
             me.log.text = 

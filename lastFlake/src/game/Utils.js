@@ -1,3 +1,5 @@
+import Consts from "../game/Consts.js";
+
 export default class Utils {
 
     /**
@@ -13,5 +15,13 @@ export default class Utils {
         }
 
         return null;
+    }
+
+    static getYbyLevel(level) {
+        return level == Consts.levelType.TOP
+            ? Consts.height.top
+            : level == Consts.levelType.MIDDLE
+                ? Consts.height.middle
+                : Consts.height.floor;
     }
 }
