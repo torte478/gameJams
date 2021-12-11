@@ -1,7 +1,13 @@
 export default class Consts {
 
+    static levelPhase = {
+        START: 1,
+        FIGHT: 2
+    }
+
     static debug = true;
     static showWalls = false;
+    static startPhase = this.levelPhase.FIGHT;
 
     static height = {
         floor: 1500,
@@ -11,8 +17,8 @@ export default class Consts {
     }
 
     static player = {
-        startX: 2100,
-        startY: this.height.roof,
+        startX: 1500,
+        startY: this.height.floor,
         speed: 500
     };
 
@@ -24,13 +30,6 @@ export default class Consts {
         DOWN: 2,
         ROOF: 3
     };
-
-    static levelPhase = {
-        START: 1,
-        FIGHT: 2
-    }
-
-    static startPhase = this.levelPhase.START;
 
     static worldSize = {
         width: 3000,

@@ -65,4 +65,20 @@ export default class Snow {
         //     }
         // });
     }
+
+    checkEat(x, y) {
+        const me = this;
+
+        const flakes = me.flakes
+            .getChildren()
+            .filter((flake) => flake.active 
+                && Consts.triggerDistance > Phaser.Math.Distance.Between(
+                    x, y, flake.x, flake.y))
+
+        const flake = flakes && flakes[0];
+
+        if (!!flake) {
+            me.flakes.killAndHide(flake);
+        }
+    }
 }

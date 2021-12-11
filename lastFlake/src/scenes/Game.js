@@ -32,6 +32,9 @@ export default class Game extends Phaser.Scene {
     /** @type {Number} */
     phase;
 
+    /** @type {Snow} */
+    snow;
+
     constructor() {
         super('game');
     }
@@ -81,8 +84,8 @@ export default class Game extends Phaser.Scene {
 
         me.physics.add.collider(me.player.sprite, walls);
 
-        const snow = new Snow(me, 1);
-        me.toUpdate.push(snow);
+        me.snow = new Snow(me, 1);
+        me.toUpdate.push(me.snow);
 
         // camera
 
@@ -164,8 +167,10 @@ export default class Game extends Phaser.Scene {
         if (me.player.isEat) {
             const stopEat = !me.keys.z.isDown;
 
-            if (stopEat)
+            if (stopEat) {
                 me.player.stopEat();
+                me.snow.checkEat(me.player.sprite.x, me.player.sprite.y);
+            }
 
             return !stopEat;
         } 
