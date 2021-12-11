@@ -4,9 +4,22 @@ export default class Consts {
     static showWalls = false;
 
     static player = {
-        startX: 350,
+        startX: 2400,
         startY: 1500, //1000 //1260 //1500,
         speed: 800
+    };
+
+    static height = {
+        floor: 1500,
+        middle: 1250,
+        top: 1000
+    }
+
+    static triggerDistance = 50;
+
+    static stairType = {
+        UP: 1,
+        DOWN: 2,
     };
 
     static worldSize = {
