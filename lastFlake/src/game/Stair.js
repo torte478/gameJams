@@ -16,6 +16,9 @@ export default class Stair {
     /** @type {Number} */
     type;
 
+    /** @type {Phaser.Events.EventEmitter} */
+    emitter;
+
     /** 
      * @param {Phaser.Scene} scene 
      * @param {Number} x 
@@ -33,6 +36,8 @@ export default class Stair {
 
         me.toY = toY;        
         me.type = type;
+
+        me.emitter = new Phaser.Events.EventEmitter();
     }
 
     /**
@@ -41,11 +46,33 @@ export default class Stair {
     move(other) {
         const me = this;
 
-        me.scene.tweens.add({
-            targets: other,
-            x: me.sprite.x,
-            y: me.toY,
-            duration: me.type == Consts.stairType.UP ? 1000 : 250
-        });
+        if (me.type == Consts.stairType.ROOF) {
+            const timeline = me.scene.tweens.createTimeline();
+            timeline
+                .add({
+                    targets: other,
+                    x: me.sprite.x - 100,
+                    y: me.sprite.y - 50,
+                    duration: 250,
+                    ease: 'Sine.easeOut'
+                })
+                .add({
+                    targets: other,
+                    x: me.sprite.x - 200,
+                    y: me.toY,
+                    duration: 1000,
+                    ease: 'Sine.easeIn',
+                    onComplete: () => { me.emitter.emit('roofJump'); }
+                })
+                .play();
+        }
+        else {
+            me.scene.tweens.add({
+                targets: other,
+                x: me.sprite.x,
+                y: me.toY,
+                duration: me.type == Consts.stairType.UP ? 1000 : 250
+            });
+        }
     }
 }

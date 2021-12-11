@@ -52,4 +52,16 @@ export default class Player {
         me.isEat = false;
         me.sprite.setTexture('kids', 2);
     }
+
+    hide() {
+        const me = this;
+
+        me.sprite.setVisible(false);
+    }
+
+    show() {
+        const me = this;
+
+        me.sprite.setVisible(true);
+    }
 }

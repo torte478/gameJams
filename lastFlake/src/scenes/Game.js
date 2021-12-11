@@ -29,6 +29,9 @@ export default class Game extends Phaser.Scene {
     /** @type {Array} */
     toUpdate;
 
+    /** @type {Number} */
+    phase;
+
     constructor() {
         super('game');
     }
@@ -66,11 +69,15 @@ export default class Game extends Phaser.Scene {
         // core
 
         me.toUpdate = [];
+        me.phase = Consts.startPhase;
 
         me.player = new Player(me, Consts.player.startX, Consts.player.startY);
 
         const walls = me.createWalls();
         me.stairs = me.createStairs();
+        me.stairs.forEach((x) => {
+            x.emitter.on('roofJump', me.onRoofJump, me);
+        });
 
         me.physics.add.collider(me.player.sprite, walls);
 
@@ -102,6 +109,36 @@ export default class Game extends Phaser.Scene {
             `${me.player.sprite.x | 0} ${me.player.sprite.y | 0}\n` +
             `${me.input.mousePointer.worldX | 0} ${me.input.mousePointer.worldY | 0}`;
         }
+    }
+
+    onRoofJump() {
+        const me = this;
+
+        if (me.phase != Consts.levelPhase.START)
+            return;
+
+        me.phase = Consts.levelPhase.FIGHT;
+
+        me.player.hide();
+        me.cameras.main.pan(
+            Consts.worldSize.width / 2,
+            Consts.worldSize.height,
+            2000,
+            'Sine.easeInOut');
+
+        me.time.delayedCall(
+            3000,
+            () => {
+                me.player.show();
+                me.player.sprite.setPosition(Consts.worldSize.width / 2, 750)
+                me.tweens.add({
+                    targets: me.player.sprite,
+                    y: Consts.height.floor,
+                    duration: 750,
+                    ease: 'Sine.easeIn',
+                    onComplete: () => { me.cameras.main.startFollow(me.player.sprite) }
+                });
+            });
     }
 
     updateInput() {
@@ -149,7 +186,9 @@ export default class Game extends Phaser.Scene {
         if (!climb) 
             return false;
             
-        const type = me.keys.up.isDown ? Consts.stairType.UP : Consts.stairType.DOWN;
+        const type = me.keys.up.isDown 
+            ? Consts.stairType.UP 
+            : me.phase == Consts.levelPhase.FIGHT ? Consts.stairType.DOWN : Consts.stairType.ROOF;
 
         /** @type {Stair} */
         const stair = Utils.firstOrDefault(
@@ -165,6 +204,11 @@ export default class Game extends Phaser.Scene {
             return false;
 
         stair.move(me.player.sprite);
+
+        if (type == Consts.stairType.ROOF) {
+            me.cameras.main.stopFollow();
+        }
+
         return true;
     }
 
@@ -183,6 +227,7 @@ export default class Game extends Phaser.Scene {
             [ 2450, Consts.height.top, Consts.height.middle, Consts.stairType.DOWN ],
             [ 2900, Consts.height.top, Consts.height.middle, Consts.stairType.DOWN ],
             [ 2070, Consts.height.middle, Consts.height.floor, Consts.stairType.DOWN ],
+            [ 2050, Consts.height.roof, Consts.height.floor, Consts.stairType.ROOF ]
         ]
         .map((a) => new Stair(me, a[0], a[1], a[2], a[3], a[4]));
     }
@@ -219,6 +264,7 @@ export default class Game extends Phaser.Scene {
             [ 2200, 1000 ],
             [ 230, 1000 ],
             [ 750, 1000 ],
+            [ 2000, 540]
         ]
         .forEach((pos) => {
             /** @type {Phaser.Physics.Arcade.Sprite} */

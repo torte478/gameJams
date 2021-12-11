@@ -3,17 +3,18 @@ export default class Consts {
     static debug = true;
     static showWalls = false;
 
-    static player = {
-        startX: 1500,
-        startY: 1500, //1000 //1260 //1500,
-        speed: 500
-    };
-
     static height = {
         floor: 1500,
         middle: 1250,
-        top: 1000
+        top: 1000,
+        roof: 540
     }
+
+    static player = {
+        startX: 2100,
+        startY: this.height.roof,
+        speed: 500
+    };
 
     static triggerDistance = 50;
     static unit = 50;
@@ -21,7 +22,15 @@ export default class Consts {
     static stairType = {
         UP: 1,
         DOWN: 2,
+        ROOF: 3
     };
+
+    static levelPhase = {
+        START: 1,
+        FIGHT: 2
+    }
+
+    static startPhase = this.levelPhase.START;
 
     static worldSize = {
         width: 3000,
