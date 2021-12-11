@@ -120,7 +120,7 @@ export default class Game extends Phaser.Scene {
         me.toUpdate.push(me.snow);
 
         me.bots = [
-            new Bot(me, 400, Consts.levelType.FLOOR, 'kid_1_walk')
+            new Bot(me, 1400, Consts.levelType.FLOOR, 'kid_1_walk')
         ];
 
         me.bots.forEach((bot) => {
@@ -150,14 +150,40 @@ export default class Game extends Phaser.Scene {
         me.updateInput();
 
         me.toUpdate.forEach((x) => x.update());
+        me.checkElectricity();
 
-        me.bots.forEach((bot) => me.snow.checkEat(bot.sprite.x, bot.sprite.y));
+        me.bots.forEach((bot) => {
+            if (!bot.damaged)
+                me.snow.checkEat(bot.sprite.x, bot.sprite.y)
+        });
 
         if (Consts.debug) {
             me.log.text = 
             `${me.player.container.x | 0} ${me.player.container.y | 0}\n` +
             `${me.input.mousePointer.worldX | 0} ${me.input.mousePointer.worldY | 0}`;
         }
+    }
+
+    checkElectricity() {
+        const me = this;
+
+        me.generators.forEach((g) => {
+            /** @type {Generator} */
+            const generator = g;
+
+            if (!generator.running) {
+                return;
+            }
+
+            me.bots.forEach((bot) => {
+                generator.garlands.forEach((garland) => {
+                    if (Math.abs(bot.sprite.x - garland.x) < 250
+                        && Math.abs(bot.sprite.y - garland.y) < 100) {
+                            bot.tryElectricityDamage();
+                        }
+                });
+            });
+        })
     }
 
     onGeneratorFinished(x, y) {

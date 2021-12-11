@@ -23,6 +23,7 @@ export default class Consts {
     };
 
     static botSpeed = 300; // 500;
+    static snowSpeed = 200; //50;
 
     static eatZones = [
         [ 

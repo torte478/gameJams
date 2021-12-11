@@ -19,6 +19,8 @@ export default class Bot {
 
     animName;
 
+    damaged;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
@@ -38,10 +40,14 @@ export default class Bot {
         me.path = [];
         me.pathIndex = 0;
         me.actualTarget = null;
+        me.damaged = false;
     }
 
     update() {
         const me = this;
+
+        if (me.damaged)
+            return;
 
         if (me.pathIndex >= me.path.length) {
             if (!!me.actualTarget) {
@@ -62,15 +68,7 @@ export default class Bot {
             ++me.pathIndex;
 
             if (me.pathIndex < me.path.length) {
-                const target = me.path[me.pathIndex];
-                me.scene.physics.moveTo(
-                    me.sprite, 
-                    target.x,
-                    target.y, 
-                    Consts.botSpeed);
-                
-                    me.sprite.play(me.animName);
-                    me.sprite.setFlip(target.x < me.sprite.x)
+                me.startMovement();
             }
             else
             {
@@ -82,6 +80,21 @@ export default class Bot {
                 me.findNewPath();
             }
         }
+    }
+
+    startMovement() {
+        const me = this;
+
+        const target = me.path[me.pathIndex];
+
+        me.scene.physics.moveTo(
+            me.sprite, 
+            target.x,
+            target.y, 
+            Consts.botSpeed);
+        
+        me.sprite.play(me.animName);
+        me.sprite.setFlip(target.x < me.sprite.x)
     }
 
     findNewPath() {
@@ -236,5 +249,28 @@ export default class Bot {
         }
 
         return { zone: Consts.eatZones[2][0], level: Consts.levelType.FLOOR };
+    }
+
+    tryElectricityDamage() {
+        const me = this;
+
+        if (me.damaged)
+            return;
+
+        me.damaged = true;
+        me.sprite.stop();
+        me.sprite.setFrame(7 + 5); //TODO
+        me.sprite.body.reset(me.sprite.x, me.sprite.y);
+
+        me.scene.time.delayedCall(
+            5000,
+            () => {
+                me.damaged = false;
+                if (me.pathIndex >= me.path.length)
+                    me.sprite.setFrame(7 + 2); // TODO
+                else
+                    me.startMovement();
+            }
+        )
     }
 }
