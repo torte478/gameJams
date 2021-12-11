@@ -17,20 +17,23 @@ export default class Bot {
 
     actualTarget;
 
+    animName;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
      * @param {Number} x 
      * @param {Number} level 
      */
-    constructor(scene, x, level) {
+    constructor(scene, x, level, animName) {
         const me = this;
 
         me.scene = scene;
 
         const y = Utils.getYbyLevel(level);
 
-        me.sprite = scene.physics.add.sprite(x, y, 'square');
+        me.animName = animName;
+        me.sprite = scene.physics.add.sprite(x, y, animName);
 
         me.path = [];
         me.pathIndex = 0;
@@ -59,11 +62,20 @@ export default class Bot {
             ++me.pathIndex;
 
             if (me.pathIndex < me.path.length) {
+                const target = me.path[me.pathIndex];
                 me.scene.physics.moveTo(
                     me.sprite, 
-                    me.path[me.pathIndex].x,
-                    me.path[me.pathIndex].y, 
+                    target.x,
+                    target.y, 
                     Consts.botSpeed);
+                
+                    me.sprite.play(me.animName);
+                    me.sprite.setFlip(target.x < me.sprite.x)
+            }
+            else
+            {
+                me.sprite.stop();
+                me.sprite.setFrame(7 + 2); // TODO
             }
 
             if (!!me.actualTarget) {
@@ -105,7 +117,7 @@ export default class Bot {
             min = 0;
         const INF = 10000;
 
-        let beginIndex = me.findBeginIndex(); // TODO
+        let beginIndex = me.findBeginIndex();
 
         for (let i = 0; i < Consts.graphPoints.length; ++i) {
             d.push(INF);
@@ -217,7 +229,7 @@ export default class Bot {
         for (let i = 0; i < Consts.eatZones.length; ++i) {
             for (let j = 0; j < Consts.eatZones[i].length; ++j) {
                 const zone = Consts.eatZones[i][j];
-                if (pos > zone.from && pos < zone.to) { // && Phaser.Math.Between(0, 1) == 1) {
+                if (pos > zone.from && pos < zone.to && Phaser.Math.Between(0, 1) == 1) {
                     return { zone: zone, level: i};
                 }
             }

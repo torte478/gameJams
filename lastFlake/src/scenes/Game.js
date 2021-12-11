@@ -93,7 +93,7 @@ export default class Game extends Phaser.Scene {
         me.toUpdate.push(me.snow);
 
         me.bots = [
-            new Bot(me, 400, Consts.levelType.FLOOR)
+            new Bot(me, 400, Consts.levelType.FLOOR, 'kid_1_walk')
         ];
 
         me.bots.forEach((bot) => {
@@ -319,5 +319,12 @@ export default class Game extends Phaser.Scene {
             frameRate: 10,
             repeat: -1
         });
+
+        me.anims.create({
+            key: 'kid_1_walk',
+            frames: me.anims.generateFrameNumbers('kids', { frames: [ 7 + 0, 7 + 1 ]}),
+            frameRate: 10,
+            repeat: -1
+        })
     }
 }

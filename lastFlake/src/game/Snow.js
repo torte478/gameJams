@@ -45,6 +45,9 @@ export default class Snow {
             return;
 
         const pos = Phaser.Math.Between(100, 2900);
+
+        if (Consts.debug)
+            console.log(pos);
         
         /** @type {Phaser.Physics.Arcade.Sprite} */
         const flake = me.flakes.get(pos, 700, 'snowflake');
