@@ -2,6 +2,7 @@ import Phaser from '../lib/phaser.js';
 
 import Bot from '../game/Bot.js';
 import Consts from '../game/Consts.js';
+import Generator from '../game/Generator.js';
 import Player from '../game/Player.js';
 import Snow from '../game/Snow.js';
 import Stair from '../game/Stair.js';
@@ -45,6 +46,9 @@ export default class Game extends Phaser.Scene {
     /** @type {Boolean} */
     isMultipleXPress;
 
+    /** @type {Array} */
+    generators;
+
     constructor() {
         super('game');
     }
@@ -60,6 +64,7 @@ export default class Game extends Phaser.Scene {
         me.loadSpriteSheet('kids', 100);
         me.loadImage('square');
         me.loadSpriteSheet('key', 100);
+        me.loadSpriteSheet('generator', 200);
     }
 
     create() {
@@ -86,6 +91,14 @@ export default class Game extends Phaser.Scene {
 
         me.toUpdate = [];
         me.phase = Consts.startPhase;
+
+        me.generators = [
+            new Generator(me, 2450, Consts.height.floor - Consts.unit, [])
+        ];
+        me.generators.forEach((x) => x.emitter.on(
+            'generatorFinished', 
+            me.onGeneratorFinished, 
+            me));
 
         me.player = new Player(me, Consts.player.startX, Consts.player.startY);
 
@@ -139,6 +152,14 @@ export default class Game extends Phaser.Scene {
             `${me.player.container.x | 0} ${me.player.container.y | 0}\n` +
             `${me.input.mousePointer.worldX | 0} ${me.input.mousePointer.worldY | 0}`;
         }
+    }
+
+    onGeneratorFinished(x, y) {
+        const me = this;
+
+        me.key
+            .setPosition(x, y + Consts.unit)
+            .setVisible(true);
     }
 
     onRoofJump() {
@@ -208,9 +229,19 @@ export default class Game extends Phaser.Scene {
             return false;
 
         if (me.player.hasKey) {
-            me.key
-                .setPosition(me.player.container.x, me.player.container.y)
-                .setVisible(true);
+
+            const generator = Utils.firstOrDefault(
+                me.generators, 
+                (gen) => gen.canStart(me.player.container.x, me.player.container.y));
+
+            if (!!generator) {
+                generator.start();
+            } else {
+                me.key
+                    .setPosition(me.player.container.x, me.player.container.y)
+                    .setVisible(true);
+            }
+
             me.player.throwKey();
         }
         else {
@@ -364,6 +395,13 @@ export default class Game extends Phaser.Scene {
             key: 'key',
             frames: 'key',
             frameRate: 2,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'generator',
+            frames: me.anims.generateFrameNumbers('generator', { frames: [ 1, 2, 3 ]}),
+            frameRate: 10,
             repeat: -1
         });
 
