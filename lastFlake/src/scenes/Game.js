@@ -1,5 +1,6 @@
 import Phaser from '../lib/phaser.js';
 
+import Bot from '../game/Bot.js';
 import Consts from '../game/Consts.js';
 import Player from '../game/Player.js';
 import Snow from '../game/Snow.js';
@@ -35,6 +36,9 @@ export default class Game extends Phaser.Scene {
     /** @type {Snow} */
     snow;
 
+    /** @type {Array} */
+    bots;
+
     constructor() {
         super('game');
     }
@@ -48,6 +52,7 @@ export default class Game extends Phaser.Scene {
         me.loadSpriteSheet('small_arrows', 50);
         me.loadImage('snowflake')
         me.loadSpriteSheet('kids', 100);
+        me.loadImage('square');
     }
 
     create() {
@@ -86,6 +91,15 @@ export default class Game extends Phaser.Scene {
 
         me.snow = new Snow(me, 1);
         me.toUpdate.push(me.snow);
+
+        me.bots = [
+            new Bot(me, 1400, 1500)
+        ];
+
+        me.bots.forEach((bot) => {
+            me.snow.emitter.on('flakeCreated', bot.onFlakeCreated, bot);  
+            me.toUpdate.push(bot);
+        });
 
         // camera
 

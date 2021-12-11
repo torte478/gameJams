@@ -13,6 +13,9 @@ export default class Snow {
     /** @type {Phaser.GameObjects.Group} */
     flakes;
 
+    /** @type {Phaser.Events.EventEmitter} */
+    emitter;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} maxCount 
@@ -24,6 +27,7 @@ export default class Snow {
         me.maxCount = maxCount;
 
         me.flakes = scene.physics.add.group();
+        me.emitter = new Phaser.Events.EventEmitter();
     }
 
     update() {
@@ -49,6 +53,8 @@ export default class Snow {
             .setActive(true)
             .setVisible(true)
             .setVelocityY(300);
+
+        me.emitter.emit('flakeCreated', pos);
 
         // me.scene.tweens.add({
         //     targets: flake,

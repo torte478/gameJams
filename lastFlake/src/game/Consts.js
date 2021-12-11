@@ -22,6 +22,8 @@ export default class Consts {
         speed: 500
     };
 
+    static botSpeed = 500;
+
     static triggerDistance = 50;
     static unit = 50;
 
