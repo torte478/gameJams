@@ -65,6 +65,8 @@ export default class Game extends Phaser.Scene {
         me.loadImage('square');
         me.loadSpriteSheet('key', 100);
         me.loadSpriteSheet('generator', 200);
+        me.loadSpriteSheet('garland', 400, 100);
+        me.loadSpriteSheet('electricity', 400, 200);
     }
 
     create() {
@@ -93,7 +95,11 @@ export default class Game extends Phaser.Scene {
         me.phase = Consts.startPhase;
 
         me.generators = [
-            new Generator(me, 2450, Consts.height.floor - Consts.unit, [])
+            new Generator(me, 2450, Consts.height.floor - Consts.unit, [
+                { x: 2600, y: Consts.height.top + Consts.unit },
+                { x: 2800, y: Consts.height.middle + Consts.unit },
+                { x: 2050, y: Consts.height.floor + Consts.unit }
+            ])
         ];
         me.generators.forEach((x) => x.emitter.on(
             'generatorFinished', 
@@ -338,12 +344,12 @@ export default class Game extends Phaser.Scene {
         .map((a) => new Stair(me, a[0], a[1], a[2], a[3], a[4]));
     }
 
-    loadSpriteSheet(name, size) {
+    loadSpriteSheet(name, x, y) {
         const me = this;
 
         return me.load.spritesheet(name, `assets/${name}.png`, {
-            frameWidth: size,
-            frameHeight: size
+            frameWidth: x,
+            frameHeight: !!y ? y : x
         });
     }
 
@@ -402,6 +408,20 @@ export default class Game extends Phaser.Scene {
             key: 'generator',
             frames: me.anims.generateFrameNumbers('generator', { frames: [ 1, 2, 3 ]}),
             frameRate: 10,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'garland',
+            frames: me.anims.generateFrameNumbers('garland', { frames: [ 0, 1 ]}),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'electricity',
+            frames: 'electricity',
+            frameRate: 15,
             repeat: -1
         });
 

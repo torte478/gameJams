@@ -13,6 +13,15 @@ export default class Generator {
     /** @type {Phaser.Events.EventEmitter} */
     emitter;
 
+    /** @type {Array} */
+    garlands;
+
+    /** @type {Array} */
+    electricity;
+
+    /** @type {Boolean} */
+    running;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} x 
@@ -25,6 +34,13 @@ export default class Generator {
         me.scene = scene;
         me.sprite = scene.add.sprite(x, y, 'generator', 0);
         me.emitter = new Phaser.Events.EventEmitter();
+        me.garlands = garlandPositions
+            .map((pos) => scene.add.sprite(pos.x, pos.y, 'garland', 2));
+        me.electricity = me.garlands
+            .map((g) => scene.add.sprite(g.x, g.y, 'electricity')
+                .setVisible(false)
+                .play('electricity'));
+        me.running = false;
     }
 
     canStart(x, y) {
@@ -36,20 +52,32 @@ export default class Generator {
             x,
             y);
 
-        return distance < Consts.unit * 1.5;
+        return !me.running && distance < Consts.unit * 1.5;
     }
 
     start() {
         const me = this;
 
         me.sprite.play('generator');
+        me.garlands.forEach((g) => g.play('garland'));
+        me.electricity.forEach((e) => e.setVisible(true));
+        me.running = true;
 
         me.scene.time.delayedCall(
-            3000,
+            1000,
             () => {
                 me.sprite.stop();
                 me.sprite.setFrame(0);
+
+                me.garlands.forEach((g) => {
+                    g.stop();
+                    g.setFrame(2);
+                })
+
+                me.electricity.forEach((e) => e.setVisible(false));
+
                 me.emitter.emit('generatorFinished', me.sprite.x, me.sprite.y);
+                me.running = false;
             });
     }
 }
