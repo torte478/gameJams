@@ -4,11 +4,20 @@ import Consts from '../game/Consts.js';
 
 export default class Player {
 
-    /** @type {Phaser.Physics.Arcade.Sprite} */
+    /** @type {Phaser.GameObjects.Container} */
+    container;
+
+    /** @type {Phaser.GameObjects.Sprite} */
     sprite;
+
+    /** @type {Phaser.GameObjects.Sprite} */
+    itemSprite;
 
     /** @type {Boolean} */
     isEat;
+
+    /** @type {Boolean} */
+    hasKey;
 
     /**
      * @param {Phaser.Scene scene 
@@ -18,14 +27,21 @@ export default class Player {
     constructor(scene, x, y) {
         const me = this;
 
-        me.sprite = scene.physics.add.sprite(x, y, 'kids', 0);
+        me.sprite = scene.add.sprite(0, 0, 'kids', 0);
+        me.itemSprite = scene.add.sprite(0, -1.5 * Consts.unit, 'key')
+            .setVisible(false);
+        me.container = scene.add.container(x, y, [ me.sprite, me.itemSprite ]);
+        me.container.setSize(me.sprite.width, me.sprite.height);
+        scene.physics.world.enable(me.container);
+
         me.isEat = false;
+        me.hasKey = false;
     }
 
     move(dir) {
         const me = this;
 
-        me.sprite.setVelocityX(Consts.player.speed * dir);
+        me.container.body.setVelocityX(Consts.player.speed * dir);
 
         if (dir != 0) {
             me.sprite.play('kid_0_walk', true);
@@ -43,7 +59,7 @@ export default class Player {
         me.isEat = true;
         me.sprite.stop();
         me.sprite.setTexture('kids', 2);
-        me.sprite.setVelocityX(0);
+        me.container.body.setVelocityX(0);
     }
 
     stopEat() {
@@ -56,12 +72,29 @@ export default class Player {
     hide() {
         const me = this;
 
-        me.sprite.setVisible(false);
+        me.container.setVisible(false);
     }
 
     show() {
         const me = this;
 
-        me.sprite.setVisible(true);
+        me.container.setVisible(true);
+    }
+
+    takeKey() {
+        const me = this;
+
+        me.itemSprite
+            .play('key')
+            .setVisible(true);
+
+        me.hasKey = true;
+    }
+
+    throwKey() {
+        const me = this;
+
+        me.itemSprite.setVisible(false);
+        me.hasKey = false;
     }
 }

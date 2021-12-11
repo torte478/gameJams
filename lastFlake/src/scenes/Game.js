@@ -39,6 +39,12 @@ export default class Game extends Phaser.Scene {
     /** @type {Array} */
     bots;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    key;
+
+    /** @type {Boolean} */
+    isMultipleXPress;
+
     constructor() {
         super('game');
     }
@@ -53,6 +59,7 @@ export default class Game extends Phaser.Scene {
         me.loadImage('snowflake')
         me.loadSpriteSheet('kids', 100);
         me.loadImage('square');
+        me.loadSpriteSheet('key', 100);
     }
 
     create() {
@@ -73,6 +80,7 @@ export default class Game extends Phaser.Scene {
         me.keys.down = me.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         me.keys.z = me.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
         me.keys.x = me.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
+        me.isMultipleXPress = false;
 
         // core
 
@@ -87,7 +95,7 @@ export default class Game extends Phaser.Scene {
             x.emitter.on('roofJump', me.onRoofJump, me);
         });
 
-        me.physics.add.collider(me.player.sprite, walls);
+        me.physics.add.collider(me.player.container, walls);
 
         me.snow = new Snow(me, 1);
         me.toUpdate.push(me.snow);
@@ -101,10 +109,13 @@ export default class Game extends Phaser.Scene {
             me.toUpdate.push(bot);
         });
 
+        me.key = me.add.sprite(1700, Consts.height.floor, 'key')
+            .play('key');
+
         // camera
 
         me.cameras.main.setBounds(0, 0, Consts.worldSize.width, Consts.worldSize.height);
-        me.cameras.main.startFollow(me.player.sprite);
+        me.cameras.main.startFollow(me.player.container);
 
         // other
 
@@ -125,7 +136,7 @@ export default class Game extends Phaser.Scene {
 
         if (Consts.debug) {
             me.log.text = 
-            `${me.player.sprite.x | 0} ${me.player.sprite.y | 0}\n` +
+            `${me.player.container.x | 0} ${me.player.container.y | 0}\n` +
             `${me.input.mousePointer.worldX | 0} ${me.input.mousePointer.worldY | 0}`;
         }
     }
@@ -149,19 +160,32 @@ export default class Game extends Phaser.Scene {
             3000,
             () => {
                 me.player.show();
-                me.player.sprite.setPosition(Consts.worldSize.width / 2, 750)
+                me.player.container.setPosition(Consts.worldSize.width / 2, 750)
                 me.tweens.add({
-                    targets: me.player.sprite,
+                    targets: me.player.container,
                     y: Consts.height.floor,
                     duration: 750,
                     ease: 'Sine.easeIn',
-                    onComplete: () => { me.cameras.main.startFollow(me.player.sprite) }
+                    onComplete: () => { me.cameras.main.startFollow(me.player.container) }
                 });
             });
     }
 
     updateInput() {
         const me = this;
+
+        let needCheckX = false;
+        if (me.keys.x.isDown) {
+            if (!me.isMultipleXPress) {
+                me.isMultipleXPress = true;
+                needCheckX = true
+            }
+        } else {
+            me.isMultipleXPress = false;
+        }
+
+        if (needCheckX && me.checkKey())
+            return;
 
         if (me.checkEat())
             return;
@@ -177,6 +201,36 @@ export default class Game extends Phaser.Scene {
         me.player.move(direction);
     }
 
+    checkKey() {
+        const me = this;
+
+        if (!me.keys.x.isDown || !me.isMultipleXPress)
+            return false;
+
+        if (me.player.hasKey) {
+            me.key
+                .setPosition(me.player.container.x, me.player.container.y)
+                .setVisible(true);
+            me.player.throwKey();
+        }
+        else {
+            const dist = Phaser.Math.Distance.Between(
+                me.player.container.x,
+                me.player.container.y,
+                me.key.x,
+                me.key.y
+            );
+    
+            if (dist > Consts.unit)
+                return false;
+    
+            me.key.setVisible(false);
+            me.player.takeKey();
+    
+            return true;
+        }
+    }
+
     checkEat() {
         const me = this;
 
@@ -185,7 +239,7 @@ export default class Game extends Phaser.Scene {
 
             if (stopEat) {
                 me.player.stopEat();
-                me.snow.checkEat(me.player.sprite.x, me.player.sprite.y);
+                me.snow.checkEat(me.player.container.x, me.player.container.y);
             }
 
             return !stopEat;
@@ -216,15 +270,15 @@ export default class Game extends Phaser.Scene {
             me.stairs, 
             (a) => a.type == type 
                     && Consts.triggerDistance > Phaser.Math.Distance.Between(
-                        me.player.sprite.x, 
-                        me.player.sprite.y, 
+                        me.player.container.x, 
+                        me.player.container.y, 
                         a.sprite.x, 
                         a.sprite.y));
 
         if (!stair)
             return false;
 
-        stair.move(me.player.sprite);
+        stair.move(me.player.container);
 
         if (type == Consts.stairType.ROOF) {
             me.cameras.main.stopFollow();
@@ -302,6 +356,13 @@ export default class Game extends Phaser.Scene {
         me.anims.create({
             key: 'small_arrow_up',
             frames: me.anims.generateFrameNumbers('small_arrows', { frames: [ 1, 1, 1, 0 ]}),
+            frameRate: 2,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'key',
+            frames: 'key',
             frameRate: 2,
             repeat: -1
         });

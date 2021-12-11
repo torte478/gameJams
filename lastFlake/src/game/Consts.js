@@ -17,7 +17,7 @@ export default class Consts {
     }
 
     static player = {
-        startX: 400,
+        startX: 1500,
         startY: this.height.floor,
         speed: 500
     };
