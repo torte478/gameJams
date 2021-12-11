@@ -4,7 +4,7 @@ export default class Consts {
     static showWalls = false;
 
     static player = {
-        startX: 2400,
+        startX: 1500,
         startY: 1500, //1000 //1260 //1500,
         speed: 800
     };
@@ -16,6 +16,7 @@ export default class Consts {
     }
 
     static triggerDistance = 50;
+    static unit = 50;
 
     static stairType = {
         UP: 1,

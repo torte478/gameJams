@@ -1,0 +1,68 @@
+import Phaser from '../lib/phaser.js';
+
+import Consts from '../game/Consts.js';
+
+export default class Snow {
+
+    /** @type {Phaser.Scene} */
+    scene;
+
+    /** @type {Number} */
+    maxCount;
+
+    /** @type {Phaser.GameObjects.Group} */
+    flakes;
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {Number} maxCount 
+     */
+    constructor(scene, maxCount) {
+        const me = this;
+
+        me.scene = scene;
+        me.maxCount = maxCount;
+
+        me.flakes = scene.physics.add.group();
+    }
+
+    update() {
+        const me = this;
+
+        me.flakes.getChildren().forEach((item) => {
+            if (item.y > Consts.worldSize.height) {
+                me.flakes.killAndHide(item);
+            }
+        })
+
+        const alive = me.flakes.getChildren().filter((x) => x.active).length;
+
+        if (alive >= me.maxCount)
+            return;
+
+        const pos = Phaser.Math.Between(1000 + 50, 2000 - 50);
+        
+        /** @type {Phaser.Physics.Arcade.Sprite} */
+        const flake = me.flakes.get(pos, 1000, 'snowflake');
+        
+        flake
+            .setActive(true)
+            .setVisible(true)
+            .setVelocityY(300);
+
+        // me.scene.tweens.add({
+        //     targets: flake,
+        //     y: {
+        //         value: Consts.worldSize.height + Consts.unit,
+        //         duration: 2000
+        //     },
+        //     x: {
+        //         value: '+= 50',
+        //         duration: 2000,
+        //         yoyo: true,
+        //         repeat: -1,
+        //         ease: 'Quad.easeInOut'
+        //     }
+        // });
+    }
+}

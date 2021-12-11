@@ -2,6 +2,7 @@ import Phaser from '../lib/phaser.js';
 
 import Consts from '../game/Consts.js';
 import Player from '../game/Player.js';
+import Snow from '../game/Snow.js';
 import Stair from '../game/Stair.js';
 import Utils from '../game/Utils.js';
 
@@ -25,6 +26,9 @@ export default class Game extends Phaser.Scene {
     /** @type {Array} */
     stairs;
 
+    /** @type {Array} */
+    toUpdate;
+
     constructor() {
         super('game');
     }
@@ -37,6 +41,7 @@ export default class Game extends Phaser.Scene {
         me.loadImage('player');
         me.loadImage('wall');
         me.loadSpriteSheet('small_arrows', 50);
+        me.loadImage('snowflake')
     }
 
     create() {
@@ -72,12 +77,17 @@ export default class Game extends Phaser.Scene {
 
         // core
 
+        me.toUpdate = [];
+
         me.player = new Player(me, Consts.player.startX, Consts.player.startY);
 
         const walls = me.createWalls();
         me.stairs = me.createStairs();
 
         me.physics.add.collider(me.player.sprite, walls);
+
+        const snow = new Snow(me, 1);
+        me.toUpdate.push(snow);
 
         // camera
 
@@ -96,6 +106,8 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         me.updateInput();
+
+        me.toUpdate.forEach((x) => x.update());
 
         if (Consts.debug) {
             me.log.text = 
