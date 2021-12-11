@@ -6,7 +6,7 @@ export default class Consts {
     static player = {
         startX: 1500,
         startY: 1500, //1000 //1260 //1500,
-        speed: 800
+        speed: 500
     };
 
     static height = {

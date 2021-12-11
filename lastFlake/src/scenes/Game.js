@@ -38,10 +38,10 @@ export default class Game extends Phaser.Scene {
 
         me.loadImage('background')
         me.loadImage('sky');
-        me.loadImage('player');
         me.loadImage('wall');
         me.loadSpriteSheet('small_arrows', 50);
         me.loadImage('snowflake')
+        me.loadSpriteSheet('kids', 100);
     }
 
     create() {
@@ -49,19 +49,7 @@ export default class Game extends Phaser.Scene {
 
         // graphics
 
-        me.anims.create({
-            key: 'small_arrow_up',
-            frames: me.anims.generateFrameNumbers('small_arrows', { frames: [ 1, 1, 1, 0 ]}),
-            frameRate: 2,
-            repeat: -1
-        });
-
-        me.anims.create({
-            key: 'small_arrow_down',
-            frames: me.anims.generateFrameNumbers('small_arrows', { frames: [ 2, 2, 2, 0 ]}),
-            frameRate: 2,
-            repeat: -1
-        });
+        me.createAnimation();
 
         me.add.image(Consts.viewSize.width / 2, Consts.viewSize.height / 2, 'sky').setScrollFactor(0);
         me.add.image(Consts.worldSize.width / 2, Consts.worldSize.height / 2, 'background');
@@ -119,6 +107,9 @@ export default class Game extends Phaser.Scene {
     updateInput() {
         const me = this;
 
+        if (me.checkEat())
+            return;
+
         if (me.tryClimb())        
             return;
 
@@ -128,6 +119,27 @@ export default class Game extends Phaser.Scene {
             : 0;
         
         me.player.move(direction);
+    }
+
+    checkEat() {
+        const me = this;
+
+        if (me.player.isEat) {
+            const stopEat = !me.keys.z.isDown;
+
+            if (stopEat)
+                me.player.stopEat();
+
+            return !stopEat;
+        } 
+        else {
+            const startEat = me.keys.z.isDown;
+            
+            if (startEat)
+                me.player.startEat();
+
+            return startEat;
+        }
     }
 
     tryClimb() {
@@ -215,5 +227,30 @@ export default class Game extends Phaser.Scene {
         });
 
         return walls;
+    }
+
+    createAnimation() {
+        const me = this;
+
+        me.anims.create({
+            key: 'small_arrow_up',
+            frames: me.anims.generateFrameNumbers('small_arrows', { frames: [ 1, 1, 1, 0 ]}),
+            frameRate: 2,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'small_arrow_down',
+            frames: me.anims.generateFrameNumbers('small_arrows', { frames: [ 2, 2, 2, 0 ]}),
+            frameRate: 2,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'kid_0_walk',
+            frames: me.anims.generateFrameNumbers('kids', { frames: [ 0, 1 ]}),
+            frameRate: 10,
+            repeat: -1
+        });
     }
 }
