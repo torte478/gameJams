@@ -4,7 +4,7 @@ import Consts from '../game/Consts.js';
 
 export default class Player {
 
-    /** @type {Phaser.Types.Physics.Arcade.SpriteWithDynamicBody} */
+    /** @type {Phaser.Physics.Arcade.Sprite} */
     sprite;
 
     /**

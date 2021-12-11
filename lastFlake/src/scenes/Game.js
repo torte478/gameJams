@@ -26,6 +26,7 @@ export default class Game extends Phaser.Scene {
         me.loadImage('background')
         me.loadImage('sky');
         me.loadImage('player');
+        me.loadImage('wall');
     }
 
     create() {
@@ -41,6 +42,10 @@ export default class Game extends Phaser.Scene {
 
         me.cameras.main.setBounds(0, 0, Consts.worldSize.width, Consts.worldSize.height);
         me.cameras.main.startFollow(me.player.sprite);
+
+        const walls = me.createWalls();
+
+        me.physics.add.collider(me.player.sprite, walls);
 
         if (Consts.debug) {
             me.log = me.add.text(10, 10, '', { fontSize: 14}).setScrollFactor(0);
@@ -66,5 +71,32 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         return me.load.image(name, `assets/${name}.png`);
+    }
+
+    createWalls() {
+        const me = this;
+
+        const walls = me.physics.add.staticGroup();
+        [
+            [ 3012, 1500 ],
+            [ 0, 1500 ],
+            [ 40, 1260 ],
+            [ 1175, 1260 ],
+            [ 2000, 1260 ],
+            [ 2950, 1260 ],
+            [ 2950, 1000 ],
+            [ 2625, 1000 ],
+            [ 2500, 1000 ],
+            [ 2200, 1000 ],
+            [ 230, 1000 ],
+            [ 750, 1000 ],
+        ]
+        .forEach((pos) => {
+            /** @type {Phaser.Physics.Arcade.Sprite} */
+            const wall = walls.create(pos[0], pos[1], 'wall');
+            wall.setVisible(Consts.showWalls);
+        });
+
+        return walls;
     }
 }
