@@ -64,6 +64,9 @@ export default class Game extends Phaser.Scene {
     /**@type {Intro} */
     intro;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    cat;
+
     constructor() {
         super('game');
     }
@@ -96,6 +99,7 @@ export default class Game extends Phaser.Scene {
         me.loadSpriteSheet('heads', 50);
         me.loadImage('fade');
         me.loadImage('win');
+        me.loadSpriteSheet('cat', 200);
     }
 
     create() {
@@ -143,6 +147,9 @@ export default class Game extends Phaser.Scene {
         me.rules = new Rules(me.initiedLevel);
         me.toUpdate.push(me.rules);
         me.rules.emitter.on('timeout', me.onTimeout, me);
+
+        me.cat = me.add.sprite(1550, 1425, 'cat', 0)
+            .play('cat_idle');
 
         me.intro = new Intro(me, me.rules);
         me.intro.stair.emitter.on('roofJump', me.onRoofJump, me);
@@ -277,6 +284,11 @@ export default class Game extends Phaser.Scene {
             'Sine.easeInOut');
 
         me.time.delayedCall(
+            2750,
+            () => { me.cat.play('cat_alert') }
+        );
+
+        me.time.delayedCall(
             3000,
             () => {
                 if (me.rules.level < 4)
@@ -317,6 +329,30 @@ export default class Game extends Phaser.Scene {
                 me.stairs.forEach((x) => x.sprite.setVisible(true));
 
                 me.snow.running = true;
+
+                me.tweens.createTimeline()
+                    .add({
+                        targets: me.cat,
+                        y: 1300,
+                        duration: 250,
+                        yoyo: true,
+                        repeat: 0,
+                        onStart: () => { me.cat.play('cat_jump') }
+                    })
+                    .add({
+                        targets: me.cat,
+                        y: 1450,
+                        duration: 100,
+                        repeat: 0
+                    })
+                    .add({
+                        targets: me.cat,
+                        x: 3500,
+                        duration: 3000,
+                        repeat: 0,
+                        onStart: () => { me.cat.play('cat_run') }
+                    })
+                    .play();
             }
         });
     }
@@ -382,6 +418,10 @@ export default class Game extends Phaser.Scene {
                 });
             }
         );
+
+        me.time.delayedCall(
+            3000,
+            () => { me.cat.play('cat_end' ) });
     }
 
     updateInput() {
@@ -638,6 +678,41 @@ export default class Game extends Phaser.Scene {
             frames: me.anims.generateFrameNumbers('small_arrows', { frames: [ 2, 2, 2, 0 ]}),
             frameRate: 2,
             repeat: -1
+        });
+
+        me.anims.create({
+            key: 'cat_idle',
+            frames: me.anims.generateFrameNumbers('cat', { frames: [ 0, 1 ]}),
+            frameRate: 1,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'cat_alert',
+            frames: me.anims.generateFrameNumbers('cat', { frames: [ 2, 3, 4, 5 ]}),
+            frameRate: 20,
+            repeat: 0
+        });
+
+        me.anims.create({
+            key: 'cat_jump',
+            frames: me.anims.generateFrameNumbers('cat', { frames: [ 6, 7 ]}),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'cat_run',
+            frames: me.anims.generateFrameNumbers('cat', { frames: [ 8, 9, 10, 9 ]}),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'cat_end',
+            frames: me.anims.generateFrameNumbers('cat', { frames: [ 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 ]}),
+            frameRate: 12,
+            repeat: 0
         });
 
         for (let i = 0; i < 14; ++i) {
