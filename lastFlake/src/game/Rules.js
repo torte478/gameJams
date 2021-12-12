@@ -57,18 +57,24 @@ export default class Rules {
 
     static playerSkin = [ 0, 4, 8, 11, 13 ];
 
+    started;
+
     constructor(level) {
         const me = this;
 
         me.level = level;
-        me.scores = [3, 2, 4, 4];
+        me.scores = [0, 0, 0, 0];
         me.startTime = new Date().getTime();
         me.emitter = new Phaser.Events.EventEmitter();
         me.timeOut = false;
+        me.started = false;
     }
 
     update() {
         const me = this;
+
+        if (!me.started)
+            return;
 
         me.timer = Consts.timerDuration - (new Date().getTime() - me.startTime) / 1000;
 
@@ -119,5 +125,18 @@ export default class Rules {
         const me = this;
 
         return Rules.outOfTime[me.level];
+    }
+
+    start() {
+        const me = this;
+        
+        me.started = true;
+        me.startTime = new Date().getTime();
+    }
+
+    getBotSkinIndex(index) {
+        const me = this;
+
+        return Rules.botSkins[me.level][index];
     }
 }

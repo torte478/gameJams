@@ -4,6 +4,9 @@ import Consts from '../game/Consts.js';
 
 export default class Player {
 
+    /** @type {Phaser.Scene} */
+    scene;
+
     /** @type {Phaser.GameObjects.Container} */
     container;
 
@@ -14,7 +17,7 @@ export default class Player {
     itemSprite;
 
     /** @type {Boolean} */
-    isEat;
+    isBusy;
 
     /** @type {Boolean} */
     hasKey;
@@ -30,6 +33,7 @@ export default class Player {
     constructor(scene, x, y, skinIndex) {
         const me = this;
 
+        me.scene = scene;
         me.skinIndex = skinIndex;
         me.sprite = scene.add.sprite(0, 0, 'kids', 0);
         me.itemSprite = scene.add.sprite(0, -1.5 * Consts.unit, 'key')
@@ -38,12 +42,15 @@ export default class Player {
         me.container.setSize(me.sprite.width, me.sprite.height);
         scene.physics.world.enable(me.container);
 
-        me.isEat = false;
+        me.isBusy = false;
         me.hasKey = false;
     }
 
     move(dir) {
         const me = this;
+
+        if (me.isBusy)
+            return;
 
         me.container.body.setVelocityX(Consts.player.speed * dir);
 
@@ -60,16 +67,16 @@ export default class Player {
     startEat() {
         const me = this;
 
-        me.isEat = true;
+        me.isBusy = true;
         me.sprite.stop();
         me.sprite.setTexture('kids', me.skinIndex * Consts.skinOffset + 2);
         me.container.body.setVelocityX(0);
     }
 
-    stopEat() {
+    stopBusy() {
         const me = this;
 
-        me.isEat = false;
+        me.isBusy = false;
         me.sprite.setTexture('kids', me.skinIndex * Consts.skinOffset);
     }
 
@@ -100,5 +107,17 @@ export default class Player {
 
         me.itemSprite.setVisible(false);
         me.hasKey = false;
+    }
+
+    startHappy() {
+        const me = this;
+
+        me.sprite.play(`kid_${me.skinIndex}_knock`);
+        me.container.body.setVelocityX(0);
+        me.isBusy = true;
+ 
+        me.scene.time.delayedCall(
+            3000,
+            () => { me.stopBusy() });
     }
 }

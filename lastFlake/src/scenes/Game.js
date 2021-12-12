@@ -2,6 +2,7 @@ import Phaser from '../lib/phaser.js';
 
 import Bot from '../game/Bot.js';
 import Consts from '../game/Consts.js';
+import Intro from '../game/Intro.js';
 import Generator from '../game/Generator.js';
 import HUD from '../game/HUD.js';
 import Player from '../game/Player.js';
@@ -59,6 +60,9 @@ export default class Game extends Phaser.Scene {
 
     /** @type {HUD} */
     hud;
+
+    /**@type {Intro} */
+    intro;
 
     constructor() {
         super('game');
@@ -136,12 +140,12 @@ export default class Game extends Phaser.Scene {
             me.onGeneratorFinished, 
             me));
 
-        me.key = me.add.sprite(700, Consts.height.floor, 'key')
-            .play('key');
-
         me.rules = new Rules(me.initiedLevel);
         me.toUpdate.push(me.rules);
         me.rules.emitter.on('timeout', me.onTimeout, me);
+
+        me.intro = new Intro(me, me.rules);
+        me.intro.stair.emitter.on('roofJump', me.onRoofJump, me);
 
         me.player = new Player(
             me, 
@@ -151,25 +155,16 @@ export default class Game extends Phaser.Scene {
 
         const walls = me.createWalls();
         me.stairs = me.createStairs();
-        me.stairs.forEach((x) => {
-            x.emitter.on('roofJump', me.onRoofJump, me);
-        });
 
         me.physics.add.collider(me.player.container, walls);
 
         me.snow = new Snow(me, 1);
         me.toUpdate.push(me.snow);
 
-        me.bots = me.rules
-            .getBotConfigs()
-            .map((cfg) => new Bot(me, cfg.x, Consts.levelType.FLOOR, cfg.skin));
-
-        me.bots.forEach((bot) => {
-            me.snow.emitter.on('flakeCreated', bot.onFlakeCreated, bot);  
-            me.toUpdate.push(bot);
-        });
+        me.bots = [];
 
         me.hud = new HUD(me, me.rules, me.rules.getHeadInidices(), me.rules.getOutOfTime());
+        me.hud.container.setVisible(false);
         me.toUpdate.push(me.hud);
 
         // camera
@@ -183,7 +178,7 @@ export default class Game extends Phaser.Scene {
             me.log = me.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(9999999)
-                .setVisible(false);
+                .setVisible(true);
         }
     }
 
@@ -201,14 +196,13 @@ export default class Game extends Phaser.Scene {
             }
         });
 
-        if (Consts.debug) {
-            me.log.text = 
-            `${me.player.container.x | 0} ${me.player.container.y | 0}\n` +
-            `${me.input.mousePointer.worldX | 0} ${me.input.mousePointer.worldY | 0}\n` + 
-            `${me.rules.scores}\n` +
-            `${(me.rules.timer).toFixed(1)}\n` +
-            `Level: ${me.rules.level}`;
-        }
+        // if (Consts.debug) {
+        //     me.log.text = 
+        //     `${me.player.container.x | 0} ${me.player.container.y | 0}\n` +
+        //     `${me.input.mousePointer.worldX | 0} ${me.input.mousePointer.worldY | 0}\n` + 
+        //     `${me.rules.scores}\n` +
+        //     `Level: ${me.rules.level}`;
+        // }
     }
 
     onTimeout() {
@@ -302,7 +296,28 @@ export default class Game extends Phaser.Scene {
             y: Consts.height.floor,
             duration: 750,
             ease: 'Sine.easeIn',
-            onComplete: () => { me.cameras.main.startFollow(me.player.container) }
+            onComplete: () => { 
+
+                me.bots = me.rules
+                    .getBotConfigs()
+                    .map((cfg) => new Bot(me, cfg.x, Consts.levelType.FLOOR, cfg.skin));
+
+                me.bots.forEach((bot) => {
+                    me.snow.emitter.on('flakeCreated', bot.onFlakeCreated, bot);  
+                    me.toUpdate.push(bot);
+                });
+
+                me.cameras.main.startFollow(me.player.container);
+                me.rules.start();
+                me.hud.container.setVisible(true);
+
+                me.key = me.add.sprite(700, Consts.height.floor, 'key')
+                    .play('key');
+
+                me.stairs.forEach((x) => x.sprite.setVisible(true));
+
+                me.snow.running = true;
+            }
         });
     }
 
@@ -382,14 +397,20 @@ export default class Game extends Phaser.Scene {
             me.isMultipleXPress = false;
         }
 
-        if (needCheckX && me.checkKey())
-            return;
+        if (me.phase == Consts.levelPhase.FIGHT) {
+            if (needCheckX && me.checkKey())
+                return;
 
-        if (me.checkEat())
-            return;
+            if (me.checkEat())
+                return;
 
-        if (me.tryClimb())        
-            return;
+            if (me.tryClimb())        
+                return;
+        } 
+        else {
+            if (me.checkIntro(needCheckX && me.keys.x.isDown, me.keys.up.isDown, me.keys.down.isDown))
+                return;
+        }
 
         const movement = me.keys.left.isDown || me.keys.right.isDown;
         const direction = movement
@@ -397,6 +418,16 @@ export default class Game extends Phaser.Scene {
             : 0;
         
         me.player.move(direction);
+    }
+
+    checkIntro(isXDown, isUpDown, isDownDown) {
+        const me = this;
+
+        return me.intro.checkIntro(
+            me.player,
+            isXDown,
+            isUpDown,
+            isDownDown);
     }
 
     checkKey() {
@@ -442,11 +473,11 @@ export default class Game extends Phaser.Scene {
     checkEat() {
         const me = this;
 
-        if (me.player.isEat) {
+        if (me.player.isBusy) {
             const stopEat = !me.keys.z.isDown;
 
             if (stopEat) {
-                me.player.stopEat();
+                me.player.stopBusy();
                 if (me.snow.checkEat(me.player.container.x, me.player.container.y)) {
                     me.rules.updateScores(false);
                 }
@@ -500,7 +531,7 @@ export default class Game extends Phaser.Scene {
     createStairs() {
         const me = this;
         
-        return [
+        const stairs = [
             [ 72, Consts.height.floor, Consts.height.middle, Consts.stairType.UP ],
             [ 286, Consts.height.middle, Consts.height.top, Consts.stairType.UP ],
             [ 400, Consts.height.middle, Consts.height.floor, Consts.stairType.DOWN ],
@@ -511,10 +542,13 @@ export default class Game extends Phaser.Scene {
             [ 2245, Consts.height.middle, Consts.height.top, Consts.stairType.UP ],
             [ 2450, Consts.height.top, Consts.height.middle, Consts.stairType.DOWN ],
             [ 2900, Consts.height.top, Consts.height.middle, Consts.stairType.DOWN ],
-            [ 2070, Consts.height.middle, Consts.height.floor, Consts.stairType.DOWN ],
-            [ 2050, Consts.height.roof, Consts.height.floor, Consts.stairType.ROOF ]
+            [ 2070, Consts.height.middle, Consts.height.floor, Consts.stairType.DOWN ]
         ]
         .map((a) => new Stair(me, a[0], a[1], a[2], a[3], a[4]));
+
+        stairs.forEach((x) => x.sprite.setVisible(false));
+
+        return stairs;
     }
 
     loadSpriteSheet(name, x, y) {
@@ -613,6 +647,15 @@ export default class Game extends Phaser.Scene {
                     i * Consts.skinOffset + 0, 
                     i * Consts.skinOffset + 1 ]}),
                 frameRate: 10,
+                repeat: -1
+            });    
+
+            me.anims.create({
+                key: `kid_${i}_knock`,
+                frames: me.anims.generateFrameNumbers('kids', { frames: [ 
+                    i * Consts.skinOffset + 3, 
+                    i * Consts.skinOffset + 4 ]}),
+                frameRate: 5,
                 repeat: -1
             });    
         }

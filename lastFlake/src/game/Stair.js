@@ -47,6 +47,7 @@ export default class Stair {
         const me = this;
 
         if (me.type == Consts.stairType.ROOF) {
+            me.scene.cameras.main.stopFollow();
             const timeline = me.scene.tweens.createTimeline();
             timeline
                 .add({

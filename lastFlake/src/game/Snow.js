@@ -16,6 +16,8 @@ export default class Snow {
     /** @type {Phaser.Events.EventEmitter} */
     emitter;
 
+    running;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} maxCount 
@@ -28,6 +30,7 @@ export default class Snow {
 
         me.flakes = scene.physics.add.group();
         me.emitter = new Phaser.Events.EventEmitter();
+        me.running = false;
     }
 
     update() {
@@ -38,6 +41,9 @@ export default class Snow {
                 me.flakes.killAndHide(item);
             }
         })
+
+        if (!me.running)
+            return;
 
         const alive = me.flakes.getChildren().filter((x) => x.active).length;
 
