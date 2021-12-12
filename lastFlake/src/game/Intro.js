@@ -16,6 +16,9 @@ export default class Intro {
     state;
     stair;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    arrow;
+
     constructor(scene, rules) {
         const me = this;
 
@@ -45,6 +48,12 @@ export default class Intro {
 
         me.state = Consts.introState;
         me.stair = new Stair(me.scene, 2050, Consts.height.roof, Consts.height.floor, Consts.stairType.ROOF);
+
+        me.arrow = me.scene.add.sprite(225, 1300, 'big_arrow')
+            .play('arrow_door')
+            .setAngle(180)
+            .setDepth(4000)
+            .setVisible(me.state == 'knock0');
 
         if (me.rules.level < 4 && Consts.playMusic)
             me.scene.sound.play('idle', { loop: true, volume: 0.20 });
@@ -118,6 +127,8 @@ export default class Intro {
         if (!roof)
             return false;
 
+        me.arrow.setVisible(false);
+
         player.isBusy = true;
         player.sprite.stop();
         player.container.body.setVelocityX(0);
@@ -164,6 +175,18 @@ export default class Intro {
             1000,
             () => {
                 player.startHappy();
+
+                if (index < 2) {
+                    const arrow_dir = index == 0
+                        ? 2180
+                        : 2780;
+                    me.arrow.setX(arrow_dir);
+                }
+                else {
+                    me.arrow.play('arrow_dir');
+                    me.arrow.setAngle(0);
+                    me.arrow.setPosition(2928, 1300);
+                }
 
                 const botSkinIndex = me.rules.getBotSkinIndex(index);
 

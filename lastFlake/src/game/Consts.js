@@ -17,8 +17,8 @@ export default class Consts {
     }
 
     static player = {
-        startX: 50,
-        startY: this.height.floor,
+        startX: 2400,
+        startY: this.height.roof,
         speed: 500
     };
 
@@ -28,8 +28,8 @@ export default class Consts {
     static startLevel = 0;
     static botLock = false;
     static skinOffset = 7;
-    static introState = 'knock0';
-    static playMusic = true;
+    static introState = 'jump';
+    static playMusic = false;
 
     static eatZones = [
         [ 

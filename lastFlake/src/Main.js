@@ -9,7 +9,7 @@ export default new Phaser.Game({
     width: Consts.viewSize.width,
     height: Consts.viewSize.height,
     scene: [ 
-        Start,
+        //Start,
         Game
         ],
     physics: {

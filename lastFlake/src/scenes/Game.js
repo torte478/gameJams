@@ -114,6 +114,7 @@ export default class Game extends Phaser.Scene {
         me.load.audio('key', 'assets/key.mp3');
         me.load.audio('punch', 'assets/punch.mp3');
         me.load.audio('lightning', 'assets/lightning.mp3');
+        me.loadSpriteSheet('big_arrow', 200);
     }
 
     create() {
@@ -779,6 +780,27 @@ export default class Game extends Phaser.Scene {
             frames: me.anims.generateFrameNumbers('cat', { frames: [ 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 ]}),
             frameRate: 12,
             repeat: 0
+        });
+
+        me.anims.create({
+            key: 'arrow_dir',
+            frames: me.anims.generateFrameNumbers('big_arrow', { frames: [ 0, 1 ]}),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'arrow_door',
+            frames: me.anims.generateFrameNumbers('big_arrow', { frames: [ 2, 3 ]}),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'arrow_snow',
+            frames: me.anims.generateFrameNumbers('big_arrow', { frames: [ 4, 5 ]}),
+            frameRate: 4,
+            repeat: -1
         });
 
         for (let i = 0; i < 14; ++i) {

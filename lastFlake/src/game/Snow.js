@@ -18,6 +18,9 @@ export default class Snow {
 
     running;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    arrow;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} maxCount 
@@ -31,6 +34,12 @@ export default class Snow {
         me.flakes = scene.physics.add.group();
         me.emitter = new Phaser.Events.EventEmitter();
         me.running = false;
+
+        me.arrow = me.scene.add.sprite(500, 400, 'big_arrow')
+            .setScrollFactor(0)
+            .setDepth(4000)
+            .setVisible(false)
+            .play('arrow_snow');
     }
 
     update() {
@@ -47,8 +56,16 @@ export default class Snow {
 
         const alive = me.flakes.getChildren().filter((x) => x.active).length;
 
-        if (alive >= me.maxCount)
+        if (alive >= me.maxCount) {
+            const target = me.flakes.getChildren()[0];
+            me.arrow.setRotation(Phaser.Math.Angle.Between(
+                me.scene.cameras.main.scrollX + Consts.viewSize.width / 2,
+                me.scene.cameras.main.scrollY + Consts.viewSize.height / 2,
+                target.x,
+                target.y));
+            me.arrow.setAngle(me.arrow.angle + 90);
             return;
+        }
 
         const pos = Phaser.Math.Between(100, 2900);
 
@@ -57,12 +74,18 @@ export default class Snow {
         
         /** @type {Phaser.Physics.Arcade.Sprite} */
         const flake = me.flakes.get(pos, 700, 'snowflake');
+
+        me.arrow.setVisible(true);
+        me.scene.time.delayedCall(
+            2000,
+            () => { me.arrow.setVisible(false)});
         
         flake
             .setActive(true)
             .setVisible(true)
             .setVelocityY(Consts.snowSpeed)
             .setDepth(1000);
+
 
         me.emitter.emit('flakeCreated', pos);
 
