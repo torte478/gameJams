@@ -82,6 +82,8 @@ export default class Game extends Phaser.Scene {
         me.loadSpriteSheet('generator', 200);
         me.loadSpriteSheet('garland', 400, 100);
         me.loadSpriteSheet('electricity', 400, 200);
+        me.loadImage('thank_text');
+        me.loadImage('christmas_text');
     }
 
     create() {
@@ -308,6 +310,33 @@ export default class Game extends Phaser.Scene {
                         200) 
                     },
             });
+
+        const thankText = me.add.sprite(1500, 1000, 'thank_text').setAlpha(0);
+        const christmasText = me.add.sprite(1500, 1100, 'christmas_text').setAlpha(0);
+
+        me.time.delayedCall(
+            3000,
+            () => {
+                me.tweens.add({
+                    targets: thankText,
+                    alpha: { from: 0, to: 1},
+                    duration: 2000,
+                    repeat: 0
+                });
+            }
+        );
+
+        me.time.delayedCall(
+            5000,
+            () => {
+                me.tweens.add({
+                    targets: christmasText,
+                    alpha: { from: 0, to: 1},
+                    duration: 2000,
+                    repeat: 0
+                });
+            }
+        );
     }
 
     updateInput() {
