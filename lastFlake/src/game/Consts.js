@@ -7,7 +7,7 @@ export default class Consts {
 
     static debug = true;
     static showWalls = false;
-    static startPhase = this.levelPhase.FIGHT;
+    static startPhase = this.levelPhase.START;
 
     static height = {
         floor: 1500,
@@ -17,15 +17,15 @@ export default class Consts {
     }
 
     static player = {
-        startX: 500,
-        startY: this.height.floor,
+        startX: 2100,
+        startY: this.height.roof,
         speed: 500
     };
 
     static botSpeed = 300; // 500;
     static snowSpeed = 100; //50;
     static timerDuration = 100;
-    static startLevel = 0;
+    static startLevel = 4;
     static botLock = true;
     static skinOffset = 7;
 

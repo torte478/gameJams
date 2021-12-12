@@ -33,6 +33,8 @@ export default class Snow {
     update() {
         const me = this;
 
+        return; // TODO !!!!
+
         me.flakes.getChildren().forEach((item) => {
             if (item.y > Consts.worldSize.height) {
                 me.flakes.killAndHide(item);

@@ -253,15 +253,60 @@ export default class Game extends Phaser.Scene {
         me.time.delayedCall(
             3000,
             () => {
-                me.player.show();
-                me.player.container.setPosition(Consts.worldSize.width / 2, 750)
-                me.tweens.add({
-                    targets: me.player.container,
-                    y: Consts.height.floor,
-                    duration: 750,
-                    ease: 'Sine.easeIn',
-                    onComplete: () => { me.cameras.main.startFollow(me.player.container) }
-                });
+                if (me.rules.level < 4)
+                   me.runFight();
+                else
+                    me.runEnding();
+            });
+    }
+
+    runFight() {
+        const me = this;
+
+        me.player.show();
+        me.player.container.setPosition(Consts.worldSize.width / 2, 750)
+        me.tweens.add({
+            targets: me.player.container,
+            y: Consts.height.floor,
+            duration: 750,
+            ease: 'Sine.easeIn',
+            onComplete: () => { me.cameras.main.startFollow(me.player.container) }
+        });
+    }
+
+    runEnding() {
+        const me = this;
+
+        const particleX = 1500;
+        const particleY = 750;
+
+        me.add.particles('snowflake')
+            .createEmitter({
+                x: particleX,
+                y: particleY,
+                angle: { min: 90, max: 90 },
+                speed: { min: 40, max: 60 },
+                rotate: { start: 0, end: 360  },
+                gravityY: 10,
+                lifespan: { min: 10000, max: 10000 },
+                blendMode: 'ADD',
+                scale: { min: 0.2, max: 0.5 },
+                emitZone: { 
+                    source: 
+                    new Phaser.Geom.Rectangle(
+                        -Consts.viewSize.width / 2, 
+                        0, 
+                        Consts.viewSize.width + Consts.unit, 
+                        10)
+                    },
+                deathZone: { 
+                    type: 'onEnter', 
+                    source: new Phaser.Geom.Rectangle(
+                        particleX - (Consts.viewSize.width * 1.5 / 2), 
+                        1700, 
+                        Consts.viewSize.width * 1.5, 
+                        200) 
+                    },
             });
     }
 
@@ -445,7 +490,8 @@ export default class Game extends Phaser.Scene {
             [ 2200, 1000 ],
             [ 230, 1000 ],
             [ 750, 1000 ],
-            [ 2000, 540]
+            [ 2000, 540],
+            [ 3012, Consts.height.roof ]
         ]
         .forEach((pos) => {
             /** @type {Phaser.Physics.Arcade.Sprite} */
