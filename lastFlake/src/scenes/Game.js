@@ -3,6 +3,7 @@ import Phaser from '../lib/phaser.js';
 import Bot from '../game/Bot.js';
 import Consts from '../game/Consts.js';
 import Generator from '../game/Generator.js';
+import HUD from '../game/HUD.js';
 import Player from '../game/Player.js';
 import Rules from '../game/Rules.js';
 import Snow from '../game/Snow.js';
@@ -56,6 +57,9 @@ export default class Game extends Phaser.Scene {
     /** @type {Number} */
     initiedLevel;
 
+    /** @type {HUD} */
+    hud;
+
     constructor() {
         super('game');
     }
@@ -84,6 +88,8 @@ export default class Game extends Phaser.Scene {
         me.loadSpriteSheet('electricity', 400, 200);
         me.loadImage('thank_text');
         me.loadImage('christmas_text');
+        me.loadImage('hud');
+        me.loadSpriteSheet('heads', 50);
     }
 
     create() {
@@ -161,6 +167,9 @@ export default class Game extends Phaser.Scene {
             me.toUpdate.push(bot);
         });
 
+        me.hud = new HUD(me, me.rules, me.rules.getHeadInidices(), me.rules.getOutOfTime());
+        me.toUpdate.push(me.hud);
+
         // camera
 
         me.cameras.main.setBounds(0, 0, Consts.worldSize.width, Consts.worldSize.height);
@@ -170,7 +179,9 @@ export default class Game extends Phaser.Scene {
 
         if (Consts.debug) {
             me.log = me.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
-                .setScrollFactor(0);
+                .setScrollFactor(0)
+                .setDepth(9999999)
+                .setVisible(false);
         }
     }
 

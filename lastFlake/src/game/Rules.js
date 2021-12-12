@@ -37,6 +37,22 @@ export default class Rules {
         [ -1, -1, -1 ]
     ];
 
+    static headIndicies = [
+        [ 0, 1, 2, 3 ],
+        [ 4, 5, 6, 7 ],
+        [ 8, 5, 9, 10 ],
+        [ 11, 5, 9, 12 ],
+        [ 13, 5, 9, 12 ]
+    ];
+
+    static outOfTime = [
+        [ false, false, false, false ],
+        [ false, false, false, false ],
+        [ false, true, false, false ],
+        [ false, true, true, false ],
+        [ false, true, true, true ]
+    ];
+
     static botPositions = [ 240, 2210, 2810 ];
 
     static playerSkin = [ 0, 4, 8, 11, 13 ];
@@ -91,5 +107,17 @@ export default class Rules {
         const me = this;
 
         return Rules.playerSkin[me.level];
+    }
+
+    getHeadInidices() {
+        const me = this;
+
+        return Rules.headIndicies[me.level];
+    }
+
+    getOutOfTime() {
+        const me = this;
+
+        return Rules.outOfTime[me.level];
     }
 }
