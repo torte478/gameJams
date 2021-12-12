@@ -24,11 +24,12 @@ export default class Consts {
 
     static botSpeed = 300; // 500;
     static snowSpeed = 100; //50;
-    static timerDuration = 10;
+    static timerDuration = 90;
     static startLevel = 2;
     static botLock = false;
     static skinOffset = 7;
     static introState = 'jump';
+    static playMusic = false;
 
     static eatZones = [
         [ 

@@ -25,6 +25,8 @@ export default class Player {
     /** @type {Number} */
     skinIndex;
 
+    isEat;
+
     /**
      * @param {Phaser.Scene scene 
      * @param {Number} x 
@@ -42,6 +44,7 @@ export default class Player {
         me.container.setSize(me.sprite.width, me.sprite.height);
         scene.physics.world.enable(me.container);
 
+        me.isEat = false;
         me.isBusy = false;
         me.hasKey = false;
     }
@@ -68,6 +71,7 @@ export default class Player {
         const me = this;
 
         me.isBusy = true;
+        me.isEat = true;
         me.sprite.stop();
         me.sprite.setTexture('kids', me.skinIndex * Consts.skinOffset + 2);
         me.container.body.setVelocityX(0);
@@ -77,6 +81,7 @@ export default class Player {
         const me = this;
 
         me.isBusy = false;
+        me.isEat = false;
         me.sprite.setTexture('kids', me.skinIndex * Consts.skinOffset);
     }
 

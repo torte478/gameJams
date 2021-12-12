@@ -245,6 +245,33 @@ export default class Game extends Phaser.Scene {
         );
     }
 
+    checkPunch() {
+        const me = this
+
+        if (me.player.isBusy)
+            return false;
+
+        me.player.isBusy = true;
+        me.player.sprite.stop();
+        me.player.container.body.setVelocityX(0);
+        me.player.sprite.setFrame(me.player.skinIndex * Consts.skinOffset + 6);
+
+        me.bots.forEach((bot) => {
+            const dist = Math.abs(bot.sprite.x - me.player.container.x + 50 * (me.player.sprite.flipX ? 1 : -1));
+            if (dist < 40
+                && Math.abs(bot.sprite.y - me.player.container.y) < 100) {
+                    bot.tryElectricityDamage();
+                }
+        });
+
+        me.time.delayedCall(
+            500,
+            () => { me.player.isBusy = false; }
+        );
+
+        return true;
+    }
+
     checkElectricity() {
         const me = this;
 
@@ -287,7 +314,7 @@ export default class Game extends Phaser.Scene {
         me.cameras.main.pan(
             Consts.worldSize.width / 2,
             Consts.worldSize.height,
-            5000,
+            10, //5000, // TODO!!!!!
             'Sine.easeInOut');
 
         me.time.delayedCall(
@@ -299,7 +326,7 @@ export default class Game extends Phaser.Scene {
             me.sound.play('theme_end');
 
         me.time.delayedCall(
-            6000,
+            10, //6000, //TODO!!!!!!
             () => {
                 if (me.rules.level < 4)
                    me.runFight();
@@ -312,7 +339,9 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         me.sound.stopByKey('idle');
-        me.sound.play('fight', { loop: true, volume: 0.10 });
+
+        if (Consts.playMusic)
+            me.sound.play('fight', { loop: true, volume: 0.10 });
 
         me.player.show();
         me.player.container.setPosition(Consts.worldSize.width / 2, 750)
@@ -454,6 +483,9 @@ export default class Game extends Phaser.Scene {
             if (needCheckX && me.checkKey())
                 return;
 
+            if (needCheckX && me.checkPunch())
+                return;
+
             if (me.checkEat())
                 return;
 
@@ -504,8 +536,9 @@ export default class Game extends Phaser.Scene {
             }
 
             me.player.throwKey();
+            return true;
         }
-        else {
+        else  if (me.key.visible) {
             const dist = Phaser.Math.Distance.Between(
                 me.player.container.x,
                 me.player.container.y,
@@ -521,12 +554,14 @@ export default class Game extends Phaser.Scene {
     
             return true;
         }
+
+        return false;
     }
 
     checkEat() {
         const me = this;
 
-        if (me.player.isBusy) {
+        if (me.player.isEat) {
             const stopEat = !me.keys.z.isDown;
 
             if (stopEat) {
