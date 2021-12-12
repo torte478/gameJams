@@ -30,25 +30,25 @@ export default class Rules {
     ];
 
     static botSkins = [
-        [ 1, 2, 3 ],
-        [ 5, 6, 7 ],
-        [ 9, -1, 10 ],
+        [ 2, 1, 3 ],
+        [ 6, 5, 7 ],
+        [ 10, -1, 9 ],
         [ -1, -1, 12 ],
         [ -1, -1, -1 ]
     ];
 
     static headIndicies = [
-        [ 0, 1, 2, 3 ],
-        [ 4, 5, 6, 7 ],
-        [ 8, 5, 9, 10 ],
-        [ 11, 5, 9, 12 ],
-        [ 13, 5, 9, 12 ]
+        [ 0, 2, 1, 3 ],
+        [ 4, 6, 5, 7 ],
+        [ 8, 9, 5, 10 ],
+        [ 11, 9, 5, 12 ],
+        [ 13, 9, 5, 12 ]
     ];
 
     static outOfTime = [
         [ false, false, false, false ],
         [ false, false, false, false ],
-        [ false, true, false, false ],
+        [ false, false, true, false ],
         [ false, true, true, false ],
         [ false, true, true, true ]
     ];
@@ -87,9 +87,15 @@ export default class Rules {
     updateScores(isBot, index) {
         const me = this;
 
-        const scoreIndex = isBot
-            ? index + 1
-            : 0;
+        let scoreIndex
+        if (isBot) {
+            Rules.botSkins[me.level].forEach((x, i) => {
+                if (Rules.botSkins[me.level][i] == index)
+                    scoreIndex = i + 1;
+            })
+        } else {
+            scoreIndex = 0;
+        }
 
         me.scores[scoreIndex] += 1;
     }

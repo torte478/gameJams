@@ -118,7 +118,7 @@ export default class Intro {
         player.isBusy = true;
         player.sprite.stop();
         player.container.body.setVelocityX(0);
-        player.container.setX(2900);
+        player.container.setX(2925);
 
         me.scene.tweens.add({
             targets: player.container,
@@ -147,7 +147,7 @@ export default class Intro {
             return false;
 
         if (me.rules.getOutOfTime()[index + 1]) {
-            me.state = `knock${index + 1}`;
+            me.state = index == 2 ? 'roof' : `knock${index + 1}`;
             console.log('next!');
             return true;
         }

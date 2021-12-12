@@ -192,7 +192,7 @@ export default class Game extends Phaser.Scene {
 
         me.bots.forEach((bot, i) => {
             if (!bot.damaged && me.snow.checkEat(bot.sprite.x, bot.sprite.y)) {
-                me.rules.updateScores(true, i);
+                me.rules.updateScores(true, bot.skinIndex);
             }
         });
 
