@@ -23,6 +23,10 @@ export default class Bot {
 
     skinIndex;
 
+    goToFight;
+    attack;
+    tempActualPos;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
@@ -45,12 +49,15 @@ export default class Bot {
         me.pathIndex = 0;
         me.actualTarget = null;
         me.damaged = false;
+        me.goToFight = false;
+        me.attack = false;
+        me.tempActualPos = null;
     }
 
     update() {
         const me = this;
 
-        if (me.damaged || Consts.botLock)
+        if (me.damaged || Consts.botLock || me.attack)
             return;
 
         if (me.pathIndex >= me.path.length) {
@@ -59,6 +66,35 @@ export default class Bot {
             }
 
             return;
+        }
+
+        if (me.goToFight) {
+            const playerDist = Phaser.Math.Distance.Between(
+                me.sprite.x + 50 * (me.sprite.flipX ? 1 : -1),
+                me.sprite.y,
+                me.scene.player.container.x,
+                me.scene.player.container.y);
+
+            if (playerDist < 50 && !me.scene.player.isBusy){
+                me.attack = true;
+                me.sprite.body.reset(me.sprite.x, me.sprite.y);
+                me.sprite.stop();
+                me.sprite.setFrame(me.skinIndex * Consts.skinOffset + 6);
+                me.scene.sound.play('hit');
+                me.scene.sound.play('punch');
+
+                me.scene.player.startDamage();
+
+                me.scene.time.delayedCall(
+                    500,
+                    () => {
+                        me.goToFight = false;
+                        me.attack = false;
+                        me.pathIndex = 1000;
+                        me.actualTarget = me.tempActualPos;
+                    }
+                )
+            }
         }
 
         const next = me.path[me.pathIndex];
@@ -74,11 +110,14 @@ export default class Bot {
             if (me.pathIndex < me.path.length) {
                 me.startMovement();
             }
-            else
+            else if (!me.goToFight)
             {
                 me.sprite.stop();
                 me.sprite.setFrame(me.skinIndex * Consts.skinOffset + 2);
                 me.scene.sound.play(`mouth_${Phaser.Math.Between(0, 2)}`);
+            }
+            else {
+                me.actualTarget = me.tempActualPos;
             }
 
             if (!!me.actualTarget) {
@@ -96,7 +135,7 @@ export default class Bot {
             me.sprite, 
             target.x,
             target.y, 
-            Consts.botSpeed);
+            Consts.botSpeed - 100 + Phaser.Math.Between(0, 100));
         
         me.sprite.play(me.animName);
         me.sprite.setFlip(target.x < me.sprite.x)
@@ -104,6 +143,12 @@ export default class Bot {
 
     findNewPath() {
         const me = this;
+
+        if (Phaser.Math.Between(0, 2) == 0) {
+            me.goToFight = true;
+            me.tempActualPos = me.actualTarget;
+            me.actualTarget = Phaser.Math.Between(100, 2900);
+        }
 
         const target = me.findTarget(me.actualTarget);
         me.buildPath(me.actualTarget, target);

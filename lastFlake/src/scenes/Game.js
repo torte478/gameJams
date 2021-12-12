@@ -326,7 +326,7 @@ export default class Game extends Phaser.Scene {
         me.cameras.main.pan(
             Consts.worldSize.width / 2,
             Consts.worldSize.height,
-            5000, // TODO!!!!!
+            10, // TODO!!!!!
             'Sine.easeInOut');
 
         me.time.delayedCall(
@@ -338,7 +338,7 @@ export default class Game extends Phaser.Scene {
             me.sound.play('theme_end');
 
         me.time.delayedCall(
-            6000, //TODO!!!!!!
+            10, //TODO!!!!!!
             () => {
                 if (me.rules.level < 4)
                    me.runFight();

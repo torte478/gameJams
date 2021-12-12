@@ -81,6 +81,22 @@ export default class Player {
         me.container.body.setVelocityX(0);
     }
 
+    startDamage() {
+        const me = this;
+
+        me.isBusy = true;
+        me.sprite.stop();
+        me.sprite.setTexture('kids', me.skinIndex * Consts.skinOffset + 5);
+        me.container.body.setVelocityX(0);
+
+        me.scene.time.delayedCall(
+            1000,
+            () => {
+                me.isBusy = false;
+            }
+        );
+    }
+
     stopBusy() {
         const me = this;
 
