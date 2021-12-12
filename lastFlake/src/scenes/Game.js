@@ -100,6 +100,7 @@ export default class Game extends Phaser.Scene {
         me.loadImage('fade');
         me.loadImage('win');
         me.loadSpriteSheet('cat', 200);
+        me.load.audio('theme_end', 'assets/theme-end.mp3');
     }
 
     create() {
@@ -280,16 +281,19 @@ export default class Game extends Phaser.Scene {
         me.cameras.main.pan(
             Consts.worldSize.width / 2,
             Consts.worldSize.height,
-            2000,
+            5000,
             'Sine.easeInOut');
 
         me.time.delayedCall(
-            2750,
+            5750,
             () => { me.cat.play('cat_alert') }
         );
 
+        if (me.rules.level >= 4)
+            me.sound.play('theme_end');
+
         me.time.delayedCall(
-            3000,
+            6000,
             () => {
                 if (me.rules.level < 4)
                    me.runFight();
@@ -361,7 +365,7 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         const particleX = 1500;
-        const particleY = 750;
+        const particleY = 700;
 
         me.add.particles('snowflake')
             .createEmitter({
@@ -396,7 +400,7 @@ export default class Game extends Phaser.Scene {
         const christmasText = me.add.sprite(1500, 1100, 'christmas_text').setAlpha(0);
 
         me.time.delayedCall(
-            3000,
+            8000,
             () => {
                 me.tweens.add({
                     targets: thankText,
@@ -408,7 +412,7 @@ export default class Game extends Phaser.Scene {
         );
 
         me.time.delayedCall(
-            5000,
+            15000,
             () => {
                 me.tweens.add({
                     targets: christmasText,
@@ -420,7 +424,7 @@ export default class Game extends Phaser.Scene {
         );
 
         me.time.delayedCall(
-            3000,
+            10000,
             () => { me.cat.play('cat_end' ) });
     }
 
