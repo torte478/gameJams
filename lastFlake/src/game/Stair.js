@@ -46,6 +46,8 @@ export default class Stair {
     move(other) {
         const me = this;
 
+        me.scene.player.isBusy = true;
+
         if (me.type == Consts.stairType.ROOF) {
             me.scene.cameras.main.stopFollow();
             const timeline = me.scene.tweens.createTimeline();
@@ -63,7 +65,9 @@ export default class Stair {
                     y: me.toY,
                     duration: 1000,
                     ease: 'Sine.easeIn',
-                    onComplete: () => { me.emitter.emit('roofJump'); }
+                    onComplete: () => { 
+                        me.emitter.emit('roofJump'); 
+                        me.scene.player.isBusy = false; }
                 })
                 .play();
         }
@@ -72,7 +76,8 @@ export default class Stair {
                 targets: other,
                 x: me.sprite.x,
                 y: me.toY,
-                duration: me.type == Consts.stairType.UP ? 1000 : 250
+                duration: me.type == Consts.stairType.UP ? 1000 : 250,
+                onComplete:() => { me.scene.player.isBusy = false; }
             });
         }
     }

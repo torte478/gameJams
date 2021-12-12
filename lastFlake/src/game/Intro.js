@@ -28,7 +28,7 @@ export default class Intro {
         me.scene.tweens.add({
             targets: me.scene.add.image(500, 400, 'fade')
                 .setScrollFactor(0)
-                .setDepth(1000),
+                .setDepth(10000),
             alpha: { from: 1, to : 0 },
             duration: 2000
         });
@@ -37,10 +37,10 @@ export default class Intro {
             .text(
                 Consts.viewSize.width / 2 - 200,
                 Consts.viewSize.height / 2 - 50,
-                `Level ${me.rules.level + 1} / 5`,
+                `Level ${me.rules.level + 1}/5`,
                 { fontSize: 72, backgroundColor: '#000' })
             .setScrollFactor(0)
-            .setDepth(1000);
+            .setDepth(10000);
 
         me.scene.time.delayedCall(
             3000,
@@ -160,7 +160,19 @@ export default class Intro {
         if (!knock) 
             return false;
 
-        me.scene.sound.play('door');
+        me.scene.sound.play('door', { volume: 0.5 });
+
+        if (index < 2) {
+            const arrow_dir = index == 0
+                ? 2180
+                : 2780;
+            me.arrow.setX(arrow_dir);
+        }
+        else {
+            me.arrow.play('arrow_dir');
+            me.arrow.setAngle(0);
+            me.arrow.setPosition(2928, 1300);
+        }
 
         if (me.rules.getOutOfTime()[index + 1]) {
             me.state = index == 2 ? 'roof' : `knock${index + 1}`;
@@ -175,18 +187,6 @@ export default class Intro {
             1000,
             () => {
                 player.startHappy();
-
-                if (index < 2) {
-                    const arrow_dir = index == 0
-                        ? 2180
-                        : 2780;
-                    me.arrow.setX(arrow_dir);
-                }
-                else {
-                    me.arrow.play('arrow_dir');
-                    me.arrow.setAngle(0);
-                    me.arrow.setPosition(2928, 1300);
-                }
 
                 const botSkinIndex = me.rules.getBotSkinIndex(index);
 

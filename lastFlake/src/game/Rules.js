@@ -21,6 +21,14 @@ export default class Rules {
     /** @type {Number} */
     level;
 
+    static levelTimers = [
+        90,
+        90,
+        60,
+        45,
+        45
+    ]
+
     static botAvailable = [
         [ true, true, true ],
         [ true, true, true ],
@@ -76,7 +84,10 @@ export default class Rules {
         if (!me.started)
             return;
 
-        me.timer = Consts.timerDuration - (new Date().getTime() - me.startTime) / 1000;
+        const total = Consts.debug
+            ? Consts.timerDuration
+            : Rules.levelTimers[me.level];
+        me.timer = total  - (new Date().getTime() - me.startTime) / 1000;
 
         if (!me.timeOut && me.timer <= 0) {
             me.timeOut = true;

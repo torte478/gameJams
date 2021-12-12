@@ -80,8 +80,11 @@ export default class Bot {
                 me.sprite.body.reset(me.sprite.x, me.sprite.y);
                 me.sprite.stop();
                 me.sprite.setFrame(me.skinIndex * Consts.skinOffset + 6);
-                me.scene.sound.play('hit');
-                me.scene.sound.play('punch');
+
+                if (me.scene.rules.timer >= 0) {
+                    me.scene.sound.play('hit');
+                    me.scene.sound.play('punch');
+                }
 
                 me.scene.player.startDamage();
 
@@ -114,7 +117,9 @@ export default class Bot {
             {
                 me.sprite.stop();
                 me.sprite.setFrame(me.skinIndex * Consts.skinOffset + 2);
-                me.scene.sound.play(`mouth_${Phaser.Math.Between(0, 2)}`);
+
+                if (me.scene.rules.timer > 0)
+                    me.scene.sound.play(`mouth_${Phaser.Math.Between(0, 2)}`);
             }
             else {
                 me.actualTarget = me.tempActualPos;
@@ -151,8 +156,10 @@ export default class Bot {
         }
 
         const target = me.findTarget(me.actualTarget);
-        me.buildPath(me.actualTarget, target);
-        me.actualTarget = null;
+        const res = me.buildPath(me.actualTarget, target);
+
+        if (res)
+            me.actualTarget = null;
     }
 
     onFlakeCreated(pos) {
@@ -170,7 +177,7 @@ export default class Bot {
 
         if (me.alreadyInZone(target)) {
             me.path.push(new Phaser.Geom.Point(pos, me.sprite.y));
-            return;
+            return true;
         }
 
         const d = [],
@@ -187,6 +194,8 @@ export default class Bot {
             v.push(1);
         }
         d[beginIndex] = 0;
+
+        let counter = 0;
 
         do {
             minIndex = INF;
@@ -210,16 +219,25 @@ export default class Bot {
                 }
                 v[minIndex] = 0;
             }
+
+            ++counter;
         }
-        while (minIndex < INF);
+        while (minIndex < INF && counter < 1000);
+
+        if (counter >= 1000)
+            return false;
 
         const ver = [];
         let end = me.findEndIndex(target);
+        if (end == -1)
+            return false;
 
         ver.push(end);
         let weight = d[end];
 
-        while (end != beginIndex) {
+        counter = 0;
+
+        while (end != beginIndex && counter < 1000) {
             for (let i = 0; i < Consts.graphPoints.length; ++i) {
                 if (Consts.graphLinks[i][end] != 0) {
                     let temp = weight - Consts.graphLinks[i][end];
@@ -230,7 +248,12 @@ export default class Bot {
                     }
                 }
             }
+
+            ++counter;
         }
+
+        if (counter >= 1000)
+            return false;
 
         for (let i = ver.length - 1; i >= 0; --i) {
             const point = Consts.graphPoints[ver[i]];
@@ -238,6 +261,8 @@ export default class Bot {
         }
 
         me.path.push(new Phaser.Geom.Point(pos, me.path[me.path.length - 1].y));
+
+        return true;
     }
 
     findEndIndex(target) {

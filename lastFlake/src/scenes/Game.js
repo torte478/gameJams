@@ -217,16 +217,17 @@ export default class Game extends Phaser.Scene {
         me.bots.forEach((bot, i) => {
             if (!bot.damaged && me.snow.checkEat(bot.sprite.x, bot.sprite.y)) {
                 me.rules.updateScores(true, bot.skinIndex);
+                me.sound.play('mouth_close');
             }
         });
 
-        // if (Consts.debug) {
-        //     me.log.text = 
-        //     `${me.player.container.x | 0} ${me.player.container.y | 0}\n` +
-        //     `${me.input.mousePointer.worldX | 0} ${me.input.mousePointer.worldY | 0}\n` + 
-        //     `${me.rules.scores}\n` +
-        //     `Level: ${me.rules.level}`;
-        // }
+        if (Consts.debug) {
+            me.log.text = 
+            `${me.player.container.x | 0} ${me.player.container.y | 0}\n` +
+            `${me.input.mousePointer.worldX | 0} ${me.input.mousePointer.worldY | 0}\n` + 
+            `${me.player.isBusy}\n` +
+            `Level: ${me.rules.level}`;
+        }
     }
 
     onTimeout() {
@@ -266,14 +267,18 @@ export default class Game extends Phaser.Scene {
         me.player.sprite.stop();
         me.player.container.body.setVelocityX(0);
         me.player.sprite.setFrame(me.player.skinIndex * Consts.skinOffset + 6);
-        me.sound.play('punch');
+
+        if (me.rules.timer >= 0)
+            me.sound.play('punch');
 
         me.bots.forEach((bot) => {
             const dist = Math.abs(bot.sprite.x - me.player.container.x + 50 * (me.player.sprite.flipX ? 1 : -1));
             if (dist < 40
                 && Math.abs(bot.sprite.y - me.player.container.y) < 100) {
                     bot.tryElectricityDamage();
-                    me.sound.play('hit');
+
+                    if (me.rules.timer >= 0)
+                        me.sound.play('hit');
                 }
         });
 
@@ -327,7 +332,7 @@ export default class Game extends Phaser.Scene {
         me.cameras.main.pan(
             Consts.worldSize.width / 2,
             Consts.worldSize.height,
-            10, // TODO!!!!!
+            5000, // TODO!!!!!
             'Sine.easeInOut');
 
         me.time.delayedCall(
@@ -339,7 +344,7 @@ export default class Game extends Phaser.Scene {
             me.sound.play('theme_end');
 
         me.time.delayedCall(
-            10, //TODO!!!!!!
+            6000, //TODO!!!!!!
             () => {
                 if (me.rules.level < 4)
                    me.runFight();
@@ -357,6 +362,8 @@ export default class Game extends Phaser.Scene {
             me.sound.play('fight', { loop: true, volume: 0.10 });
 
         me.player.show();
+        me.player.isBusy = true;
+        me.player.container.body.setVelocityX(0);
         me.player.container.setPosition(Consts.worldSize.width / 2, 750)
         me.tweens.add({
             targets: me.player.container,
@@ -384,6 +391,8 @@ export default class Game extends Phaser.Scene {
                 me.stairs.forEach((x) => x.sprite.setVisible(true));
 
                 me.snow.running = true;
+
+                me.player.isBusy = false;
 
                 me.tweens.createTimeline()
                     .add({
@@ -531,7 +540,7 @@ export default class Game extends Phaser.Scene {
     checkKey() {
         const me = this;
 
-        if (!me.keys.x.isDown || !me.isMultipleXPress)
+        if (!me.keys.x.isDown || !me.isMultipleXPress || me.player.isBusy)
             return false;
 
         if (me.player.hasKey) {
@@ -581,9 +590,13 @@ export default class Game extends Phaser.Scene {
 
             if (stopEat) {
                 me.player.stopBusy();
-                me.sound.play('mouth_close');
+
+                if (me.rules.timer >= 0)
+                    me.sound.play('mouth_close');
+
                 if (me.snow.checkEat(me.player.container.x, me.player.container.y)) {
-                    me.sound.play('coin');
+                    if (me.rules.timer >= 0)
+                        me.sound.play('coin');
                     me.rules.updateScores(false);
                 }
             }
@@ -591,11 +604,12 @@ export default class Game extends Phaser.Scene {
             return !stopEat;
         } 
         else {
-            const startEat = me.keys.z.isDown;
+            const startEat = me.keys.z.isDown && !me.player.isBusy;
             
             if (startEat) {
                 me.player.startEat();
-                me.sound.play(`mouth_${Phaser.Math.Between(0, 2)}`);
+                if (me.rules.timer >= 0)
+                    me.sound.play(`mouth_${Phaser.Math.Between(0, 2)}`);
             }
 
             return startEat;
@@ -651,7 +665,7 @@ export default class Game extends Phaser.Scene {
             [ 2900, Consts.height.top, Consts.height.middle, Consts.stairType.DOWN ],
             [ 2070, Consts.height.middle, Consts.height.floor, Consts.stairType.DOWN ]
         ]
-        .map((a) => new Stair(me, a[0], a[1], a[2], a[3], a[4]));
+        .map((a) => new Stair(me, a[0], a[1], a[2], a[3]));
 
         stairs.forEach((x) => x.sprite.setVisible(false));
 
@@ -680,15 +694,15 @@ export default class Game extends Phaser.Scene {
         [
             [ 3012, 1500 ],
             [ 0, 1500 ],
-            [ 40, 1260 ],
+            [ 0, 1260 ],
             [ 1175, 1260 ],
             [ 2000, 1260 ],
-            [ 2950, 1260 ],
-            [ 2950, 1000 ],
-            [ 2625, 1000 ],
+            [ 3012, 1260 ],
+            [ 3012, 1000 ],
+            [ 2590, 1000 ],
             [ 2500, 1000 ],
-            [ 2200, 1000 ],
-            [ 230, 1000 ],
+            [ 2175, 1000 ],
+            [ 220, 1000 ],
             [ 750, 1000 ],
             [ 2000, 540],
             [ 3012, Consts.height.roof ]
