@@ -5,6 +5,9 @@ import Rules from './Rules.js';
 
 export default class HUD {
 
+    /** @type {Phaser.Scene} */
+    scene;
+
     /** @type {Phaser.GameObjects.Container} */
     container;
 
@@ -15,6 +18,7 @@ export default class HUD {
     heads;
     defeatText;
     timerText;
+    winText;
     
     /**
      * 
@@ -24,6 +28,7 @@ export default class HUD {
     constructor(scene, rules, headIndicies, outOfTime) {
         const me = this;
 
+        me.scene = scene;
         me.rules = rules;
 
         const scoreStyle = { fontSize: 24 }
@@ -51,6 +56,14 @@ export default class HUD {
             scene.add.text(360, defeatHeight, 'out of time', defeatStyle).setVisible(outOfTime[3]).setAngle(angle)
         ];
 
+        const winHeight = 100;
+        me.winText = [
+            scene.add.image(-400, winHeight, 'win').setAlpha(0),
+            scene.add.image(-190, winHeight, 'win').setAlpha(0),
+            scene.add.image(230, winHeight, 'win').setAlpha(0),
+            scene.add.image(420, winHeight, 'win').setAlpha(0)
+        ]
+
         me.timerText = scene.add.text(-5, 17, '0', { fontSize: 40 });
 
         me.container = scene.add.container(Consts.viewSize.width / 2, 0, [ 
@@ -67,7 +80,11 @@ export default class HUD {
             me.defeatText[1],
             me.defeatText[2],
             me.defeatText[3],
-            me.timerText
+            me.timerText,
+            me.winText[0],
+            me.winText[1],
+            me.winText[2],
+            me.winText[3]
         ])
             .setScrollFactor(0)
             .setDepth(10000);
@@ -79,6 +96,26 @@ export default class HUD {
         for (let i = 0; i < me.rules.scores.length; ++i)
             me.scoreText[i].text = `x${me.rules.scores[i]}`;
 
-        me.timerText.text = me.rules.timer | 0;
+        if (me.rules.timer >= 0)
+            me.timerText.text = me.rules.timer | 0;
+    }
+
+    showWinner(){
+        const me = this;
+
+        let maxScore = 0;
+        me.rules.scores.forEach((x) => { if (x > maxScore) maxScore = x; });
+
+        me.winText
+            .filter((x, i) => me.rules.scores[i] == maxScore)
+            .forEach((text) => {
+                me.scene.tweens.add({
+                    targets: text,
+                    alpha: { from: 0, to: 1},
+                    duration: 1000,
+                    yoyo: true,
+                    repeat: -1
+                })
+        });
     }
 }

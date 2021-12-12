@@ -61,7 +61,7 @@ export default class Rules {
         const me = this;
 
         me.level = level;
-        me.scores = [0, 0, 0, 0];
+        me.scores = [3, 2, 4, 4];
         me.startTime = new Date().getTime();
         me.emitter = new Phaser.Events.EventEmitter();
         me.timeOut = false;

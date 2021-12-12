@@ -90,6 +90,8 @@ export default class Game extends Phaser.Scene {
         me.loadImage('christmas_text');
         me.loadImage('hud');
         me.loadSpriteSheet('heads', 50);
+        me.loadImage('fade');
+        me.loadImage('win');
     }
 
     create() {
@@ -215,7 +217,24 @@ export default class Game extends Phaser.Scene {
         if (me.rules.level >= 4)
             return;
 
-        me.scene.start('game', { level: me.rules.level + 1 });
+        //TODO : stop all
+
+        me.tweens.add({
+            targets: me.add.image(Consts.viewSize.width / 2, Consts.viewSize.height / 2, 'fade')
+                .setScrollFactor(0)
+                .setAlpha(0)
+                .setDepth(9000),
+            alpha: { from: 0, to: 1},
+            duration: 1000,
+            onComplete: () => { 
+                me.hud.showWinner();
+            }
+        });
+
+        me.time.delayedCall(
+            7000,
+            () => { me.scene.start('game', { level: me.rules.level + 1 }); }
+        );
     }
 
     checkElectricity() {
