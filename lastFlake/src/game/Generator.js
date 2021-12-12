@@ -63,6 +63,7 @@ export default class Generator {
         me.garlands.forEach((g) => g.play('garland'));
         me.electricity.forEach((e) => e.setVisible(true));
         me.running = true;
+        me.scene.sound.play('lightning', { volume: 0.5 });
 
         me.scene.time.delayedCall(
             1000,
@@ -79,6 +80,7 @@ export default class Generator {
 
                 me.emitter.emit('generatorFinished', me.sprite.x, me.sprite.y);
                 me.running = false;
+                me.scene.sound.stopByKey('lightning');
             });
     }
 }

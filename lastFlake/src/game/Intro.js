@@ -126,7 +126,7 @@ export default class Intro {
         me.scene.tweens.add({
             targets: player.container,
             y: Consts.height.roof,
-            duration: 3000,
+            duration: me.rules.level >= 4 ? 6000 : 3000,
             onComplete: () => { player.isBusy = false }
         });
 
@@ -149,68 +149,77 @@ export default class Intro {
         if (!knock) 
             return false;
 
+        me.scene.sound.play('door');
+
         if (me.rules.getOutOfTime()[index + 1]) {
             me.state = index == 2 ? 'roof' : `knock${index + 1}`;
-            console.log('next!');
             return true;
         }
         
-        player.startHappy();
+        player.isBusy = true;
+        player.sprite.stop();
+        player.container.body.setVelocityX(0);
 
-        const botSkinIndex = me.rules.getBotSkinIndex(index);
+        me.scene.time.delayedCall(
+            1000,
+            () => {
+                player.startHappy();
 
-        const bot = me.scene.add.sprite(pos + 50, Consts.height.floor, 'kids')
-            .play(`kid_${botSkinIndex}_knock`)
-            .setFlipX(true);
+                const botSkinIndex = me.rules.getBotSkinIndex(index);
 
-        const timeline = me.scene.tweens.createTimeline()
-            .add({
-                targets: bot,
-                x: 2925,
-                duration: firstDuration,
-                delay: 2000,
-                onStart: () => { 
-                    bot.setFlipX(false);
-                    bot.play(`kid_${botSkinIndex}_walk`)
-                }
-            })
-            .add({
-                targets: bot,
-                y: Consts.height.roof,
-                duration: 3000
-            })
-            .add({
-                targets: bot,
-                x: 2060,
-                duration: 2000,
-                onStart: () => { bot.setFlipX(true) }
-            })
-            .add({
-                targets: bot,
-                x: 1960,
-                y: Consts.height.roof - 50,
-                duration: 250,
-                ease: 'Sine.easeOut'
-            })
-            .add({
-                targets: bot,
-                x: 1760,
-                y: 1000,
-                duration: 500,
-                ease: 'Sine.easeIn',
-                onComplete: () => { bot.destroy(); },
-                onUpdate: () => {
-                    const camera = me.scene.cameras.main;
-                    if (bot.x < camera.scrollX - 100
-                        || bot.x > camera.scrollX + Consts.viewSize.width + 100
-                        || bot.y < camera.scrollY - 100
-                        || bot.y > camera.scrollY + Consts.viewSize.height + 100) {
+                const bot = me.scene.add.sprite(pos + 50, Consts.height.floor, 'kids')
+                    .play(`kid_${botSkinIndex}_knock`)
+                    .setFlipX(true);
 
-                            bot.setVisible(false);
+                const timeline = me.scene.tweens.createTimeline()
+                    .add({
+                        targets: bot,
+                        x: 2925,
+                        duration: firstDuration,
+                        delay: 2000,
+                        onStart: () => { 
+                            bot.setFlipX(false);
+                            bot.play(`kid_${botSkinIndex}_walk`)
                         }
-                }
-            })
-            .play();
+                    })
+                    .add({
+                        targets: bot,
+                        y: Consts.height.roof,
+                        duration: 3000
+                    })
+                    .add({
+                        targets: bot,
+                        x: 2060,
+                        duration: 2000,
+                        onStart: () => { bot.setFlipX(true) }
+                    })
+                    .add({
+                        targets: bot,
+                        x: 1960,
+                        y: Consts.height.roof - 50,
+                        duration: 250,
+                        ease: 'Sine.easeOut'
+                    })
+                    .add({
+                        targets: bot,
+                        x: 1760,
+                        y: 1000,
+                        duration: 500,
+                        ease: 'Sine.easeIn',
+                        onComplete: () => { bot.destroy(); },
+                        onUpdate: () => {
+                            const camera = me.scene.cameras.main;
+                            if (bot.x < camera.scrollX - 100
+                                || bot.x > camera.scrollX + Consts.viewSize.width + 100
+                                || bot.y < camera.scrollY - 100
+                                || bot.y > camera.scrollY + Consts.viewSize.height + 100) {
+
+                                    bot.setVisible(false);
+                                }
+                        }
+                    })
+                    .play();
+            });
         
         me.state = index < 2
             ? `knock${index + 1}`

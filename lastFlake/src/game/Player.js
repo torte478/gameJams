@@ -55,7 +55,11 @@ export default class Player {
         if (me.isBusy)
             return;
 
-        me.container.body.setVelocityX(Consts.player.speed * dir);
+        let speed = Consts.player.speed;
+        if (me.scene.rules.level >= 4)
+            speed /= 2;
+
+        me.container.body.setVelocityX(speed * dir);
 
         if (dir != 0) {
             me.sprite.play(`kid_${me.skinIndex}_walk`, true);

@@ -77,7 +77,8 @@ export default class Bot {
             else
             {
                 me.sprite.stop();
-                me.sprite.setFrame(me.skinIndex * Consts.skinOffset + 2); // TODO
+                me.sprite.setFrame(me.skinIndex * Consts.skinOffset + 2);
+                me.scene.sound.play(`mouth_${Phaser.Math.Between(0, 2)}`);
             }
 
             if (!!me.actualTarget) {

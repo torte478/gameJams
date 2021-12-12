@@ -104,6 +104,16 @@ export default class Game extends Phaser.Scene {
         me.load.audio('bass', 'assets/bass.mp3');
         me.load.audio('fight', 'assets/fight.mp3');
         me.load.audio('idle', 'assets/idle.mp3');
+        me.load.audio('mouth_0', 'assets/mouth_0.mp3');
+        me.load.audio('mouth_1', 'assets/mouth_2.mp3');
+        me.load.audio('mouth_2', 'assets/mouth_1.mp3');
+        me.load.audio('mouth_close', 'assets/mouth_close.mp3');
+        me.load.audio('coin', 'assets/coin.wav');
+        me.load.audio('door', 'assets/door.mp3');
+        me.load.audio('hit', 'assets/hit.wav');
+        me.load.audio('key', 'assets/key.mp3');
+        me.load.audio('punch', 'assets/punch.mp3');
+        me.load.audio('lightning', 'assets/lightning.mp3');
     }
 
     create() {
@@ -255,12 +265,14 @@ export default class Game extends Phaser.Scene {
         me.player.sprite.stop();
         me.player.container.body.setVelocityX(0);
         me.player.sprite.setFrame(me.player.skinIndex * Consts.skinOffset + 6);
+        me.sound.play('punch');
 
         me.bots.forEach((bot) => {
             const dist = Math.abs(bot.sprite.x - me.player.container.x + 50 * (me.player.sprite.flipX ? 1 : -1));
             if (dist < 40
                 && Math.abs(bot.sprite.y - me.player.container.y) < 100) {
                     bot.tryElectricityDamage();
+                    me.sound.play('hit');
                 }
         });
 
@@ -314,7 +326,7 @@ export default class Game extends Phaser.Scene {
         me.cameras.main.pan(
             Consts.worldSize.width / 2,
             Consts.worldSize.height,
-            10, //5000, // TODO!!!!!
+            5000, // TODO!!!!!
             'Sine.easeInOut');
 
         me.time.delayedCall(
@@ -326,7 +338,7 @@ export default class Game extends Phaser.Scene {
             me.sound.play('theme_end');
 
         me.time.delayedCall(
-            10, //6000, //TODO!!!!!!
+            6000, //TODO!!!!!!
             () => {
                 if (me.rules.level < 4)
                    me.runFight();
@@ -533,6 +545,7 @@ export default class Game extends Phaser.Scene {
                 me.key
                     .setPosition(me.player.container.x, me.player.container.y)
                     .setVisible(true);
+                me.sound.play('key');
             }
 
             me.player.throwKey();
@@ -551,6 +564,7 @@ export default class Game extends Phaser.Scene {
     
             me.key.setVisible(false);
             me.player.takeKey();
+            me.sound.play('key');
     
             return true;
         }
@@ -566,7 +580,9 @@ export default class Game extends Phaser.Scene {
 
             if (stopEat) {
                 me.player.stopBusy();
+                me.sound.play('mouth_close');
                 if (me.snow.checkEat(me.player.container.x, me.player.container.y)) {
+                    me.sound.play('coin');
                     me.rules.updateScores(false);
                 }
             }
@@ -576,8 +592,10 @@ export default class Game extends Phaser.Scene {
         else {
             const startEat = me.keys.z.isDown;
             
-            if (startEat)
+            if (startEat) {
                 me.player.startEat();
+                me.sound.play(`mouth_${Phaser.Math.Between(0, 2)}`);
+            }
 
             return startEat;
         }

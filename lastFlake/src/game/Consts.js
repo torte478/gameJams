@@ -17,19 +17,19 @@ export default class Consts {
     }
 
     static player = {
-        startX: 2400,
-        startY: this.height.roof,
+        startX: 50,
+        startY: this.height.floor,
         speed: 500
     };
 
     static botSpeed = 300; // 500;
     static snowSpeed = 100; //50;
-    static timerDuration = 90;
-    static startLevel = 2;
+    static timerDuration = 15;
+    static startLevel = 4;
     static botLock = false;
     static skinOffset = 7;
-    static introState = 'jump';
-    static playMusic = false;
+    static introState = 'knock0';
+    static playMusic = true;
 
     static eatZones = [
         [ 
