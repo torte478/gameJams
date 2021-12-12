@@ -87,6 +87,9 @@ export default class Rules {
     updateScores(isBot, index) {
         const me = this;
 
+        if (me.timer <= 0)
+            return;
+
         let scoreIndex
         if (isBot) {
             Rules.botSkins[me.level].forEach((x, i) => {

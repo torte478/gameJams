@@ -45,6 +45,9 @@ export default class Intro {
 
         me.state = Consts.introState;
         me.stair = new Stair(me.scene, 2050, Consts.height.roof, Consts.height.floor, Consts.stairType.ROOF);
+
+        if (me.rules.level < 4)
+            me.scene.sound.play('idle', { loop: true, volume: 0.20 });
     }
 
     /**
@@ -92,7 +95,7 @@ export default class Intro {
         if (!jump)
             return false;
 
-        me.stair.move(player.container)
+        me.stair.move(player.container);
 
         me.state = 'halt';
     }

@@ -101,6 +101,9 @@ export default class Game extends Phaser.Scene {
         me.loadImage('win');
         me.loadSpriteSheet('cat', 200);
         me.load.audio('theme_end', 'assets/theme-end.mp3');
+        me.load.audio('bass', 'assets/bass.mp3');
+        me.load.audio('fight', 'assets/fight.mp3');
+        me.load.audio('idle', 'assets/idle.mp3');
     }
 
     create() {
@@ -195,7 +198,9 @@ export default class Game extends Phaser.Scene {
 
         me.updateInput();
 
+        
         me.toUpdate.forEach((x) => x.update());
+
         me.checkElectricity();
 
         me.bots.forEach((bot, i) => {
@@ -232,6 +237,7 @@ export default class Game extends Phaser.Scene {
                 me.hud.showWinner();
             }
         });
+        me.sound.stopAll();
 
         me.time.delayedCall(
             7000,
@@ -304,6 +310,9 @@ export default class Game extends Phaser.Scene {
 
     runFight() {
         const me = this;
+
+        me.sound.stopByKey('idle');
+        me.sound.play('fight', { loop: true, volume: 0.10 });
 
         me.player.show();
         me.player.container.setPosition(Consts.worldSize.width / 2, 750)

@@ -24,8 +24,8 @@ export default class Consts {
 
     static botSpeed = 300; // 500;
     static snowSpeed = 100; //50;
-    static timerDuration = 100;
-    static startLevel = 4;
+    static timerDuration = 10;
+    static startLevel = 2;
     static botLock = false;
     static skinOffset = 7;
     static introState = 'jump';
