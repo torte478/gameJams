@@ -4,6 +4,7 @@ import Bot from '../game/Bot.js';
 import Consts from '../game/Consts.js';
 import Generator from '../game/Generator.js';
 import Player from '../game/Player.js';
+import Rules from '../game/Rules.js';
 import Snow from '../game/Snow.js';
 import Stair from '../game/Stair.js';
 import Utils from '../game/Utils.js';
@@ -49,8 +50,22 @@ export default class Game extends Phaser.Scene {
     /** @type {Array} */
     generators;
 
+    /** @type {Rules} */
+    rules;
+
+    /** @type {Number} */
+    initiedLevel;
+
     constructor() {
         super('game');
+    }
+
+    init(data) {
+        const me = this;
+
+        me.initiedLevel = !!data.level
+            ? data.level
+            : Consts.startLevel;
     }
 
     preload() {
@@ -106,6 +121,13 @@ export default class Game extends Phaser.Scene {
             me.onGeneratorFinished, 
             me));
 
+        me.key = me.add.sprite(1700, Consts.height.floor, 'key')
+            .play('key');
+
+        me.rules = new Rules(me.initiedLevel);
+        me.toUpdate.push(me.rules);
+        me.rules.emitter.on('timeout', me.onTimeout, me);
+
         me.player = new Player(me, Consts.player.startX, Consts.player.startY);
 
         const walls = me.createWalls();
@@ -128,9 +150,6 @@ export default class Game extends Phaser.Scene {
             me.toUpdate.push(bot);
         });
 
-        me.key = me.add.sprite(1700, Consts.height.floor, 'key')
-            .play('key');
-
         // camera
 
         me.cameras.main.setBounds(0, 0, Consts.worldSize.width, Consts.worldSize.height);
@@ -152,16 +171,26 @@ export default class Game extends Phaser.Scene {
         me.toUpdate.forEach((x) => x.update());
         me.checkElectricity();
 
-        me.bots.forEach((bot) => {
-            if (!bot.damaged)
-                me.snow.checkEat(bot.sprite.x, bot.sprite.y)
+        me.bots.forEach((bot, i) => {
+            if (!bot.damaged && me.snow.checkEat(bot.sprite.x, bot.sprite.y)) {
+                me.rules.updateScores(true, i);
+            }
         });
 
         if (Consts.debug) {
             me.log.text = 
             `${me.player.container.x | 0} ${me.player.container.y | 0}\n` +
-            `${me.input.mousePointer.worldX | 0} ${me.input.mousePointer.worldY | 0}`;
+            `${me.input.mousePointer.worldX | 0} ${me.input.mousePointer.worldY | 0}\n` + 
+            `${me.rules.scores}\n` +
+            `${(me.rules.timer).toFixed(1)}\n` +
+            `Level: ${me.rules.level}`;
         }
+    }
+
+    onTimeout() {
+        const me = this;
+
+        me.scene.start('game', { level: me.rules.level + 1 });
     }
 
     checkElectricity() {
@@ -302,7 +331,9 @@ export default class Game extends Phaser.Scene {
 
             if (stopEat) {
                 me.player.stopEat();
-                me.snow.checkEat(me.player.container.x, me.player.container.y);
+                if (me.snow.checkEat(me.player.container.x, me.player.container.y)) {
+                    me.rules.updateScores(false);
+                }
             }
 
             return !stopEat;
