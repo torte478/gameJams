@@ -35,7 +35,8 @@ export default class Generator {
         me.sprite = scene.add.sprite(x, y, 'generator', 0);
         me.emitter = new Phaser.Events.EventEmitter();
         me.garlands = garlandPositions
-            .map((pos) => scene.add.sprite(pos.x, pos.y, 'garland', 2));
+            .map((pos) => scene.add.sprite(pos.x, pos.y, 'garland', 2)
+                .setDepth(100));
         me.electricity = me.garlands
             .map((g) => scene.add.sprite(g.x, g.y, 'electricity')
                 .setVisible(false)

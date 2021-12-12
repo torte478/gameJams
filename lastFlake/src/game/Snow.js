@@ -55,7 +55,8 @@ export default class Snow {
         flake
             .setActive(true)
             .setVisible(true)
-            .setVelocityY(Consts.snowSpeed);
+            .setVelocityY(Consts.snowSpeed)
+            .setDepth(1000);
 
         me.emitter.emit('flakeCreated', pos);
 

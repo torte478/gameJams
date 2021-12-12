@@ -112,8 +112,13 @@ export default class Game extends Phaser.Scene {
         me.generators = [
             new Generator(me, 2450, Consts.height.floor - Consts.unit, [
                 { x: 2600, y: Consts.height.top + Consts.unit },
-                { x: 2800, y: Consts.height.middle + Consts.unit },
-                { x: 2050, y: Consts.height.floor + Consts.unit }
+                { x: 2800, y: Consts.height.middle + Consts.unit /2 },
+                { x: 2050, y: Consts.height.floor + Consts.unit / 2 }
+            ]),
+            new Generator(me, 600, Consts.height.floor - Consts.unit, [
+                { x: 490, y: Consts.height.top + Consts.unit },
+                { x: 790, y: Consts.height.middle + Consts.unit / 2 },
+                { x: 210, y: Consts.height.floor + Consts.unit / 2 }
             ])
         ];
         me.generators.forEach((x) => x.emitter.on(
@@ -121,7 +126,7 @@ export default class Game extends Phaser.Scene {
             me.onGeneratorFinished, 
             me));
 
-        me.key = me.add.sprite(1700, Consts.height.floor, 'key')
+        me.key = me.add.sprite(700, Consts.height.floor, 'key')
             .play('key');
 
         me.rules = new Rules(me.initiedLevel);
