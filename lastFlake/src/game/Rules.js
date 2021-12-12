@@ -21,6 +21,26 @@ export default class Rules {
     /** @type {Number} */
     level;
 
+    static botAvailable = [
+        [ true, true, true ],
+        [ true, true, true ],
+        [ true, false, true ],
+        [ false, false, true ],
+        [ false, false, false ]
+    ];
+
+    static botSkins = [
+        [ 1, 2, 3 ],
+        [ 5, 6, 7 ],
+        [ 9, -1, 10 ],
+        [ -1, -1, 12 ],
+        [ -1, -1, -1 ]
+    ];
+
+    static botPositions = [ 240, 2210, 2810 ];
+
+    static playerSkin = [ 0, 4, 8, 11, 13 ];
+
     constructor(level) {
         const me = this;
 
@@ -50,5 +70,26 @@ export default class Rules {
             : 0;
 
         me.scores[scoreIndex] += 1;
+    }
+
+    getBotConfigs() {
+        const me = this;
+
+        const res = [];
+        for (let i = 0; i < Rules.botPositions.length; ++i){
+            if (Rules.botAvailable[me.level][i])
+                res.push({
+                    x: Rules.botPositions[i],
+                    skin: Rules.botSkins[me.level][i]
+                });
+        }
+
+        return res;
+    }
+
+    getPlayerSkin() {
+        const me = this;
+
+        return Rules.playerSkin[me.level];
     }
 }

@@ -133,7 +133,11 @@ export default class Game extends Phaser.Scene {
         me.toUpdate.push(me.rules);
         me.rules.emitter.on('timeout', me.onTimeout, me);
 
-        me.player = new Player(me, Consts.player.startX, Consts.player.startY);
+        me.player = new Player(
+            me, 
+            Consts.player.startX, 
+            Consts.player.startY,
+            me.rules.getPlayerSkin());
 
         const walls = me.createWalls();
         me.stairs = me.createStairs();
@@ -146,9 +150,9 @@ export default class Game extends Phaser.Scene {
         me.snow = new Snow(me, 1);
         me.toUpdate.push(me.snow);
 
-        me.bots = [
-            new Bot(me, 1400, Consts.levelType.FLOOR, 'kid_1_walk')
-        ];
+        me.bots = me.rules
+            .getBotConfigs()
+            .map((cfg) => new Bot(me, cfg.x, Consts.levelType.FLOOR, cfg.skin));
 
         me.bots.forEach((bot) => {
             me.snow.emitter.on('flakeCreated', bot.onFlakeCreated, bot);  
@@ -194,6 +198,9 @@ export default class Game extends Phaser.Scene {
 
     onTimeout() {
         const me = this;
+
+        if (me.rules.level >= 4)
+            return;
 
         me.scene.start('game', { level: me.rules.level + 1 });
     }
@@ -494,18 +501,15 @@ export default class Game extends Phaser.Scene {
             repeat: -1
         });
 
-        me.anims.create({
-            key: 'kid_0_walk',
-            frames: me.anims.generateFrameNumbers('kids', { frames: [ 0, 1 ]}),
-            frameRate: 10,
-            repeat: -1
-        });
-
-        me.anims.create({
-            key: 'kid_1_walk',
-            frames: me.anims.generateFrameNumbers('kids', { frames: [ 7 + 0, 7 + 1 ]}),
-            frameRate: 10,
-            repeat: -1
-        })
+        for (let i = 0; i < 14; ++i) {
+            me.anims.create({
+                key: `kid_${i}_walk`,
+                frames: me.anims.generateFrameNumbers('kids', { frames: [ 
+                    i * Consts.skinOffset + 0, 
+                    i * Consts.skinOffset + 1 ]}),
+                frameRate: 10,
+                repeat: -1
+            });    
+        }
     }
 }

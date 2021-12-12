@@ -24,8 +24,10 @@ export default class Consts {
 
     static botSpeed = 300; // 500;
     static snowSpeed = 100; //50;
-    static timerDuration = 60;
-    static startLevel = 1;
+    static timerDuration = 100;
+    static startLevel = 0;
+    static botLock = true;
+    static skinOffset = 7;
 
     static eatZones = [
         [ 

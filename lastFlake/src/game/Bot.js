@@ -21,21 +21,25 @@ export default class Bot {
 
     damaged;
 
+    skinIndex;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
      * @param {Number} x 
      * @param {Number} level 
      */
-    constructor(scene, x, level, animName) {
+    constructor(scene, x, level, skinIndex) {
         const me = this;
 
         me.scene = scene;
 
         const y = Utils.getYbyLevel(level);
 
-        me.animName = animName;
-        me.sprite = scene.physics.add.sprite(x, y, animName);
+        me.skinIndex = skinIndex;
+        me.animName = `kid_${skinIndex}_walk`;
+        me.sprite = scene.physics.add.sprite(x, y, me.animName)
+            .play(me.animName);
 
         me.path = [];
         me.pathIndex = 0;
@@ -46,7 +50,7 @@ export default class Bot {
     update() {
         const me = this;
 
-        if (me.damaged)
+        if (me.damaged || Consts.botLock)
             return;
 
         if (me.pathIndex >= me.path.length) {
@@ -73,7 +77,7 @@ export default class Bot {
             else
             {
                 me.sprite.stop();
-                me.sprite.setFrame(7 + 2); // TODO
+                me.sprite.setFrame(me.skinIndex * Consts.skinOffset + 2); // TODO
             }
 
             if (!!me.actualTarget) {
@@ -259,7 +263,7 @@ export default class Bot {
 
         me.damaged = true;
         me.sprite.stop();
-        me.sprite.setFrame(7 + 5); //TODO
+        me.sprite.setFrame(me.skinIndex * Consts.skinOffset + 5);
         me.sprite.body.reset(me.sprite.x, me.sprite.y);
 
         me.scene.time.delayedCall(
@@ -267,7 +271,7 @@ export default class Bot {
             () => {
                 me.damaged = false;
                 if (me.pathIndex >= me.path.length)
-                    me.sprite.setFrame(7 + 2); // TODO
+                    me.sprite.setFrame(me.skinIndex * Consts.skinOffset + 2);
                 else
                     me.startMovement();
             }

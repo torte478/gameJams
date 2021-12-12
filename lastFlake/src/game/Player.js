@@ -19,14 +19,18 @@ export default class Player {
     /** @type {Boolean} */
     hasKey;
 
+    /** @type {Number} */
+    skinIndex;
+
     /**
      * @param {Phaser.Scene scene 
      * @param {Number} x 
      * @param {Number} y 
      */
-    constructor(scene, x, y) {
+    constructor(scene, x, y, skinIndex) {
         const me = this;
 
+        me.skinIndex = skinIndex;
         me.sprite = scene.add.sprite(0, 0, 'kids', 0);
         me.itemSprite = scene.add.sprite(0, -1.5 * Consts.unit, 'key')
             .setVisible(false);
@@ -44,11 +48,11 @@ export default class Player {
         me.container.body.setVelocityX(Consts.player.speed * dir);
 
         if (dir != 0) {
-            me.sprite.play('kid_0_walk', true);
+            me.sprite.play(`kid_${me.skinIndex}_walk`, true);
             me.sprite.flipX = dir < 0;
         }
         else {
-            me.sprite.setFrame(0);
+            me.sprite.setFrame(me.skinIndex * Consts.skinOffset);
             me.sprite.stop();
         }
     }
@@ -58,7 +62,7 @@ export default class Player {
 
         me.isEat = true;
         me.sprite.stop();
-        me.sprite.setTexture('kids', 2);
+        me.sprite.setTexture('kids', me.skinIndex * Consts.skinOffset + 2);
         me.container.body.setVelocityX(0);
     }
 
@@ -66,7 +70,7 @@ export default class Player {
         const me = this;
 
         me.isEat = false;
-        me.sprite.setTexture('kids', 2);
+        me.sprite.setTexture('kids', me.skinIndex * Consts.skinOffset);
     }
 
     hide() {
