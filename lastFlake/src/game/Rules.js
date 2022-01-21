@@ -23,8 +23,8 @@ export default class Rules {
 
     static levelTimers = [
         90,
-        90,
         60,
+        50,
         45,
         45
     ]
