@@ -11,6 +11,14 @@ export default class Game extends Phaser.Scene {
     /** @type {Phaser.GameObjects.Image} */
     cursor;
 
+    dices = {
+        /** @type {Phaser.GameObjects.Sprite} */
+        first: null,
+
+        /** @type {Phaser.GameObjects.Sprite} */
+        second: null
+    };
+
     constructor() {
         super('game');
     }
@@ -21,6 +29,7 @@ export default class Game extends Phaser.Scene {
         me.loadImage('temp');
         me.loadImage('hud');
         me.loadImage('cursor');
+        me.loadSpriteSheet('dice', 50);
     }
 
     create() {
@@ -34,6 +43,11 @@ export default class Game extends Phaser.Scene {
             .setDepth(Consts.Depth.HUD);
 
         me.cursor = me.createCursor();
+
+        me.dices.first = me.add.sprite(0, 0, 'dice', 0);
+        me.dices.second = me.add.sprite(75, 10, 'dice', 1);
+
+        me.cameras.main.setScroll(Consts.World.Width / -2, Consts.World.Height / -2);
 
         if (Global.isDebug) {
             me.log = me.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
@@ -73,9 +87,7 @@ export default class Game extends Phaser.Scene {
                 return;
 
             me.input.mouse.requestPointerLock();
-            cursor
-                .setPosition(pointer.x, pointer.y)
-                .setVisible(true);
+            cursor.setVisible(true);
 
             me.cameras.main.startFollow(cursor, true, 0.05, 0.05);
         }, me);
@@ -92,5 +104,14 @@ export default class Game extends Phaser.Scene {
         }, me);
 
         return cursor;
+    }
+
+    loadSpriteSheet(name, width, height) {
+        const me = this;
+
+        return me.load.spritesheet(name, `assets/${name}.png`, {
+            frameWidth: width,
+            frameHeight: !!height ? height : width
+        });
     }
 }
