@@ -1,6 +1,7 @@
 import Phaser from '../lib/phaser.js';
 
 import Consts from '../game/Consts.js';
+import Dices from '../game/Dices.js';
 import Global from '../game/Global.js';
 
 export default class Game extends Phaser.Scene {
@@ -11,13 +12,8 @@ export default class Game extends Phaser.Scene {
     /** @type {Phaser.GameObjects.Image} */
     cursor;
 
-    dices = {
-        /** @type {Phaser.GameObjects.Sprite} */
-        first: null,
-
-        /** @type {Phaser.GameObjects.Sprite} */
-        second: null
-    };
+    /** @type {Dices} */
+    dices;
 
     constructor() {
         super('game');
@@ -42,12 +38,15 @@ export default class Game extends Phaser.Scene {
             .setScrollFactor(0)
             .setDepth(Consts.Depth.HUD);
 
+        me.dices = new Dices(me);
+
         me.cursor = me.createCursor();
 
-        me.dices.first = me.add.sprite(0, 0, 'dice', 0);
-        me.dices.second = me.add.sprite(75, 10, 'dice', 1);
-
         me.cameras.main.setScroll(Consts.World.Width / -2, Consts.World.Height / -2);
+
+        me.input.on('pointerdown', (p) => {
+            me.dices.checkClick(me.cursor.x, me.cursor.y);
+        }, me);
 
         if (Global.isDebug) {
             me.log = me.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
@@ -75,7 +74,7 @@ export default class Game extends Phaser.Scene {
     createCursor() {
         const me = this;
 
-        const cursor = me.add.image(0, 0, 'cursor')
+        const cursor = me.add.image(100, 100, 'cursor')
             .setDepth(Consts.Depth.Max)
             .setVisible(false);
 
