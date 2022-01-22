@@ -44,9 +44,7 @@ export default class Game extends Phaser.Scene {
 
         me.cameras.main.setScroll(Consts.World.Width / -2, Consts.World.Height / -2);
 
-        me.input.on('pointerdown', (p) => {
-            me.dices.checkClick(me.cursor.x, me.cursor.y);
-        }, me);
+        me.input.on('pointerdown', (p) => me.onPointerDown(), me);
 
         if (Global.isDebug) {
             me.log = me.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
@@ -60,7 +58,7 @@ export default class Game extends Phaser.Scene {
 
         if (Global.isDebug) {
             me.log.text = 
-            `ptr: ${me.cursor.x | 0} ${me.cursor.worldY | 0}\n` + 
+            `ptr: ${me.cursor.worldX | 0} ${me.cursor.worldY | 0}\n` + 
             `cam: ${me.cameras.main.scrollX | 0} ${me.cameras.main.scrollX | 0}`
         }
     }
@@ -112,5 +110,19 @@ export default class Game extends Phaser.Scene {
             frameWidth: width,
             frameHeight: !!height ? height : width
         });
+    }
+
+    onPointerDown() {
+        const me = this;
+
+        const point = new Phaser.Geom.Point(me.cursor.x, me.cursor.y);
+
+        if (me.dices.canDrop()) {
+            const result = me.dices.drop(point);
+            console.log(result.first, result.second);
+        }
+        else {
+            me.dices.checkClick(point);
+        }
     }
 }

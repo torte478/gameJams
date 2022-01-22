@@ -1,5 +1,7 @@
 import Phaser from '../lib/phaser.js';
 
+import Consts from './Consts.js';
+
 export default class Dices {
 
     _first = {
@@ -25,28 +27,64 @@ export default class Dices {
         const me = this;
 
         me._first.sprite = scene.add.sprite(0, 0, 'dice', 0);
-        me._second.sprite = scene.add.sprite(75, 10, 'dice', 1);
+        me._second.sprite = scene.add.sprite(
+            Consts.SecondDiceOffset.X, 
+            Consts.SecondDiceOffset.Y,
+            'dice', 
+            1);
     }
 
     /**
-     * @param {Number} x 
-     * @param {Number} y 
+     * @param {Phaser.Geom.Point} point
      * @returns {Boolean}
      */
-    checkClick(x, y) {
+    checkClick(point) {
         const me = this;
 
-        return me._checkDiceClick(true, x, y)
-               || me._checkDiceClick(false, x, y);
+        return me._checkDiceClick(true, point)
+               || me._checkDiceClick(false, point);
+    }
+
+    /**
+     * @returns {Boolean}
+     */
+    canDrop() {
+        const me = this;
+
+        return me._first.catched && me._second.catched;
+    }
+
+    /**
+     * @param {Phaser.Geom.Point} point
+     */
+    drop(point) {
+        const me = this;
+
+        me._first.sprite
+            .setPosition(point.x, point.y)
+            .setVisible(true);
+        
+        me._second.sprite
+            .setPosition(
+                point.x + Consts.SecondDiceOffset.X, 
+                point.y + Consts.SecondDiceOffset.Y)
+            .setVisible(true);
+
+        me._first.catched = false;
+        me._second.catched = false;
+
+        return {
+            first: Phaser.Math.Between(1, 6),
+            second: Phaser.Math.Between(1, 6)
+        };
     }
 
     /**
      * @param {Boolean} isFirst 
-     * @param {Number} x 
-     * @param {Number} y 
+     * @param {Phaser.Geom.Point} point
      * @returns {Boolean}
      */
-    _checkDiceClick(isFirst, x, y) {
+    _checkDiceClick(isFirst, point) {
         const me = this,
               dice = isFirst
                      ? me._first
@@ -55,9 +93,9 @@ export default class Dices {
         if (dice.catched)
             return false;
 
-        const clicked = Phaser.Geom.Rectangle.Contains(
+        const clicked = Phaser.Geom.Rectangle.ContainsPoint(
             dice.sprite.getBounds(), 
-            x, y);
+            point);
 
         if (clicked) {
             dice.sprite.setVisible(false);
