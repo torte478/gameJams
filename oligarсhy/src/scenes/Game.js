@@ -2,7 +2,7 @@ import Phaser from '../lib/phaser.js';
 
 import Consts from '../game/Consts.js';
 import Dices from '../game/Dices.js';
-import Field from '../game/Field.js';
+import Fields from '../game/Fields.js';
 import Global from '../game/Global.js';
 
 export default class Game extends Phaser.Scene {
@@ -16,8 +16,8 @@ export default class Game extends Phaser.Scene {
     /** @type {Dices} */
     dices;
 
-    /** @type {Field} */
-    field;
+    /** @type {Fields} */
+    fields;
 
     constructor() {
         super('game');
@@ -30,8 +30,8 @@ export default class Game extends Phaser.Scene {
         me.loadImage('hud');
         me.loadImage('cursor');
         me.loadSpriteSheet('dice', 50);
-        me.loadImage('field');
-        me.loadImage('field_corner');
+        me.loadSpriteSheet('field', 160, 240);
+        me.loadSpriteSheet('field_corner', 240);
     }
 
     create() {
@@ -39,7 +39,7 @@ export default class Game extends Phaser.Scene {
 
         me.add.image(0, 0, 'temp');
 
-        me.field = new Field(me);
+        me.fields = new Fields(me);
 
         me.add.image(0, 0, 'hud')
             .setOrigin(0)

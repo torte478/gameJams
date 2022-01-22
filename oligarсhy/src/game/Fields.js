@@ -3,7 +3,7 @@ import Consts from './Consts.js';
 
 import Global from './Global.js';
 
-export default class Field {
+export default class Fields {
 
     /** @type {Array} */
     _sprites;
