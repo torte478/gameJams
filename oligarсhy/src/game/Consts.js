@@ -14,4 +14,9 @@ export default class Consts {
         X: 75,
         Y: 10
     };
+
+    static Field = {
+        Width: 160,
+        Height: 240
+    };
 }

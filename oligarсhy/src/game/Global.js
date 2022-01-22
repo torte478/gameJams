@@ -1,4 +1,6 @@
 export default class Global {
 
-    static isDebug = true;
+    static Debug = true;
+
+    static FieldUnit = 10;
 }

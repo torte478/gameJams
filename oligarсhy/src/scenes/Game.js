@@ -2,6 +2,7 @@ import Phaser from '../lib/phaser.js';
 
 import Consts from '../game/Consts.js';
 import Dices from '../game/Dices.js';
+import Field from '../game/Field.js';
 import Global from '../game/Global.js';
 
 export default class Game extends Phaser.Scene {
@@ -15,6 +16,9 @@ export default class Game extends Phaser.Scene {
     /** @type {Dices} */
     dices;
 
+    /** @type {Field} */
+    field;
+
     constructor() {
         super('game');
     }
@@ -26,12 +30,16 @@ export default class Game extends Phaser.Scene {
         me.loadImage('hud');
         me.loadImage('cursor');
         me.loadSpriteSheet('dice', 50);
+        me.loadImage('field');
+        me.loadImage('field_corner');
     }
 
     create() {
         const me = this;
 
         me.add.image(0, 0, 'temp');
+
+        me.field = new Field(me);
 
         me.add.image(0, 0, 'hud')
             .setOrigin(0)
@@ -46,7 +54,7 @@ export default class Game extends Phaser.Scene {
 
         me.input.on('pointerdown', (p) => me.onPointerDown(), me);
 
-        if (Global.isDebug) {
+        if (Global.Debug) {
             me.log = me.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
@@ -56,9 +64,9 @@ export default class Game extends Phaser.Scene {
     update() {
         const me = this;
 
-        if (Global.isDebug) {
+        if (Global.Debug) {
             me.log.text = 
-            `ptr: ${me.cursor.worldX | 0} ${me.cursor.worldY | 0}\n` + 
+            `ptr: ${me.cursor.x | 0} ${me.cursor.y | 0}\n` + 
             `cam: ${me.cameras.main.scrollX | 0} ${me.cameras.main.scrollX | 0}`
         }
     }
