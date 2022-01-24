@@ -28,14 +28,14 @@ export default class Consts {
             color: Consts.TextColor,
             fontFamily: Consts.Font,
             align: 'center',
-            fontSize: 24
+            fontSize: 20
         },
 
         FieldCost: {
             color: Consts.TextColor,
             fontFamily: Consts.Font,
             align: 'center',
-            fontSize: 24
+            fontSize: 22
         },
     }
 }
