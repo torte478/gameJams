@@ -23,6 +23,18 @@ export default class Global {
             name: 'iOSs',
             cost: 60,
             icon: 0
+        },
+        // 2
+        {
+            type: Enums.FieldType.CHANCE
+        },
+        // 3
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.BROWN,
+            name: 'Cyborg',
+            cost: 60,
+            icon: 2
         }
     ]
 }

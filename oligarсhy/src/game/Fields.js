@@ -51,7 +51,7 @@ export default class Fields {
                     scene.add.image(0, 0, 'field'),
                     scene.add.image(0, -95, 'field_header', config.color),
                     scene.add.image(0, 20, 'icons', config.icon),
-                    scene.add.text(0, -45, config.name, Consts.TextStyle.FieldName).setOrigin(0.5),
+                    scene.add.text(0, -40, config.name, Consts.TextStyle.FieldName).setOrigin(0.5),
                     scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
                 ])
                 .setAngle(angle)
