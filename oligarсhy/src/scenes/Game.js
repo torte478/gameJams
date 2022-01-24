@@ -32,6 +32,8 @@ export default class Game extends Phaser.Scene {
         me.loadSpriteSheet('dice', 50);
         me.loadSpriteSheet('field', 160, 240);
         me.loadSpriteSheet('field_corner', 240);
+        me.loadSpriteSheet('icons', 100);
+        me.loadSpriteSheet('field_header', 160, 50);
     }
 
     create() {
@@ -50,7 +52,9 @@ export default class Game extends Phaser.Scene {
 
         me.cursor = me.createCursor();
 
-        me.cameras.main.setScroll(Consts.World.Width / -2, Consts.World.Height / -2);
+        me.cameras.main.setScroll(
+            Global.StartPosition.x - Consts.Viewport.Width / 2,
+            Global.StartPosition.y - Consts.Viewport.Height / 2);
 
         me.input.on('pointerdown', (p) => me.onPointerDown(), me);
 
@@ -80,7 +84,7 @@ export default class Game extends Phaser.Scene {
     createCursor() {
         const me = this;
 
-        const cursor = me.add.image(100, 100, 'cursor')
+        const cursor = me.add.image(Global.StartPosition.x, Global.StartPosition.y, 'cursor')
             .setDepth(Consts.Depth.Max)
             .setVisible(false);
 

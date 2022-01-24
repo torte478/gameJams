@@ -5,8 +5,8 @@ import Game from './scenes/Game.js';
 
 export default new Phaser.Game({
     type: Phaser.AUTO,
-    width: Consts.World.Width,
-    height: Consts.World.Height,
+    width: Consts.Viewport.Width,
+    height: Consts.Viewport.Height,
     scene: [ 
         Game
         ],

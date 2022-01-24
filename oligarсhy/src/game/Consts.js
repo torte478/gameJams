@@ -1,6 +1,6 @@
 export default class Consts {
 
-    static World = {
+    static Viewport = {
         Width: 1000,
         Height: 800
     };
@@ -19,4 +19,23 @@ export default class Consts {
         Width: 160,
         Height: 240
     };
+
+    static TextColor = '#232429';
+    static Font = 'Arial';
+
+    static TextStyle = {
+        FieldName: {
+            color: Consts.TextColor,
+            fontFamily: Consts.Font,
+            align: 'center',
+            fontSize: 24
+        },
+
+        FieldCost: {
+            color: Consts.TextColor,
+            fontFamily: Consts.Font,
+            align: 'center',
+            fontSize: 24
+        },
+    }
 }
