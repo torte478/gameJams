@@ -60,6 +60,7 @@ export default class Dices {
     drop(point) {
         const me = this;
 
+        // TODO: extract single Dice class
         me._first.sprite
             .setPosition(point.x, point.y)
             .setVisible(true);

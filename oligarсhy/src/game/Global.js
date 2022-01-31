@@ -107,6 +107,110 @@ export default class Global {
         //15
         {
             type: Enums.FieldType.RAILSTATION
-        }
+        },
+        //16
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.ORANGE,
+            name: 'INSTAPOUND',
+            cost: 180,
+            icon: 16
+        },
+        //17
+        {
+            type: Enums.FieldType.CHANCE
+        },
+        //18
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.ORANGE,
+            name: 'WETUBE',
+            cost: 180,
+            icon: 18
+        },
+        //19
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.ORANGE,
+            name: 'HONKER',
+            cost: 200,
+            icon: 20
+        },
+        //20
+        {
+            type: Enums.FieldType.FREE
+        },
+        //21
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.RED,
+            name: 'BURGER QUEEN',
+            cost: 220,
+            icon: 22
+        },
+        //22
+        {
+            type: Enums.FieldType.CHANCE
+        },
+        //23
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.RED,
+            name: 'SUBPATH',
+            cost: 220,
+            icon: 24
+        },
+        //24
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.RED,
+            name: "DONMACLD'S",
+            cost: 240,
+            icon: 26
+        },
+        //25
+        {
+            type: Enums.FieldType.RAILSTATION
+        },
+        //26
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.YELLOW,
+            name: "SIEWOMANS",
+            cost: 260,
+            icon: 28
+        },
+        //27
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.YELLOW,
+            name: "AUTOROLA",
+            cost: 260,
+            icon: 30
+        },
+        //28
+        {
+            type: Enums.FieldType.UTILITY
+        },
+        //29
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.YELLOW,
+            name: "YESKIA",
+            cost: 280,
+            icon: 32
+        },
+        //30
+        {
+            type: Enums.FieldType.GOTOJAIL,
+        },
+        //31
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.GREEN,
+            name: "YESKIA",
+            cost: 300,
+            icon: 34
+        },
     ]
 }

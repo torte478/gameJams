@@ -28,7 +28,7 @@ export default class Consts {
             color: Consts.TextColor,
             fontFamily: Consts.Font,
             align: 'center',
-            fontSize: 20
+            fontSize: 18
         },
 
         FieldCost: {

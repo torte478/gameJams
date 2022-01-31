@@ -78,7 +78,7 @@ export default class Game extends Phaser.Scene {
     loadImage(name) {
         const me = this;
 
-        return this.load.image(name, `assets/${name}.png`);
+        return me.load.image(name, `assets/${name}.png`);
     }
 
     createCursor() {
@@ -89,9 +89,6 @@ export default class Game extends Phaser.Scene {
             .setVisible(false);
 
         me.input.on('pointerdown', (p) => {
-            /** @type {Phaser.Input.Pointer} */
-            const pointer = p;
-
             if (me.input.mouse.locked)
                 return;
 
