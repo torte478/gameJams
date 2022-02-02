@@ -1,5 +1,6 @@
 import Enums from "./Enums.js";
 
+// TODO: why? (Global ->? Config)
 export default class Global {
 
     static StartPosition = {
@@ -11,6 +12,7 @@ export default class Global {
 
     static FieldUnit = 10;
 
+    // TODO : replace
     static Fields = [
         // 0
         {

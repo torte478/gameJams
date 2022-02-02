@@ -37,5 +37,12 @@ export default class Consts {
             align: 'center',
             fontSize: 22
         },
+
+        ChangeHeader: {
+            color: Consts.TextColor,
+            fontFamily: Consts.Font,
+            align: 'center',
+            fontSize: 28
+        },
     }
 }

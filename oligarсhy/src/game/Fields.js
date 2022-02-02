@@ -1,6 +1,7 @@
 import Phaser from '../lib/phaser.js';
-import Consts from './Consts.js';
 
+import Consts from './Consts.js';
+import Enums from './Enums.js';
 import Global from './Global.js';
 
 export default class Fields {
@@ -44,16 +45,35 @@ export default class Fields {
 
         for (let i = 0; i < Global.FieldUnit - 1; ++i) {
             const config = Global.Fields[index + i + 1] || Global.Fields[1]; // TODO
+
+            let content = [];
+
+            switch (config.type) {
+                case Enums.FieldType.PROPERTY:
+                    content = [
+                        scene.add.image(0, -95, 'field_header', config.color),
+                        scene.add.image(0, 20, 'icons', config.icon),
+                        scene.add.text(0, -40, config.name, Consts.TextStyle.FieldName).setOrigin(0.5),
+                        scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
+                    ];
+                    break;
+
+                case Enums.FieldType.CHANCE:
+                    content = [
+                        scene.add.image(0, 20, 'icons_big', 0),
+                        scene.add.text(0, -90, 'CHANCE', Consts.TextStyle.ChangeHeader).setOrigin(0.5)
+                    ];
+                    break;
+
+                default:
+                    //throw `Unknown field type ${config.type}`;
+                    break;
+            }
+
             const field = scene.add.container(
                 start * signX + shiftX * (offset + i * Consts.Field.Width),
                 start * signY + shiftY * (offset + i * Consts.Field.Width),
-                [
-                    scene.add.image(0, 0, 'field'),
-                    scene.add.image(0, -95, 'field_header', config.color),
-                    scene.add.image(0, 20, 'icons', config.icon),
-                    scene.add.text(0, -40, config.name, Consts.TextStyle.FieldName).setOrigin(0.5),
-                    scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
-                ])
+                [ scene.add.image(0, 0, 'field') ].concat(content))
                 .setAngle(angle)
 
             me._fields.push(field);
