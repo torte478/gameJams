@@ -208,9 +208,57 @@ export default class Global {
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColor.GREEN,
-            name: "YESKIA",
+            name: "NINELEVENDO",
             cost: 300,
             icon: 34
         },
+        //32
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.GREEN,
+            name: "XSPHERE",
+            cost: 300,
+            icon: 36
+        },
+        //33
+        {
+            type: Enums.FieldType.CHANCE,
+        },
+        //34
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.GREEN,
+            name: "STOPSTATION",
+            cost: 320,
+            icon: 38
+        },
+        //35
+        {
+            type: Enums.FieldType.RAILSTATION
+        },
+        //36
+        {
+            type: Enums.FieldType.CHANCE
+        },
+        //37
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.BLUE,
+            name: "LC COMICS",
+            cost: 350,
+            icon: 40
+        },
+        //38
+        {
+            type: Enums.FieldType.TAX
+        },
+        //39
+        {
+            type: Enums.FieldType.PROPERTY,
+            color: Enums.FieldColor.BLUE,
+            name: "MALVER",
+            cost: 400,
+            icon: 42
+        }
     ]
 }
