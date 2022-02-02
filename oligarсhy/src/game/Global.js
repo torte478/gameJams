@@ -45,7 +45,9 @@ export default class Global {
         },
         // 5
         {
-            type: Enums.FieldType.RAILSTATION
+            type: Enums.FieldType.RAILSTATION,
+            name: 'MOSCOW',
+            cost: 200
         },
         // 6
         {
@@ -109,7 +111,9 @@ export default class Global {
         },
         //15
         {
-            type: Enums.FieldType.RAILSTATION
+            type: Enums.FieldType.RAILSTATION,
+            name: 'LONDON',
+            cost: 200
         },
         //16
         {
@@ -173,7 +177,9 @@ export default class Global {
         },
         //25
         {
-            type: Enums.FieldType.RAILSTATION
+            type: Enums.FieldType.RAILSTATION,
+            name: 'PARIS',
+            cost: 200
         },
         //26
         {
@@ -237,7 +243,9 @@ export default class Global {
         },
         //35
         {
-            type: Enums.FieldType.RAILSTATION
+            type: Enums.FieldType.RAILSTATION,
+            name: 'ISTANBUL',
+            cost: 200
         },
         //36
         {

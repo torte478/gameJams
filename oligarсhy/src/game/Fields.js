@@ -46,37 +46,7 @@ export default class Fields {
         for (let i = 0; i < Global.FieldUnit - 1; ++i) {
             const config = Global.Fields[index + i + 1] || Global.Fields[1]; // TODO
 
-            let content = [];
-
-            switch (config.type) {
-                case Enums.FieldType.PROPERTY:
-                    content = [
-                        scene.add.image(0, -95, 'field_header', config.color),
-                        scene.add.image(0, 20, 'icons', config.icon),
-                        scene.add.text(0, -40, config.name, Consts.TextStyle.FieldName).setOrigin(0.5),
-                        scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
-                    ];
-                    break;
-
-                case Enums.FieldType.CHANCE:
-                    content = [
-                        scene.add.image(0, 20, 'icons_big', 0),
-                        scene.add.text(0, -90, 'CHANCE', Consts.TextStyle.ChangeHeader).setOrigin(0.5)
-                    ];
-                    break;
-
-                case Enums.FieldType.TAX:
-                    content = [
-                        scene.add.image(0, 0, 'icons_big', 2),
-                        scene.add.text(0, -90, 'TAX', Consts.TextStyle.ChangeHeader).setOrigin(0.5),
-                        scene.add.text(0, 95, `PAY ${config.cost}`, Consts.TextStyle.FieldCost).setOrigin(0.5),
-                    ];
-                    break;
-
-                default:
-                    //throw `Unknown field type ${config.type}`;
-                    break;
-            }
+            const content = me._getFieldContent(scene, config);
 
             const field = scene.add.container(
                 start * signX + shiftX * (offset + i * Consts.Field.Width),
@@ -85,6 +55,48 @@ export default class Fields {
                 .setAngle(angle)
 
             me._fields.push(field);
+        }
+    }
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {Object} config 
+     */
+    _getFieldContent(scene, config) {
+        const me = this;
+
+        switch (config.type) {
+            case Enums.FieldType.PROPERTY:
+                return [
+                    scene.add.image(0, -95, 'field_header', config.color),
+                    scene.add.image(0, 20, 'icons', config.icon),
+                    scene.add.text(0, -40, config.name, Consts.TextStyle.FieldName).setOrigin(0.5),
+                    scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
+                ];
+
+            case Enums.FieldType.CHANCE:
+                return [
+                    scene.add.image(0, 20, 'icons_big', 0),
+                    scene.add.text(0, -90, 'CHANCE', Consts.TextStyle.ChangeHeader).setOrigin(0.5)
+                ];
+
+            case Enums.FieldType.TAX:
+                return [
+                    scene.add.image(0, 0, 'icons_big', 2),
+                    scene.add.text(0, -90, 'TAX', Consts.TextStyle.ChangeHeader).setOrigin(0.5),
+                    scene.add.text(0, 95, `PAY ${config.cost}`, Consts.TextStyle.FieldCost).setOrigin(0.5),
+                ];
+
+            case Enums.FieldType.RAILSTATION:
+                return [
+                    scene.add.image(0, 0, 'icons_big', 4),
+                    scene.add.text(0, -90, config.name, Consts.TextStyle.FieldCost).setOrigin(0.5), //TODO : text style name
+                    scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
+                ];
+
+            default:
+                //throw `Unknown field type ${config.type}`;
+                return [];
         }
     }
 }
