@@ -40,7 +40,8 @@ export default class Global {
         },
         // 4
         {
-            type: Enums.FieldType.TAX
+            type: Enums.FieldType.TAX,
+            cost: 200
         },
         // 5
         {
@@ -252,7 +253,8 @@ export default class Global {
         },
         //38
         {
-            type: Enums.FieldType.TAX
+            type: Enums.FieldType.TAX,
+            cost: 100
         },
         //39
         {

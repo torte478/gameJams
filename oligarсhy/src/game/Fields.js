@@ -65,6 +65,14 @@ export default class Fields {
                     ];
                     break;
 
+                case Enums.FieldType.TAX:
+                    content = [
+                        scene.add.image(0, 0, 'icons_big', 2),
+                        scene.add.text(0, -90, 'TAX', Consts.TextStyle.ChangeHeader).setOrigin(0.5),
+                        scene.add.text(0, 95, `PAY ${config.cost}`, Consts.TextStyle.FieldCost).setOrigin(0.5),
+                    ];
+                    break;
+
                 default:
                     //throw `Unknown field type ${config.type}`;
                     break;
