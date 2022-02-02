@@ -92,6 +92,9 @@ export default class Global {
         //12
         {
             type: Enums.FieldType.UTILITY,
+            name: 'ELECTRICITY',
+            cost: 150,
+            icon: 6
         },
         //13
         {
@@ -199,7 +202,10 @@ export default class Global {
         },
         //28
         {
-            type: Enums.FieldType.UTILITY
+            type: Enums.FieldType.UTILITY,
+            name: 'WATER',
+            cost: 150,
+            icon: 8
         },
         //29
         {

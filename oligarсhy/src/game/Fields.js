@@ -77,13 +77,13 @@ export default class Fields {
             case Enums.FieldType.CHANCE:
                 return [
                     scene.add.image(0, 20, 'icons_big', 0),
-                    scene.add.text(0, -90, 'CHANCE', Consts.TextStyle.ChangeHeader).setOrigin(0.5)
+                    scene.add.text(0, -90, 'CHANCE', Consts.TextStyle.ChanceHeader).setOrigin(0.5)
                 ];
 
             case Enums.FieldType.TAX:
                 return [
                     scene.add.image(0, 0, 'icons_big', 2),
-                    scene.add.text(0, -90, 'TAX', Consts.TextStyle.ChangeHeader).setOrigin(0.5),
+                    scene.add.text(0, -90, 'TAX', Consts.TextStyle.ChanceHeader).setOrigin(0.5),
                     scene.add.text(0, 95, `PAY ${config.cost}`, Consts.TextStyle.FieldCost).setOrigin(0.5),
                 ];
 
@@ -94,9 +94,15 @@ export default class Fields {
                     scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
                 ];
 
+            case Enums.FieldType.UTILITY:
+                return [
+                    scene.add.image(0, 0, 'icons_big', config.icon),
+                    scene.add.text(0, -90, config.name, Consts.TextStyle.FieldName).setOrigin(0.5),
+                    scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
+                ];
+
             default:
-                //throw `Unknown field type ${config.type}`;
-                return [];
+                throw `Unknown field type ${config.type}`;
         }
     }
 }

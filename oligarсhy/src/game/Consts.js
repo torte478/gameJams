@@ -38,7 +38,7 @@ export default class Consts {
             fontSize: 22
         },
 
-        ChangeHeader: {
+        ChanceHeader: {
             color: Consts.TextColor,
             fontFamily: Consts.Font,
             align: 'center',
