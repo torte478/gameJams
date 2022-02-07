@@ -35,6 +35,7 @@ export default class Game extends Phaser.Scene {
         me.loadSpriteSheet('icons', 100);
         me.loadSpriteSheet('field_header', 160, 50);
         me.loadSpriteSheet('icons_big', 150, 200);
+        me.loadSpriteSheet('icons_corner', 240);
     }
 
     create() {

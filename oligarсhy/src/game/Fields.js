@@ -31,28 +31,28 @@ export default class Fields {
 
         const start = (Consts.Field.Width * (Global.FieldUnit - 1) + Consts.Field.Height) / 2;
 
-        const corner = scene.add.container(
+        const corner = me._createField(
+            scene, 
             start * signX,
             start * signY,
-            [
-                scene.add.image(0, 0, 'field_corner')
-            ])
-            .setAngle(angle);
+            'field_corner',
+            angle,
+            index);
 
         me._fields.push(corner);
 
         const offset = (Consts.Field.Height + Consts.Field.Width) / 2; 
 
         for (let i = 0; i < Global.FieldUnit - 1; ++i) {
-            const config = Global.Fields[index + i + 1] || Global.Fields[1]; // TODO
 
-            const content = me._getFieldContent(scene, config);
-
-            const field = scene.add.container(
+            const field = me._createField(
+                scene,
                 start * signX + shiftX * (offset + i * Consts.Field.Width),
                 start * signY + shiftY * (offset + i * Consts.Field.Width),
-                [ scene.add.image(0, 0, 'field') ].concat(content))
-                .setAngle(angle)
+                'field',
+                angle,
+                index + i + 1
+            )
 
             me._fields.push(field);
         }
@@ -60,7 +60,26 @@ export default class Fields {
 
     /**
      * @param {Phaser.Scene} scene 
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {String} texture 
+     * @param {Number} index 
+     * @returns {Phaser.GameObjects.Container}
+     */
+    _createField(scene, x, y, texture, angle, index) {
+        const me = this,
+              config = Global.Fields[index],
+              content = me._getFieldContent(scene, config),
+              children = [ scene.add.image(0, 0, texture) ].concat(content);
+
+        return scene.add.container(x, y, children)
+            .setAngle(angle);
+    }
+
+    /**
+     * @param {Phaser.Scene} scene 
      * @param {Object} config 
+     * @returns {Phaser.GameObjects.GameObject[]}
      */
     _getFieldContent(scene, config) {
         const me = this;
@@ -101,8 +120,29 @@ export default class Fields {
                     scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
                 ];
 
+            case Enums.FieldType.START:
+                return [
+                    scene.add.image(0, 0, 'icons_corner', 0)
+                ];
+
+            case Enums.FieldType.JAIL:
+                return [
+                    scene.add.image(0, 0, 'icons_corner', 2)
+                ];
+
+            case Enums.FieldType.FREE:
+                return [
+                    scene.add.image(0, 0, 'icons_corner', 4)
+                ];
+
+            case Enums.FieldType.GOTOJAIL:
+                return [
+                    scene.add.image(0, 0, 'icons_corner', 6)
+                ];
+
             default:
-                throw `Unknown field type ${config.type}`;
+                //throw `Unknown field type ${config.type}`;
+                return [];
         }
     }
 }
