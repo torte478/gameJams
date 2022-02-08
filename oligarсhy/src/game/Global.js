@@ -3,16 +3,21 @@ import Enums from "./Enums.js";
 // TODO: why? (Global ->? Config)
 export default class Global {
 
+    static Debug = true;
+
     static StartPosition = {
-        x: 200,
-        y: 200
+        x: 800,
+        y: 600
     };
 
     static StartIndicies = [
-        0
+        0,
+        1,
+        1,
+        2
     ];
 
-    static Debug = true;
+    static PlayerCount = 4;
 
     static FieldCount = 40;
 

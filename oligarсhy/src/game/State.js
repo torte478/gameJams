@@ -12,6 +12,9 @@ export default class State {
     /** @type {Number} */
     nextPieceIndex;
 
+    /**@type {Number} */
+    player;
+
     /**
      * @param {Number} pieceIndex 
      */
@@ -20,6 +23,7 @@ export default class State {
 
         me._pieceIndex = pieceIndex;
         me.current = Enums.GameState.BEGIN;
+        me.player = Enums.PlayerType.HUMAN;
     }
 
     takeFirstDice() {
@@ -57,8 +61,8 @@ export default class State {
     _setCurrent(value) {
         const me = this;
 
-        //TODO : to human read
-        console.log(`${me.current} => ${value}`);
+        //TODO : to human read && own Debug flag
+        console.log(`(${me.player}): ${me.current} => ${value}`);
 
         me.current = value;
     }

@@ -21,8 +21,8 @@ export default class Game extends Phaser.Scene {
     /** @type {State} */
     state;
 
-    /** @type {Phaser.GameObjects.Image} */
-    piece;
+    /** @type {Phaser.GameObjects.Image[]} */
+    pieces;
 
     /** @type {Phaser.GameObjects.Sprite} */
     dice1;
@@ -58,7 +58,7 @@ export default class Game extends Phaser.Scene {
 
         me.add.image(0, 0, 'temp');
 
-        me.fields = new Fields(me);
+        me.fields = new Fields(me, Global.StartIndicies);
 
         me.add.image(0, 0, 'hud')
             .setOrigin(0)
@@ -77,9 +77,15 @@ export default class Game extends Phaser.Scene {
 
         me.state = new State(Global.StartIndicies[0]);
 
-        // TODO : start x,y
-        me.piece = me.add.image(833, 838, 'pieces', 0)
-            .setDepth(Consts.Depth.Pieces);
+        me.pieces = [];
+        for (let i = 0; i < Global.PlayerCount; ++i) {
+            const position = me.fields.movePiece(i, Global.StartIndicies[i]);
+
+            const piece = me.add.image(position.x, position.y, 'pieces', i)
+                .setDepth(Consts.Depth.Pieces);
+
+            me.pieces.push(piece);
+        }
 
         me.dice1 = me.add.sprite(0, 0, 'dice', 0)
             .setDepth(Consts.Depth.Pieces);
@@ -223,7 +229,10 @@ export default class Game extends Phaser.Scene {
 
             case Enums.GameState.DICES_DROPED: {
                 
-                const pieceTaked = me.hand.tryTake(me.piece, point, Enums.HandContent.PIECE);
+                const pieceTaked = me.hand.tryTake(
+                    me.pieces[me.state.player], 
+                    point, 
+                    Enums.HandContent.PIECE);
 
                 if (pieceTaked)
                     me.state.takePiece();
@@ -233,7 +242,7 @@ export default class Game extends Phaser.Scene {
 
             case Enums.GameState.PIECE_TAKED: {
                 
-                const field = me.fields.findField(point);
+                const field = me.fields.findField(me.state.player, point);
 
                 if (!field)
                     return;

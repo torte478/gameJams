@@ -35,11 +35,10 @@ export default class Enums {
     };
 
     static PlayerType = {
-        NOONE: 0,
+        HUMAN: 0,
         CPU1: 1,
         CPU2: 2,
-        CPU4: 3,
-        HUMAN: 4
+        CPU3: 3
     };
 
     static HandContent = {

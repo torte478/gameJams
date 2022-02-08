@@ -3,16 +3,21 @@ import Phaser from '../lib/phaser.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Global from './Global.js';
+import Utils from './Utils.js';
 
 export default class Fields {
 
     /** @type {Phaser.GameObjects.Container[]} */
     _fields;
 
+    /** @type {Number[]} */
+    _pieces;
+
     /**
      * @param {Phaser.Scene} scene 
+     * @param {Number[]} piecePositions
      */
-    constructor(scene) {
+    constructor(scene, piecePositions) {
         const me = this;
 
         me._fields = [];
@@ -21,13 +26,19 @@ export default class Fields {
         me._createFieldLine(scene, -1, 1, 0, -1, 90, 10);
         me._createFieldLine(scene, -1, -1, 1, 0, 180, 20);
         me._createFieldLine(scene, 1, -1, 0, 1, 270, 30);
+
+        me._pieces = [];
+
+        for (let i = 0; i < piecePositions.length; ++i)
+            me._pieces.push({field: -1, position: -1});
     }
 
     /**
+     * @param {Number} player
      * @param {Phaser.Geom.Point} point 
      * @returns {Phaser.Geom.Point}
      */
-    findField(point) {
+    findField(player, point) {
         const me = this;
 
         for (let i = 0; i < me._fields.length; ++i) {
@@ -35,20 +46,106 @@ export default class Fields {
                 me._fields[i].first.getBounds(),
                 point);
 
-            if (!contains) 
-                continue;
-
-            const result = {
-                index: i,
-                position: new Phaser.Geom.Point(
-                    me._fields[i].x,
-                    me._fields[i].y)
+            if (contains) {
+                return {
+                    index: i,
+                    position: me.movePiece(player, i)
                 };
-
-            return result;
+            }
         }
 
         return null;
+    }
+
+    /**
+     * @param {Number} player 
+     * @param {Number} field 
+     * @returns {Phaser.Geom.Point}
+     */
+    movePiece(player, field) {
+        const me = this;
+
+        const config = me._getPiecePosConfig(player, field);
+        me._pieces[player] = config;
+
+        const fieldContainer = me._fields[field];
+        const offset = me._getPiecePosOffset(field)[config.position];
+
+        const origin = new Phaser.Geom.Point(
+            fieldContainer.x + offset.x,
+            fieldContainer.y + offset.y);
+
+        if (Global.Fields[field].type == Enums.FieldType.JAIL)
+            return origin;
+        
+        const angle = me._getAngle(field);
+
+        return Phaser.Math.RotateAround(
+            origin, 
+            fieldContainer.x, 
+            fieldContainer.y, 
+            Phaser.Math.DegToRad(angle));
+    }
+
+    _getAngle(field) {
+        const quotient = field / (Global.FieldCount / 4);
+
+        switch (Math.floor(quotient)) {
+            case 0:
+                return 0;
+
+            case 1:
+                return 90;
+
+            case 2:
+                return 180;
+
+            case 3: 
+                return 270;
+
+            default:
+                throw `can't calculate angle for field ${field}`;
+        }
+    }
+
+    /**
+     * @param {Number} player 
+     * @param {Number} field 
+     */
+    _getPiecePosConfig(player, field) {
+        const me = this;
+
+        for (let position = 0; position < me._pieces.length; ++position) {
+            if (Utils.all(me._pieces, (p) => p.field != field || p.position != position)) {
+                return {
+                    field: field,
+                    position: position
+                };
+            }
+        }
+
+        throw `can't place player ${player} to field ${field}`;
+    }
+
+    /**
+     * @param {Number} field 
+     */
+    _getPiecePosOffset(field) {
+        const me = this;
+
+        switch (Global.Fields[field].type) {
+
+            case Enums.FieldType.START:
+            case Enums.FieldType.FREE:
+            case Enums.FieldType.GOTOJAIL:
+                return Consts.PiecePosition.Corner;
+
+            case Enums.FieldType.JAIL:
+                return Consts.PiecePosition.JailOutside;
+
+            default:
+                return Consts.PiecePosition.Usual;
+        }
     }
 
     /**
