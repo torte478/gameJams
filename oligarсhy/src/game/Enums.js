@@ -1,5 +1,14 @@
 export default class Enums {
 
+    static GameState = {
+        UNKNOWN: 0,
+        BEGIN: 10,
+        FIRST_DICE_TAKED: 20,
+        SECOND_DICE_TAKED: 30,
+        DICES_DROPED: 40,
+        PIECE_TAKED: 50
+    };
+
     static FieldType = {
         UNKNOW: 0,
         PROPERTY: 1,
@@ -31,5 +40,12 @@ export default class Enums {
         CPU2: 2,
         CPU4: 3,
         HUMAN: 4
+    };
+
+    static HandContent = {
+        UNKNOWN: 0,
+        EMPTY: 10,
+        DICES: 20,
+        PIECE: 30
     };
 }

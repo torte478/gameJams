@@ -6,7 +6,7 @@ import Global from './Global.js';
 
 export default class Fields {
 
-    /** @type {Array} */
+    /** @type {Phaser.GameObjects.Container[]} */
     _fields;
 
     /**
@@ -24,12 +24,42 @@ export default class Fields {
     }
 
     /**
+     * @param {Phaser.Geom.Point} point 
+     * @returns {Phaser.Geom.Point}
+     */
+    findField(point) {
+        const me = this;
+
+        for (let i = 0; i < me._fields.length; ++i) {
+            const contains = Phaser.Geom.Rectangle.ContainsPoint(
+                me._fields[i].first.getBounds(),
+                point);
+
+            if (!contains) 
+                continue;
+
+            const result = {
+                index: i,
+                position: new Phaser.Geom.Point(
+                    me._fields[i].x,
+                    me._fields[i].y)
+                };
+
+            return result;
+        }
+
+        return null;
+    }
+
+    /**
      * @param {Phaser.Scene} scene 
      */
     _createFieldLine(scene, signX, signY, shiftX, shiftY, angle, index) {
         const me = this;
 
-        const start = (Consts.Field.Width * (Global.FieldUnit - 1) + Consts.Field.Height) / 2;
+        const sideLength = Global.FieldCount / 4;
+
+        const start = (Consts.Field.Width * (sideLength - 1) + Consts.Field.Height) / 2;
 
         const corner = me._createField(
             scene, 
@@ -43,7 +73,7 @@ export default class Fields {
 
         const offset = (Consts.Field.Height + Consts.Field.Width) / 2; 
 
-        for (let i = 0; i < Global.FieldUnit - 1; ++i) {
+        for (let i = 0; i < sideLength - 1; ++i) {
 
             const field = me._createField(
                 scene,
@@ -141,8 +171,7 @@ export default class Fields {
                 ];
 
             default:
-                //throw `Unknown field type ${config.type}`;
-                return [];
+                throw `Unknown field type ${config.type}`;
         }
     }
 }

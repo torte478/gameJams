@@ -4,13 +4,17 @@ import Enums from "./Enums.js";
 export default class Global {
 
     static StartPosition = {
-        x: 512,
-        y: 700
+        x: 200,
+        y: 200
     };
+
+    static StartIndicies = [
+        0
+    ];
 
     static Debug = true;
 
-    static FieldUnit = 10;
+    static FieldCount = 40;
 
     // TODO : replace
     static Fields = [

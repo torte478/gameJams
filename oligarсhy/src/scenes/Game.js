@@ -1,9 +1,11 @@
 import Phaser from '../lib/phaser.js';
 
 import Consts from '../game/Consts.js';
-import Dices from '../game/Dices.js';
 import Fields from '../game/Fields.js';
 import Global from '../game/Global.js';
+import Hand from '../game/Hand.js';
+import State from '../game/State.js';
+import Enums from '../game/Enums.js';
 
 export default class Game extends Phaser.Scene {
 
@@ -13,11 +15,23 @@ export default class Game extends Phaser.Scene {
     /** @type {Phaser.GameObjects.Image} */
     cursor;
 
-    /** @type {Dices} */
-    dices;
-
     /** @type {Fields} */
     fields;
+
+    /** @type {State} */
+    state;
+
+    /** @type {Phaser.GameObjects.Image} */
+    piece;
+
+    /** @type {Phaser.GameObjects.Sprite} */
+    dice1;
+
+    /** @type {Phaser.GameObjects.Sprite} */
+    dice2;
+
+    /** @type {Hand} */
+    hand;
 
     constructor() {
         super('game');
@@ -36,6 +50,7 @@ export default class Game extends Phaser.Scene {
         me.loadSpriteSheet('field_header', 160, 50);
         me.loadSpriteSheet('icons_big', 150, 200);
         me.loadSpriteSheet('icons_corner', 240);
+        me.loadSpriteSheet('pieces', 50);
     }
 
     create() {
@@ -48,9 +63,8 @@ export default class Game extends Phaser.Scene {
         me.add.image(0, 0, 'hud')
             .setOrigin(0)
             .setScrollFactor(0)
-            .setDepth(Consts.Depth.HUD);
-
-        me.dices = new Dices(me);
+            .setDepth(Consts.Depth.HUD)
+            .setVisible(false); // TODO
 
         me.cursor = me.createCursor();
 
@@ -59,6 +73,25 @@ export default class Game extends Phaser.Scene {
             Global.StartPosition.y - Consts.Viewport.Height / 2);
 
         me.input.on('pointerdown', (p) => me.onPointerDown(), me);
+        me.input.keyboard.on('keydown', (e) => me.onKeyDown(e), me);
+
+        me.state = new State(Global.StartIndicies[0]);
+
+        // TODO : start x,y
+        me.piece = me.add.image(833, 838, 'pieces', 0)
+            .setDepth(Consts.Depth.Pieces);
+
+        me.dice1 = me.add.sprite(0, 0, 'dice', 0)
+            .setDepth(Consts.Depth.Pieces);
+
+        me.dice2 = me.add.sprite(
+            Consts.SecondDiceOffset.X, 
+            Consts.SecondDiceOffset.Y,
+            'dice', 
+            1)
+            .setDepth(Consts.Depth.Pieces);;
+
+        me.hand = new Hand();
 
         if (Global.Debug) {
             me.log = me.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
@@ -123,17 +156,96 @@ export default class Game extends Phaser.Scene {
         });
     }
 
+    onKeyDown(event) {
+        const me = this;
+
+        if (Global.Debug) {
+            if (isNaN(event.key) || me.state.current != Enums.GameState.BEGIN) 
+                return;
+
+            const result = {
+                first: 0,
+                second: +event.key
+            };
+
+            console.log(`${result.first} ${result.second} (${result.first + result.second})`);
+
+            me.state.dropDices(result.first, result.second);
+        }
+    }
+
     onPointerDown() {
         const me = this;
 
         const point = new Phaser.Geom.Point(me.cursor.x, me.cursor.y);
 
-        if (me.dices.canDrop()) {
-            const result = me.dices.drop(point);
-            console.log(result.first, result.second);
-        }
-        else {
-            me.dices.checkClick(point);
+        // TODO : to independent class
+        switch (me.state.current) {
+            case Enums.GameState.BEGIN: {
+
+                const diceTaked = 
+                    me.hand.tryTake(me.dice1, point, Enums.HandContent.DICES)
+                    || me.hand.tryTake(me.dice2, point, Enums.HandContent.DICES)
+
+                if (diceTaked)
+                    me.state.takeFirstDice();
+
+                break;
+            }
+
+            case Enums.GameState.FIRST_DICE_TAKED: {
+
+                const diceTaked = 
+                    me.hand.tryTake(me.dice1, point, Enums.HandContent.DICES)
+                    || me.hand.tryTake(me.dice2, point, Enums.HandContent.DICES)
+
+                if (diceTaked)
+                    me.state.takeSecondDice();
+
+                break;
+            }
+
+            case Enums.GameState.SECOND_DICE_TAKED: {
+
+                const result = {
+                    first: Phaser.Math.Between(1, 6),
+                    second: Phaser.Math.Between(1, 6)
+                };
+
+                console.log(`${result.first} ${result.second} (${result.first + result.second})`);
+
+                me.state.dropDices(result.first, result.second);
+
+                me.hand.drop(point);
+
+                break;
+            }
+
+            case Enums.GameState.DICES_DROPED: {
+                
+                const pieceTaked = me.hand.tryTake(me.piece, point, Enums.HandContent.PIECE);
+
+                if (pieceTaked)
+                    me.state.takePiece();
+
+                break;
+            }
+
+            case Enums.GameState.PIECE_TAKED: {
+                
+                const field = me.fields.findField(point);
+
+                if (!field)
+                    return;
+
+                if (field.index != me.state.nextPieceIndex)
+                    return;
+
+                me.hand.drop(field.position);
+                me.state.dropPiece();
+
+                break;
+            }
         }
     }
 }
