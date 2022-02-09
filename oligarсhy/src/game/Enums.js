@@ -34,7 +34,7 @@ export default class Enums {
         BROWN: 8,
     };
 
-    static PlayerType = {
+    static Players = {
         HUMAN: 0,
         CPU1: 1,
         CPU2: 2,

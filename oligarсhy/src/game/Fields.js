@@ -38,7 +38,7 @@ export default class Fields {
      * @param {Phaser.Geom.Point} point 
      * @returns {Phaser.Geom.Point}
      */
-    findField(player, point) {
+    findFieldByPoint(player, point) {
         const me = this;
 
         for (let i = 0; i < me._fields.length; ++i) {

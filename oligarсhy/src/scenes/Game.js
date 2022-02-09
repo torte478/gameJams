@@ -109,6 +109,10 @@ export default class Game extends Phaser.Scene {
     update() {
         const me = this;
 
+        if (me.state.player != Enums.Players.HUMAN) {
+            me.processCpuTurn();
+        }
+
         if (Global.Debug) {
             me.log.text = 
             `ptr: ${me.cursor.x | 0} ${me.cursor.y | 0}\n` + 
@@ -188,7 +192,52 @@ export default class Game extends Phaser.Scene {
 
         const point = new Phaser.Geom.Point(me.cursor.x, me.cursor.y);
 
-        if (pointer.rightButtonDown()) {
+        me.processTurn(point, pointer.rightButtonDown())
+    }
+
+    processCpuTurn() {
+        const me = this;
+
+        let x, y;
+        switch (me.state.current) {
+            case Enums.GameState.BEGIN:
+                x = me.dice1.x;
+                y = me.dice1.y;
+                break;
+
+            case Enums.GameState.FIRST_DICE_TAKED:
+                x = me.dice2.x;
+                y = me.dice2.y;
+                break;
+
+            case Enums.GameState.SECOND_DICE_TAKED:
+                x = Phaser.Math.Between(-100, 100);
+                y = Phaser.Math.Between(-100, 100);
+                break;
+
+            case Enums.GameState.DICES_DROPED:
+                const piece = me.pieces[me.state.player];
+                x = piece.x;
+                y = piece.y;
+                break;
+
+            case Enums.GameState.PIECE_TAKED:
+                const position = me.fields.movePiece(me.state.player, me.state.nextPieceIndex);
+                x = position.x;
+                y = position.y;
+                break;
+
+            default:
+                throw 'Cpu Error! Unknown state';
+        }
+
+        me.processTurn(new Phaser.Geom.Point(x, y), false);
+    }
+
+    processTurn(point, isCancel) {
+        const me = this;
+
+        if (isCancel) {
             me.state.cancelCurrentAction();
             me.hand.cancel();
             return;
@@ -251,7 +300,7 @@ export default class Game extends Phaser.Scene {
 
             case Enums.GameState.PIECE_TAKED: {
                 
-                const field = me.fields.findField(me.state.player, point);
+                const field = me.fields.findFieldByPoint(me.state.player, point);
 
                 if (!field)
                     return;
