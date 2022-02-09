@@ -88,7 +88,7 @@ export default class Fields {
     }
 
     _getAngle(field) {
-        const quotient = field / (Global.FieldCount / 4);
+        const quotient = field / (Consts.FieldCount / 4);
 
         switch (Math.floor(quotient)) {
             case 0:
@@ -154,7 +154,7 @@ export default class Fields {
     _createFieldLine(scene, signX, signY, shiftX, shiftY, angle, index) {
         const me = this;
 
-        const sideLength = Global.FieldCount / 4;
+        const sideLength = Consts.FieldCount / 4;
 
         const start = (Consts.Field.Width * (sideLength - 1) + Consts.Field.Height) / 2;
 

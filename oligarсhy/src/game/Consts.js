@@ -22,6 +22,8 @@ export default class Consts {
         Height: 240
     };
 
+    static FieldCount = 40;
+
     static PiecePosition = {
         Usual: [
             { x: -30, y: -5},

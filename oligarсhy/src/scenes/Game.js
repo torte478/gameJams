@@ -56,6 +56,8 @@ export default class Game extends Phaser.Scene {
     create() {
         const me = this;
 
+        me.physics.world.setBounds(-1500, -1500, 3000, 3000);
+
         me.add.image(0, 0, 'temp');
 
         me.fields = new Fields(me, Global.PlayersStart);
@@ -68,9 +70,15 @@ export default class Game extends Phaser.Scene {
 
         me.cursor = me.createCursor();
 
-        me.cameras.main.setScroll(
-            Global.StartPosition.x - Consts.Viewport.Width / 2,
-            Global.StartPosition.y - Consts.Viewport.Height / 2);
+        me.cameras.main
+            .setScroll(
+                Global.StartPosition.x - Consts.Viewport.Width / 2,
+                Global.StartPosition.y - Consts.Viewport.Height / 2)
+            .setBounds(
+                me.physics.world.bounds.x,
+                me.physics.world.bounds.y,
+                me.physics.world.bounds.width,
+                me.physics.world.bounds.height);
 
         me.input.on('pointerdown', me.onPointerDown, me);
         me.input.keyboard.on('keydown', (e) => me.onKeyDown(e), me);
@@ -116,7 +124,7 @@ export default class Game extends Phaser.Scene {
         if (Global.Debug) {
             me.log.text = 
             `ptr: ${me.cursor.x | 0} ${me.cursor.y | 0}\n` + 
-            `cam: ${me.cameras.main.scrollX | 0} ${me.cameras.main.scrollX | 0}`
+            `mse: ${me.input.activePointer.worldX} ${me.input.activePointer.worldY}`;
         }
     }
 
@@ -129,9 +137,10 @@ export default class Game extends Phaser.Scene {
     createCursor() {
         const me = this;
 
-        const cursor = me.add.image(Global.StartPosition.x, Global.StartPosition.y, 'cursor')
+        const cursor = me.physics.add.image(Global.StartPosition.x, Global.StartPosition.y, 'cursor')
             .setDepth(Consts.Depth.Max)
-            .setVisible(false);
+            .setVisible(false)
+            .setCollideWorldBounds(true);
 
         me.input.on('pointerdown', (p) => {
             if (me.input.mouse.locked)
@@ -271,6 +280,11 @@ export default class Game extends Phaser.Scene {
 
             case Enums.GameState.SECOND_DICE_TAKED: {
 
+                var success = me.hand.tryDrop(point);
+
+                if (!success)
+                    return;
+
                 const result = {
                     first: Phaser.Math.Between(1, 6),
                     second: Phaser.Math.Between(1, 6)
@@ -279,8 +293,6 @@ export default class Game extends Phaser.Scene {
                 console.log(`${result.first} ${result.second} (${result.first + result.second})`);
 
                 me.state.dropDices(result.first, result.second);
-
-                me.hand.drop(point);
 
                 break;
             }
@@ -308,7 +320,7 @@ export default class Game extends Phaser.Scene {
                 if (field.index != me.state.nextPieceIndex)
                     return;
 
-                me.hand.drop(field.position);
+                me.hand.tryDrop(field.position);
                 me.state.dropPiece();
 
                 break;

@@ -45,7 +45,7 @@ export default class Hand {
     /**
      * @param {Phaser.Geom.Point} point 
      */
-    drop(point) {
+    tryDrop(point) {
         const me = this;
 
         switch (me._type) {
@@ -53,6 +53,13 @@ export default class Hand {
                 
                 if (me._content.length != 2)
                     throw `Wrong hand content length: ${me._content.length}`;
+
+                const inside = Phaser.Geom.Rectangle.ContainsPoint(
+                    new Phaser.Geom.Rectangle(-690, -690, 1380, 1380),
+                    point);
+
+                if (!inside)
+                    return false;
 
                 const first = me._content.pop();
                 const second = me._content.pop();
@@ -84,6 +91,8 @@ export default class Hand {
                 me._type = Enums.HandContent.EMPTY;
             }
         }
+
+        return true;
     }
 
     cancel() {

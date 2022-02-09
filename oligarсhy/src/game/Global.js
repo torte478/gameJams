@@ -17,8 +17,6 @@ export default class Global {
         // 2
     ];
 
-    static FieldCount = 40;
-
     // TODO : replace
     static Fields = [
         // 0

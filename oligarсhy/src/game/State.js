@@ -1,5 +1,5 @@
+import Consts from './Consts.js';
 import Enums from './Enums.js';
-import Global from './Global.js';
 
 export default class State {
 
@@ -42,7 +42,7 @@ export default class State {
     dropDices(first, second) {
         const me = this;
 
-        me.nextPieceIndex = (me._pieceIndicies[me.player] + first + second) % Global.FieldCount;
+        me.nextPieceIndex = (me._pieceIndicies[me.player] + first + second) % Consts.FieldCount;
         me._setCurrent(Enums.GameState.DICES_DROPED);
     }
 
