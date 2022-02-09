@@ -58,6 +58,13 @@ export default class State {
         me._setCurrent(Enums.GameState.BEGIN);
     }
 
+    cancelCurrentAction() {
+        const me = this;
+
+        const next = me._getNextStateAfterCancel();
+        me._setCurrent(next);
+    }
+
     _setCurrent(value) {
         const me = this;
 
@@ -65,5 +72,21 @@ export default class State {
         console.log(`(${me.player}): ${me.current} => ${value}`);
 
         me.current = value;
+    }
+
+    _getNextStateAfterCancel() {
+        const me = this;
+
+        switch (me.current) {
+            case Enums.GameState.FIRST_DICE_TAKED:
+            case Enums.GameState.SECOND_DICE_TAKED:
+                return Enums.GameState.BEGIN;
+
+            case Enums.GameState.PIECE_TAKED:
+                return Enums.GameState.DICES_DROPED;
+            
+            default:
+                return me.current;
+        }
     }
 }

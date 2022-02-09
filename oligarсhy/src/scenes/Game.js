@@ -72,7 +72,7 @@ export default class Game extends Phaser.Scene {
             Global.StartPosition.x - Consts.Viewport.Width / 2,
             Global.StartPosition.y - Consts.Viewport.Height / 2);
 
-        me.input.on('pointerdown', (p) => me.onPointerDown(), me);
+        me.input.on('pointerdown', me.onPointerDown, me);
         me.input.keyboard.on('keydown', (e) => me.onKeyDown(e), me);
 
         me.state = new State(Global.StartIndicies[0]);
@@ -180,10 +180,19 @@ export default class Game extends Phaser.Scene {
         }
     }
 
-    onPointerDown() {
+    /**
+     * @param {Phaser.Input.Pointer} pointer 
+     */
+    onPointerDown(pointer) {
         const me = this;
 
         const point = new Phaser.Geom.Point(me.cursor.x, me.cursor.y);
+
+        if (pointer.rightButtonDown()) {
+            me.state.cancelCurrentAction();
+            me.hand.cancel();
+            return;
+        }
 
         // TODO : to independent class
         switch (me.state.current) {

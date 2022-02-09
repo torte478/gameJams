@@ -85,4 +85,16 @@ export default class Hand {
             }
         }
     }
+
+    cancel() {
+        const me = this;
+
+        while (me._content.length > 0) {
+            const item = me._content.pop();
+
+            item.setVisible(true);
+        }
+
+        me._type = Enums.HandContent.EMPTY;
+    }
 }
