@@ -58,7 +58,7 @@ export default class Game extends Phaser.Scene {
 
         me.add.image(0, 0, 'temp');
 
-        me.fields = new Fields(me, Global.StartIndicies);
+        me.fields = new Fields(me, Global.PlayersStart);
 
         me.add.image(0, 0, 'hud')
             .setOrigin(0)
@@ -75,11 +75,11 @@ export default class Game extends Phaser.Scene {
         me.input.on('pointerdown', me.onPointerDown, me);
         me.input.keyboard.on('keydown', (e) => me.onKeyDown(e), me);
 
-        me.state = new State(Global.StartIndicies[0]);
+        me.state = new State(Global.PlayersStart, 0); //0 -> from config
 
         me.pieces = [];
-        for (let i = 0; i < Global.PlayerCount; ++i) {
-            const position = me.fields.movePiece(i, Global.StartIndicies[i]);
+        for (let i = 0; i < Global.PlayersStart.length; ++i) {
+            const position = me.fields.movePiece(i, Global.PlayersStart[i]);
 
             const piece = me.add.image(position.x, position.y, 'pieces', i)
                 .setDepth(Consts.Depth.Pieces);

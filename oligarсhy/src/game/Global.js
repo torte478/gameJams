@@ -10,14 +10,12 @@ export default class Global {
         y: 600
     };
 
-    static StartIndicies = [
+    static PlayersStart = [
         0,
-        1,
-        1,
-        2
+        1
+        // 1,
+        // 2
     ];
-
-    static PlayerCount = 4;
 
     static FieldCount = 40;
 

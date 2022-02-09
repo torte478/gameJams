@@ -3,8 +3,8 @@ import Global from './Global.js';
 
 export default class State {
 
-    /** @type {Number} */
-    _pieceIndex;
+    /** @type {Number[]} */
+    _pieceIndicies;
 
     /** @type {Number} */
     current;
@@ -16,14 +16,15 @@ export default class State {
     player;
 
     /**
-     * @param {Number} pieceIndex 
+     * @param {Number[]} pieceIndicies 
+     * @param {Number} player
      */
-    constructor(pieceIndex) {
+    constructor(pieceIndicies, firstPlayer) {
         const me = this;
 
-        me._pieceIndex = pieceIndex;
+        me._pieceIndicies = pieceIndicies;
         me.current = Enums.GameState.BEGIN;
-        me.player = Enums.PlayerType.HUMAN;
+        me.player = firstPlayer;
     }
 
     takeFirstDice() {
@@ -41,7 +42,7 @@ export default class State {
     dropDices(first, second) {
         const me = this;
 
-        me.nextPieceIndex = (me._pieceIndex + first + second) % Global.FieldCount;
+        me.nextPieceIndex = (me._pieceIndicies[me.player] + first + second) % Global.FieldCount;
         me._setCurrent(Enums.GameState.DICES_DROPED);
     }
 
@@ -54,7 +55,9 @@ export default class State {
     dropPiece() {
         const me = this;
 
-        me._pieceIndex = me.nextPieceIndex;
+        me._pieceIndicies[me.player] = me.nextPieceIndex;
+        me.player = (me.player + 1) % me._pieceIndicies.length;
+
         me._setCurrent(Enums.GameState.BEGIN);
     }
 
@@ -69,7 +72,7 @@ export default class State {
         const me = this;
 
         //TODO : to human read && own Debug flag
-        console.log(`(${me.player}): ${me.current} => ${value}`);
+        console.log(`(${me.player + 1}): ${me.current} => ${value}`);
 
         me.current = value;
     }
