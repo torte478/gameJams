@@ -1,9 +1,10 @@
 import Enums from "./Enums.js";
 
-// TODO: why? (Global ->? Config)
-export default class Global {
+export default class Config {
 
     static Debug = true;
+    
+    static DebugStateLog = true;
 
     static StartPosition = {
         x: 800,
@@ -17,7 +18,6 @@ export default class Global {
         // 2
     ];
 
-    // TODO : replace
     static Fields = [
         // 0
         {

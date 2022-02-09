@@ -1,5 +1,7 @@
+import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
+import Utils from './Utils.js';
 
 export default class State {
 
@@ -71,8 +73,11 @@ export default class State {
     _setCurrent(value) {
         const me = this;
 
-        //TODO : to human read && own Debug flag
-        console.log(`(${me.player + 1}): ${me.current} => ${value}`);
+        if (Config.DebugStateLog)
+            console.log(
+                `(${me.player + 1}): `
+                + `${Utils.enumToString(Enums.GameState, me.current)} => `
+                + `${Utils.enumToString(Enums.GameState, value)}`);
 
         me.current = value;
     }

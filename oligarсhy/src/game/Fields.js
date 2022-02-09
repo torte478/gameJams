@@ -1,8 +1,8 @@
 import Phaser from '../lib/phaser.js';
 
+import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
-import Global from './Global.js';
 import Utils from './Utils.js';
 
 export default class Fields {
@@ -14,18 +14,18 @@ export default class Fields {
     _pieces;
 
     /**
-     * @param {Phaser.Scene} scene 
+     * @param {Phaser.GameObjects.GameObjectFactory} factory 
      * @param {Number[]} piecePositions
      */
-    constructor(scene, piecePositions) {
+    constructor(factory, piecePositions) {
         const me = this;
 
         me._fields = [];
 
-        me._createFieldLine(scene, 1, 1, -1, 0, 0, 0);
-        me._createFieldLine(scene, -1, 1, 0, -1, 90, 10);
-        me._createFieldLine(scene, -1, -1, 1, 0, 180, 20);
-        me._createFieldLine(scene, 1, -1, 0, 1, 270, 30);
+        me._createFieldLine(factory, 1, 1, -1, 0, 0, 0);
+        me._createFieldLine(factory, -1, 1, 0, -1, 90, 10);
+        me._createFieldLine(factory, -1, -1, 1, 0, 180, 20);
+        me._createFieldLine(factory, 1, -1, 0, 1, 270, 30);
 
         me._pieces = [];
 
@@ -75,7 +75,7 @@ export default class Fields {
             fieldContainer.x + offset.x,
             fieldContainer.y + offset.y);
 
-        if (Global.Fields[field].type == Enums.FieldType.JAIL)
+        if (Config.Fields[field].type == Enums.FieldType.JAIL)
             return origin;
         
         const angle = me._getAngle(field);
@@ -133,7 +133,7 @@ export default class Fields {
     _getPiecePosOffset(field) {
         const me = this;
 
-        switch (Global.Fields[field].type) {
+        switch (Config.Fields[field].type) {
 
             case Enums.FieldType.START:
             case Enums.FieldType.FREE:
@@ -149,9 +149,9 @@ export default class Fields {
     }
 
     /**
-     * @param {Phaser.Scene} scene 
+     * @param {Phaser.GameObjects.GameObjectFactory} factory 
      */
-    _createFieldLine(scene, signX, signY, shiftX, shiftY, angle, index) {
+    _createFieldLine(factory, signX, signY, shiftX, shiftY, angle, index) {
         const me = this;
 
         const sideLength = Consts.FieldCount / 4;
@@ -159,7 +159,7 @@ export default class Fields {
         const start = (Consts.Field.Width * (sideLength - 1) + Consts.Field.Height) / 2;
 
         const corner = me._createField(
-            scene, 
+            factory, 
             start * signX,
             start * signY,
             'field_corner',
@@ -173,7 +173,7 @@ export default class Fields {
         for (let i = 0; i < sideLength - 1; ++i) {
 
             const field = me._createField(
-                scene,
+                factory,
                 start * signX + shiftX * (offset + i * Consts.Field.Width),
                 start * signY + shiftY * (offset + i * Consts.Field.Width),
                 'field',
@@ -186,85 +186,85 @@ export default class Fields {
     }
 
     /**
-     * @param {Phaser.Scene} scene 
+     * @param {Phaser.GameObjects.GameObjectFactory} factory 
      * @param {Number} x 
      * @param {Number} y 
      * @param {String} texture 
      * @param {Number} index 
      * @returns {Phaser.GameObjects.Container}
      */
-    _createField(scene, x, y, texture, angle, index) {
+    _createField(factory, x, y, texture, angle, index) {
         const me = this,
-              config = Global.Fields[index],
-              content = me._getFieldContent(scene, config),
-              children = [ scene.add.image(0, 0, texture) ].concat(content);
+              config = Config.Fields[index],
+              content = me._getFieldContent(factory, config),
+              children = [ factory.image(0, 0, texture) ].concat(content);
 
-        return scene.add.container(x, y, children)
+        return factory.container(x, y, children)
             .setAngle(angle);
     }
 
     /**
-     * @param {Phaser.Scene} scene 
+     * @param {Phaser.GameObjects.GameObjectFactory} factory 
      * @param {Object} config 
      * @returns {Phaser.GameObjects.GameObject[]}
      */
-    _getFieldContent(scene, config) {
+    _getFieldContent(factory, config) {
         const me = this;
 
         switch (config.type) {
             case Enums.FieldType.PROPERTY:
                 return [
-                    scene.add.image(0, -95, 'field_header', config.color),
-                    scene.add.image(0, 20, 'icons', config.icon),
-                    scene.add.text(0, -40, config.name, Consts.TextStyle.FieldName).setOrigin(0.5),
-                    scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
+                    factory.image(0, -95, 'field_header', config.color),
+                    factory.image(0, 20, 'icons', config.icon),
+                    factory.text(0, -40, config.name, Consts.TextStyle.FieldSmall).setOrigin(0.5),
+                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5)
                 ];
 
             case Enums.FieldType.CHANCE:
                 return [
-                    scene.add.image(0, 20, 'icons_big', 0),
-                    scene.add.text(0, -90, 'CHANCE', Consts.TextStyle.ChanceHeader).setOrigin(0.5)
+                    factory.image(0, 20, 'icons_big', 0),
+                    factory.text(0, -90, 'CHANCE', Consts.TextStyle.FieldBig).setOrigin(0.5)
                 ];
 
             case Enums.FieldType.TAX:
                 return [
-                    scene.add.image(0, 0, 'icons_big', 2),
-                    scene.add.text(0, -90, 'TAX', Consts.TextStyle.ChanceHeader).setOrigin(0.5),
-                    scene.add.text(0, 95, `PAY ${config.cost}`, Consts.TextStyle.FieldCost).setOrigin(0.5),
+                    factory.image(0, 0, 'icons_big', 2),
+                    factory.text(0, -90, 'TAX', Consts.TextStyle.FieldBig).setOrigin(0.5),
+                    factory.text(0, 95, `PAY ${config.cost}`, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
                 ];
 
             case Enums.FieldType.RAILSTATION:
                 return [
-                    scene.add.image(0, 0, 'icons_big', 4),
-                    scene.add.text(0, -90, config.name, Consts.TextStyle.FieldCost).setOrigin(0.5), //TODO : text style name
-                    scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
+                    factory.image(0, 0, 'icons_big', 4),
+                    factory.text(0, -90, config.name, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
+                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5)
                 ];
 
             case Enums.FieldType.UTILITY:
                 return [
-                    scene.add.image(0, 0, 'icons_big', config.icon),
-                    scene.add.text(0, -90, config.name, Consts.TextStyle.FieldName).setOrigin(0.5),
-                    scene.add.text(0, 95, config.cost, Consts.TextStyle.FieldCost).setOrigin(0.5)
+                    factory.image(0, 0, 'icons_big', config.icon),
+                    factory.text(0, -90, config.name, Consts.TextStyle.FieldSmall).setOrigin(0.5),
+                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5)
                 ];
 
             case Enums.FieldType.START:
                 return [
-                    scene.add.image(0, 0, 'icons_corner', 0)
+                    factory.image(0, 0, 'icons_corner', 0)
                 ];
 
             case Enums.FieldType.JAIL:
                 return [
-                    scene.add.image(0, 0, 'icons_corner', 2)
+                    factory.image(0, 0, 'icons_corner', 2)
                 ];
 
             case Enums.FieldType.FREE:
                 return [
-                    scene.add.image(0, 0, 'icons_corner', 4)
+                    factory.image(0, 0, 'icons_corner', 4)
                 ];
 
             case Enums.FieldType.GOTOJAIL:
                 return [
-                    scene.add.image(0, 0, 'icons_corner', 6)
+                    factory.image(0, 0, 'icons_corner', 6)
                 ];
 
             default:

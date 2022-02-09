@@ -51,21 +51,21 @@ export default class Consts {
     static Font = 'Arial';
 
     static TextStyle = {
-        FieldName: {
+        FieldSmall: {
             color: Consts.TextColor,
             fontFamily: Consts.Font,
             align: 'center',
             fontSize: 18
         },
 
-        FieldCost: {
+        FieldMiddle: {
             color: Consts.TextColor,
             fontFamily: Consts.Font,
             align: 'center',
             fontSize: 22
         },
 
-        ChanceHeader: {
+        FieldBig: {
             color: Consts.TextColor,
             fontFamily: Consts.Font,
             align: 'center',
