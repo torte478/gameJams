@@ -39,19 +39,9 @@ export default class Game extends Phaser.Scene {
     create() {
         const me = this;
 
-        me.core = new Core(me.add);
+        // Phaser
 
         me.physics.world.setBounds(-1500, -1500, 3000, 3000);
-
-        me.add.image(0, 0, 'temp');
-
-        me.add.image(0, 0, 'hud')
-            .setOrigin(0)
-            .setScrollFactor(0)
-            .setDepth(Consts.Depth.HUD)
-            .setVisible(false); // TODO
-
-        me.cursor = me.createCursor();
 
         me.cameras.main
             .setScroll(
@@ -63,8 +53,24 @@ export default class Game extends Phaser.Scene {
                 me.physics.world.bounds.width,
                 me.physics.world.bounds.height);
 
+        // custom
+
+        me.core = new Core(me.add);
+
+        me.add.image(0, 0, 'hud')
+            .setOrigin(0)
+            .setScrollFactor(0)
+            .setDepth(Consts.Depth.HUD)
+            .setVisible(false); // TODO
+
+        me.cursor = me.createCursor();
+
+        // events
+
         me.input.on('pointerdown', me.onPointerDown, me);
         me.input.keyboard.on('keydown', (e) => me.onKeyDown(e), me);
+
+        // debug
 
         if (Config.Debug) {
             me.log = me.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
@@ -91,17 +97,11 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         if (Config.Debug) {
-            if (isNaN(event.key) || me.state.current != Enums.GameState.BEGIN) 
+            
+            if (isNaN(event.key))
                 return;
 
-            const result = {
-                first: 0,
-                second: +event.key
-            };
-
-            console.log(`${result.first} ${result.second} (${result.first + result.second})`);
-
-            me.core.debugDropDices(result.first, result.second);
+            me.core.debugDropDices(+event.key);
         }
     }
 

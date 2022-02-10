@@ -5,7 +5,7 @@ import Consts from '../game/Consts.js';
 import Enums from '../game/Enums.js';
 import Fields from '../game/Fields.js';
 import Hand from '../game/Hand.js';
-import State from '../game/State.js';
+import Status from './Status.js';
 
 export default class Core {
 
@@ -24,25 +24,24 @@ export default class Core {
     /** @type {Hand} */
     _hand;
 
-    /** @type {State} */
-    _state;
+    /** @type {Status} */
+    _status;
 
     /**
-     * 
-      * @param {Phaser.GameObjects.GameObjectFactory} factory 
+     * @param {Phaser.GameObjects.GameObjectFactory} factory 
      */
     constructor(factory) {
         const me = this;
 
-        me._state = new State(Config.PlayersStart, 0); //TODO: 0 -> from config
+        me._status = new Status(Config.PieceStartPositions, Config.FirstPlayer);
 
-        me._fields = new Fields(factory, Config.PlayersStart);
+        me._fields = new Fields(factory, Config.PieceStartPositions);
 
         me._pieces = [];
-        for (let i = 0; i < Config.PlayersStart.length; ++i) {
-            const position = me._fields.movePiece(i, Config.PlayersStart[i]);
+        for (let player = 0; player < Config.PieceStartPositions.length; ++player) {
+            const position = me._fields.movePiece(player, Config.PieceStartPositions[player]);
 
-            const piece = factory.image(position.x, position.y, 'pieces', i)
+            const piece = factory.image(position.x, position.y, 'pieces', player)
                 .setDepth(Consts.Depth.Pieces);
 
             me._pieces.push(piece);
@@ -56,29 +55,34 @@ export default class Core {
             Consts.SecondDiceOffset.Y,
             'dice', 
             1)
-            .setDepth(Consts.Depth.Pieces);;
+            .setDepth(Consts.Depth.Pieces);
 
         me._hand = new Hand();
     }
 
+    //TODODO: inheritance
+    /**
+     * @param {Phaser.Geom.Point} point 
+     * @param {Boolean} isCancel 
+     */
     processTurn(point, isCancel) {
         const me = this;
 
         if (isCancel) {
-            me._state.cancelCurrentAction();
+            me._status.cancelCurrentAction();
             me._hand.cancel();
             return;
         }
 
-        switch (me._state.current) {
+        switch (me._status.state) {
             case Enums.GameState.BEGIN: {
 
                 const diceTaked = 
-                    me._hand.tryTake(me._dice1, point, Enums.HandContent.DICES)
-                    || me._hand.tryTake(me._dice2, point, Enums.HandContent.DICES)
+                    me._hand.tryTake(me._dice1, point, Enums.HandState.DICES)
+                    || me._hand.tryTake(me._dice2, point, Enums.HandState.DICES)
 
                 if (diceTaked)
-                    me._state.takeFirstDice();
+                    me._status.takeFirstDice();
 
                 break;
             }
@@ -86,11 +90,11 @@ export default class Core {
             case Enums.GameState.FIRST_DICE_TAKED: {
 
                 const diceTaked = 
-                    me._hand.tryTake(me._dice1, point, Enums.HandContent.DICES)
-                    || me._hand.tryTake(me._dice2, point, Enums.HandContent.DICES)
+                    me._hand.tryTake(me._dice1, point, Enums.HandState.DICES)
+                    || me._hand.tryTake(me._dice2, point, Enums.HandState.DICES)
 
                 if (diceTaked)
-                    me._state.takeSecondDice();
+                    me._status.takeSecondDice();
 
                 break;
             }
@@ -109,7 +113,7 @@ export default class Core {
 
                 console.log(`${result.first} ${result.second} (${result.first + result.second})`);
 
-                me._state.dropDices(result.first, result.second);
+                me._status.dropDices(result.first, result.second);
 
                 break;
             }
@@ -117,28 +121,28 @@ export default class Core {
             case Enums.GameState.DICES_DROPED: {
                 
                 const pieceTaked = me._hand.tryTake(
-                    me._pieces[me._state.player], 
+                    me._pieces[me._status.player], 
                     point, 
-                    Enums.HandContent.PIECE);
+                    Enums.HandState.PIECE);
 
                 if (pieceTaked)
-                    me._state.takePiece();
+                    me._status.takePiece();
 
                 break;
             }
 
             case Enums.GameState.PIECE_TAKED: {
                 
-                const field = me._fields.findFieldByPoint(me._state.player, point);
+                const field = me._fields.moveToFieldAtPoint(me._status.player, point);
 
                 if (!field)
                     return;
 
-                if (field.index != me._state.nextPieceIndex)
+                if (field.index != me._status.nextPieceIndex)
                     return;
 
                 me._hand.tryDrop(field.position);
-                me._state.dropPiece();
+                me._status.dropPiece();
 
                 break;
             }
@@ -149,7 +153,7 @@ export default class Core {
         const me = this;
 
         let x, y;
-        switch (me._state.current) {
+        switch (me._status.state) {
             case Enums.GameState.BEGIN:
                 x = me._dice1.x;
                 y = me._dice1.y;
@@ -166,13 +170,13 @@ export default class Core {
                 break;
 
             case Enums.GameState.DICES_DROPED:
-                const piece = me._pieces[me._state.player];
+                const piece = me._pieces[me._status.player];
                 x = piece.x;
                 y = piece.y;
                 break;
 
             case Enums.GameState.PIECE_TAKED:
-                const position = me._fields.movePiece(me._state.player, me._state.nextPieceIndex);
+                const position = me._fields.movePiece(me._status.player, me._status.nextPieceIndex);
                 x = position.x;
                 y = position.y;
                 break;
@@ -187,12 +191,15 @@ export default class Core {
     isHumanTurn() {
         const me = this;
 
-        return me._state.player == Enums.Players.HUMAN;
+        return me._status.player == Enums.PlayerIndex.HUMAN;
     }
 
-    debugDropDices(first, second) {
+    debugDropDices(value) {
         const me = this;
 
-        me._state.dropDices(first, second);
+        if (me._status.state == Enums.GameState.BEGIN) {
+            console.log(`debug drop: ${value}`);
+            me._status.dropDices(value, 0);
+        }
     }
 }

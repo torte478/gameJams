@@ -3,16 +3,17 @@ import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Utils from './Utils.js';
 
-export default class State {
+//TODODO: replace logic to Core
+export default class Status {
 
     /** @type {Number[]} */
-    _pieceIndicies;
+    _pieceIndicies; //TODOO: ?
 
     /** @type {Number} */
-    current;
+    state;
 
     /** @type {Number} */
-    nextPieceIndex;
+    nextPieceIndex; //TODOOD: ?
 
     /**@type {Number} */
     player;
@@ -25,33 +26,34 @@ export default class State {
         const me = this;
 
         me._pieceIndicies = pieceIndicies;
-        me.current = Enums.GameState.BEGIN;
+        me.state = Enums.GameState.BEGIN;
         me.player = firstPlayer;
     }
 
     takeFirstDice() {
         const me = this;
 
-        me._setCurrent(Enums.GameState.FIRST_DICE_TAKED);
+        me._setState(Enums.GameState.FIRST_DICE_TAKED);
     }
 
     takeSecondDice() {
         const me = this;
 
-        me._setCurrent(Enums.GameState.SECOND_DICE_TAKED);
+        me._setState(Enums.GameState.SECOND_DICE_TAKED);
     }
 
+    // TODODO : replace
     dropDices(first, second) {
         const me = this;
 
         me.nextPieceIndex = (me._pieceIndicies[me.player] + first + second) % Consts.FieldCount;
-        me._setCurrent(Enums.GameState.DICES_DROPED);
+        me._setState(Enums.GameState.DICES_DROPED);
     }
 
     takePiece() {
         const me = this;
 
-        me._setCurrent(Enums.GameState.PIECE_TAKED);
+        me._setState(Enums.GameState.PIECE_TAKED);
     }
 
     dropPiece() {
@@ -60,32 +62,32 @@ export default class State {
         me._pieceIndicies[me.player] = me.nextPieceIndex;
         me.player = (me.player + 1) % me._pieceIndicies.length;
 
-        me._setCurrent(Enums.GameState.BEGIN);
+        me._setState(Enums.GameState.BEGIN);
     }
 
     cancelCurrentAction() {
         const me = this;
 
         const next = me._getNextStateAfterCancel();
-        me._setCurrent(next);
+        me._setState(next);
     }
 
-    _setCurrent(value) {
+    _setState(value) {
         const me = this;
 
         if (Config.DebugStateLog)
             console.log(
                 `(${me.player + 1}): `
-                + `${Utils.enumToString(Enums.GameState, me.current)} => `
+                + `${Utils.enumToString(Enums.GameState, me.state)} => `
                 + `${Utils.enumToString(Enums.GameState, value)}`);
 
-        me.current = value;
+        me.state = value;
     }
 
     _getNextStateAfterCancel() {
         const me = this;
 
-        switch (me.current) {
+        switch (me.state) {
             case Enums.GameState.FIRST_DICE_TAKED:
             case Enums.GameState.SECOND_DICE_TAKED:
                 return Enums.GameState.BEGIN;
@@ -94,7 +96,7 @@ export default class State {
                 return Enums.GameState.DICES_DROPED;
             
             default:
-                return me.current;
+                return me.state;
         }
     }
 }

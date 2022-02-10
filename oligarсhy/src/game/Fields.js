@@ -7,6 +7,7 @@ import Utils from './Utils.js';
 
 export default class Fields {
 
+    // TODODO: extract Field class
     /** @type {Phaser.GameObjects.Container[]} */
     _fields;
 
@@ -38,7 +39,7 @@ export default class Fields {
      * @param {Phaser.Geom.Point} point 
      * @returns {Phaser.Geom.Point}
      */
-    findFieldByPoint(player, point) {
+    moveToFieldAtPoint(player, point) {
         const me = this;
 
         for (let i = 0; i < me._fields.length; ++i) {
@@ -65,26 +66,49 @@ export default class Fields {
     movePiece(player, field) {
         const me = this;
 
-        const config = me._getPiecePosConfig(player, field);
-        me._pieces[player] = config;
+        const target = me._getFreePosition(field);
+
+        me._pieces[player] = {
+            field: target.field,
+            position: target.position
+        };
 
         const fieldContainer = me._fields[field];
-        const offset = me._getPiecePosOffset(field)[config.position];
 
         const origin = new Phaser.Geom.Point(
-            fieldContainer.x + offset.x,
-            fieldContainer.y + offset.y);
+            fieldContainer.x + target.offset.x,
+            fieldContainer.y + target.offset.y);
 
         if (Config.Fields[field].type == Enums.FieldType.JAIL)
             return origin;
-        
-        const angle = me._getAngle(field);
 
         return Phaser.Math.RotateAround(
             origin, 
             fieldContainer.x, 
             fieldContainer.y, 
-            Phaser.Math.DegToRad(angle));
+            Phaser.Math.DegToRad(target.angle));
+    }
+
+    _getFreePosition(field) {
+        const me = this;
+
+        for (let position = 0; position < me._pieces.length; ++position) {
+
+            const isFree = Utils.all(
+                me._pieces, 
+                (p) => p.field != field || p.position != position);
+
+            if (isFree) {
+                return {
+                    field: field,
+                    position: position,
+                    offset: me._getPiecePosOffset(field)[position],
+                    angle: me._getAngle(field)
+                };
+            }
+        }
+
+        throw `can't find free space on field ${field}`;
     }
 
     _getAngle(field) {
@@ -106,25 +130,6 @@ export default class Fields {
             default:
                 throw `can't calculate angle for field ${field}`;
         }
-    }
-
-    /**
-     * @param {Number} player 
-     * @param {Number} field 
-     */
-    _getPiecePosConfig(player, field) {
-        const me = this;
-
-        for (let position = 0; position < me._pieces.length; ++position) {
-            if (Utils.all(me._pieces, (p) => p.field != field || p.position != position)) {
-                return {
-                    field: field,
-                    position: position
-                };
-            }
-        }
-
-        throw `can't place player ${player} to field ${field}`;
     }
 
     /**

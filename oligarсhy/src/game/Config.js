@@ -11,12 +11,14 @@ export default class Config {
         y: 600
     };
 
-    static PlayersStart = [
+    static PieceStartPositions = [
         0,
         1
         // 1,
         // 2
     ];
+
+    static FirstPlayer = 0;
 
     static Fields = [
         // 0
@@ -26,7 +28,7 @@ export default class Config {
         // 1
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.BROWN,
+            color: Enums.FieldColorIndex.BROWN,
             name: 'iOSS',
             cost: 60,
             icon: 0
@@ -38,7 +40,7 @@ export default class Config {
         // 3
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.BROWN,
+            color: Enums.FieldColorIndex.BROWN,
             name: 'CYBORG',
             cost: 60,
             icon: 2
@@ -57,7 +59,7 @@ export default class Config {
         // 6
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.LIGHTBLUE,
+            color: Enums.FieldColorIndex.LIGHTBLUE,
             name: 'BWM',
             cost: 100,
             icon: 4
@@ -69,7 +71,7 @@ export default class Config {
         // 8
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.LIGHTBLUE,
+            color: Enums.FieldColorIndex.LIGHTBLUE,
             name: 'MERCYDEATH',
             cost: 100,
             icon: 6
@@ -77,7 +79,7 @@ export default class Config {
         // 9
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.LIGHTBLUE,
+            color: Enums.FieldColorIndex.LIGHTBLUE,
             name: 'OOOOUDI',
             cost: 120,
             icon: 8
@@ -89,7 +91,7 @@ export default class Config {
         //11
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.PURPLE,
+            color: Enums.FieldColorIndex.PURPLE,
             name: 'LC',
             cost: 140,
             icon: 10
@@ -104,7 +106,7 @@ export default class Config {
         //13
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.PURPLE,
+            color: Enums.FieldColorIndex.PURPLE,
             name: 'SAMMOONG',
             cost: 140,
             icon: 12
@@ -112,7 +114,7 @@ export default class Config {
         //14
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.PURPLE,
+            color: Enums.FieldColorIndex.PURPLE,
             name: 'MIKEA',
             cost: 160,
             icon: 14
@@ -126,7 +128,7 @@ export default class Config {
         //16
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.ORANGE,
+            color: Enums.FieldColorIndex.ORANGE,
             name: 'INSTAPOUND',
             cost: 180,
             icon: 16
@@ -138,7 +140,7 @@ export default class Config {
         //18
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.ORANGE,
+            color: Enums.FieldColorIndex.ORANGE,
             name: 'WETUBE',
             cost: 180,
             icon: 18
@@ -146,7 +148,7 @@ export default class Config {
         //19
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.ORANGE,
+            color: Enums.FieldColorIndex.ORANGE,
             name: 'HONKER',
             cost: 200,
             icon: 20
@@ -158,7 +160,7 @@ export default class Config {
         //21
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.RED,
+            color: Enums.FieldColorIndex.RED,
             name: 'BURGER QUEEN',
             cost: 220,
             icon: 22
@@ -170,7 +172,7 @@ export default class Config {
         //23
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.RED,
+            color: Enums.FieldColorIndex.RED,
             name: 'SUBPATH',
             cost: 220,
             icon: 24
@@ -178,7 +180,7 @@ export default class Config {
         //24
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.RED,
+            color: Enums.FieldColorIndex.RED,
             name: "DONMACLD'S",
             cost: 240,
             icon: 26
@@ -192,7 +194,7 @@ export default class Config {
         //26
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.YELLOW,
+            color: Enums.FieldColorIndex.YELLOW,
             name: "SIEWOMANS",
             cost: 260,
             icon: 28
@@ -200,7 +202,7 @@ export default class Config {
         //27
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.YELLOW,
+            color: Enums.FieldColorIndex.YELLOW,
             name: "AUTOROLA",
             cost: 260,
             icon: 30
@@ -215,7 +217,7 @@ export default class Config {
         //29
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.YELLOW,
+            color: Enums.FieldColorIndex.YELLOW,
             name: "YESKIA",
             cost: 280,
             icon: 32
@@ -227,7 +229,7 @@ export default class Config {
         //31
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.GREEN,
+            color: Enums.FieldColorIndex.GREEN,
             name: "NINELEVENDO",
             cost: 300,
             icon: 34
@@ -235,7 +237,7 @@ export default class Config {
         //32
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.GREEN,
+            color: Enums.FieldColorIndex.GREEN,
             name: "XSPHERE",
             cost: 300,
             icon: 36
@@ -247,7 +249,7 @@ export default class Config {
         //34
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.GREEN,
+            color: Enums.FieldColorIndex.GREEN,
             name: "STOPSTATION",
             cost: 320,
             icon: 38
@@ -265,7 +267,7 @@ export default class Config {
         //37
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.BLUE,
+            color: Enums.FieldColorIndex.BLUE,
             name: "LC COMICS",
             cost: 350,
             icon: 40
@@ -278,7 +280,7 @@ export default class Config {
         //39
         {
             type: Enums.FieldType.PROPERTY,
-            color: Enums.FieldColor.BLUE,
+            color: Enums.FieldColorIndex.BLUE,
             name: "MALVER",
             cost: 400,
             icon: 42

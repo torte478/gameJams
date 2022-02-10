@@ -9,17 +9,17 @@ export default class Hand {
     _content;
 
     /** @type {Number} */
-    _type;
+    _state;
 
     constructor() {
         const me = this;
 
         me._content = [];
-        me._type = Enums.HandContent.EMPTY;
+        me._state = Enums.HandState.EMPTY;
     }
 
     /**
-     * @param {Phaser.GameObjects.Image} image 
+     * @param {Phaser.GameObjects.Image} image //TODO : image?
      * @param {Phaser.Geom.Point} point 
      * @param {Number} type
      */
@@ -36,7 +36,7 @@ export default class Hand {
         if (success) {
             image.setVisible(false);
             me._content.push(image);
-            me._type = type;
+            me._state = type;
         }
 
         return success;
@@ -48,8 +48,8 @@ export default class Hand {
     tryDrop(point) {
         const me = this;
 
-        switch (me._type) {
-            case Enums.HandContent.DICES: {
+        switch (me._state) {
+            case Enums.HandState.DICES: {
                 
                 if (me._content.length != 2)
                     throw `Wrong hand content length: ${me._content.length}`;
@@ -74,7 +74,7 @@ export default class Hand {
                         point.y + Consts.SecondDiceOffset.Y)
                     .setVisible(true);
 
-                me._type = Enums.HandContent.EMPTY;
+                me._state = Enums.HandState.EMPTY;
 
                 break;
             }
@@ -88,7 +88,7 @@ export default class Hand {
                         .setVisible(true);
                 }               
 
-                me._type = Enums.HandContent.EMPTY;
+                me._state = Enums.HandState.EMPTY;
             }
         }
 
@@ -104,6 +104,6 @@ export default class Hand {
             item.setVisible(true);
         }
 
-        me._type = Enums.HandContent.EMPTY;
+        me._state = Enums.HandState.EMPTY;
     }
 }
