@@ -13,9 +13,9 @@ export default class Config {
 
     static PieceStartPositions = [
         0,
-        1,
-        1,
-        2
+        1
+        // 1,
+        // 2
     ];
 
     static FirstPlayer = 0;

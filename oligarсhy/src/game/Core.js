@@ -59,17 +59,6 @@ export default class Core {
 
         me._hand = new Hand();
     }
-
-    /**
-     * @param {Phaser.Geom.Point} point 
-     * @param {Boolean} isCancel 
-     */
-    processHumanTurn(point, isCancel) {
-        const me = this;
-
-        if (me._status.player == Enums.PlayerIndex.HUMAN)
-            me.processTurn(point, isCancel);
-    }
     
     /**
      * @param {Phaser.Geom.Point} point 
@@ -79,7 +68,8 @@ export default class Core {
         const me = this;
 
         if (isCancel) {
-            me._status.cancelCurrentAction();
+            const next = me._status_getNextStateAfterCancel();
+            me._status.setState(next);
             me._hand.cancel();
             return;
         }
@@ -92,7 +82,7 @@ export default class Core {
                     || me._hand.tryTake(me._dice2, point, Enums.HandState.DICES)
 
                 if (diceTaked)
-                    me._status.takeFirstDice();
+                    me._status.setState(Enums.GameState.FIRST_DICE_TAKED);
 
                 break;
             }
@@ -104,7 +94,7 @@ export default class Core {
                     || me._hand.tryTake(me._dice2, point, Enums.HandState.DICES)
 
                 if (diceTaked)
-                    me._status.takeSecondDice();
+                    me._status.setState(Enums.GameState.SECOND_DICE_TAKED);
 
                 break;
             }
@@ -116,14 +106,12 @@ export default class Core {
                 if (!success)
                     return;
 
-                const result = {
-                    first: Phaser.Math.Between(1, 6),
-                    second: Phaser.Math.Between(1, 6)
-                };
+                const first = Phaser.Math.Between(1, 6);
+                const second = Phaser.Math.Between(1, 6);
 
-                console.log(`${result.first} ${result.second} (${result.first + result.second})`);
+                console.log(`${first} ${second} (${first + second})`);
 
-                me._status.dropDices(result.first, result.second);
+                me._applyDiceDrop(first, second);
 
                 break;
             }
@@ -136,7 +124,7 @@ export default class Core {
                     Enums.HandState.PIECE);
 
                 if (pieceTaked)
-                    me._status.takePiece();
+                    me._status.setState(Enums.GameState.PIECE_TAKED);
 
                 break;
             }
@@ -155,7 +143,10 @@ export default class Core {
                     return;
 
                 me._hand.tryDrop(field.position);
-                me._status.dropPiece();
+
+                me._status.pieceIndicies[me._status.player] = me._status.nextPieceIndex;
+                me._status.player = (me._status.player + 1) % me._status.pieceIndicies.length;
+                me._status.setState(Enums.GameState.BEGIN);
 
                 break;
             }
@@ -212,7 +203,31 @@ export default class Core {
 
         if (me._status.state == Enums.GameState.BEGIN) {
             console.log(`debug drop: ${value}`);
-            me._status.dropDices(value, 0);
+            me._applyDiceDrop(value, 0);
+        }
+    }
+
+    _applyDiceDrop(first, second) {
+        const me = this;
+
+        const current = me._status.pieceIndicies[me._status.player];
+        me._status.nextPieceIndex = (current + first + second) % Consts.FieldCount;
+        me._status.setState(Enums.GameState.DICES_DROPED);
+    }
+
+    _getNextStateAfterCancel() {
+        const me = this;
+
+        switch (me._status.state) {
+            case Enums.GameState.FIRST_DICE_TAKED:
+            case Enums.GameState.SECOND_DICE_TAKED:
+                return Enums.GameState.BEGIN;
+
+            case Enums.GameState.PIECE_TAKED:
+                return Enums.GameState.DICES_DROPED;
+            
+            default:
+                return me._status.state;
         }
     }
 }
