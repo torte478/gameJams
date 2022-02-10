@@ -113,7 +113,7 @@ export default class Game extends Phaser.Scene {
 
         const point = new Phaser.Geom.Point(me.cursor.x, me.cursor.y);
 
-        me.core.processTurn(point, pointer.rightButtonDown());
+        me.core.processHumanTurn(point, pointer.rightButtonDown());
     }
 
     createCursor() {

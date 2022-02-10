@@ -7,7 +7,7 @@ import Utils from './Utils.js';
 export default class Status {
 
     /** @type {Number[]} */
-    _pieceIndicies; //TODOO: ?
+    pieceIndicies; //TODOO: ?
 
     /** @type {Number} */
     state;
@@ -25,7 +25,7 @@ export default class Status {
     constructor(pieceIndicies, firstPlayer) {
         const me = this;
 
-        me._pieceIndicies = pieceIndicies;
+        me.pieceIndicies = pieceIndicies;
         me.state = Enums.GameState.BEGIN;
         me.player = firstPlayer;
     }
@@ -42,11 +42,10 @@ export default class Status {
         me._setState(Enums.GameState.SECOND_DICE_TAKED);
     }
 
-    // TODODO : replace
     dropDices(first, second) {
         const me = this;
 
-        me.nextPieceIndex = (me._pieceIndicies[me.player] + first + second) % Consts.FieldCount;
+        me.nextPieceIndex = (me.pieceIndicies[me.player] + first + second) % Consts.FieldCount;
         me._setState(Enums.GameState.DICES_DROPED);
     }
 
@@ -59,8 +58,8 @@ export default class Status {
     dropPiece() {
         const me = this;
 
-        me._pieceIndicies[me.player] = me.nextPieceIndex;
-        me.player = (me.player + 1) % me._pieceIndicies.length;
+        me.pieceIndicies[me.player] = me.nextPieceIndex;
+        me.player = (me.player + 1) % me.pieceIndicies.length;
 
         me._setState(Enums.GameState.BEGIN);
     }

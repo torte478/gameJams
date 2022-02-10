@@ -39,7 +39,7 @@ export default class Core {
 
         me._pieces = [];
         for (let player = 0; player < Config.PieceStartPositions.length; ++player) {
-            const position = me._fields.movePiece(player, Config.PieceStartPositions[player]);
+            const position = me._fields.movePiece(player, 0, Config.PieceStartPositions[player]);
 
             const piece = factory.image(position.x, position.y, 'pieces', player)
                 .setDepth(Consts.Depth.Pieces);
@@ -60,7 +60,17 @@ export default class Core {
         me._hand = new Hand();
     }
 
-    //TODODO: inheritance
+    /**
+     * @param {Phaser.Geom.Point} point 
+     * @param {Boolean} isCancel 
+     */
+    processHumanTurn(point, isCancel) {
+        const me = this;
+
+        if (me._status.player == Enums.PlayerIndex.HUMAN)
+            me.processTurn(point, isCancel);
+    }
+    
     /**
      * @param {Phaser.Geom.Point} point 
      * @param {Boolean} isCancel 
@@ -133,7 +143,10 @@ export default class Core {
 
             case Enums.GameState.PIECE_TAKED: {
                 
-                const field = me._fields.moveToFieldAtPoint(me._status.player, point);
+                const field = me._fields.moveToFieldAtPoint(
+                    me._status.player,
+                    me._status.pieceIndicies[me._status.player],
+                    point);
 
                 if (!field)
                     return;
@@ -176,7 +189,7 @@ export default class Core {
                 break;
 
             case Enums.GameState.PIECE_TAKED:
-                const position = me._fields.movePiece(me._status.player, me._status.nextPieceIndex);
+                const position = me._fields.getFieldPosition(me._status.nextPieceIndex);
                 x = position.x;
                 y = position.y;
                 break;

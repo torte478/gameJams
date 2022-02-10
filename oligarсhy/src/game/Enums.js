@@ -35,10 +35,11 @@ export default class Enums {
     };
 
     static PlayerIndex = {
+        NOONE: -1,
         HUMAN: 0,
         CPU1: 1,
         CPU2: 2,
-        CPU3: 3
+        CPU3: 3,
     };
 
     static HandState = {

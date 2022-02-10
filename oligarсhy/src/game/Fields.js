@@ -3,16 +3,12 @@ import Phaser from '../lib/phaser.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
-import Utils from './Utils.js';
+import Field from './Field.js';
 
 export default class Fields {
 
-    // TODODO: extract Field class
-    /** @type {Phaser.GameObjects.Container[]} */
+    /** @type {Field[]} */
     _fields;
-
-    /** @type {Number[]} */
-    _pieces;
 
     /**
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
@@ -27,30 +23,26 @@ export default class Fields {
         me._createFieldLine(factory, -1, 1, 0, -1, 90, 10);
         me._createFieldLine(factory, -1, -1, 1, 0, 180, 20);
         me._createFieldLine(factory, 1, -1, 0, 1, 270, 30);
-
-        me._pieces = [];
-
-        for (let i = 0; i < piecePositions.length; ++i)
-            me._pieces.push({field: -1, position: -1});
     }
 
     /**
      * @param {Number} player
+     * @param {Number} from
      * @param {Phaser.Geom.Point} point 
      * @returns {Phaser.Geom.Point}
      */
-    moveToFieldAtPoint(player, point) {
+    moveToFieldAtPoint(player, from, point) {
         const me = this;
 
         for (let i = 0; i < me._fields.length; ++i) {
             const contains = Phaser.Geom.Rectangle.ContainsPoint(
-                me._fields[i].first.getBounds(),
+                me._fields[i].getBounds(),
                 point);
 
             if (contains) {
                 return {
                     index: i,
-                    position: me.movePiece(player, i)
+                    position: me.movePiece(player, from, i)
                 };
             }
         }
@@ -60,55 +52,53 @@ export default class Fields {
 
     /**
      * @param {Number} player 
-     * @param {Number} field 
+     * @param {Number} from
+     * @param {Number} to 
      * @returns {Phaser.Geom.Point}
      */
-    movePiece(player, field) {
+    movePiece(player, from, to) {
         const me = this;
 
-        const target = me._getFreePosition(field);
+        const target = me._getNextPointConfig(player, from, to);
 
-        me._pieces[player] = {
-            field: target.field,
-            position: target.position
-        };
-
-        const fieldContainer = me._fields[field];
+        const fieldPosition = me._fields[to].toPoint();
 
         const origin = new Phaser.Geom.Point(
-            fieldContainer.x + target.offset.x,
-            fieldContainer.y + target.offset.y);
+            fieldPosition.x + target.offset.x,
+            fieldPosition.y + target.offset.y);
 
-        if (Config.Fields[field].type == Enums.FieldType.JAIL)
+        if (Config.Fields[to].type == Enums.FieldType.JAIL)
             return origin;
 
         return Phaser.Math.RotateAround(
             origin, 
-            fieldContainer.x, 
-            fieldContainer.y, 
+            fieldPosition.x, 
+            fieldPosition.y, 
             Phaser.Math.DegToRad(target.angle));
     }
 
-    _getFreePosition(field) {
+    /**
+     * @param {Number} index 
+     * @returns {Phaser.Geom.Point}
+     */
+    getFieldPosition(index) {
         const me = this;
 
-        for (let position = 0; position < me._pieces.length; ++position) {
+        return me._fields[index].toPoint();
+    }
 
-            const isFree = Utils.all(
-                me._pieces, 
-                (p) => p.field != field || p.position != position);
+    _getNextPointConfig(player, from, to) {
+        const me = this;
 
-            if (isFree) {
-                return {
-                    field: field,
-                    position: position,
-                    offset: me._getPiecePosOffset(field)[position],
-                    angle: me._getAngle(field)
-                };
-            }
-        }
+        if (from >= 0)
+            me._fields[from].removePiece(player);
 
-        throw `can't find free space on field ${field}`;
+        const position = me._fields[to].addPiece(player);
+
+        return {
+            offset: me._getPiecePosOffset(to)[position],
+            angle: me._getAngle(to)
+        };
     }
 
     _getAngle(field) {
@@ -204,8 +194,9 @@ export default class Fields {
               content = me._getFieldContent(factory, config),
               children = [ factory.image(0, 0, texture) ].concat(content);
 
-        return factory.container(x, y, children)
+        const container = factory.container(x, y, children)
             .setAngle(angle);
+        return new Field(container);
     }
 
     /**
