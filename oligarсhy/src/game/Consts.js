@@ -1,3 +1,5 @@
+import Enums from "./Enums.js";
+
 export default class Consts {
 
     static Viewport = {
@@ -45,6 +47,21 @@ export default class Consts {
             { x: -20, y: 85},
             { x: 65, y: 85}
         ]
+    };
+
+    static MoneyValues = [
+        Enums.Money.M1,
+        Enums.Money.M5,
+        Enums.Money.M10,
+        Enums.Money.M20,
+        Enums.Money.M50,
+        Enums.Money.M100,
+        Enums.Money.M500
+    ];
+
+    static MoneySize = {
+        Width: 360,
+        Height: 200
     };
 
     static TextColor = '#232429';

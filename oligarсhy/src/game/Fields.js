@@ -4,6 +4,7 @@ import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Field from './Field.js';
+import Utils from './Utils.js';
 
 export default class Fields {
 
@@ -103,23 +104,7 @@ export default class Fields {
 
     _getAngle(field) {
         const quotient = field / (Consts.FieldCount / 4);
-
-        switch (Math.floor(quotient)) {
-            case 0:
-                return 0;
-
-            case 1:
-                return 90;
-
-            case 2:
-                return 180;
-
-            case 3: 
-                return 270;
-
-            default:
-                throw `can't calculate angle for field ${field}`;
-        }
+        return Utils.getAngle(Math.floor(quotient));
     }
 
     /**

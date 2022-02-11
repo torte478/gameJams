@@ -25,4 +25,33 @@ export default class Utils {
 
         throw `Unknown enum member ${value} in ${enumObj}`;
     }
+
+    /**
+     * @param {Number} side 
+     * @param {Boolean} vertical
+     * @returns {Number}
+     */
+    static getAngle(side, vertical) {
+
+        const index = vertical
+            ? (side + 1) % 4
+            : side;
+
+        switch (index) {
+            case 0:
+                return 0;
+
+            case 1:
+                return 90;
+
+            case 2:
+                return 180;
+
+            case 3: 
+                return 270;
+
+            default:
+                throw `can't calculate angle for side ${side}`;
+        }
+    }
 }

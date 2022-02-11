@@ -4,6 +4,7 @@ import Config from '../game/Config.js';
 import Consts from '../game/Consts.js';
 import Core from '../game/Core.js';
 import Enums from '../game/Enums.js';
+import Inventory from '../game/Inventory.js';
 
 export default class Game extends Phaser.Scene {
 
@@ -27,13 +28,14 @@ export default class Game extends Phaser.Scene {
         me.loadImage('hud');
         me.loadImage('cursor');
         me.loadSpriteSheet('dice', 50);
-        me.loadSpriteSheet('field', 160, 240);
+        me.loadSpriteSheet('field', Consts.Field.Width, Consts.Field.Height);
         me.loadSpriteSheet('field_corner', 240);
         me.loadSpriteSheet('icons', 100);
         me.loadSpriteSheet('field_header', 160, 50);
         me.loadSpriteSheet('icons_big', 150, 200);
         me.loadSpriteSheet('icons_corner', 240);
         me.loadSpriteSheet('pieces', 50);
+        me.loadSpriteSheet('money', Consts.MoneySize.Width, Consts.MoneySize.Height);
     }
 
     create() {
@@ -64,6 +66,10 @@ export default class Game extends Phaser.Scene {
             .setVisible(false); // TODO
 
         me.cursor = me.createCursor();
+
+        for (let i = 0; i < Config.PieceStartPositions.length; ++ i) {
+            const inventory = new Inventory(me.add, i);
+        }
 
         // events
 

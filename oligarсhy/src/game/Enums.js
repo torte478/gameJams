@@ -48,4 +48,14 @@ export default class Enums {
         DICES: 20,
         PIECE: 30
     };
+
+    static Money = {
+        M1: 0,
+        M5: 1,
+        M10: 2,
+        M20: 3,
+        M50: 4,
+        M100: 5,
+        M500: 6
+    }
 }
