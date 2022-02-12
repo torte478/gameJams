@@ -66,7 +66,9 @@ export default class Core {
 
         me._inventory = [];
         for (let i = 0; i < Config.PlayerCount; ++ i) {
-            me._inventory.push(new Inventory(factory, i, Config.Start.Money));
+            const inventory = new Inventory(factory, i, Config.Start.Money);
+            inventory.startTurn(i == Config.Start.Player)
+            me._inventory.push(inventory);
         }
     }
     
@@ -225,7 +227,7 @@ export default class Core {
                 break;
 
             case Enums.GameState.PIECE_ON_PROPERTY:
-                me._finishTurn();
+                //me._finishTurn();
                 break;
 
             default:
@@ -246,7 +248,7 @@ export default class Core {
         const me = this;
 
         if (me._status.state == Enums.GameState.BEGIN) {
-            console.log(`debug drop: ${value}`);
+            console.log(`debug drop: ${value}`); // TODO : to debug log
             me._applyDiceDrop(value, 0);
         }
     }
@@ -291,6 +293,10 @@ export default class Core {
         const me = this;
 
         me._status.player = (me._status.player + 1) % Config.PlayerCount;
+        
+        for (let i = 0; i < me._inventory.length; ++i)
+            me._inventory[i].startTurn(i == me._status.player);
+
         me._status.setState(Enums.GameState.BEGIN);
     }
 }

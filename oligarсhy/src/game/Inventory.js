@@ -1,7 +1,7 @@
 import Phaser from '../lib/phaser.js';
 
+import Config from './Config.js';
 import Consts from './Consts.js';
-import Enums from './Enums.js';
 import Utils from './Utils.js';
 
 export default class Inventory {
@@ -45,7 +45,11 @@ export default class Inventory {
             me._bills.push(bills);
         }
 
-        me._buyButton = factory.image(0, 450, 'buttons', 0);
+        const butttonPoint = Phaser.Math.RotateAround(
+            new Phaser.Geom.Point(0, 450), 0, 0, sideAngle);
+        me._buyButton = factory.image(butttonPoint.x, butttonPoint.y, 'buttons', 0)
+            .setAngle(Utils.getAngle(player));
+            
         me._fields = [];
     }
 
@@ -117,5 +121,14 @@ export default class Inventory {
         const me = this;
 
         return Utils.any(me._fields, (f) => f == field);
+    }
+
+    /**
+     * @param {Boolean} isCurrentPlayer 
+     */
+    startTurn(isCurrentPlayer) {
+        const me = this;
+
+        me._buyButton.setVisible(isCurrentPlayer);
     }
 }
