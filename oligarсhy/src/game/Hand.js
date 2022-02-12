@@ -2,7 +2,6 @@ import Phaser from '../lib/phaser.js';
 
 import Consts from './Consts.js';
 import Enums from './Enums.js';
-import Utils from './Utils.js';
 
 export default class Hand {
     
@@ -13,7 +12,7 @@ export default class Hand {
     _state;
 
     /** @type {Number[]} */
-    _bills;
+    _money;
 
     constructor() {
         const me = this;
@@ -21,9 +20,9 @@ export default class Hand {
         me._content = [];
         me._state = Enums.HandState.EMPTY;
         
-        me._bills = [];
+        me._money = [];
         for (let x in Enums.Money) {
-            me._bills.push(0);
+            me._money.push(0);
         }
     }
 
@@ -113,8 +112,8 @@ export default class Hand {
             item.setVisible(true);
         }
 
-        for (let i = 0; i < me._bills.length; ++i)
-            me._bills[i] = 0;
+        for (let i = 0; i < me._money.length; ++i)
+            me._money[i] = 0;
 
         me._state = Enums.HandState.EMPTY;
     }
@@ -122,9 +121,26 @@ export default class Hand {
     takeBill(index) {
         const me = this;
 
-        me._bills[index] += 1;
+        me._money[index] += 1;
         me._state = Enums.HandState.MONEY;
 
-        console.log(`money: ${me._bills.join(';')}`);
+        console.log(`money: ${me._money.join(';')}`);
+    }
+    
+    dropMoney() {
+        const me = this;
+
+        if (me._state != Enums.HandState.MONEY)
+            throw `can't drop money in hand state: ${me._state}`;
+
+        let result = [];
+        for (let i = 0; i < me._money.length; ++i) {
+            result.push(me._money[i]);
+            me._money[i] = 0;
+        }
+
+        me._state = Enums.HandState.EMPTY;
+
+        return result;
     }
 }

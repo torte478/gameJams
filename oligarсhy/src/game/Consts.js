@@ -25,6 +25,7 @@ export default class Consts {
     };
 
     static FieldCount = 40;
+    static BillCount = 7;
 
     static PiecePosition = {
         Usual: [

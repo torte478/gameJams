@@ -25,7 +25,17 @@ export default class Config {
 
         Player: 0,
 
-        State: Enums.GameState.PIECE_DROPED
+        State: Enums.GameState.PIECE_DROPED,
+
+        Money: [
+            5,
+            1,
+            2,
+            1,
+            1,
+            4,
+            2
+        ]
     }
 
     static Fields = [

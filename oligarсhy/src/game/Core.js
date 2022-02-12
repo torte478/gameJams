@@ -65,7 +65,7 @@ export default class Core {
 
         me._inventory = [];
         for (let i = 0; i < Config.PlayerCount; ++ i) {
-            me._inventory.push(new Inventory(factory, i));
+            me._inventory.push(new Inventory(factory, i, Config.Start.Money));
         }
     }
     
@@ -77,9 +77,7 @@ export default class Core {
         const me = this;
 
         if (isCancel) {
-            const next = me._getNextStateAfterCancel();
-            me._status.setState(next);
-            me._hand.cancel();
+            me._cancelTurn();
             return;
         }
 
@@ -233,6 +231,18 @@ export default class Core {
         const current = me._status.pieceIndicies[me._status.player];
         me._status.nextPieceIndex = (current + first + second) % Consts.FieldCount;
         me._status.setState(Enums.GameState.DICES_DROPED);
+    }
+
+    _cancelTurn() {
+        const me = this;
+
+        const money = me._hand.dropMoney();
+        me._hand.cancel();
+
+        me._inventory[me._status.player].addMoney(money);
+
+        const next = me._getNextStateAfterCancel();
+        me._status.setState(next);
     }
 
     _getNextStateAfterCancel() {

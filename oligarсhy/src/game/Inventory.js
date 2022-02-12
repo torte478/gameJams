@@ -6,14 +6,15 @@ import Utils from './Utils.js';
 
 export default class Inventory {
 
-    /** @type {Phaser.GameObjects.Image[]} */
+    /** @type {Bills[]} */
     _bills;
 
     /**
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
      * @param {Number} player
+     * @param {Number[]} money
      */
-    constructor(factory, player) {
+    constructor(factory, player, money) {
         const me = this;
 
         const shift = Consts.MoneySize.Height  + 25;
@@ -22,18 +23,20 @@ export default class Inventory {
         const sideAngle = Phaser.Math.DegToRad(
             Utils.getAngle(player));
 
-        let i = 0;
         me._bills = [];
-        for (let item in Enums.Money) {
+        for (let i = 0; i < Consts.BillCount; ++i) {
 
             const origin = new Phaser.Geom.Point(-860 + i * shift, 1250);
             const point = Phaser.Math.RotateAround(origin, 0, 0, sideAngle);
 
-            const bill = factory.image(point.x, point.y, 'money', Enums.Money[item])
-                .setAngle(billAngle);
+            const bills = {
+                count: money[i],
+                image: factory.image(point.x, point.y, 'money', i)
+                    .setAngle(billAngle)
+                    .setVisible(money[i] > 0)
+            };
 
-            me._bills.push(bill);
-            ++i;
+            me._bills.push(bills);
         }
     }
 
@@ -47,15 +50,32 @@ export default class Inventory {
         for (let i = 0; i < me._bills.length; ++i) {
 
             const contains = Phaser.Geom.Rectangle.ContainsPoint(
-                me._bills[i].getBounds(),
+                me._bills[i].image.getBounds(),
                 point
             )
 
-            if (contains) {
+            if (contains && me._bills[i].count > 0) {
+                me._bills[i].count -= 1;
+                me._bills[i].image.setVisible(
+                    me._bills[i].count > 0);
+
                 return i;
             }
         }
 
         return -1;
+    }
+
+    /**
+     * @param {Number[]} money 
+     */
+    addMoney(money) {
+        const me = this;
+
+        for (let i = 0; i < money.length; ++i) {
+            me._bills[i].count += money[i];
+            me._bills[i].image.setVisible(
+                me._bills[i].count > 0);
+        }
     }
 }
