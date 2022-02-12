@@ -50,10 +50,20 @@ export default class Consts {
         ]
     };
 
-    static MoneySize = {
+    static BillSize = {
         Width: 360,
         Height: 200
     };
+
+    static BillValue = [
+        1,
+        5,
+        10,
+        20,
+        50,
+        100,
+        500
+    ];
 
     static TextColor = '#232429';
     static Font = 'Arial';

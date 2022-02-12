@@ -11,7 +11,7 @@ export default class Status {
     state;
 
     /** @type {Number} */
-    nextPieceIndex;
+    targetPieceIndex;
 
     /**@type {Number} */
     player;
@@ -26,6 +26,8 @@ export default class Status {
 
         me.pieceIndicies = pieceIndicies;
         me.player = startPlayer;
+        
+        me.targetPieceIndex = me.pieceIndicies[me.player];
         me.setState(startState);
     }
 

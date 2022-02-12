@@ -17,7 +17,7 @@ export default class Config {
         PlayerCount: 2,
 
         PiecePositions: [
-            0,
+            1,
             1,
             1,
             2
@@ -25,7 +25,7 @@ export default class Config {
 
         Player: 0,
 
-        State: Enums.GameState.PIECE_DROPED,
+        State: Enums.GameState.PIECE_ON_PROPERTY,
 
         Money: [
             5,

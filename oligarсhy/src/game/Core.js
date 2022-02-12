@@ -7,6 +7,7 @@ import Fields from '../game/Fields.js';
 import Inventory from './Inventory.js';
 import Hand from '../game/Hand.js';
 import Status from './Status.js';
+import Utils from './Utils.js';
 
 export default class Core {
 
@@ -146,25 +147,45 @@ export default class Core {
                 if (!field)
                     return;
 
-                if (field.index != me._status.nextPieceIndex)
+                if (field.index != me._status.targetPieceIndex)
                     return;
 
                 me._hand.tryDrop(field.position);
 
-                me._status.pieceIndicies[me._status.player] = me._status.nextPieceIndex;
-                me._status.player = (me._status.player + 1) % Config.PlayerCount;
-                me._status.setState(Enums.GameState.BEGIN);
+                me._status.pieceIndicies[me._status.player] = me._status.targetPieceIndex;
+
+                if (Config.Fields[field.index].type == Enums.FieldType.PROPERTY) 
+                    me._status.setState(Enums.GameState.PIECE_ON_PROPERTY);
+                else
+                    me._finishTurn();
 
                 break;
             }
 
-            case Enums.GameState.PIECE_DROPED: {
-                const billIndex = me._inventory[me._status.player].findBillOnPoint(point);
+            case Enums.GameState.PIECE_ON_PROPERTY: {
+                const inventory = me._inventory[me._status.player];
+                const billIndex = inventory.findBillOnPoint(point);
 
-                if (billIndex < 0)
-                    return;
+                if (billIndex >= 0) {
+                    me._hand.takeBill(billIndex);
+                }
+                else {
+                    const button = inventory.isButtonClick(point);
+                    if (!button)
+                        return;
 
-                me._hand.takeBill(billIndex);
+                    const field = Config.Fields[me._status.targetPieceIndex];
+                    const handMoney = me._hand.getTotalMoney();
+                    if (handMoney < field.cost)
+                        return;
+
+                    const money = me._hand.dropMoney();
+                    const diff = Utils.getMoneyDiff(money, field.cost);
+                    inventory.addMoney(diff);
+                    inventory.addProperty(me._status.targetPieceIndex);
+
+                    me._finishTurn();
+                }
 
                 break;
             }
@@ -198,13 +219,18 @@ export default class Core {
                 break;
 
             case Enums.GameState.PIECE_TAKED:
-                const position = me._fields.getFieldPosition(me._status.nextPieceIndex);
+                const position = me._fields.getFieldPosition(me._status.targetPieceIndex);
                 x = position.x;
                 y = position.y;
                 break;
 
+            case Enums.GameState.PIECE_ON_PROPERTY:
+                me._finishTurn();
+                break;
+
             default:
-                throw 'Cpu Error! Unknown state';
+                const stateStr = Utils.enumToString(Enums.GameState, me._status.state);
+                throw `Cpu Error! Unknown state ${stateStr}`;
         }
 
         me.processTurn(new Phaser.Geom.Point(x, y), false);
@@ -229,7 +255,7 @@ export default class Core {
         const me = this;
 
         const current = me._status.pieceIndicies[me._status.player];
-        me._status.nextPieceIndex = (current + first + second) % Consts.FieldCount;
+        me._status.targetPieceIndex = (current + first + second) % Consts.FieldCount;
         me._status.setState(Enums.GameState.DICES_DROPED);
     }
 
@@ -259,5 +285,12 @@ export default class Core {
             default:
                 return me._status.state;
         }
+    }
+
+    _finishTurn() {
+        const me = this;
+
+        me._status.player = (me._status.player + 1) % Config.PlayerCount;
+        me._status.setState(Enums.GameState.BEGIN);
     }
 }

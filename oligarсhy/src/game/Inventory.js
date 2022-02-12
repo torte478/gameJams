@@ -9,6 +9,12 @@ export default class Inventory {
     /** @type {Bills[]} */
     _bills;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _buyButton;
+
+    /** @type {Number[]} */
+    _fields;
+
     /**
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
      * @param {Number} player
@@ -17,7 +23,7 @@ export default class Inventory {
     constructor(factory, player, money) {
         const me = this;
 
-        const shift = Consts.MoneySize.Height  + 25;
+        const shift = Consts.BillSize.Height  + 25;
 
         const billAngle = Utils.getAngle(player, true);
         const sideAngle = Phaser.Math.DegToRad(
@@ -38,6 +44,9 @@ export default class Inventory {
 
             me._bills.push(bills);
         }
+
+        me._buyButton = factory.image(0, 450, 'buttons', 0);
+        me._fields = [];
     }
 
     /**
@@ -77,5 +86,36 @@ export default class Inventory {
             me._bills[i].image.setVisible(
                 me._bills[i].count > 0);
         }
+    }
+
+    /**
+     * @param {Phaser.Geom.Point} point 
+     */
+    isButtonClick(point) {
+        const me = this;
+
+        return Phaser.Geom.Rectangle.ContainsPoint(
+            me._buyButton.getBounds(),
+            point);
+    }
+
+    /**
+     * @param {Number} field 
+     */
+    addProperty(field) {
+        const me = this;
+
+        me._fields.push(field);
+        console.log(`player buys property ${field}!`);
+    }
+
+    /**
+     * @param {Number} field 
+     * @returns {Boolean}
+     */
+    hasField(field) {
+        const me = this;
+
+        return Utils.any(me._fields, (f) => f == field);
     }
 }

@@ -1,3 +1,5 @@
+import Consts from "./Consts.js";
+
 export default class Utils {
 
     /**
@@ -14,6 +16,19 @@ export default class Utils {
     }
 
     /**
+     * @param {Array} array 
+     * @param {Function} f 
+     */
+     static any(array, f) {
+        for (let i = 0; i < array.length; ++i) {
+            if (!!f(array[i]))
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param {Object} enumObj 
      * @param {Number} value 
      */
@@ -23,7 +38,7 @@ export default class Utils {
                 return name;
         }
 
-        return 'UNDEFINED';
+        return `UNDEFINED (${value})`;
     }
 
     /**
@@ -67,5 +82,52 @@ export default class Utils {
         }
 
         return null;
+    }
+
+    /**
+     * @param {Number[]} money 
+     */
+    static getTotalMoney(money) {
+        let result = 0;
+
+        for (let i = 0; i < money.length; ++i)
+            result += money[i] * Consts.BillValue[i];
+
+        return result;
+    }
+
+    /**
+     * @param {Number[]} money 
+     * @param {Number} value 
+     */
+    static getMoneyDiff(money, value) {
+        const result = Utils.buildArray(Consts.BillCount, 0);
+        let diff = Utils.getTotalMoney(money) - value;
+
+        let i = result.length - 1;
+        while (diff > 0) {
+
+            while (diff < Consts.BillValue[i])
+                i -= 1;
+
+            result[i] += 1;
+            diff -= Consts.BillValue[i];
+        }
+
+        return result;
+    }
+
+    /**
+     * @param {Number} length 
+     * @param {Object} value 
+     * @returns {Object[]}
+     */
+    static buildArray(length, value) {
+        const result = [];
+
+        for (let i = 0; i < length; ++i)
+            result.push(value);
+
+        return result;
     }
 }
