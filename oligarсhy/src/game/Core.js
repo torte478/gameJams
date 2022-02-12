@@ -116,8 +116,8 @@ export default class Core {
                 if (!success)
                     return;
 
-                const first = Phaser.Math.Between(1, 6);
-                const second = Phaser.Math.Between(1, 6);
+                const first = 1; //Phaser.Math.Between(1, 6);
+                const second = 0; //Phaser.Math.Between(1, 6);
 
                 console.log(`${first} ${second} (${first + second})`);
 
@@ -165,7 +165,7 @@ export default class Core {
 
                         const msg = `player ${Utils.enumToString(Enums.PlayerIndex, me._status.player)} should pay rent: ${rent}`;
                         Utils.debugLog(msg);
-                        
+
                         me._status.setState(Enums.GameState.PIECE_ON_ENEMY_PROPERTY);
                         return;
                     }
@@ -287,11 +287,12 @@ export default class Core {
                 const handMoney = me._hand.getTotalMoney();
                 const diff = cost - handMoney;
                 if (diff > 0) {
-                    const position = me._getCurrentPlayer().getNextOptimalBillPosition(cost - handMoney);
+                    const position = me._getCurrentPlayer().getNextOptimalBillPosition(diff);
                     x = position.x;
                     y = position.y;
-                } else {
-                    const position = me._getCurrentPlayer().getBuyButtonPosition();
+                } 
+                else {
+                    const position = me._getCurrentPlayer().getButtonPosition();
                     x = position.x;
                     y = position.y;
                 }
@@ -299,6 +300,21 @@ export default class Core {
             }
 
             case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
+                /** @type {Player} */
+                const enemy = Utils.single(me._players, (p) => p.hasField(me._status.targetPieceIndex));
+                const rent = enemy.getRent(me._status.targetPieceIndex); // TODO : move rent to status property as targetIndex
+                const handMoney = me._hand.getTotalMoney();
+                const diff = rent- handMoney;
+                if (diff > 0) {
+                    const position = me._getCurrentPlayer().getNextOptimalBillPosition(diff);
+                    x = position.x;
+                    y = position.y;
+                }
+                else {
+                    const position = enemy.getButtonPosition();
+                    x = position.x;
+                    y = position.y;
+                }
                 break;
             }
 

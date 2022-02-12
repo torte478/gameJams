@@ -172,7 +172,7 @@ export default class Player {
     /**
      * @returns {Phaser.Geom.Point}
      */
-    getBuyButtonPosition() {
+    getButtonPosition() {
         const me = this;
 
         return new Phaser.Geom.Point(me._buyButton.x, me._buyButton.y);

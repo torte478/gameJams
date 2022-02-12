@@ -140,7 +140,7 @@ export default class Utils {
         while (value > 0 && i >= 0) {
 
             while (temp[i] == 0)
-                i -= 1;
+                i -= 1; //TODO : fix all occurrences (--i)
 
             result[i] += 1;
             temp[i] -= 1;
