@@ -33,13 +33,13 @@ export default class Core {
     constructor(factory) {
         const me = this;
 
-        me._status = new Status(Config.PieceStartPositions, Config.FirstPlayer);
+        me._status = new Status(Config.Start.PiecePositions, Config.Start.Player, Config.Start.State);
 
-        me._fields = new Fields(factory, Config.PieceStartPositions);
+        me._fields = new Fields(factory, Config.Start.PiecePositions);
 
         me._pieces = [];
-        for (let player = 0; player < Config.PieceStartPositions.length; ++player) {
-            const position = me._fields.movePiece(player, 0, Config.PieceStartPositions[player]);
+        for (let player = 0; player < Config.PlayerCount; ++player) {
+            const position = me._fields.movePiece(player, 0, Config.Start.PiecePositions[player]);
 
             const piece = factory.image(position.x, position.y, 'pieces', player)
                 .setDepth(Consts.Depth.Pieces);
@@ -145,7 +145,7 @@ export default class Core {
                 me._hand.tryDrop(field.position);
 
                 me._status.pieceIndicies[me._status.player] = me._status.nextPieceIndex;
-                me._status.player = (me._status.player + 1) % me._status.pieceIndicies.length;
+                me._status.player = (me._status.player + 1) % Config.PlayerCount;
                 me._status.setState(Enums.GameState.BEGIN);
 
                 break;

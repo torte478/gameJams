@@ -47,8 +47,8 @@ export default class Game extends Phaser.Scene {
 
         me.cameras.main
             .setScroll(
-                Config.StartPosition.x - Consts.Viewport.Width / 2,
-                Config.StartPosition.y - Consts.Viewport.Height / 2)
+                Config.Start.CameraPosition.x - Consts.Viewport.Width / 2,
+                Config.Start.CameraPosition.y - Consts.Viewport.Height / 2)
             .setBounds(
                 me.physics.world.bounds.x,
                 me.physics.world.bounds.y,
@@ -67,7 +67,7 @@ export default class Game extends Phaser.Scene {
 
         me.cursor = me.createCursor();
 
-        for (let i = 0; i < Config.PieceStartPositions.length; ++ i) {
+        for (let i = 0; i < Config.PlaterCount; ++ i) {
             const inventory = new Inventory(me.add, i);
         }
 
@@ -126,7 +126,10 @@ export default class Game extends Phaser.Scene {
     createCursor() {
         const me = this;
 
-        const cursor = me.physics.add.image(Config.StartPosition.x, Config.StartPosition.y, 'cursor')
+        const cursor = me.physics.add.image(
+            Config.Start.CameraPosition.x, 
+            Config.Start.CameraPosition.y, 
+            'cursor')
             .setDepth(Consts.Depth.Max)
             .setVisible(false)
             .setCollideWorldBounds(true);

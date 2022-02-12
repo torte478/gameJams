@@ -23,7 +23,7 @@ export default class Utils {
                 return name;
         }
 
-        throw `Unknown enum member ${value} in ${enumObj}`;
+        return 'UNDEFINED';
     }
 
     /**

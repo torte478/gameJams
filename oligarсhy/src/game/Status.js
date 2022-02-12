@@ -19,13 +19,14 @@ export default class Status {
     /**
      * @param {Number[]} pieceIndicies 
      * @param {Number} player
+     * @param {Number} startState
      */
-    constructor(pieceIndicies, firstPlayer) {
+    constructor(pieceIndicies, startPlayer, startState) {
         const me = this;
 
         me.pieceIndicies = pieceIndicies;
-        me.state = Enums.GameState.BEGIN;
-        me.player = firstPlayer;
+        me.player = startPlayer;
+        me.setState(startState);
     }
 
     cancelCurrentAction() {

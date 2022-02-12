@@ -13,9 +13,8 @@ export default class Fields {
 
     /**
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
-     * @param {Number[]} piecePositions
      */
-    constructor(factory, piecePositions) {
+    constructor(factory) {
         const me = this;
 
         me._fields = [];

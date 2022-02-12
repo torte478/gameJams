@@ -6,7 +6,8 @@ export default class Enums {
         FIRST_DICE_TAKED: 20,
         SECOND_DICE_TAKED: 30,
         DICES_DROPED: 40,
-        PIECE_TAKED: 50
+        PIECE_TAKED: 50,
+        PIECE_DROPED: 60
     };
 
     static FieldType = {

@@ -6,19 +6,27 @@ export default class Config {
     
     static DebugStateLog = true;
 
-    static StartPosition = {
-        x: 800,
-        y: 600
-    };
+    static PlayerCount = 2;
 
-    static PieceStartPositions = [
-        0,
-        1
-        // 1,
-        // 2
-    ];
+    static Start = {
+        CameraPosition: {
+            x: 800,
+            y: 600
+        },
 
-    static FirstPlayer = 0;
+        PlayerCount: 2,
+
+        PiecePositions: [
+            0,
+            1,
+            1,
+            2
+        ],
+
+        Player: 0,
+
+        State: Enums.GameState.PIECE_DROPED
+    }
 
     static Fields = [
         // 0
