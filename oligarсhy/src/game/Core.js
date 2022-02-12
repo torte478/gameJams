@@ -156,7 +156,10 @@ export default class Core {
 
                 me._status.pieceIndicies[me._status.player] = me._status.targetPieceIndex;
 
-                if (Config.Fields[field.index].type == Enums.FieldType.PROPERTY) 
+                const canBuyProperty = Config.Fields[field.index].type == Enums.FieldType.PROPERTY
+                    && Config.Fields[field.index].cost <= me._players[me._status.player].getTotalMoney();
+
+                if (canBuyProperty) 
                     me._status.setState(Enums.GameState.PIECE_ON_PROPERTY);
                 else
                     me._finishTurn();
@@ -182,7 +185,7 @@ export default class Core {
                         return;
 
                     const money = me._hand.dropMoney();
-                    const diff = Utils.getMoneyDiff(money, field.cost);
+                    const diff = Utils.getBillCount(money, handMoney - field.cost);
                     player.addMoney(diff);
                     player.addProperty(me._status.targetPieceIndex);
 
@@ -199,40 +202,58 @@ export default class Core {
 
         let x, y;
         switch (me._status.state) {
-            case Enums.GameState.BEGIN:
+            case Enums.GameState.BEGIN: {
+                //TODO : refactory by Utils.toPoint();
                 x = me._dice1.x;
                 y = me._dice1.y;
                 break;
+            }
 
-            case Enums.GameState.FIRST_DICE_TAKED:
+            case Enums.GameState.FIRST_DICE_TAKED: {
                 x = me._dice2.x;
                 y = me._dice2.y;
                 break;
+            }
 
-            case Enums.GameState.SECOND_DICE_TAKED:
+            case Enums.GameState.SECOND_DICE_TAKED: {
                 x = Phaser.Math.Between(-100, 100);
                 y = Phaser.Math.Between(-100, 100);
                 break;
+            }
 
-            case Enums.GameState.DICES_DROPED:
+            case Enums.GameState.DICES_DROPED: {
                 const piece = me._pieces[me._status.player];
                 x = piece.x;
                 y = piece.y;
                 break;
+            }
 
-            case Enums.GameState.PIECE_TAKED:
+            case Enums.GameState.PIECE_TAKED: {
                 const position = me._fields.getFieldPosition(me._status.targetPieceIndex);
                 x = position.x;
                 y = position.y;
                 break;
+            }
 
-            case Enums.GameState.PIECE_ON_PROPERTY:
-                //me._finishTurn();
+            case Enums.GameState.PIECE_ON_PROPERTY: {
+                const cost = Config.Fields[me._status.targetPieceIndex].cost;
+                const handMoney = me._hand.getTotalMoney();
+                const diff = cost - handMoney;
+                if (diff > 0) {
+                    const position = me._getCurrentPlayer().getNextOptimalBillPosition(cost - handMoney);
+                    x = position.x;
+                    y = position.y;
+                } else {
+                    const position = me._getCurrentPlayer().getBuyButtonPosition();
+                    x = position.x;
+                    y = position.y;
+                }
                 break;
+            }
 
             default:
                 const stateStr = Utils.enumToString(Enums.GameState, me._status.state);
-                throw `Cpu Error! Unknown state ${stateStr}`;
+                throw `CPU Error! Unknown state ${stateStr}`;
         }
 
         me.processTurn(new Phaser.Geom.Point(x, y), false);
@@ -298,5 +319,12 @@ export default class Core {
             me._players[i].startTurn(i == me._status.player);
 
         me._status.setState(Enums.GameState.BEGIN);
+    }
+
+    //TODO: refactor all occurences
+    _getCurrentPlayer() {
+        const me = this;
+
+        return me._players[me._status.player];
     }
 }

@@ -100,18 +100,17 @@ export default class Utils {
      * @param {Number[]} money 
      * @param {Number} value 
      */
-    static getMoneyDiff(money, value) {
+    static getBillCount(money, value) {
         const result = Utils.buildArray(Consts.BillCount, 0);
-        let diff = Utils.getTotalMoney(money) - value;
 
         let i = result.length - 1;
-        while (diff > 0) {
+        while (value > 0) {
 
-            while (diff < Consts.BillValue[i])
+            while (value < Consts.BillValue[i])
                 i -= 1;
 
             result[i] += 1;
-            diff -= Consts.BillValue[i];
+            value -= Consts.BillValue[i];
         }
 
         return result;

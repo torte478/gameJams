@@ -48,8 +48,18 @@ export default class Config {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.BROWN,
             name: 'iOSS',
+            icon: 0,
             cost: 60,
-            icon: 0
+            costHouse: 50,
+            rent: [
+                2,
+                4,
+                10,
+                30,
+                90,
+                160,
+                250
+            ]
         },
         // 2
         {
@@ -61,7 +71,18 @@ export default class Config {
             color: Enums.FieldColorIndex.BROWN,
             name: 'CYBORG',
             cost: 60,
-            icon: 2
+            icon: 2,
+            cost: 60,
+            costHouse: 50,
+            rent: [
+                4,
+                8,
+                20,
+                60,
+                180,
+                320,
+                450
+            ]
         },
         // 4
         {
@@ -72,15 +93,31 @@ export default class Config {
         {
             type: Enums.FieldType.RAILSTATION,
             name: 'MOSCOW',
-            cost: 200
+            cost: 200,
+            rent: [
+                25,
+                50,
+                100,
+                200
+            ]
         },
         // 6
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.LIGHTBLUE,
             name: 'BWM',
+            icon: 4,
             cost: 100,
-            icon: 4
+            costHouse: 50,
+            rent: [
+                6,
+                12,
+                30,
+                90,
+                270,
+                400,
+                550
+            ]
         },
         // 7
         {
@@ -91,16 +128,37 @@ export default class Config {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.LIGHTBLUE,
             name: 'MERCYDEATH',
+            icon: 6,
             cost: 100,
-            icon: 6
+            costHouse: 50,
+            rent: [
+                6,
+                12,
+                30,
+                90,
+                270,
+                400,
+                550
+            ]
         },
         // 9
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.LIGHTBLUE,
             name: 'OOOOUDI',
-            cost: 120,
-            icon: 8
+            icon: 8,
+            cost: 100,
+            costHouse: 50,
+            rent: [
+                8,
+                16,
+                40,
+                100,
+                300,
+                450,
+                600
+            ]
+
         },
         //10
         {
@@ -111,45 +169,95 @@ export default class Config {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.PURPLE,
             name: 'LC',
+            icon: 10,
             cost: 140,
-            icon: 10
+            costHouse: 100,
+            rent: [
+                10,
+                20,
+                50,
+                150,
+                450,
+                625,
+                750
+            ]
         },
         //12
         {
             type: Enums.FieldType.UTILITY,
             name: 'ELECTRICITY',
+            icon: 6,
             cost: 150,
-            icon: 6
+            rent: [
+                4,
+                10
+            ]
         },
         //13
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.PURPLE,
             name: 'SAMMOONG',
+            icon: 12,
             cost: 140,
-            icon: 12
+            costHouse: 100,
+            rent: [
+                10,
+                20,
+                50,
+                150,
+                450,
+                625,
+                750
+            ]
         },
         //14
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.PURPLE,
             name: 'MIKEA',
+            icon: 14,
             cost: 160,
-            icon: 14
+            costHouse: 100,
+            rent: [
+                12,
+                24,
+                60,
+                180,
+                500,
+                700,
+                900
+            ]
         },
         //15
         {
             type: Enums.FieldType.RAILSTATION,
             name: 'LONDON',
-            cost: 200
+            cost: 200,
+            rent: [
+                25,
+                50,
+                100,
+                200
+            ]
         },
         //16
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.ORANGE,
             name: 'INSTAPOUND',
+            icon: 16,
             cost: 180,
-            icon: 16
+            costHouse: 100,
+            rent: [
+                14,
+                28,
+                70,
+                200,
+                550,
+                750,
+                950
+            ]
         },
         //17
         {
@@ -160,16 +268,36 @@ export default class Config {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.ORANGE,
             name: 'WETUBE',
+            icon: 18,
             cost: 180,
-            icon: 18
+            costHouse: 100,
+            rent: [
+                14,
+                28,
+                70,
+                200,
+                550,
+                750,
+                950
+            ]
         },
         //19
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.ORANGE,
             name: 'HONKER',
+            icon: 20,
             cost: 200,
-            icon: 20
+            costHouse: 100,
+            rent: [
+                16,
+                32,
+                80,
+                220,
+                600,
+                800,
+                1000
+            ]
         },
         //20
         {
@@ -180,8 +308,18 @@ export default class Config {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.RED,
             name: 'BURGER QUEEN',
+            icon: 22,
             cost: 220,
-            icon: 22
+            costHouse: 150,
+            rent: [
+                18,
+                36,
+                90,
+                250,
+                700,
+                875,
+                1050
+            ]
         },
         //22
         {
@@ -192,53 +330,113 @@ export default class Config {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.RED,
             name: 'SUBPATH',
+            icon: 24,
             cost: 220,
-            icon: 24
+            costHouse: 150,
+            rent: [
+                18,
+                36,
+                90,
+                250,
+                700,
+                875,
+                1050
+            ]
         },
         //24
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.RED,
             name: "DONMACLD'S",
+            icon: 26,
             cost: 240,
-            icon: 26
+            costHouse: 150,
+            rent: [
+                20,
+                40,
+                100,
+                300,
+                750,
+                925,
+                1100
+            ]
         },
         //25
         {
             type: Enums.FieldType.RAILSTATION,
             name: 'PARIS',
-            cost: 200
+            cost: 200,
+            rent: [
+                25,
+                50,
+                100,
+                200
+            ]
         },
         //26
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.YELLOW,
             name: "SIEWOMANS",
+            icon: 28,
             cost: 260,
-            icon: 28
+            costHouse: 150,
+            rent: [
+                22,
+                44,
+                110,
+                330,
+                800,
+                975,
+                1150
+            ]
         },
         //27
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.YELLOW,
             name: "AUTOROLA",
+            icon: 30,
             cost: 260,
-            icon: 30
+            costHouse: 150,
+            rent: [
+                22,
+                44,
+                110,
+                330,
+                800,
+                975,
+                1150
+            ]
         },
         //28
         {
             type: Enums.FieldType.UTILITY,
             name: 'WATER',
+            icon: 8,
             cost: 150,
-            icon: 8
+            rent: [
+                4,
+                10
+            ]
         },
         //29
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.YELLOW,
             name: "YESKIA",
+            icon: 32,
             cost: 280,
-            icon: 32
+            costHouse: 150,
+            rent: [
+                24,
+                48,
+                120,
+                360,
+                850,
+                1025,
+                1200
+            ]
         },
         //30
         {
@@ -249,16 +447,36 @@ export default class Config {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.GREEN,
             name: "NINELEVENDO",
+            icon: 34,
             cost: 300,
-            icon: 34
+            costHouse: 200,
+            rent: [
+                26,
+                52,
+                130,
+                390,
+                900,
+                1100,
+                1275
+            ]
         },
         //32
         {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.GREEN,
             name: "XSPHERE",
+            icon: 36,
             cost: 300,
-            icon: 36
+            costHouse: 200,
+            rent: [
+                26,
+                52,
+                130,
+                390,
+                900,
+                1100,
+                1275
+            ]
         },
         //33
         {
@@ -269,14 +487,30 @@ export default class Config {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.GREEN,
             name: "STOPSTATION",
+            icon: 38,
             cost: 320,
-            icon: 38
+            costHouse: 200,
+            rent: [
+                28,
+                56,
+                150,
+                390,
+                900,
+                1200,
+                1400
+            ]
         },
         //35
         {
             type: Enums.FieldType.RAILSTATION,
             name: 'ISTANBUL',
-            cost: 200
+            cost: 200,
+            rent: [
+                25,
+                50,
+                100,
+                200
+            ]
         },
         //36
         {
@@ -287,8 +521,18 @@ export default class Config {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.BLUE,
             name: "LC COMICS",
+            icon: 40,
             cost: 350,
-            icon: 40
+            costHouse: 200,
+            rent: [
+                35,
+                70,
+                175,
+                500,
+                1100,
+                1300,
+                1500
+            ]
         },
         //38
         {
@@ -300,8 +544,18 @@ export default class Config {
             type: Enums.FieldType.PROPERTY,
             color: Enums.FieldColorIndex.BLUE,
             name: "MALVER",
+            icon: 42,
             cost: 400,
-            icon: 42
+            costHouse: 200,
+            rent: [
+                50,
+                100,
+                200,
+                600,
+                1400,
+                1700,
+                2000
+            ]
         }
     ]
 }

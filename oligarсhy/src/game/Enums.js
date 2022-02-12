@@ -60,4 +60,14 @@ export default class Enums {
         M100: 5,
         M500: 6
     }
+
+    static PropertyRentIndex = {
+        BASE: 0,
+        COLOR: 1,
+        ONE: 2,
+        TWO: 3,
+        THREE: 4,
+        FOUR: 5,
+        HOTEL: 6
+    }
 }

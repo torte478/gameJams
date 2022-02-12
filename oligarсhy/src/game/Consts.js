@@ -65,6 +65,17 @@ export default class Consts {
         500
     ];
 
+    static PropertyColorCounts = {
+        LIGHTBLUE: 4,
+        PURPLE: 4,
+        ORANGE: 4,
+        RED: 4,
+        YELLOW: 4,
+        GREEN: 4,
+        BLUE: 2,
+        BROWN: 2,
+    };
+
     static TextColor = '#232429';
     static Font = 'Arial';
 
