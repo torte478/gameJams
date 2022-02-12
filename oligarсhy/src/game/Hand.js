@@ -2,6 +2,7 @@ import Phaser from '../lib/phaser.js';
 
 import Consts from './Consts.js';
 import Enums from './Enums.js';
+import Utils from './Utils.js';
 
 export default class Hand {
     
@@ -11,11 +12,19 @@ export default class Hand {
     /** @type {Number} */
     _state;
 
+    /** @type {Number[]} */
+    _bills;
+
     constructor() {
         const me = this;
 
         me._content = [];
         me._state = Enums.HandState.EMPTY;
+        
+        me._bills = [];
+        for (let x in Enums.Money) {
+            me._bills.push(0);
+        }
     }
 
     /**
@@ -104,6 +113,18 @@ export default class Hand {
             item.setVisible(true);
         }
 
+        for (let i = 0; i < me._bills.length; ++i)
+            me._bills[i] = 0;
+
         me._state = Enums.HandState.EMPTY;
+    }
+
+    takeBill(index) {
+        const me = this;
+
+        me._bills[index] += 1;
+        me._state = Enums.HandState.MONEY;
+
+        console.log(`money: ${me._bills.join(';')}`);
     }
 }

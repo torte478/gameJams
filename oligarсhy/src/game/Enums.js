@@ -47,7 +47,8 @@ export default class Enums {
         UNKNOWN: 0,
         EMPTY: 10,
         DICES: 20,
-        PIECE: 30
+        PIECE: 30,
+        MONEY: 40
     };
 
     static Money = {

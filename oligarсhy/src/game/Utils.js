@@ -54,4 +54,18 @@ export default class Utils {
                 throw `can't calculate angle for side ${side}`;
         }
     }
+
+    /**
+     * @param {Array} array 
+     * @param {Function} f 
+     */
+    static firstOrDefault(array, f) {
+        for (let x in array) {
+            if (!!f(x)) {
+                return x;
+            }
+        }
+
+        return null;
+    }
 }

@@ -31,7 +31,7 @@ export default class Fields {
      * @param {Phaser.Geom.Point} point 
      * @returns {Phaser.Geom.Point}
      */
-    moveToFieldAtPoint(player, from, point) {
+    tryMoveToFieldAtPoint(player, from, point) {
         const me = this;
 
         for (let i = 0; i < me._fields.length; ++i) {

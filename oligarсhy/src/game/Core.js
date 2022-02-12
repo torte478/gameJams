@@ -4,6 +4,7 @@ import Config from '../game/Config.js';
 import Consts from '../game/Consts.js';
 import Enums from '../game/Enums.js';
 import Fields from '../game/Fields.js';
+import Inventory from './Inventory.js';
 import Hand from '../game/Hand.js';
 import Status from './Status.js';
 
@@ -26,6 +27,9 @@ export default class Core {
 
     /** @type {Status} */
     _status;
+
+    /** @type {Inventory[]} */
+    _inventory;
 
     /**
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
@@ -58,6 +62,11 @@ export default class Core {
             .setDepth(Consts.Depth.Pieces);
 
         me._hand = new Hand();
+
+        me._inventory = [];
+        for (let i = 0; i < Config.PlayerCount; ++ i) {
+            me._inventory.push(new Inventory(factory, i));
+        }
     }
     
     /**
@@ -68,7 +77,7 @@ export default class Core {
         const me = this;
 
         if (isCancel) {
-            const next = me._status_getNextStateAfterCancel();
+            const next = me._getNextStateAfterCancel();
             me._status.setState(next);
             me._hand.cancel();
             return;
@@ -131,7 +140,7 @@ export default class Core {
 
             case Enums.GameState.PIECE_TAKED: {
                 
-                const field = me._fields.moveToFieldAtPoint(
+                const field = me._fields.tryMoveToFieldAtPoint(
                     me._status.player,
                     me._status.pieceIndicies[me._status.player],
                     point);
@@ -147,6 +156,17 @@ export default class Core {
                 me._status.pieceIndicies[me._status.player] = me._status.nextPieceIndex;
                 me._status.player = (me._status.player + 1) % Config.PlayerCount;
                 me._status.setState(Enums.GameState.BEGIN);
+
+                break;
+            }
+
+            case Enums.GameState.PIECE_DROPED: {
+                const billIndex = me._inventory[me._status.player].findBillOnPoint(point);
+
+                if (billIndex < 0)
+                    return;
+
+                me._hand.takeBill(billIndex);
 
                 break;
             }

@@ -3,8 +3,6 @@ import Phaser from '../lib/phaser.js';
 import Config from '../game/Config.js';
 import Consts from '../game/Consts.js';
 import Core from '../game/Core.js';
-import Enums from '../game/Enums.js';
-import Inventory from '../game/Inventory.js';
 
 export default class Game extends Phaser.Scene {
 
@@ -67,10 +65,6 @@ export default class Game extends Phaser.Scene {
 
         me.cursor = me.createCursor();
 
-        for (let i = 0; i < Config.PlaterCount; ++ i) {
-            const inventory = new Inventory(me.add, i);
-        }
-
         // events
 
         me.input.on('pointerdown', me.onPointerDown, me);
@@ -117,7 +111,7 @@ export default class Game extends Phaser.Scene {
     onPointerDown(pointer) {
         const me = this;
 
-        if (me.core.isHumanTurn()) {
+        if (me.core.isHumanTurn()) { //TODO : to Core (it's logic)
             const point = new Phaser.Geom.Point(me.cursor.x, me.cursor.y);
             me.core.processTurn(point, pointer.rightButtonDown());
         }
