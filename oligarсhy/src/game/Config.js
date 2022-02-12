@@ -18,13 +18,13 @@ export default class Config {
         PlayerCount: 2,
 
         PiecePositions: [
-            1,
             0,
+            1,
             1,
             2
         ],
 
-        Player: 0,
+        Player: 1,
 
         State: Enums.GameState.PIECE_ON_FREE_PROPERTY,
 

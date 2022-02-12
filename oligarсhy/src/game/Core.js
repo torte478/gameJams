@@ -157,11 +157,20 @@ export default class Core {
                 me._status.pieceIndicies[me._status.player] = me._status.targetPieceIndex;
 
                 const fieldConfig = Config.Fields[field.index];
+                const player = me._getCurrentPlayer(); // TODO : move to outer scope
                 if (fieldConfig.type == Enums.FieldType.PROPERTY) {
                     
-                    const enemy = Utils.firstOrDefault(me._players, (p) => p.hasField(field.index));
+                    const enemy = Utils.firstOrDefault(
+                        me._players, 
+                        (p) => p.index != me._status.player && p.hasField(field.index));
+
                     if (!!enemy) {
                         const rent = enemy.getRent(field.index);
+                        
+                        if (rent > player.getTotalMoney()) {
+                            me._killPlayer();
+                            return;
+                        }
 
                         const msg = `player ${Utils.enumToString(Enums.PlayerIndex, me._status.player)} should pay rent: ${rent}`;
                         Utils.debugLog(msg);
@@ -170,7 +179,7 @@ export default class Core {
                         return;
                     }
 
-                    const canBuyProperty = fieldConfig.cost <= me._players[me._status.player].getTotalMoney();
+                    const canBuyProperty = fieldConfig.cost <= player.getTotalMoney();
                     if (canBuyProperty) {
                         me._status.setState(Enums.GameState.PIECE_ON_FREE_PROPERTY);
                         return;
@@ -380,7 +389,9 @@ export default class Core {
     _finishTurn() {
         const me = this;
 
-        me._status.player = (me._status.player + 1) % Config.PlayerCount;
+        do {
+            me._status.player = (me._status.player + 1) % Config.PlayerCount;
+        } while (Utils.all(me._status.activePlayers, (p) => p != me._status.player));
         
         for (let i = 0; i < me._players.length; ++i)
             me._players[i].startTurn(i == me._status.player);
@@ -393,5 +404,22 @@ export default class Core {
         const me = this;
 
         return me._players[me._status.player];
+    }
+
+    _killPlayer() {
+        const me = this;
+
+        if (me._status.player == Enums.PlayerIndex.HUMAN) {
+            throw 'YOU LOSE!';
+        }
+
+        me._status.activePlayers = me._status.activePlayers.filter((p) => p != me._status.player);
+        if (me._status.activePlayers.length == 1) {
+            throw 'YOU WIN!!!'
+        }        
+
+        Utils.debugLog(`Player ${Utils.enumToString(Enums.PlayerIndex, me._status.player)} lose!`);
+
+        me._finishTurn();
     }
 }

@@ -16,6 +16,9 @@ export default class Status {
     /**@type {Number} */
     player;
 
+    /** @type {Number[]} */
+    activePlayers;
+
     /**
      * @param {Number[]} pieceIndicies 
      * @param {Number} player
@@ -26,6 +29,10 @@ export default class Status {
 
         me.pieceIndicies = pieceIndicies;
         me.player = startPlayer;
+
+        me.activePlayers = [];
+        for (let i = 0; i < Config.PlayerCount; ++i)
+            me.activePlayers.push(i);
         
         me.targetPieceIndex = me.pieceIndicies[me.player];
         me.state = Enums.GameState.UNKNOWN;

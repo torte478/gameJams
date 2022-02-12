@@ -7,9 +7,6 @@ import Utils from './Utils.js';
 
 export default class Player {
 
-    /** @type {Number} */
-    _player;
-
     /** @type {Bills[]} */
     _money;
 
@@ -17,23 +14,26 @@ export default class Player {
     _buyButton;
 
     /** @type {Object[]} */
-    _fields;
+    _fields; // <================================================ ADD START FIELDS
+
+    /** @type {Number} */
+    index;
 
     /**
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
-     * @param {Number} player
+     * @param {Number} index
      * @param {Number[]} money
      */
-    constructor(factory, player, money) {
+    constructor(factory, index, money) {
         const me = this;
 
-        me._player = player;
+        me.index = index;
 
         const shift = Consts.BillSize.Height  + 25;
 
-        const billAngle = Utils.getAngle(player, true);
+        const billAngle = Utils.getAngle(index, true);
         const sideAngle = Phaser.Math.DegToRad(
-            Utils.getAngle(player));
+            Utils.getAngle(index));
 
         me._money = [];
         for (let i = 0; i < Consts.BillCount; ++i) {
@@ -54,7 +54,7 @@ export default class Player {
         const butttonPoint = Phaser.Math.RotateAround(
             new Phaser.Geom.Point(0, 450), 0, 0, sideAngle);
         me._buyButton = factory.image(butttonPoint.x, butttonPoint.y, 'buttons', 0)
-            .setAngle(Utils.getAngle(player));
+            .setAngle(Utils.getAngle(index));
 
         me._fields = [];
     }
@@ -120,7 +120,7 @@ export default class Player {
             houses: [],
             hotel: null
         });
-        console.log(`player ${Utils.enumToString(Enums.PlayerIndex, me._player)} buys property ${field}!`);
+        console.log(`player ${Utils.enumToString(Enums.PlayerIndex, me.index)} buys property ${field}!`);
     }
 
     /**
