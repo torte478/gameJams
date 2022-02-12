@@ -4,7 +4,7 @@ import Config from '../game/Config.js';
 import Consts from '../game/Consts.js';
 import Enums from '../game/Enums.js';
 import Fields from '../game/Fields.js';
-import Inventory from './Inventory.js';
+import Player from './Player.js';
 import Hand from '../game/Hand.js';
 import Status from './Status.js';
 import Utils from './Utils.js';
@@ -29,8 +29,8 @@ export default class Core {
     /** @type {Status} */
     _status;
 
-    /** @type {Inventory[]} */
-    _inventory;
+    /** @type {Player[]} */
+    _players;
 
     /**
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
@@ -64,11 +64,11 @@ export default class Core {
 
         me._hand = new Hand();
 
-        me._inventory = [];
+        me._players = [];
         for (let i = 0; i < Config.PlayerCount; ++ i) {
-            const inventory = new Inventory(factory, i, Config.Start.Money);
-            inventory.startTurn(i == Config.Start.Player)
-            me._inventory.push(inventory);
+            const player = new Player(factory, i, Config.Start.Money);
+            player.startTurn(i == Config.Start.Player)
+            me._players.push(player);
         }
     }
     
@@ -165,14 +165,14 @@ export default class Core {
             }
 
             case Enums.GameState.PIECE_ON_PROPERTY: {
-                const inventory = me._inventory[me._status.player];
-                const billIndex = inventory.findBillOnPoint(point);
+                const player = me._players[me._status.player];
+                const billIndex = player.findBillOnPoint(point);
 
                 if (billIndex >= 0) {
                     me._hand.takeBill(billIndex);
                 }
                 else {
-                    const button = inventory.isButtonClick(point);
+                    const button = player.isButtonClick(point);
                     if (!button)
                         return;
 
@@ -183,8 +183,8 @@ export default class Core {
 
                     const money = me._hand.dropMoney();
                     const diff = Utils.getMoneyDiff(money, field.cost);
-                    inventory.addMoney(diff);
-                    inventory.addProperty(me._status.targetPieceIndex);
+                    player.addMoney(diff);
+                    player.addProperty(me._status.targetPieceIndex);
 
                     me._finishTurn();
                 }
@@ -267,7 +267,7 @@ export default class Core {
         const money = me._hand.dropMoney();
         me._hand.cancel();
 
-        me._inventory[me._status.player].addMoney(money);
+        me._players[me._status.player].addMoney(money);
 
         const next = me._getNextStateAfterCancel();
         me._status.setState(next);
@@ -294,8 +294,8 @@ export default class Core {
 
         me._status.player = (me._status.player + 1) % Config.PlayerCount;
         
-        for (let i = 0; i < me._inventory.length; ++i)
-            me._inventory[i].startTurn(i == me._status.player);
+        for (let i = 0; i < me._players.length; ++i)
+            me._players[i].startTurn(i == me._status.player);
 
         me._status.setState(Enums.GameState.BEGIN);
     }
