@@ -1,3 +1,4 @@
+import Config from "./Config.js";
 import Consts from "./Consts.js";
 
 export default class Utils {
@@ -73,15 +74,39 @@ export default class Utils {
     /**
      * @param {Array} array 
      * @param {Function} f 
+     * @returns {Object}
      */
     static firstOrDefault(array, f) {
-        for (let x in array) {
-            if (!!f(x)) {
-                return x;
+        for (let i = 0; i < array.length; ++i) {
+            if (!!f(array[i])) {
+                return array[i];
             }
         }
 
         return null;
+    }
+
+    /**
+     * @param {Array} array 
+     * @param {Function} f 
+     * @returns {Object}
+     */
+    static single(array, f) {
+        let result;
+
+        for (let i = 0; i < array.length; ++i) {
+            if (!!f(array[i])) {
+                if (!!result)
+                    throw 'array contains more that single occurrence';
+
+                result = array[i];
+            }
+        }
+
+        if (!result)
+            throw 'array not contains single occurrence';
+
+        return result;
     }
 
     /**
@@ -100,7 +125,35 @@ export default class Utils {
      * @param {Number[]} money 
      * @param {Number} value 
      */
-    static getBillCount(money, value) {
+    static valueToBills(money, value) {
+
+        if (Utils.getTotalMoney(money) < value)
+            throw `not enough money for pay ${value}`;
+
+        const result = Utils.buildArray(Consts.BillCount, 0);
+
+        const temp = [];
+        for (let i = 0; i < money.length; ++i)
+            temp.push(money[i]);
+
+        let i = result.length - 1;
+        while (value > 0 && i >= 0) {
+
+            while (temp[i] == 0)
+                i -= 1;
+
+            result[i] += 1;
+            temp[i] -= 1;
+            value -= Consts.BillValue[i];
+        }
+
+        return result;
+    }
+
+    /**
+     * @param {Number} value 
+     */
+     static splitValueToBills(value) {
         const result = Utils.buildArray(Consts.BillCount, 0);
 
         let i = result.length - 1;
@@ -128,5 +181,10 @@ export default class Utils {
             result.push(value);
 
         return result;
+    }
+
+    static debugLog(msg) {
+        if (Config.DebugLog)
+            console.log(msg);
     }
 }

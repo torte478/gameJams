@@ -7,6 +7,9 @@ import Utils from './Utils.js';
 
 export default class Player {
 
+    /** @type {Number} */
+    _player;
+
     /** @type {Bills[]} */
     _money;
 
@@ -23,6 +26,8 @@ export default class Player {
      */
     constructor(factory, player, money) {
         const me = this;
+
+        me._player = player;
 
         const shift = Consts.BillSize.Height  + 25;
 
@@ -115,7 +120,7 @@ export default class Player {
             houses: [],
             hotel: null
         });
-        console.log(`player buys property ${field}!`);
+        console.log(`player ${Utils.enumToString(Enums.PlayerIndex, me._player)} buys property ${field}!`);
     }
 
     /**
@@ -125,7 +130,7 @@ export default class Player {
     hasField(field) {
         const me = this;
 
-        return Utils.any(me._fields, (f) => f == field);
+        return Utils.any(me._fields, (f) => f.index == field);
     }
 
     /**
@@ -134,7 +139,8 @@ export default class Player {
     startTurn(isCurrentPlayer) {
         const me = this;
 
-        me._buyButton.setVisible(isCurrentPlayer);
+        //TODO
+        // me._buyButton.setVisible(isCurrentPlayer);
     }
 
     /**
@@ -153,7 +159,7 @@ export default class Player {
     getNextOptimalBillPosition(cost) {
         const me = this;
 
-        const counts = Utils.getBillCount(me._enumBills(), cost);
+        const counts = Utils.valueToBills(me._enumBills(), cost);
         for (let i = counts.length - 1; i >= 0; --i)
             if (counts[i] > 0) {
                 const bill = me._money[i].image;

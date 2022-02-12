@@ -5,6 +5,7 @@ export default class Config {
     static Debug = true;
     
     static DebugStateLog = true;
+    static DebugLog = true;
 
     static PlayerCount = 2;
 
@@ -17,15 +18,15 @@ export default class Config {
         PlayerCount: 2,
 
         PiecePositions: [
-            1,
+            0,
             1,
             1,
             2
         ],
 
-        Player: 0,
+        Player: 1,
 
-        State: Enums.GameState.PIECE_ON_PROPERTY,
+        State: Enums.GameState.PIECE_ON_FREE_PROPERTY,
 
         Money: [
             5,

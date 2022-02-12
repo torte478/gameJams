@@ -156,18 +156,33 @@ export default class Core {
 
                 me._status.pieceIndicies[me._status.player] = me._status.targetPieceIndex;
 
-                const canBuyProperty = Config.Fields[field.index].type == Enums.FieldType.PROPERTY
-                    && Config.Fields[field.index].cost <= me._players[me._status.player].getTotalMoney();
+                const fieldConfig = Config.Fields[field.index];
+                if (fieldConfig.type == Enums.FieldType.PROPERTY) {
+                    
+                    const enemy = Utils.firstOrDefault(me._players, (p) => p.hasField(field.index));
+                    if (!!enemy) {
+                        const rent = enemy.getRent(field.index);
 
-                if (canBuyProperty) 
-                    me._status.setState(Enums.GameState.PIECE_ON_PROPERTY);
-                else
-                    me._finishTurn();
+                        const msg = `player ${Utils.enumToString(Enums.PlayerIndex, me._status.player)} should pay rent: ${rent}`;
+                        Utils.debugLog(msg);
+                        
+                        me._status.setState(Enums.GameState.PIECE_ON_ENEMY_PROPERTY);
+                        return;
+                    }
+
+                    const canBuyProperty = fieldConfig.cost <= me._players[me._status.player].getTotalMoney();
+                    if (canBuyProperty) {
+                        me._status.setState(Enums.GameState.PIECE_ON_FREE_PROPERTY);
+                        return;
+                    }
+                }
+
+                me._finishTurn();
 
                 break;
             }
 
-            case Enums.GameState.PIECE_ON_PROPERTY: {
+            case Enums.GameState.PIECE_ON_FREE_PROPERTY: {
                 const player = me._players[me._status.player];
                 const billIndex = player.findBillOnPoint(point);
 
@@ -184,8 +199,8 @@ export default class Core {
                     if (handMoney < field.cost)
                         return;
 
-                    const money = me._hand.dropMoney();
-                    const diff = Utils.getBillCount(money, handMoney - field.cost);
+                    me._hand.dropMoney();
+                    const diff = Utils.splitValueToBills(handMoney - field.cost);
                     player.addMoney(diff);
                     player.addProperty(me._status.targetPieceIndex);
 
@@ -194,6 +209,38 @@ export default class Core {
 
                 break;
             }
+
+            case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
+                const player = me._players[me._status.player];
+                const billIndex = player.findBillOnPoint(point);
+
+                if (billIndex >= 0) {
+                    me._hand.takeBill(billIndex);
+                }
+                else {
+                    /** @type {Player} */
+                    const enemy = Utils.single(me._players, (p) => p.hasField(me._status.targetPieceIndex));
+                    if (!enemy.isButtonClick(point))
+                        return;
+
+                    const rent = enemy.getRent(me._status.targetPieceIndex);
+                    const handMoney = me._hand.getTotalMoney();
+                    if (handMoney < rent)
+                        return;
+
+                    const money = me._hand.dropMoney();
+                    const diff = Utils.splitValueToBills(handMoney - rent);
+                    player.addMoney(diff);                 
+                    enemy.addMoney(Utils.splitValueToBills(rent));
+
+                    me._finishTurn();
+                }
+
+                break;
+            }
+
+            default: 
+                throw `can't process state: ${Utils.enumToString(Enums.GameState, me._status.state)}`;
         }
     }
 
@@ -235,7 +282,7 @@ export default class Core {
                 break;
             }
 
-            case Enums.GameState.PIECE_ON_PROPERTY: {
+            case Enums.GameState.PIECE_ON_FREE_PROPERTY: {
                 const cost = Config.Fields[me._status.targetPieceIndex].cost;
                 const handMoney = me._hand.getTotalMoney();
                 const diff = cost - handMoney;
@@ -248,6 +295,10 @@ export default class Core {
                     x = position.x;
                     y = position.y;
                 }
+                break;
+            }
+
+            case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
                 break;
             }
 

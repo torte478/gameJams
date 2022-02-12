@@ -28,6 +28,7 @@ export default class Status {
         me.player = startPlayer;
         
         me.targetPieceIndex = me.pieceIndicies[me.player];
+        me.state = Enums.GameState.UNKNOWN;
         me.setState(startState);
     }
 
