@@ -14,7 +14,7 @@ export default class Player {
     _buyButton;
 
     /** @type {Object[]} */
-    _fields; // <================================================ ADD START FIELDS
+    _fields;
 
     /** @type {Number} */
     index;
@@ -24,7 +24,7 @@ export default class Player {
      * @param {Number} index
      * @param {Number[]} money
      */
-    constructor(factory, index, money) {
+    constructor(factory, index, money, fields) {
         const me = this;
 
         me.index = index;
@@ -35,6 +35,7 @@ export default class Player {
         const sideAngle = Phaser.Math.DegToRad(
             Utils.getAngle(index));
 
+        // TODO: refactor
         me._money = [];
         for (let i = 0; i < Consts.BillCount; ++i) {
 
@@ -56,7 +57,7 @@ export default class Player {
         me._buyButton = factory.image(butttonPoint.x, butttonPoint.y, 'buttons', 0)
             .setAngle(Utils.getAngle(index));
 
-        me._fields = [];
+        me._fields = me._buildFields(fields);
     }
 
     /**
@@ -213,5 +214,27 @@ export default class Player {
         const me = this;
 
         return me._money.map((x) => x.count);
+    }
+
+    /**
+     * @param {Array} fields 
+     */
+    _buildFields(fields) {
+        const me = this;
+
+        const result = [];
+
+        for (let x in fields) {
+            if (isNaN(x)) 
+                result.push(x);
+            else
+                result.push({
+                    index: x,
+                    houses: [],
+                    hotel: null
+                });
+        }
+        
+        return result;
     }
 }

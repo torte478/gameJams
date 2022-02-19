@@ -66,7 +66,7 @@ export default class Core {
 
         me._players = [];
         for (let i = 0; i < Config.PlayerCount; ++ i) {
-            const player = new Player(factory, i, Config.Start.Money);
+            const player = new Player(factory, i, Config.Start.Money, Config.Start.Fields[i]);
             player.startTurn(i == Config.Start.Player)
             me._players.push(player);
         }
@@ -414,6 +414,8 @@ export default class Core {
         }
 
         me._status.activePlayers = me._status.activePlayers.filter((p) => p != me._status.player);
+        me._players[me._status.player].kill();
+
         if (me._status.activePlayers.length == 1) {
             throw 'YOU WIN!!!'
         }        

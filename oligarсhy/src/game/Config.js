@@ -7,7 +7,7 @@ export default class Config {
     static DebugStateLog = true;
     static DebugLog = true;
 
-    static PlayerCount = 2;
+    static PlayerCount = 3;
 
     static Start = {
         CameraPosition: {
@@ -15,27 +15,42 @@ export default class Config {
             y: 600
         },
 
-        PlayerCount: 2,
-
         PiecePositions: [
             0,
-            1,
-            1,
+            0,
+            0,
             2
         ],
 
-        Player: 1,
+        Player: 2,
 
-        State: Enums.GameState.PIECE_ON_FREE_PROPERTY,
+        State: Enums.GameState.BEGIN,
+
+        // Money: [
+        //     5,
+        //     1,
+        //     2,
+        //     1,
+        //     1,
+        //     4,
+        //     2
+        // ],
 
         Money: [
-            5,
-            1,
-            2,
-            1,
-            1,
-            4,
-            2
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+
+        Fields: [
+            [ 1, 3 ],
+            [],
+            [],
+            []
         ]
     }
 
