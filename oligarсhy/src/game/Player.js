@@ -231,7 +231,7 @@ export default class Player {
      * @param {Number} index 
      * @returns {Number}
      */
-    getFieldAction(index) {
+    getBuyAction(index) {
         const me = this;
 
         const field = me._getProperty(index);
@@ -239,11 +239,23 @@ export default class Player {
         if (field.hotel != null)
             return null;
 
+        const color = Config.Fields[field.index].color;
+        const sameColorFields = me._fields
+            .filter((f) => Config.Fields[f.index].color == color);
+
+        const colorStr = Utils.enumToString(Enums.FieldColorIndex, color);
+        if (sameColorFields.length != Consts.PropertyColorCounts[colorStr])
+            return null;
+
         // TODO: limitations
         if (field.houses.length == 4)
-            return Enums.ButtonType.BUY_HOTEL;
+            return Utils.all(sameColorFields, (f) => f.houses.length == 4 || f.hotel != null)
+                ? Enums.ButtonType.BUY_HOTEL
+                : null;
         else
-            return Enums.ButtonType.BUY_HOUSE;
+            return Utils.all(sameColorFields, (f) => f.houses.length >= field.houses.length)
+                ? Enums.ButtonType.BUY_HOUSE
+                : null;
     }
 
     /**

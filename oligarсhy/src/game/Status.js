@@ -25,6 +25,9 @@ export default class Status {
     /** @type {Number} */
     stateToReturn;
 
+    /** @type {Boolean} */
+    useBuy;
+
     /**
      * @param {Number[]} pieceIndicies 
      * @param {Number} player
@@ -48,6 +51,7 @@ export default class Status {
         // TODO : add validators
         me.selectedField = null;
         me.stateToReturn = null;
+        me.useBuy = false;
 
         me.state = Enums.GameState.UNKNOWN;
     }
@@ -69,5 +73,14 @@ export default class Status {
                 + `${Utils.enumToString(Enums.GameState, value)}`);
 
         me.state = value;
+    }
+
+    reset() {
+        const me = this;
+
+        me.targetPieceIndex = null;
+        me.selectedField = null;
+        me.stateToReturn = null;
+        me.useBuy = false;
     }
 }

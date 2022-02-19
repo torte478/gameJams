@@ -189,7 +189,7 @@ export default class Core {
                     }
 
                     const canBuyProperty = fieldConfig.cost <= player.getTotalMoney();
-                    if (canBuyProperty) {
+                    if (!player.hasField(field.index) && canBuyProperty) {
                         player.showButtons([Enums.ButtonType.BUY_FIELD, Enums.ButtonType.NEXT_TURN]);
                         me._setState(Enums.GameState.PIECE_ON_FREE_PROPERTY);
                         return;
@@ -298,6 +298,7 @@ export default class Core {
                     const count = player.getHouseCount(me._status.selectedField);
                     const positions = me._fields.getHousePositions(me._status.selectedField, count);
                     player.addHouse(me._status.selectedField, positions);
+                    me._status.useBuy = true;
 
                     return me._setState(me._status.stateToReturn);
                 }
@@ -480,6 +481,7 @@ export default class Core {
         for (let i = 0; i < me._players.length; ++i)
             me._players[i].showButtons(i == me._status.player);
 
+        me._status.reset();
         me._setState(Enums.GameState.BEGIN);
     }
 
@@ -526,8 +528,8 @@ export default class Core {
         me._status.stateToReturn = me._status.state;
 
         const buttons = [];
-        const action = player.getFieldAction(field);
-        if (action != null)
+        const action = player.getBuyAction(field);
+        if (action != null && !me._status.useBuy)
             buttons.push(action);
         buttons.push(Enums.ButtonType.SELL);
         player.showButtons(buttons);
