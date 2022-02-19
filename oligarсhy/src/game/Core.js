@@ -4,8 +4,9 @@ import Config from '../game/Config.js';
 import Consts from '../game/Consts.js';
 import Enums from '../game/Enums.js';
 import Fields from '../game/Fields.js';
-import Player from './Player.js';
+import Groups from './Groups.js';
 import Hand from '../game/Hand.js';
+import Player from './Player.js';
 import Status from './Status.js';
 import Utils from './Utils.js';
 
@@ -64,9 +65,10 @@ export default class Core {
 
         me._hand = new Hand();
 
+        const groups = new Groups(factory);
         me._players = [];
         for (let i = 0; i < Config.PlayerCount; ++ i) {
-            const player = new Player(factory, i, Config.Start.Money, Config.Start.Fields[i]);
+            const player = new Player(factory, i, Config.Start.Money, Config.Start.Fields[i], groups);
             me._players.push(player);
         }
 
@@ -224,7 +226,7 @@ export default class Core {
                     player.addMoney(diff);
                     player.addProperty(me._status.targetPieceIndex);
 
-                    me._finishTurn();
+                    me._setState(Enums.GameState.FINAL);
                 }
 
                 break;
@@ -264,17 +266,41 @@ export default class Core {
             case Enums.GameState.OWN_FIELD_SELECTED: {
 
                 const player = me._getCurrentPlayer();
-                if (!player.isButtonClick(point, Enums.ButtonType.SELL))
-                    return;
+                if (player.isButtonClick(point, Enums.ButtonType.SELL)) {
+                    player.removeProperty(me._status.selectedField);
+                    const money = Utils.splitValueToBills(
+                        Config.Fields[me._status.selectedField].cost / 2);
+                    player.addMoney(money);
+                
+                    player.showButtons([]);
+                    Utils.debugLog(`sell field ${me._status.selectedField}`);
+                    return me._setState(me._status.stateToReturn);
+                }
+                
+                const billIndex = player.findBillOnPoint(point);
 
-                player.removeProperty(me._status.selectedField);
-                const money = Utils.splitValueToBills(
-                    Config.Fields[me._status.selectedField].cost / 2);
-                player.addMoney(money);
-            
-                player.showButtons([]);
-                me._setState(me._status.stateToReturn);
-                Utils.debugLog(`sell field ${me._status.selectedField}`);
+                if (billIndex >= 0)
+                    return me._hand.takeBill(billIndex);
+
+                // TODO : duplication
+                if (player.isButtonClick(point, Enums.ButtonType.BUY_HOUSE) 
+                    || player.isButtonClick(point, Enums.ButtonType.BUY_HOTEL)) {
+                    const field = Config.Fields[me._status.selectedField];
+                    const handMoney = me._hand.getTotalMoney();
+                    if (handMoney < field.costHouse)
+                        return;
+
+                    me._hand.dropMoney();
+                    const diff = Utils.splitValueToBills(handMoney - field.costHouse);
+                    player.addMoney(diff);
+
+                    // TODO : shit
+                    const count = player.getHouseCount(me._status.selectedField);
+                    const positions = me._fields.getHousePositions(me._status.selectedField, count);
+                    player.addHouse(me._status.selectedField, positions);
+
+                    return me._setState(me._status.stateToReturn);
+                }
 
                 break;
             }
@@ -498,7 +524,13 @@ export default class Core {
 
         me._status.selectedField = field;
         me._status.stateToReturn = me._status.state;
-        player.showButtons([Enums.ButtonType.SELL]);
+
+        const buttons = [];
+        const action = player.getFieldAction(field);
+        if (action != null)
+            buttons.push(action);
+        buttons.push(Enums.ButtonType.SELL);
+        player.showButtons(buttons);
 
         Utils.debugLog(`select field ${field}`);
         return true;
@@ -511,6 +543,9 @@ export default class Core {
         if (Utils.contains(Consts.States.Final, state)) {
             me._getCurrentPlayer().showButtons([Enums.ButtonType.NEXT_TURN]);
         }
+
+        if (state == Enums.GameState.BEGIN)
+            me._getCurrentPlayer().showButtons([]);
 
         me._status.setState(state);
     }

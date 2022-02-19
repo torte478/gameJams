@@ -101,6 +101,41 @@ export default class Fields {
                 point));
     }
 
+    /**
+     * @param {Number} index 
+     * @param {Number} count 
+     * @returns {Phaser.Geom.Point[]}
+     */
+    getHousePositions(index, count) {
+        const me = this;
+
+        const total = (count + 1) * 50;
+        const start = -total / 2 + 25;
+
+        const field = me._fields[index].toPoint();
+
+        const positions = [];
+        for (let i = 0; i < count + 1; ++i) {
+            const point = new Phaser.Geom.Point(
+                field.x + start + 50 * i,
+                field.y - 95
+            );
+    
+            const angle = me._getAngle(index);
+    
+            const result = Phaser.Math.RotateAround(
+                point,
+                field.x,
+                field.y,
+                Phaser.Math.DegToRad(angle)
+            );
+
+            positions.push(result);
+        }
+
+        return positions;
+    }
+
     _getNextPointConfig(player, from, to) {
         const me = this;
 

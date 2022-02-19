@@ -9,7 +9,8 @@ export default class Consts {
 
     static Depth = {
         Board: 0,
-        Pieces: 100,
+        Houses: 100,
+        Pieces: 200,
         HUD: 1000,
         Max: 10000
     };

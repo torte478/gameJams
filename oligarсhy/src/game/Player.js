@@ -4,6 +4,7 @@ import Buttons from './Buttons.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
+import Groups from './Groups.js';
 import Utils from './Utils.js';
 
 export default class Player {
@@ -17,6 +18,9 @@ export default class Player {
     /** @type {Object[]} */
     _fields;
 
+    /** @type {Groups} */
+    _groups;
+
     /** @type {Number} */
     index;
 
@@ -25,8 +29,9 @@ export default class Player {
      * @param {Number} index
      * @param {Number[]} money
      * @param {Array} fields
+     * @param {Groups} groups
      */
-    constructor(factory, index, money, fields) {
+    constructor(factory, index, money, fields, groups) {
         const me = this;
 
         me.index = index;
@@ -56,6 +61,7 @@ export default class Player {
 
         me._buttons = new Buttons(factory, index);
 
+        me._groups = groups;
         me._fields = me._buildFields(fields);
     }
 
@@ -219,6 +225,87 @@ export default class Player {
         const me = this;
 
         me._fields = me._fields.filter((f) => f.index != index);
+    }
+
+    /**
+     * @param {Number} index 
+     * @returns {Number}
+     */
+    getFieldAction(index) {
+        const me = this;
+
+        const field = me._getProperty(index);
+
+        if (field.hotel != null)
+            return null;
+
+        // TODO: limitations
+        if (field.houses.length == 4)
+            return Enums.ButtonType.BUY_HOTEL;
+        else
+            return Enums.ButtonType.BUY_HOUSE;
+    }
+
+    /**
+     * @param {Number} index
+     * @param {Phaser.Geom.Point[]} positions
+     */
+    addHouse(index, positions) {
+        const me = this;
+
+        const field = me._getProperty(index);
+        if (!field)
+            throw `can't find property with index ${index}`;
+
+        // TODO : to Utils (+ duplicate from Fields)
+        const quotient = field.index / (Consts.FieldCount / 4);
+        const angle = Utils.getAngle(Math.floor(quotient));
+
+        if (field.houses.length >= 4) {
+            for (let i = 0; i < field.houses.length; ++i)
+                me._groups.kill(field.houses[i]);
+
+            field.houses = [];
+
+            field.hotel = me._groups.createHotel()
+                .setAngle(angle)
+                .setPosition(positions[0].x, positions[0].y);
+        }
+        else {
+            const house = me._groups.createHouse()
+                .setAngle(angle);
+            field.houses.push(house);
+            for (let i = 0; i < positions.length; ++i)
+                field.houses[i].setPosition(positions[i].x, positions[i].y);
+        }
+    }
+
+    /**
+     * @param {Number} index 
+     * @returns {Number}
+     */
+    getHouseCount(index) {
+        const me = this;
+
+        const field = me._getProperty(index);
+
+        if (!field || field.houses.length == 4)
+            return 0;
+
+        return field.houses.length;
+    }
+
+    _getProperty(index) {
+        const me = this;
+
+        const field = Utils.firstOrDefault(me._fields, (f) => f.index == index);
+        if (!field)
+            return null;
+
+        if (Config.Fields[field.index].type != Enums.FieldType.PROPERTY)
+            return null;
+
+        return field;
     }
 
     _enumBills() {
