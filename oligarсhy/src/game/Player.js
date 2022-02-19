@@ -210,6 +210,15 @@ export default class Player {
         return config.rent[Enums.PropertyRentIndex.BASE];
     }
 
+    /**
+     * @param {Number} index 
+     */
+    removeProperty(index) {
+        const me = this;
+
+        me._fields = me._fields.filter((f) => f.index != index);
+    }
+
     _enumBills() {
         const me = this;
 
@@ -224,12 +233,14 @@ export default class Player {
 
         const result = [];
 
-        for (let x in fields) {
-            if (isNaN(x)) 
-                result.push(x);
+        for (let i = 0; i < fields.length; ++i) {
+            const item = fields[i];
+
+            if (isNaN(item)) 
+                result.push(item);
             else
                 result.push({
-                    index: x,
+                    index: item,
                     houses: [],
                     hotel: null
                 });

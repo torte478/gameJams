@@ -76,6 +76,12 @@ export default class Consts {
         BROWN: 2,
     };
 
+    static BuyableFieldTypes = [
+        Enums.FieldType.PROPERTY,
+        Enums.FieldType.RAILSTATION,
+        Enums.FieldType.UTILITY
+    ];
+
     static TextColor = '#232429';
     static Font = 'Arial';
 

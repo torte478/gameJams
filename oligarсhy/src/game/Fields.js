@@ -87,6 +87,20 @@ export default class Fields {
         return me._fields[index].toPoint();
     }
 
+    /**
+     * @param {Phaser.Geom.Point} point 
+     * @returns {Number}
+     */
+    getFieldIndex(point) {
+        const me = this;
+
+        return Utils.firstOrDefaultIndex(
+            me._fields, 
+            (f) => Phaser.Geom.Rectangle.ContainsPoint(
+                f.getBounds(),
+                point));
+    }
+
     _getNextPointConfig(player, from, to) {
         const me = this;
 

@@ -1,6 +1,8 @@
 import Config from "./Config.js";
 import Consts from "./Consts.js";
+import Enums from "./Enums.js";
 
+// TODO : split to general Utils and Game Utils
 export default class Utils {
 
     /**
@@ -89,6 +91,21 @@ export default class Utils {
     /**
      * @param {Array} array 
      * @param {Function} f 
+     * @returns {Number}
+     */
+     static firstOrDefaultIndex(array, f) {
+        for (let i = 0; i < array.length; ++i) {
+            if (!!f(array[i])) {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param {Array} array 
+     * @param {Function} f 
      * @returns {Object}
      */
     static single(array, f) {
@@ -107,6 +124,19 @@ export default class Utils {
             throw 'array not contains single occurrence';
 
         return result;
+    }
+
+    /**
+     * @param {Array} array 
+     * @param {Object} elem 
+     * @returns {Boolean}
+     */
+    static contains(array, elem) {
+        for (let i = 0; i < array.length; ++i)
+            if (array[i] === elem)
+                return true;
+
+        return false;
     }
 
     /**
@@ -152,6 +182,7 @@ export default class Utils {
 
     /**
      * @param {Number} value 
+     * @returns {Number[]}
      */
      static splitValueToBills(value) {
         const result = Utils.buildArray(Consts.BillCount, 0);
@@ -183,6 +214,9 @@ export default class Utils {
         return result;
     }
 
+    /**
+     * @param {String} msg 
+     */
     static debugLog(msg) {
         if (Config.DebugLog)
             console.log(msg);

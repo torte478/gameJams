@@ -19,6 +19,12 @@ export default class Status {
     /** @type {Number[]} */
     activePlayers;
 
+    /** @type {Number} */
+    selectedField;
+
+    /** @type {Number} */
+    stateToReturn;
+
     /**
      * @param {Number[]} pieceIndicies 
      * @param {Number} player
@@ -28,6 +34,9 @@ export default class Status {
         const me = this;
 
         me.pieceIndicies = pieceIndicies;
+
+        if (startPlayer >= Config.PlayerCount)
+            throw `Player index ${startPlayer} >= total player count ${Config.PlayerCount}`;
         me.player = startPlayer;
 
         me.activePlayers = [];
@@ -35,6 +44,10 @@ export default class Status {
             me.activePlayers.push(i);
         
         me.targetPieceIndex = me.pieceIndicies[me.player];
+
+        me.selectedField = null;
+        me.stateToReturn = null;
+
         me.state = Enums.GameState.UNKNOWN;
         me.setState(startState);
     }

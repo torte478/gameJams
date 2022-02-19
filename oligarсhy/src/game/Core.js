@@ -81,11 +81,14 @@ export default class Core {
 
         if (isCancel) {
             me._cancelTurn();
-            return;
+            return; // TODO : refactor - combine return with previous
         }
 
         switch (me._status.state) {
             case Enums.GameState.BEGIN: {
+
+                if (me._trySelectOwnField(point))
+                    return me._status.setState(Enums.GameState.OWN_FIELD_SELECTED);
 
                 const diceTaked = 
                     me._hand.tryTake(me._dice1, point, Enums.HandState.DICES)
@@ -192,6 +195,10 @@ export default class Core {
             }
 
             case Enums.GameState.PIECE_ON_FREE_PROPERTY: {
+
+                if (me._trySelectOwnField(point))
+                    return me._status.setState(Enums.GameState.OWN_FIELD_SELECTED);
+
                 const player = me._players[me._status.player];
                 const billIndex = player.findBillOnPoint(point);
 
@@ -220,6 +227,10 @@ export default class Core {
             }
 
             case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
+
+                if (me._trySelectOwnField(point))
+                    return me._status.setState(Enums.GameState.OWN_FIELD_SELECTED);
+
                 const player = me._players[me._status.player];
                 const billIndex = player.findBillOnPoint(point);
 
@@ -244,6 +255,24 @@ export default class Core {
 
                     me._finishTurn();
                 }
+
+                break;
+            }
+
+            case Enums.GameState.OWN_FIELD_SELECTED: {
+
+                const player = me._getCurrentPlayer();
+                const button = player.isButtonClick(point);
+                if (!button)
+                    return;
+
+                player.removeProperty(me._status.selectedField);
+                const money = Utils.splitValueToBills(
+                    Config.Fields[me._status.selectedField].cost / 2);
+                player.addMoney(money);
+            
+                me._status.setState(me._status.stateToReturn);
+                Utils.debugLog(`sell field ${me._status.selectedField}`);
 
                 break;
             }
@@ -327,6 +356,13 @@ export default class Core {
                 break;
             }
 
+            case Enums.GameState.OWN_FIELD_SELECTED: {
+            
+                throw 'cpu OWN_FIELD_SELECTED state not implemented';
+
+                break;
+            }
+
             default:
                 const stateStr = Utils.enumToString(Enums.GameState, me._status.state);
                 throw `CPU Error! Unknown state ${stateStr}`;
@@ -366,6 +402,7 @@ export default class Core {
 
         me._players[me._status.player].addMoney(money);
 
+        me._status.selectedField = null;
         const next = me._getNextStateAfterCancel();
         me._status.setState(next);
     }
@@ -380,6 +417,9 @@ export default class Core {
 
             case Enums.GameState.PIECE_TAKED:
                 return Enums.GameState.DICES_DROPED;
+
+            case Enums.GameState.OWN_FIELD_SELECTED:
+                return me._status.stateToReturn;
             
             default:
                 return me._status.state;
@@ -414,7 +454,6 @@ export default class Core {
         }
 
         me._status.activePlayers = me._status.activePlayers.filter((p) => p != me._status.player);
-        me._players[me._status.player].kill();
 
         if (me._status.activePlayers.length == 1) {
             throw 'YOU WIN!!!'
@@ -423,5 +462,25 @@ export default class Core {
         Utils.debugLog(`Player ${Utils.enumToString(Enums.PlayerIndex, me._status.player)} lose!`);
 
         me._finishTurn();
+    }
+
+    _trySelectOwnField(point) {
+        const me = this;
+
+        const field = me._fields.getFieldIndex(point);
+        if (!field)       
+            return false;
+
+        if (!Utils.contains(Consts.BuyableFieldTypes, Config.Fields[field].type))
+            return false;
+
+        if (!me._getCurrentPlayer().hasField(field))
+            return false;
+
+        me._status.selectedField = field;
+        me._status.stateToReturn = me._status.state;
+        Utils.debugLog(`select field ${field}`);
+
+        return true;
     }
 }

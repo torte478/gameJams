@@ -8,7 +8,8 @@ export default class Enums {
         DICES_DROPED: 40,
         PIECE_TAKED: 50,
         PIECE_ON_FREE_PROPERTY: 60,
-        PIECE_ON_ENEMY_PROPERTY: 70
+        PIECE_ON_ENEMY_PROPERTY: 70,
+        OWN_FIELD_SELECTED: 80
     };
 
     static FieldType = {

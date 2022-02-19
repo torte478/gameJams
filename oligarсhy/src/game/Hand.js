@@ -132,7 +132,7 @@ export default class Hand {
         const me = this;
 
         if (me._state != Enums.HandState.MONEY)
-            throw `can't drop money in hand state: ${me._state}`;
+            return [];
 
         let result = [];
         for (let i = 0; i < me._money.length; ++i) {
