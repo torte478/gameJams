@@ -19,9 +19,21 @@ export default class Consts {
         Y: 10
     };
 
-    static Field = {
-        Width: 160,
-        Height: 240
+    static Sizes = {
+        Field: {
+            Width: 160,
+            Height: 240
+        },
+
+        Bill: {
+            Width: 360,
+            Height: 200
+        },
+
+        Button: {
+            Width: 360,
+            Height: 200
+        }
     };
 
     static FieldCount = 40;
@@ -48,11 +60,6 @@ export default class Consts {
             { x: -20, y: 85},
             { x: 65, y: 85}
         ]
-    };
-
-    static BillSize = {
-        Width: 360,
-        Height: 200
     };
 
     static BillValue = [

@@ -72,4 +72,13 @@ export default class Enums {
         FOUR: 5,
         HOTEL: 6
     }
+
+    static ButtonType = {
+        UNKNOWN: 0,
+        NEXT_TURN: 1,
+        BUY_FIELD: 2,
+        BUY_HOUSE: 3,
+        BUY_HOTEL: 4,
+        SELL: 5,
+    };
 }

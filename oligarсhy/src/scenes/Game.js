@@ -26,14 +26,14 @@ export default class Game extends Phaser.Scene {
         me.loadImage('hud');
         me.loadImage('cursor');
         me.loadSpriteSheet('dice', 50);
-        me.loadSpriteSheet('field', Consts.Field.Width, Consts.Field.Height);
+        me.loadSpriteSheet('field', Consts.Sizes.Field.Width, Consts.Sizes.Field.Height);
         me.loadSpriteSheet('field_corner', 240);
         me.loadSpriteSheet('icons', 100);
         me.loadSpriteSheet('field_header', 160, 50);
         me.loadSpriteSheet('icons_big', 150, 200);
         me.loadSpriteSheet('icons_corner', 240);
         me.loadSpriteSheet('pieces', 50);
-        me.loadSpriteSheet('money', Consts.BillSize.Width, Consts.BillSize.Height);
+        me.loadSpriteSheet('money', Consts.Sizes.Bill.Width, Consts.Sizes.Bill.Height);
         me.loadSpriteSheet('buttons', 360, 200);
     }
 

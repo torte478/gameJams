@@ -149,7 +149,8 @@ export default class Fields {
 
         const sideLength = Consts.FieldCount / 4;
 
-        const start = (Consts.Field.Width * (sideLength - 1) + Consts.Field.Height) / 2;
+        const size = Consts.Sizes.Field;
+        const start = (size.Width * (sideLength - 1) + size.Height) / 2;
 
         const corner = me._createField(
             factory, 
@@ -161,14 +162,14 @@ export default class Fields {
 
         me._fields.push(corner);
 
-        const offset = (Consts.Field.Height + Consts.Field.Width) / 2; 
+        const offset = (size.Height + size.Width) / 2; 
 
         for (let i = 0; i < sideLength - 1; ++i) {
 
             const field = me._createField(
                 factory,
-                start * signX + shiftX * (offset + i * Consts.Field.Width),
-                start * signY + shiftY * (offset + i * Consts.Field.Width),
+                start * signX + shiftX * (offset + i * size.Width),
+                start * signY + shiftY * (offset + i * size.Width),
                 'field',
                 angle,
                 index + i + 1

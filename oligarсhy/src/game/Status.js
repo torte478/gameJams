@@ -45,11 +45,11 @@ export default class Status {
         
         me.targetPieceIndex = me.pieceIndicies[me.player];
 
+        // TODO : add validators
         me.selectedField = null;
         me.stateToReturn = null;
 
         me.state = Enums.GameState.UNKNOWN;
-        me.setState(startState);
     }
 
     cancelCurrentAction() {

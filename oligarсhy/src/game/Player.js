@@ -1,5 +1,6 @@
 import Phaser from '../lib/phaser.js';
 
+import Buttons from './Buttons.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
@@ -10,8 +11,8 @@ export default class Player {
     /** @type {Bills[]} */
     _money;
 
-    /** @type {Phaser.GameObjects.Image} */
-    _buyButton;
+    /** @type {Buttons} */
+    _buttons;
 
     /** @type {Object[]} */
     _fields;
@@ -23,13 +24,14 @@ export default class Player {
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
      * @param {Number} index
      * @param {Number[]} money
+     * @param {Array} fields
      */
     constructor(factory, index, money, fields) {
         const me = this;
 
         me.index = index;
 
-        const shift = Consts.BillSize.Height  + 25;
+        const shift = Consts.Sizes.Bill.Height  + 25;
 
         const billAngle = Utils.getAngle(index, true);
         const sideAngle = Phaser.Math.DegToRad(
@@ -52,10 +54,7 @@ export default class Player {
             me._money.push(bills);
         }
 
-        const butttonPoint = Phaser.Math.RotateAround(
-            new Phaser.Geom.Point(0, 450), 0, 0, sideAngle);
-        me._buyButton = factory.image(butttonPoint.x, butttonPoint.y, 'buttons', 0)
-            .setAngle(Utils.getAngle(index));
+        me._buttons = new Buttons(factory, index);
 
         me._fields = me._buildFields(fields);
     }
@@ -101,13 +100,16 @@ export default class Player {
 
     /**
      * @param {Phaser.Geom.Point} point 
+     * @param {Number}
      */
-    isButtonClick(point) {
+    isButtonClick(point, type) {
         const me = this;
 
-        return Phaser.Geom.Rectangle.ContainsPoint(
-            me._buyButton.getBounds(),
-            point);
+        const result = me._buttons.checkClick(point);
+        if (result == null)
+            return false;
+
+        return result == type;
     }
 
     /**
@@ -135,13 +137,12 @@ export default class Player {
     }
 
     /**
-     * @param {Boolean} isCurrentPlayer 
+     * @param {Number[]} types
      */
-    startTurn(isCurrentPlayer) {
+    showButtons(types) {
         const me = this;
 
-        //TODO
-        // me._buyButton.setVisible(isCurrentPlayer);
+        me._buttons.show(types);
     }
 
     /**
@@ -171,12 +172,13 @@ export default class Player {
     }
 
     /**
+     * @param {Number} type
      * @returns {Phaser.Geom.Point}
      */
-    getButtonPosition() {
+    getButtonPosition(type) {
         const me = this;
 
-        return new Phaser.Geom.Point(me._buyButton.x, me._buyButton.y);
+        return me._buttons.getButtonPosition(type);
     }
 
     /**
