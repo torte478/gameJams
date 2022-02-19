@@ -85,11 +85,13 @@ export default class Core {
             return; // TODO : refactor - combine return with previous
         }
 
+        if (Utils.contains(Consts.States.Management, me._status.state)) {
+            if (me._trySelectOwnField(point))
+                return me._setState(Enums.GameState.OWN_FIELD_SELECTED);
+        }
+
         switch (me._status.state) {
             case Enums.GameState.BEGIN: {
-
-                if (me._trySelectOwnField(point))
-                    return me._setState(Enums.GameState.OWN_FIELD_SELECTED);
 
                 const diceTaked = 
                     me._hand.tryTake(me._dice1, point, Enums.HandState.DICES)
@@ -186,21 +188,18 @@ export default class Core {
 
                     const canBuyProperty = fieldConfig.cost <= player.getTotalMoney();
                     if (canBuyProperty) {
-                        player.showButtons([Enums.ButtonType.BUY_FIELD]);
+                        player.showButtons([Enums.ButtonType.BUY_FIELD, Enums.ButtonType.NEXT_TURN]);
                         me._setState(Enums.GameState.PIECE_ON_FREE_PROPERTY);
                         return;
                     }
                 }
 
-                me._finishTurn();
+                me._setState(Enums.GameState.FINAL);
 
                 break;
             }
 
             case Enums.GameState.PIECE_ON_FREE_PROPERTY: {
-
-                if (me._trySelectOwnField(point))
-                    return me._setState(Enums.GameState.OWN_FIELD_SELECTED);
 
                 const player = me._players[me._status.player];
                 const billIndex = player.findBillOnPoint(point);
@@ -209,8 +208,10 @@ export default class Core {
                     me._hand.takeBill(billIndex);
                 }
                 else {
-                    const button = player.isButtonClick(point, Enums.ButtonType.BUY_FIELD);
-                    if (!button)
+                    if (player.isButtonClick(point, Enums.ButtonType.NEXT_TURN))
+                        return;
+
+                    if (!player.isButtonClick(point, Enums.ButtonType.BUY_FIELD))
                         return;
 
                     const field = Config.Fields[me._status.targetPieceIndex];
@@ -230,9 +231,6 @@ export default class Core {
             }
 
             case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
-
-                if (me._trySelectOwnField(point))
-                    return me._setState(Enums.GameState.OWN_FIELD_SELECTED);
 
                 const player = me._players[me._status.player];
                 const billIndex = player.findBillOnPoint(point);
@@ -255,8 +253,9 @@ export default class Core {
                     const diff = Utils.splitValueToBills(handMoney - rent);
                     player.addMoney(diff);                 
                     enemy.addMoney(Utils.splitValueToBills(rent));
+                    enemy.showButtons([]);
 
-                    me._finishTurn();
+                    me._setState(Enums.GameState.FINAL);
                 }
 
                 break;
@@ -276,6 +275,14 @@ export default class Core {
                 player.showButtons([]);
                 me._setState(me._status.stateToReturn);
                 Utils.debugLog(`sell field ${me._status.selectedField}`);
+
+                break;
+            }
+
+            case Enums.GameState.FINAL: {
+
+                if (me._getCurrentPlayer().isButtonClick(point, Enums.ButtonType.NEXT_TURN))
+                    return me._finishTurn();
 
                 break;
             }
@@ -362,6 +369,14 @@ export default class Core {
             case Enums.GameState.OWN_FIELD_SELECTED: {
             
                 throw 'cpu OWN_FIELD_SELECTED state not implemented';
+
+                break;
+            }
+
+            case Enums.GameState.FINAL: {
+                const position = me._getCurrentPlayer().getButtonPosition(Enums.ButtonType.NEXT_TURN);
+                x = position.x;
+                y = position.y;
 
                 break;
             }
@@ -492,6 +507,10 @@ export default class Core {
     // TODO : it's necessary?
     _setState(state) {
         const me = this;
+
+        if (Utils.contains(Consts.States.Final, state)) {
+            me._getCurrentPlayer().showButtons([Enums.ButtonType.NEXT_TURN]);
+        }
 
         me._status.setState(state);
     }

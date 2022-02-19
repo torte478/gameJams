@@ -89,6 +89,20 @@ export default class Consts {
         Enums.FieldType.UTILITY
     ];
 
+    static States = {
+        Management: [
+            Enums.GameState.BEGIN,
+            Enums.GameState.PIECE_ON_ENEMY_PROPERTY,
+            Enums.GameState.PIECE_ON_FREE_PROPERTY,
+            Enums.GameState.FINAL
+        ],
+
+        Final: [
+            Enums.GameState.PIECE_ON_FREE_PROPERTY,
+            Enums.GameState.FINAL
+        ],
+    };
+
     static TextColor = '#232429';
     static Font = 'Arial';
 
