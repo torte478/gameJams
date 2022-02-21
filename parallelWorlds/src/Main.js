@@ -2,6 +2,7 @@ import Phaser from './lib/phaser.js';
 
 import Consts from './game/Consts.js';
 import Game from './scenes/Game.js';
+import Config from './game/Config.js';
 
 export default new Phaser.Game({
     type: Phaser.AUTO,
@@ -13,7 +14,8 @@ export default new Phaser.Game({
     physics: {
         default: 'arcade',
         arcade: {
-            debug: false
+            debug: false,
+            gravity: { y: Config.Physics.Gravity }
         }
     }
 });

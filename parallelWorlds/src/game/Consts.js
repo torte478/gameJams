@@ -5,10 +5,14 @@ export default class Consts {
         Height: 800
     };
 
-    static Unit = 25;
+    static Unit = {
+        Small: 25,
+        Default: 50
+    };
 
     static Depth = {
         Tiles: -100,
-        Default: 0
+        Default: 0,
+        Max: 99999
     };
 }

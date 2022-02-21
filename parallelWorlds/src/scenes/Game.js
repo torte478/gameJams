@@ -1,9 +1,14 @@
 import Phaser from '../lib/phaser.js';
 
+import Config from '../game/Config.js';
 import Consts from '../game/Consts.js';
+import Controls from '../game/Controls.js';
 import Core from '../game/Core.js';
 
 export default class Game extends Phaser.Scene {
+
+    /** @type {Phaser.GameObjects.Text} */
+    _logger;
 
 	/** @type {Core} */
 	_core;
@@ -16,10 +21,16 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         me.load.tilemapCSV('level', 'assets/level.csv');
+
         me.load.spritesheet('tiles', 'assets/tiles.png', {
-            frameWidth: Consts.Unit,
-            frameHeight: Consts.Unit
+            frameWidth: Consts.Unit.Small,
+            frameHeight: Consts.Unit.Small
         });
+
+        me.load.spritesheet('sprites', 'assets/sprites.png', {
+            frameWidth: Consts.Unit.Default,
+            frameHeight: Consts.Unit.Default,
+        })
     }
 
     create() {
@@ -29,20 +40,29 @@ export default class Game extends Phaser.Scene {
 
         const level = me.make.tilemap({
             key: 'level',
-            tileWidth: Consts.Unit,
-            tileHeight: Consts.Unit
+            tileWidth: Consts.Unit.Small,
+            tileHeight: Consts.Unit.Small
         });
 
-        const image = level.addTilesetImage('tiles');
-        const layer = level.createLayer(0, image)
-            .setDepth(Consts.Depth.Tiles);
+        const controls = new Controls(me.input.keyboard);
 
-        //level.setCollisionBetween(1, 3);
+        me._core = new Core(me.add, me.physics, level, controls);
 
-        me._core = new Core(me.add);
+        if (Config.Debug) {
+            me._logger = me.add.text(10, 10, 'DEBUG', { fontSize: 14, backgroundColor: '#000' })
+                .setScrollFactor(0)
+                .setDepth(Consts.Depth.Max);
+        }
     }
 
     update() {
         const me = this;
+
+        me._core.update();
+
+        if (Config.Debug) {
+            me._logger.text = 
+                `mse: ${me.input.activePointer.worldX} ${me.input.activePointer.worldY}`;
+        }
     }
 }
