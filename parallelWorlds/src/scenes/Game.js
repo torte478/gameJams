@@ -36,17 +36,7 @@ export default class Game extends Phaser.Scene {
     create() {
         const me = this;
 
-        me.cameras.main.setScroll(0, Consts.Viewport.Height);
-
-        const level = me.make.tilemap({
-            key: 'level',
-            tileWidth: Consts.Unit.Small,
-            tileHeight: Consts.Unit.Small
-        });
-
-        const controls = new Controls(me.input.keyboard);
-
-        me._core = new Core(controls, me.add, me.physics, level);
+        me._core = new Core(me);
 
         if (Config.Debug) {
             me._logger = me.add.text(10, 10, 'DEBUG', { fontSize: 14, backgroundColor: '#000' })

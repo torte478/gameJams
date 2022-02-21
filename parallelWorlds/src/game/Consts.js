@@ -15,4 +15,6 @@ export default class Consts {
         Default: 0,
         Max: 99999
     };
+
+    static Layers = 3;
 }
