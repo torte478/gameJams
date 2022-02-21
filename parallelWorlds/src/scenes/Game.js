@@ -46,7 +46,7 @@ export default class Game extends Phaser.Scene {
 
         const controls = new Controls(me.input.keyboard);
 
-        me._core = new Core(me.add, me.physics, level, controls);
+        me._core = new Core(controls, me.add, me.physics, level);
 
         if (Config.Debug) {
             me._logger = me.add.text(10, 10, 'DEBUG', { fontSize: 14, backgroundColor: '#000' })

@@ -15,13 +15,15 @@ export default class Core {
     _controls;
 
     /**
+     * @param {Controls} controls
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
      * @param {Phaser.Physics.Arcade.ArcadePhysics} physics
      * @param {Phaser.Tilemaps.Tilemap} level
-     * @param {Controls} controls
      */
-    constructor(factory, physics, level, controls) {
+    constructor(controls, factory, physics, level) {
         const me = this;
+
+        me._controls = controls;
 
         const tileset = level.addTilesetImage('tiles');
         const tiles = level.createLayer(0, tileset)
@@ -31,11 +33,13 @@ export default class Core {
 
         me._player = physics.add.sprite(Config.Player.X, Config.Player.Y, 'sprites', 0);
 
-        physics.collide(me._player, tiles)
+        const exit = physics.add.image(925, 1525, 'sprites', 11);
+        exit.body.setAllowGravity(false);
 
         physics.add.collider(me._player, tiles);
-
-        me._controls = controls;
+        physics.add.overlap(me._player, exit, () => {
+            console.log('YOU WIN!!!');
+        })
     }
 
     update() {
