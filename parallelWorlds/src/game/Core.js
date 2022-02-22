@@ -359,15 +359,15 @@ export default class Core {
 
             case Enums.Layer.PRESENT:
                 return [
-                    1 / Config.TimeScale,
+                    1 / (2 * Config.TimeScale),
                     1,
                     1 * Config.TimeScale
                 ];
 
             case Enums.Layer.FUTURE:
                 return [
+                    1 / (4 * Config.TimeScale),
                     1 / (2 * Config.TimeScale),
-                    1 / Config.TimeScale,
                     1
                 ];
 
