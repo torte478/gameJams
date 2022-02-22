@@ -5,7 +5,9 @@ export default class Enums {
         RIGHT: 2,
         JUMP: 3,
         PAST_ACTION: 4,
-        FUTURE_ACTION: 5
+        FUTURE_ACTION: 5,
+        LOOK_PAST: 6,
+        LOOK_FUTURE: 7
     };
 
     static Layer = {

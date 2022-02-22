@@ -33,6 +33,9 @@ export default class Core {
     /** @type {Phaser.Cameras.Scene2D.Camera[]} */
     _debugCameras;
 
+    /** @type {Phaser.GameObjects.Group} */
+    _phantom;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -56,6 +59,8 @@ export default class Core {
             .setDepth(Consts.Depth.Fade)
             .setScrollFactor(0)
             .setAlpha(0);
+
+        me._phantom = scene.add.group();
 
         const tileset = me._level.addTilesetImage('tiles');
         const tiles = me._level.createLayer(0, tileset)
@@ -132,10 +137,86 @@ export default class Core {
         if (me._controls.isDownOnce(Enums.Keyboard.JUMP))
             me._player.tryJump();
 
-        // 
+        // phantom
+        if (me._tryLookPhantom())
+            return;
 
         // portals
         me._tryTeleport();
+    }
+
+    _tryLookPhantom() {
+        const me = this;
+
+        let shift = 0;
+        if (me._controls.isDownOnce(Enums.Keyboard.LOOK_PAST))
+            shift = -1;
+        else if (me._controls.isDownOnce(Enums.Keyboard.LOOK_FUTURE))
+            shift = 1;
+
+        if (shift == 0)
+            return false;
+
+        const nextLayer = me._layer + shift;
+        if (nextLayer == me._layer || nextLayer < 0 || nextLayer >= Consts.Layers)
+            return false;
+
+        const targets = [];
+
+        for (let i = 0; i < me._layers[nextLayer].length; ++i)
+            for (let j = 0; j < me._layers[nextLayer][i].targets.length; ++j) {
+                /** @type {Phaser.GameObjects.Sprite} */
+                const origin = me._layers[nextLayer][i].targets[j];
+
+                /** @type {Phaser.GameObjects.Sprite} */
+                const sprite = me._phantom.create(
+                    origin.x, 
+                    me._layer * Consts.Viewport.Height + origin.y % Consts.Viewport.Height, 
+                    origin.texture, 
+                    origin.frame.name);
+
+                targets.push(sprite);
+            }
+
+        const playerPos = me._player.getPosition();
+        const playerY = nextLayer * Consts.Viewport.Height + playerPos.y % Consts.Viewport.Height;
+
+        me._level.forEachTile((tile) => {    
+                const x = tile.getCenterX();
+                const originY = tile.getCenterY();
+                
+                const dist = Phaser.Math.Distance.Between(playerPos.x, playerY, x, originY);
+            
+                if (dist <= 200 && tile.canCollide) {
+                    const y = me._layer * Consts.Viewport.Height + originY % Consts.Viewport.Height;
+                    targets.push(me._phantom.create(x, y, 'tiles', tile.index));
+                }
+            },
+            me,
+            0,
+            nextLayer * (Consts.Viewport.Height / Consts.Unit.Small),
+            Consts.Viewport.Width / Consts.Unit.Small,
+            Consts.Viewport.Height / Consts.Unit.Small,
+            { isColliding: true });
+
+        for (let i = 0; i < targets.length; ++i) {
+            targets[i]
+                .setDepth(Consts.Depth.Phantom)
+                .setTintFill(nextLayer > me._layer ? 0xe9ac00 : 0x230fcf);
+        }
+
+        me._scene.tweens.add({
+            targets: targets,
+            alpha: { from: 1, to: 0 },
+            duration: 2000,
+            ease: 'Sine.easeOut',
+            onComplete: () => {
+                for (let obj in targets)
+                    me._phantom.killAndHide(obj);
+            }
+        });
+
+        return true;
     }
 
     _tryTeleport() {

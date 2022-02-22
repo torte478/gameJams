@@ -15,6 +15,7 @@ export default class Consts {
         Default: 0,
         Fade: 900,
         Player: 1000,
+        Phantom: 1500,
         Max: 99999
     };
 

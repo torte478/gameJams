@@ -18,6 +18,14 @@ export default class Controls {
             key: null,
             once: false
         },
+        lookPast: {
+            key: null,
+            once: false
+        },
+        lookFuture: {
+            key: null,
+            once: false
+        },
         futureAction: {
             key: null,
             once: false,
@@ -43,6 +51,9 @@ export default class Controls {
 
         me._keys.futureAction.key = input.activePointer;
         me._keys.pastAction.key = input.activePointer;
+
+        me._keys.lookPast.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+        me._keys.lookFuture.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     }
 
     isDown(key) {
@@ -72,6 +83,12 @@ export default class Controls {
 
             case Enums.Keyboard.JUMP: 
                 return me._keys.up.once;
+
+            case Enums.Keyboard.LOOK_PAST:
+                return me._keys.lookPast.once;
+
+            case Enums.Keyboard.LOOK_FUTURE:
+                return me._keys.lookFuture.once;
 
             default:
                 return false;
