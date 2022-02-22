@@ -5,8 +5,8 @@ export default class Config {
     static DebugCameras = true;
 
     static Player = {
-        X: 925,
-        Y: 1248
+        X: 75,
+        Y: 1400
     };
 
     static Physics = {
@@ -17,7 +17,8 @@ export default class Config {
 
     static Speed = {
         Bullet: 400,
-        Teleport: 1000
+        Teleport: 1000,
+        Enemy: 300
     }
 
     static TimeScale = 4;

@@ -116,6 +116,25 @@ export default class Core {
             me._buttonGroup, 
             (p, b) => { me._onButtonPush(b) });
 
+        const enemy = scene.physics.add.sprite(875, 1525, 'sprites', 10)
+            .setFlipX(true);
+        enemy.body.setAllowGravity(false); // TODO : disable global gravity
+
+        const enemyDuration = Math.abs(enemy.x - 75) / Config.Speed.Enemy * 1000;
+
+        scene.physics.add.overlap(me._player.getCollider(), enemy, () => {
+            console.log('You lose!')
+        });
+
+        me._layers[1].push(scene.tweens.add({
+            targets: enemy,
+            x: 75,
+            yoyo: true,
+            repeat: -1,
+            flipX: true,
+            duration: enemyDuration
+        }));
+
         me._scene.cameras.main.setScroll(0, me._layer * Consts.Viewport.Height);
 
         if (Config.DebugCameras) {
@@ -241,6 +260,7 @@ export default class Core {
                     me._layer * Consts.Viewport.Height + origin.y % Consts.Viewport.Height, 
                     origin.texture, 
                     origin.frame.name);
+                sprite.setFlipX(origin.flipX);
 
                 targets.push(sprite);
             }
