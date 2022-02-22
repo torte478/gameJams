@@ -1,8 +1,10 @@
 import Phaser from '../lib/phaser.js';
+import Button from './Button.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Controls from './Controls.js';
+import Door from './Door.js';
 import Enums from './Enums.js';
 import Player from './Player.js';
 import Utils from './Utils.js';
@@ -35,6 +37,15 @@ export default class Core {
 
     /** @type {Phaser.GameObjects.Group} */
     _phantom;
+
+    /** @type {Phaser.Physics.Arcade.Group} */
+    _bulletGroup;
+
+    /** @type {Phaser.Physics.Arcade.Group} */
+    _doorGroup;
+
+    /** @type {Phaser.Physics.Arcade.Group} */
+    _buttonGroup;
 
     /**
      * @param {Phaser.Scene} scene
@@ -76,12 +87,34 @@ export default class Core {
             console.log('YOU WIN!!!');
         })
 
-        me._layers = [ [], [], []];
+        me._bulletGroup = scene.physics.add.group();
 
-        me._createTurret(150, 1050, false, tiles),
-        me._createTurret(775, 1400, true, tiles),
-        me._createTurret(100, 725, false, tiles),
-        me._createTurret(850, 2325, true, tiles)
+        me._layers = [ [], [], [] ];
+
+        me._createTurret(150, 1050, false);
+        me._createTurret(925, 1400, true, 0.5);
+
+        me._scene.physics.add.overlap(me._player.getCollider(), me._bulletGroup, (p, b) => {
+            b.parentTween.restart();
+            console.log('hit');
+        });
+
+        me._doorGroup = me._scene.physics.add.staticGroup();
+        new Door(me._doorGroup, 1, 100, 1300, true);
+        me._scene.physics.add.collider(me._player.getCollider(), me._doorGroup);
+
+        me._buttonGroup = me._scene.physics.add.staticGroup();
+        new Button(me._buttonGroup, 1, 925, 1250, 0, [ 1 ], [], [], [ 2 ]);
+        new Button(me._buttonGroup, 2, 275, 1400, 90, [], [ 1 ], [], [ 1 ]);
+        me._scene.physics.add.overlap(
+            me._player.getCollider(), 
+            me._buttonGroup, 
+            (p, b) => { me._onButtonPush(b) });
+
+        me._scene.physics.add.overlap(
+            me._bulletGroup, 
+            me._buttonGroup, 
+            (p, b) => { me._onButtonPush(b) });
 
         me._scene.cameras.main.setScroll(0, me._layer * Consts.Viewport.Height);
 
@@ -143,6 +176,40 @@ export default class Core {
 
         // portals
         me._tryTeleport();
+    }
+
+    /**
+     * @param {Button} button 
+     */
+    _onButtonPush(buttonCollider) {
+        const me = this;
+
+        const button = buttonCollider.parentButton;
+
+        if (button.isPushed)        
+            return;
+
+        button.push();
+
+        me._doorGroup
+            .getChildren()
+            .filter((d) => Utils.any(button.doorsToOpen, (id) => d.parentDoor.id == id))
+            .forEach((d) => { d.parentDoor.open() });
+        
+        me._doorGroup
+            .getChildren()
+            .filter((d) => Utils.any(button.doorsToClose, (id) => d.parentDoor.id == id))
+            .forEach((d) => { d.parentDoor.close() });
+
+        me._buttonGroup
+            .getChildren()
+            .filter((b) => Utils.any(button.buttonsToPush, (id) => b.parentButton.id == id))
+            .forEach((d) => { me._onButtonPush(b) });
+
+        me._buttonGroup
+            .getChildren()
+            .filter((b) => Utils.any(button.buttonsToPull, (id) => b.parentButton.id == id))
+            .forEach((b) => { b.parentButton.pull(); });
     }
 
     _tryLookPhantom() {
@@ -309,12 +376,12 @@ export default class Core {
         }
     }
 
-    _createTurret(x, y, flip) {
+    _createTurret(x, y, flip, speedFactor) {
         const me = this;
 
         const turret = me._scene.add.sprite(x, y, 'sprites', 1)
             .setFlipX(flip);
-        const bullet = me._scene.physics.add.sprite(x, y, 'sprites_small')
+        const bullet = me._bulletGroup.create(x, y, 'sprites_small')
         bullet.body.setAllowGravity(false);
 
         const target = flip
@@ -326,10 +393,12 @@ export default class Core {
             ? 1
             : layer == Enums.Layer.PAST ? 1 / Config.TimeScale : Config.TimeScale;
 
+        const speed = Config.Speed.Bullet * (!!speedFactor ? speedFactor : 1);
+
         const bulletTween = me._scene.tweens.add({
             targets: bullet,
             x: { from: x, to: target },
-            duration: Math.abs(target - x) / Config.Speed.Bullet * 1000,
+            duration:Math.abs(target - x) / speed * 1000,
             repeat: -1,
             onUpdate: () => {
                 if (!Utils.isTileFree(bullet.getBounds(), me._level))
@@ -337,11 +406,7 @@ export default class Core {
             }})
             .setTimeScale(timeScale);
 
-        me._scene.physics.add.overlap(me._player.getCollider(), bullet, () => {
-            bulletTween.restart();
-            console.log('hit');
-        });
-
+        bullet.parentTween = bulletTween;
 
         me._layers[layer].push(bulletTween);
     }
