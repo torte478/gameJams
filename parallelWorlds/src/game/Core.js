@@ -20,6 +20,9 @@ export default class Core {
     /** @type {Number} */
     _layer;
 
+    /** @type {Phaser.Tilemaps.Tilemap} */
+    _level;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -33,17 +36,17 @@ export default class Core {
         me._player = me._scene.physics.add.sprite(Config.Player.X, Config.Player.Y, 'sprites', 0);
         me._layer = Enums.Layer.PRESENT;
 
-        const level = me._scene.make.tilemap({
+        me._level = me._scene.make.tilemap({
             key: 'level',
             tileWidth: Consts.Unit.Small,
             tileHeight: Consts.Unit.Small
         });
 
-        const tileset = level.addTilesetImage('tiles');
-        const tiles = level.createLayer(0, tileset)
+        const tileset = me._level.addTilesetImage('tiles');
+        const tiles = me._level.createLayer(0, tileset)
             .setDepth(Consts.Depth.Tiles);
 
-        level.setCollisionBetween(1, 3);
+        me._level.setCollisionBetween(1, 3);
 
         const exit = me._scene.physics.add.image(925, 1525, 'sprites', 11);
         exit.body.setAllowGravity(false);
@@ -68,6 +71,9 @@ export default class Core {
         else if (me._controls.isDown(Enums.Keyboard.RIGHT))
             signX = 1;
 
+        if (signX != 0)
+            me._player.setFlipX(signX < 0);
+
         me._player.setVelocityX(signX * Config.Physics.VelocityX);
 
         const isJump = me._controls.isDownOnce(Enums.Keyboard.UP) 
@@ -84,11 +90,69 @@ export default class Core {
             shift = 1;
 
         const nextLayer = me._layer + shift;
-        if (nextLayer != me._layer) {
-            const pos = me._player.y % Consts.Viewport.Height;
-            me._player.setY(nextLayer * Consts.Viewport.Height + pos);
+        const target = me._findFreePosition(nextLayer);
+        if (!!target) {
+            me._player.setPosition(target.x, target.y);
             me._scene.cameras.main.setScroll(0, nextLayer * Consts.Viewport.Height);
             me._layer = nextLayer;
         }
+    }
+
+    _findFreePosition(nextLayer) {
+        const me = this;
+
+        if (nextLayer == me._layer || nextLayer < 0 || nextLayer >= Consts.Layers)
+            return null;
+
+        if (!me._player.body.blocked.down)
+            return null;
+
+        const bounds = me._player.getBounds();
+
+        const relativeY = bounds.top % Consts.Viewport.Height;
+        const nextY = nextLayer * Consts.Viewport.Height + relativeY;
+
+        const target = new Phaser.Geom.Rectangle(
+            Math.round(bounds.left / Consts.Unit.Small) * Consts.Unit.Small,
+            Math.round(nextY / Consts.Unit.Small) * Consts.Unit.Small,
+            bounds.width,
+            bounds.height);
+
+        if (!me._isCollisionFree(target))
+            return null;
+
+        return new Phaser.Geom.Point(
+            target.x + target.width / 2,
+            target.y + target.height / 2
+        );
+    }
+
+    /**
+     * @param {Phaser.Geom.Rectangle} rect 
+     * @returns {Boolean}
+     */
+    _isCollisionFree(rect) {
+        const me = this;
+
+        const bodies = me._scene.physics.overlapRect(rect);
+
+        if (bodies.length > 0)
+            return false;
+        
+        const tileX = Math.floor(rect.x / Consts.Unit.Small);
+        const tileY = Math.floor(rect.y / Consts.Unit.Small);
+        const tiles = me._level.findTile(
+            () => true, 
+            me, 
+            tileX, 
+            tileY, 
+            2, // TODO : fall on sprite size change
+            2, 
+            { isColliding: true });
+
+        if (!!tiles)
+            return false;
+
+        return true;
     }
 }

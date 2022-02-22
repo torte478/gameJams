@@ -52,7 +52,8 @@ export default class Game extends Phaser.Scene {
 
         if (Config.Debug) {
             me._logger.text = 
-                `mse: ${me.input.activePointer.worldX} ${me.input.activePointer.worldY}`;
+                `mse: ${me.input.activePointer.worldX} ${me.input.activePointer.worldY}\n` +
+                `plr: ${me._core._player.x.toFixed(0)} ${me._core._player.y.toFixed(0)}`;
         }
     }
 }
