@@ -72,6 +72,9 @@ export default class Core {
 
         me._controls.update();
 
+        if (me._player.isBusy)
+            return;
+
         // movement
         let signX = 0;
         if (me._controls.isDown(Enums.Keyboard.LEFT))
@@ -106,6 +109,7 @@ export default class Core {
         if (!target)
             return;
 
+        me._player.teleport(target, me._scene.tweens);
         me._scene.tweens.createTimeline()
             .add({
                 targets: me._fade,
@@ -114,7 +118,7 @@ export default class Core {
                 ease: 'Sine.easeOut',
                 onComplete: () => {
                     me._scene.cameras.main.setScroll(0, nextLayer * Consts.Viewport.Height);
-                    me._player.teleport(target, me._scene.tweens);
+                    me._player.setPositionY(target.y);
                     me._layer = nextLayer;
                 }
             })

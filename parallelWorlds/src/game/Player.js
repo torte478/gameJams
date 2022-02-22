@@ -8,6 +8,9 @@ export default class Player {
     /** @type {Phaser.Physics.Arcade.Sprite} */
     _sprite;
 
+    /** @type {Boolean} */
+    isBusy;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -16,6 +19,8 @@ export default class Player {
 
         me._sprite = scene.physics.add.sprite(Config.Player.X, Config.Player.Y, 'sprites', 0)
             .setDepth(Consts.Depth.Player);
+
+        me.isBusy = false;
     }
 
     /**
@@ -92,16 +97,19 @@ export default class Player {
     teleport(position, tweens) {
         const me = this;
 
-        me._sprite.setY(position.y);
         me._sprite.disableBody(false, false);
         me._sprite.body.setAllowGravity(false);
+        me.isBusy = true;
+
         tweens.add({
             targets: me._sprite,
             x: position.x,
-            duration: 1000,
+            duration: 2000,
+            ease: 'Sine.easeOut',
             onComplete: () => {
                 me._sprite.enableBody(true, position.x, position.y, true, true);
                 me._sprite.body.setAllowGravity(true);
+                me.isBusy = false;
             }
         })
     }
@@ -113,6 +121,15 @@ export default class Player {
         const me = this;
 
         return new Phaser.Geom.Point(me._sprite.x, me._sprite.y);
+    }
+
+    /**
+     * @param {Number} y 
+     */
+    setPositionY(y) {
+        const me = this;
+
+        me._sprite.setY(y);
     }
 
     /**
