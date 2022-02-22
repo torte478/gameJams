@@ -2,7 +2,6 @@ import Phaser from '../lib/phaser.js';
 
 import Config from '../game/Config.js';
 import Consts from '../game/Consts.js';
-import Controls from '../game/Controls.js';
 import Core from '../game/Core.js';
 
 export default class Game extends Phaser.Scene {
@@ -53,7 +52,7 @@ export default class Game extends Phaser.Scene {
         if (Config.Debug) {
             me._logger.text = 
                 `mse: ${me.input.activePointer.worldX} ${me.input.activePointer.worldY}\n` +
-                `plr: ${me._core._player.x.toFixed(0)} ${me._core._player.y.toFixed(0)}`;
+                `plr: ${me._core._player.getPosition().x.toFixed(0)} ${me._core._player.getPosition().y.toFixed(0)}`;
         }
     }
 }
