@@ -3,9 +3,9 @@ export default class Enums {
         UNKNOWN: 0,
         LEFT: 1,
         RIGHT: 2,
-        UP: 3,
-        X: 4,
-        C: 5
+        JUMP: 3,
+        PAST_ACTION: 4,
+        FUTURE_ACTION: 5
     };
 
     static Layer = {

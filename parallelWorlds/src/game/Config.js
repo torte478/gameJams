@@ -16,7 +16,7 @@ export default class Config {
     }
 
     static Speed = {
-        Bullet: 700,
+        Bullet: 400,
         Teleport: 1000
     }
 

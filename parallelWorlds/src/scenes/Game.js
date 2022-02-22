@@ -38,6 +38,8 @@ export default class Game extends Phaser.Scene {
     create() {
         const me = this;
 
+        me.input.mouse.disableContextMenu();
+
         me._core = new Core(me);
 
         if (Config.Debug) {

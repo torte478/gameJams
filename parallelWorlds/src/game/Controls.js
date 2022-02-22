@@ -18,28 +18,31 @@ export default class Controls {
             key: null,
             once: false
         },
-        x: {
+        futureAction: {
             key: null,
-            once: false
+            once: false,
+            isDown: false,
         },
-        c: {
+        pastAction: {
             key: null,
-            once: false
+            once: false,
+            isDown: false,
         }
     };
 
     /**
      * 
-     * @param {Phaser.Input.Keyboard.KeyboardPlugin} keyboard 
+     * @param {Phaser.Input.InputPlugin} input 
      */
-    constructor(keyboard) {
+    constructor(input) {
         const me = this;
 
-        me._keys.left.key = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
-        me._keys.right.key = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-        me._keys.up.key = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-        me._keys.x.key = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
-        me._keys.c.key = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
+        me._keys.left.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        me._keys.right.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        me._keys.up.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+
+        me._keys.futureAction.key = input.activePointer;
+        me._keys.pastAction.key = input.activePointer;
     }
 
     isDown(key) {
@@ -61,13 +64,13 @@ export default class Controls {
         const me = this;
 
         switch (key) {
-            case Enums.Keyboard.X: 
-                return me._keys.x.once;
+            case Enums.Keyboard.PAST_ACTION: 
+                return me._keys.pastAction.once;
 
-            case Enums.Keyboard.C: 
-                return me._keys.c.once;
+            case Enums.Keyboard.FUTURE_ACTION: 
+                return me._keys.futureAction.once;
 
-            case Enums.Keyboard.UP: 
+            case Enums.Keyboard.JUMP: 
                 return me._keys.up.once;
 
             default:
@@ -80,7 +83,21 @@ export default class Controls {
 
         for (let name in me._keys) {
             const item = me._keys[name];
-            item.once = Phaser.Input.Keyboard.JustDown(item.key);
+
+            switch (name) {
+                case 'pastAction':
+                    item.once = !item.isDown && item.key.isDown && !item.key.rightButtonDown();
+                    item.isDown = item.key.isDown;
+                    break;
+
+                case 'futureAction':
+                    item.once = !item.isDown && item.key.isDown && item.key.rightButtonDown();
+                    item.isDown = item.key.isDown;
+                    break;
+
+                default:
+                    item.once = Phaser.Input.Keyboard.JustDown(item.key);
+            }
         }
     }
 }

@@ -41,7 +41,7 @@ export default class Core {
 
         me._scene = scene;
 
-        me._controls = new Controls(scene.input.keyboard);
+        me._controls = new Controls(scene.input);
 
         me._player = new Player(scene);
         me._layer = Enums.Layer.PRESENT;
@@ -129,8 +129,10 @@ export default class Core {
 
         me._player.setDirectionX(signX);
 
-        if (me._controls.isDownOnce(Enums.Keyboard.UP))
+        if (me._controls.isDownOnce(Enums.Keyboard.JUMP))
             me._player.tryJump();
+
+        // 
 
         // portals
         me._tryTeleport();
@@ -140,9 +142,9 @@ export default class Core {
         const me = this;
 
         let shift = 0;
-        if (me._controls.isDownOnce(Enums.Keyboard.X))
+        if (me._controls.isDownOnce(Enums.Keyboard.PAST_ACTION))
             shift = -1;
-        else if (me._controls.isDownOnce(Enums.Keyboard.C))
+        else if (me._controls.isDownOnce(Enums.Keyboard.FUTURE_ACTION))
             shift = 1;
 
         const nextLayer = me._layer + shift;
