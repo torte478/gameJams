@@ -14,7 +14,8 @@ export default class Player {
      constructor(scene) {
         const me = this;
 
-        me._sprite = scene.physics.add.sprite(Config.Player.X, Config.Player.Y, 'sprites', 0);
+        me._sprite = scene.physics.add.sprite(Config.Player.X, Config.Player.Y, 'sprites', 0)
+            .setDepth(Consts.Depth.Player);
     }
 
     /**
@@ -57,33 +58,7 @@ export default class Player {
      * @param {Phaser.Tilemaps.Tilemap} level
      * @returns {Boolean}
      */
-    tryTeleport(nextLayer, physics, level) {
-        const me = this;
-
-        const target = me._findFreePosition(nextLayer, physics, level);
-        if (!target)
-            return false;
-
-        me._sprite.setPosition(target.x, target.y);
-        return true;
-    }
-
-    /**
-     * @returns {Phaser.Geom.Point}
-     */
-    getPosition() {
-        const me = this;
-
-        return new Phaser.Geom.Point(me._sprite.x, me._sprite.y);
-    }
-
-    /**
-     * @param {Number} nextLayer 
-     * @param {Phaser.Physics.Arcade.ArcadePhysics} physics
-     * @param {Phaser.Tilemaps.Tilemap} level
-     * @returns {Phaser.Geom.Point}
-     */
-    _findFreePosition(nextLayer, physics, level) {
+    canTeleport(nextLayer, physics, level) {
         const me = this;
 
         if (!me._sprite.body.blocked.down)
@@ -107,6 +82,37 @@ export default class Player {
             target.x + target.width / 2,
             target.y + target.height / 2
         );
+    }
+
+    /**
+     * 
+     * @param {Phaser.Geom.Point} position 
+     * @param {Phaser.Tweens.TweenManager} tweens 
+     */
+    teleport(position, tweens) {
+        const me = this;
+
+        me._sprite.setY(position.y);
+        me._sprite.disableBody(false, false);
+        me._sprite.body.setAllowGravity(false);
+        tweens.add({
+            targets: me._sprite,
+            x: position.x,
+            duration: 1000,
+            onComplete: () => {
+                me._sprite.enableBody(true, position.x, position.y, true, true);
+                me._sprite.body.setAllowGravity(true);
+            }
+        })
+    }
+
+    /**
+     * @returns {Phaser.Geom.Point}
+     */
+    getPosition() {
+        const me = this;
+
+        return new Phaser.Geom.Point(me._sprite.x, me._sprite.y);
     }
 
     /**

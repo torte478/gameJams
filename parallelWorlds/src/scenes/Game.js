@@ -21,6 +21,8 @@ export default class Game extends Phaser.Scene {
 
         me.load.tilemapCSV('level', 'assets/level.csv');
 
+        me.load.image('fade', 'assets/fade.png');
+
         me.load.spritesheet('tiles', 'assets/tiles.png', {
             frameWidth: Consts.Unit.Small,
             frameHeight: Consts.Unit.Small

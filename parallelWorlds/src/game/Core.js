@@ -23,6 +23,9 @@ export default class Core {
     /** @type {Phaser.Tilemaps.Tilemap} */
     _level;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _fade; 
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -41,6 +44,11 @@ export default class Core {
             tileWidth: Consts.Unit.Small,
             tileHeight: Consts.Unit.Small
         });
+
+        me._fade = scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
+            .setDepth(Consts.Depth.Fade)
+            .setScrollFactor(0)
+            .setAlpha(0);
 
         const tileset = me._level.addTilesetImage('tiles');
         const tiles = me._level.createLayer(0, tileset)
@@ -77,6 +85,11 @@ export default class Core {
             me._player.tryJump();
 
         // portals
+        me._tryTeleport();
+    }
+
+    _tryTeleport() {
+        const me = this;
 
         let shift = 0;
         if (me._controls.isDownOnce(Enums.Keyboard.X))
@@ -86,15 +99,31 @@ export default class Core {
 
         const nextLayer = me._layer + shift;
 
-        const teleported = 
-            nextLayer != me._layer 
-            && nextLayer >= 0 
-            && nextLayer < Consts.Layers
-            && me._player.tryTeleport(nextLayer, me._scene.physics, me._level);
+        if (nextLayer == me._layer || nextLayer < 0 || nextLayer >= Consts.Layers)
+            return;
 
-        if (teleported) {
-            me._scene.cameras.main.setScroll(0, nextLayer * Consts.Viewport.Height);
-            me._layer = nextLayer;
-        }
+        const target = me._player.canTeleport(nextLayer, me._scene.physics, me._level);
+        if (!target)
+            return;
+
+        me._scene.tweens.createTimeline()
+            .add({
+                targets: me._fade,
+                alpha: { from: 0, to: 1 },
+                duration: 1000,
+                ease: 'Sine.easeOut',
+                onComplete: () => {
+                    me._scene.cameras.main.setScroll(0, nextLayer * Consts.Viewport.Height);
+                    me._player.teleport(target, me._scene.tweens);
+                    me._layer = nextLayer;
+                }
+            })
+            .add({
+                targets: me._fade,
+                alpha: { from: 1, to: 0 },
+                duration: 1000,
+                ease: 'Sine.easeOut'
+            })
+            .play();
     }
 }
