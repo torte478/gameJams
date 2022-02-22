@@ -4,8 +4,8 @@ export default class Config {
     static DebugLog = true;
 
     static Player = {
-        X: 250,
-        Y: 900
+        X: 350,
+        Y: 925
     };
 
     static Physics = {

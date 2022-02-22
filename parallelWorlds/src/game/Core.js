@@ -5,6 +5,7 @@ import Consts from './Consts.js';
 import Controls from './Controls.js';
 import Enums from './Enums.js';
 import Player from './Player.js';
+import Utils from './Utils.js';
 
 export default class Core {
 
@@ -25,6 +26,9 @@ export default class Core {
 
     /** @type {Phaser.GameObjects.Image} */
     _fade; 
+
+    /** @type {Phaser.Tweens.Tween[]}*/
+    _layer1;
 
     /**
      * @param {Phaser.Scene} scene
@@ -63,6 +67,11 @@ export default class Core {
         me._scene.physics.add.overlap(me._player.getCollider(), exit, () => {
             console.log('YOU WIN!!!');
         })
+
+        me._layer1 = [
+            me._createTurret(150, 1050, false, tiles),
+            me._createTurret(775, 1400, true, tiles)
+        ];
 
         me._scene.cameras.main.setScroll(0, me._layer * Consts.Viewport.Height);
     }
@@ -129,5 +138,38 @@ export default class Core {
                 ease: 'Sine.easeOut'
             })
             .play();
+    }
+
+    _createTurret(x, y, flip) {
+        const me = this;
+
+        const turret = me._scene.add.sprite(x, y, 'sprites', 1)
+            .setFlipX(flip);
+        const bullet = me._scene.physics.add.sprite(x, y, 'sprites_small')
+        bullet.body.setAllowGravity(false);
+
+        const speed = 700;
+        const target = flip
+            ? 0 - Consts.Unit.Small
+            : Consts.Viewport.Width + Consts.Unit.Small;
+
+        const bulletTween = me._scene.tweens.add({
+            targets: bullet,
+            x: { from: x, to: target },
+            duration: Math.abs(target - x) / speed * 1000,
+            repeat: -1,
+            onUpdate: () => {
+                if (!Utils.isTileFree(bullet.getBounds(), me._level))
+                    bulletTween.restart();
+            }
+        });
+
+        me._scene.physics.add.overlap(me._player.getCollider(), bullet, () => {
+            bulletTween.restart();
+            console.log('hit');
+        });
+
+
+        return bulletTween;
     }
 }

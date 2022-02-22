@@ -1,4 +1,5 @@
 import Config from "./Config.js";
+import Consts from "./Consts.js";
 
 export default class Utils {
 
@@ -99,5 +100,29 @@ export default class Utils {
     static debugLog(msg) {
         if (Config.DebugLog)
             console.log(msg);
+    }
+
+    // =============== Custom =====
+
+    /**
+     * @param {Phaser.Geom.Rectangle} bounds 
+     * @param {Phaser.Tilemaps.Tilemap} level
+     * @returns {Boolean}
+     */
+    static isTileFree(bounds, level) {
+
+        const x = Math.floor(bounds.x / Consts.Unit.Small);
+        const y = Math.floor(bounds.y / Consts.Unit.Small);
+
+        const widthMod = bounds.x % Consts.Unit.Small > 4 ? 1 : 0;
+        const heghtMod = bounds.y % Consts.Unit.Small > 4 ? 1 : 0;
+
+        const width = Math.floor(bounds.width / Consts.Unit.Small) + widthMod;
+        const height = Math.floor(bounds.height / Consts.Unit.Small) + heghtMod;
+
+        const tiles = level.findTile(() => true, this, x, y, width, height, { 
+            isColliding: true });
+
+        return !tiles;
     }
 }

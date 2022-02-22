@@ -2,6 +2,7 @@ import Phaser from '../lib/phaser.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
+import Utils from './Utils.js';
 
 export default class Player {
 
@@ -71,21 +72,32 @@ export default class Player {
 
         const bounds = me._sprite.getBounds();
 
-        const relativeY = bounds.top % Consts.Viewport.Height;
+        const relativeY = bounds.centerY % Consts.Viewport.Height;
         const nextY = nextLayer * Consts.Viewport.Height + relativeY;
 
-        const target = new Phaser.Geom.Rectangle(
-            Math.round(bounds.left / Consts.Unit.Small) * Consts.Unit.Small,
-            Math.round(nextY / Consts.Unit.Small) * Consts.Unit.Small,
+        const originTarget = new Phaser.Geom.Rectangle(
+            bounds.left,
+            nextY - bounds.height / 2,
             bounds.width,
             bounds.height);
 
-        if (!me._isCollisionFree(target, physics, level))
+        if (me._isCollisionFree(originTarget, physics, level))
+            return new Phaser.Geom.Point(
+                bounds.centerX,
+                nextY);
+
+        const gridTarget = new Phaser.Geom.Rectangle(
+            Math.round(bounds.left / Consts.Unit.Small) * Consts.Unit.Small,
+            Math.round((nextY - bounds.height / 2) / Consts.Unit.Small) * Consts.Unit.Small,
+            bounds.width,
+            bounds.height);
+
+        if (!me._isCollisionFree(gridTarget, physics, level))
             return null;
 
         return new Phaser.Geom.Point(
-            target.x + target.width / 2,
-            target.y + target.height / 2
+            gridTarget.x + gridTarget.width / 2,
+            gridTarget.y + gridTarget.height / 2
         );
     }
 
@@ -145,21 +157,10 @@ export default class Player {
 
         if (bodies.length > 0)
             return false;
-        
-        const tileX = Math.floor(rect.x / Consts.Unit.Small);
-        const tileY = Math.floor(rect.y / Consts.Unit.Small);
-        const tiles = level.findTile(
-            () => true, 
-            me, 
-            tileX, 
-            tileY, 
-            2, // TODO : fall on sprite size change
-            2, 
-            { isColliding: true });
 
-        if (!!tiles)
+        if (!Utils.isTileFree(rect, level))
             return false;
-
+        
         return true;
     }
 }
