@@ -6,11 +6,16 @@ import Config from './game/Config.js';
 
 export default new Phaser.Game({
     type: Phaser.AUTO,
-    width: Consts.Viewport.Width,
+
+    width: Consts.Viewport.Width 
+        + (Config.DebugCameras ? Consts.Viewport.Width / 2 : 0),
+
     height: Consts.Viewport.Height,
+
     scene: [ 
         Game
         ],
+
     physics: {
         default: 'arcade',
         arcade: {

@@ -44,6 +44,11 @@ export default class Game extends Phaser.Scene {
             me._logger = me.add.text(10, 10, 'DEBUG', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
+            
+            if (Config.DebugCameras) {
+                me._core._debugCameras[0].ignore(me._logger);
+                me._core._debugCameras[1].ignore(me._logger);
+            }
         }
     }
 

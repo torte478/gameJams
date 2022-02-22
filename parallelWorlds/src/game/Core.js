@@ -27,8 +27,11 @@ export default class Core {
     /** @type {Phaser.GameObjects.Image} */
     _fade; 
 
-    /** @type {Phaser.Tweens.Tween[]}*/
-    _layer1;
+    /** @type {Phaser.Tweens.Tween[][]}*/
+    _layers;
+
+    /** @type {Phaser.Cameras.Scene2D.Camera[]} */
+    _debugCameras;
 
     /**
      * @param {Phaser.Scene} scene
@@ -68,12 +71,45 @@ export default class Core {
             console.log('YOU WIN!!!');
         })
 
-        me._layer1 = [
-            me._createTurret(150, 1050, false, tiles),
-            me._createTurret(775, 1400, true, tiles)
-        ];
+        me._layers = [ [], [], []];
+
+        me._createTurret(150, 1050, false, tiles),
+        me._createTurret(775, 1400, true, tiles),
+        me._createTurret(100, 725, false, tiles),
+        me._createTurret(850, 2325, true, tiles)
 
         me._scene.cameras.main.setScroll(0, me._layer * Consts.Viewport.Height);
+
+        if (Config.DebugCameras) {
+            me._scene.cameras.main.setSize(Consts.Viewport.Width, Consts.Viewport.Height);
+
+            me._debugCameras = [];
+
+            me._debugCameras.push(
+                me._scene.cameras.add(
+                    Consts.Viewport.Width, 
+                    0, 
+                    Consts.Viewport.Width, 
+                    Consts.Viewport.Height / 2)
+                .setScroll(
+                    Consts.Viewport.Width / 2, 
+                    0 + Consts.Viewport.Height / 4)
+                .setZoom(0.5));
+
+            me._debugCameras.push(
+                me._scene.cameras.add(
+                    Consts.Viewport.Width, 
+                    Consts.Viewport.Height / 2, 
+                    Consts.Viewport.Width, 
+                    Consts.Viewport.Height / 2)
+                .setScroll(
+                    Consts.Viewport.Width / 2, 
+                    Consts.Viewport.Height * 2 + Consts.Viewport.Height / 4)
+                .setZoom(0.5));   
+                
+            me._debugCameras[0].ignore(me._fade);
+            me._debugCameras[1].ignore(me._fade);
+        }
     }
 
     update() {
@@ -123,21 +159,71 @@ export default class Core {
             .add({
                 targets: me._fade,
                 alpha: { from: 0, to: 1 },
-                duration: 1000,
+                duration: Config.Speed.Teleport / 2,
                 ease: 'Sine.easeOut',
                 onComplete: () => {
                     me._scene.cameras.main.setScroll(0, nextLayer * Consts.Viewport.Height);
                     me._player.setPositionY(target.y);
                     me._layer = nextLayer;
+
+                    if (Config.DebugCameras) {
+                        const first = nextLayer == 0 ? 1 : 0;
+                        const second = nextLayer == 2 ? 1 : 2;
+
+                        me._debugCameras[0].setScroll(
+                            Consts.Viewport.Width / 2, 
+                            first * Consts.Viewport.Height + Consts.Viewport.Height / 4);
+
+                        me._debugCameras[1].setScroll(
+                            Consts.Viewport.Width / 2, 
+                            second * Consts.Viewport.Height + Consts.Viewport.Height / 4);
+                    }
                 }
             })
             .add({
                 targets: me._fade,
                 alpha: { from: 1, to: 0 },
-                duration: 1000,
-                ease: 'Sine.easeOut'
+                duration: Config.Speed.Teleport / 2,
+                ease: 'Sine.easeOut',
             })
             .play();
+            
+
+        const timeScale = me._getPlayerTimeScale(nextLayer);
+        for (let i = 0; i < Consts.Layers; ++i)
+            me._scene.tweens.add({
+                targets: me._layers[i],
+                timeScale: timeScale[i],
+                duration: Config.Speed.Teleport
+            });
+    }
+
+    _getPlayerTimeScale(to) {
+        switch (to) {
+            case Enums.Layer.PAST:
+                return [
+                    1,
+                    1 * Config.TimeScale,
+                    2 * Config.TimeScale
+                ];
+
+            case Enums.Layer.PRESENT:
+                return [
+                    1 / Config.TimeScale,
+                    1,
+                    1 * Config.TimeScale
+                ];
+
+            case Enums.Layer.FUTURE:
+                return [
+                    1 / (2 * Config.TimeScale),
+                    1 / Config.TimeScale,
+                    1
+                ];
+
+            default:
+                throw `Unknown layer ${to}`;
+        }
     }
 
     _createTurret(x, y, flip) {
@@ -148,21 +234,25 @@ export default class Core {
         const bullet = me._scene.physics.add.sprite(x, y, 'sprites_small')
         bullet.body.setAllowGravity(false);
 
-        const speed = 700;
         const target = flip
             ? 0 - Consts.Unit.Small
             : Consts.Viewport.Width + Consts.Unit.Small;
 
+        const layer = Math.floor(y / Consts.Viewport.Height);
+        const timeScale = layer == Enums.Layer.PRESENT
+            ? 1
+            : layer == Enums.Layer.PAST ? 1 / Config.TimeScale : Config.TimeScale;
+
         const bulletTween = me._scene.tweens.add({
             targets: bullet,
             x: { from: x, to: target },
-            duration: Math.abs(target - x) / speed * 1000,
+            duration: Math.abs(target - x) / Config.Speed.Bullet * 1000,
             repeat: -1,
             onUpdate: () => {
                 if (!Utils.isTileFree(bullet.getBounds(), me._level))
                     bulletTween.restart();
-            }
-        });
+            }})
+            .setTimeScale(timeScale);
 
         me._scene.physics.add.overlap(me._player.getCollider(), bullet, () => {
             bulletTween.restart();
@@ -170,6 +260,6 @@ export default class Core {
         });
 
 
-        return bulletTween;
+        me._layers[layer].push(bulletTween);
     }
 }

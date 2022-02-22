@@ -2,10 +2,11 @@ export default class Config {
 
     static Debug = true;
     static DebugLog = true;
+    static DebugCameras = true;
 
     static Player = {
-        X: 350,
-        Y: 925
+        X: 100,
+        Y: 900
     };
 
     static Physics = {
@@ -13,4 +14,11 @@ export default class Config {
         Jump: -600,
         Gravity: 600
     }
+
+    static Speed = {
+        Bullet: 700,
+        Teleport: 1000
+    }
+
+    static TimeScale = 4;
 }

@@ -116,7 +116,7 @@ export default class Player {
         tweens.add({
             targets: me._sprite,
             x: position.x,
-            duration: 2000,
+            duration: Config.Speed.Teleport,
             ease: 'Sine.easeOut',
             onComplete: () => {
                 me._sprite.enableBody(true, position.x, position.y, true, true);
