@@ -3,12 +3,14 @@ import Phaser from '../../lib/phaser.js';
 import Button from './Button.js';
 import ButtonConfig from './ButtonConfig.js';
 import Door from './Door.js';
+import Portal from './Portal.js';
 
 import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
+import LevelMap from '../LevelMap.js';
 import Utils from '../Utils.js';
-import Portal from './Portal.js';
+
 
 export default class Entities {
 
@@ -40,7 +42,7 @@ export default class Entities {
      * 
      * @param {Phaser.Scene} scene 
      * @param {Object} config 
-     * @param {Phaser.Tilemaps.Tilemap} level
+     * @param {LevelMap} map
      */
     constructor(scene, config, level) {
         const me = this;
@@ -110,7 +112,7 @@ export default class Entities {
         }
     }
 
-    _createTurret(cfg, scene, level) {
+    _createTurret(cfg, scene, map) {
         const me = this;
 
         /** @type {Phaser.GameObjects.Sprite} */
@@ -137,7 +139,7 @@ export default class Entities {
             duration:Math.abs(target - cfg.x) / speed * 1000,
             repeat: -1,
             onUpdate: () => {
-                if (!Utils.isTileFree(bullet.getBounds(), level))
+                if (!map.isFree(bullet.getBounds()))
                     bulletTween.restart();
             }})
             .setTimeScale(timeScale);

@@ -8,6 +8,7 @@ import Enums from './Enums.js';
 import Levels from './Levels.js';
 import Player from './Player.js';
 import Utils from './Utils.js';
+import LevelMap from './LevelMap.js';
 
 export default class Core {
 
@@ -26,9 +27,6 @@ export default class Core {
     /** @type {Number} */
     _layer; // TODO : to status
 
-    /** @type {Phaser.Tilemaps.Tilemap} */
-    _level;
-
     /** @type {Phaser.GameObjects.Image} */
     _fade; 
 
@@ -37,6 +35,9 @@ export default class Core {
 
     /** @type {Phaser.GameObjects.Group} */
     _phantom;
+
+    /** @type {LevelMap} */
+    _map;
 
     /**
      * @param {Phaser.Scene} scene
@@ -52,11 +53,7 @@ export default class Core {
         me._player = new Player(scene);
         me._layer = Enums.Layer.PRESENT;
 
-        me._level = me._scene.make.tilemap({
-            key: 'level',
-            tileWidth: Consts.Unit.Small,
-            tileHeight: Consts.Unit.Small
-        });
+        me._map = new LevelMap(scene);
 
         me._fade = scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
             .setDepth(Consts.Depth.Fade)
@@ -65,15 +62,7 @@ export default class Core {
 
         me._phantom = scene.add.group();
 
-        const tileset = me._level.addTilesetImage('tiles');
-        const tiles = me._level.createLayer(0, tileset)
-            .setDepth(Consts.Depth.Tiles);
-
-        me._level.setCollisionBetween(1, 3);
-
-        me._scene.physics.add.collider(me._player.getCollider(), tiles);
-
-        me._entities = new Entities(scene, Levels.Config[levelIndex], me._level);
+        me._entities = new Entities(scene, Levels.Config[levelIndex], me._map);
 
         me._initColliders();
 
@@ -195,6 +184,10 @@ export default class Core {
                 me._tryTeleportTo(nextLayer);
         });
 
+        me._scene.physics.add.collider(
+            player, 
+            me._map.getCollider());
+
         // other
 
         me._scene.physics.add.overlap(
@@ -265,26 +258,16 @@ export default class Core {
             }
         });
 
-        const playerPos = me._player.getPosition();
-        const playerY = nextLayer * Consts.Viewport.Height + playerPos.y % Consts.Viewport.Height;
+        const tiles = me._map.foo(
+            me._player.getPosition(),
+            200,
+            me._layer,
+            nextLayer);
 
-        me._level.forEachTile((tile) => {    
-                const x = tile.getCenterX();
-                const originY = tile.getCenterY();
-                
-                const dist = Phaser.Math.Distance.Between(playerPos.x, playerY, x, originY);
-            
-                if (dist <= 200 && tile.canCollide) {
-                    const y = me._layer * Consts.Viewport.Height + originY % Consts.Viewport.Height;
-                    targets.push(me._phantom.create(x, y, 'tiles', tile.index));
-                }
-            },
-            me,
-            0,
-            nextLayer * (Consts.Viewport.Height / Consts.Unit.Small),
-            Consts.Viewport.Width / Consts.Unit.Small,
-            Consts.Viewport.Height / Consts.Unit.Small,
-            { isColliding: true });
+        for (let i = 0; i < tiles.length; ++i) {
+            const item = tiles[i]
+            targets.push(me._phantom.create(item.x, item.y, 'tiles', item.index));
+        }
 
         for (let i = 0; i < targets.length; ++i) {
             targets[i]
@@ -325,7 +308,7 @@ export default class Core {
         if (nextLayer == me._layer || nextLayer < 0 || nextLayer >= Consts.Layers)
             return;
 
-        const target = me._player.canTeleport(nextLayer, me._scene.physics, me._level);
+        const target = me._player.canTeleport(nextLayer, me._scene.physics, me._map);
         if (!target)
             return;
 

@@ -2,7 +2,7 @@ import Phaser from '../lib/phaser.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
-import Utils from './Utils.js';
+import LevelMap from './LevelMap.js';
 
 export default class Player {
 
@@ -61,10 +61,10 @@ export default class Player {
     /**
      * @param {Number} nextLayer 
      * @param {Phaser.Physics.Arcade.ArcadePhysics} physics
-     * @param {Phaser.Tilemaps.Tilemap} level
+     * @param {LevelMap} map
      * @returns {Boolean}
      */
-    canTeleport(nextLayer, physics, level) {
+    canTeleport(nextLayer, physics, map) {
         const me = this;
 
         if (!me._sprite.body.blocked.down)
@@ -81,7 +81,7 @@ export default class Player {
             bounds.width,
             bounds.height);
 
-        if (me._isCollisionFree(originTarget, physics, level))
+        if (me._isCollisionFree(originTarget, physics, map))
             return new Phaser.Geom.Point(
                 bounds.centerX,
                 nextY);
@@ -92,7 +92,7 @@ export default class Player {
             bounds.width,
             bounds.height);
 
-        if (!me._isCollisionFree(gridTarget, physics, level))
+        if (!me._isCollisionFree(gridTarget, physics, map))
             return null;
 
         return new Phaser.Geom.Point(
@@ -147,10 +147,10 @@ export default class Player {
     /**
      * @param {Phaser.Geom.Rectangle} rect 
      * @param {Phaser.Physics.Arcade.ArcadePhysics} physics
-     * @param {Phaser.Tilemaps.Tilemap} level
+     * @param {LevelMap} map
      * @returns {Boolean}
      */
-    _isCollisionFree(rect, physics, level) {
+    _isCollisionFree(rect, physics, map) {
         const me = this;
 
         const bodies = physics.overlapRect(rect);
@@ -158,7 +158,7 @@ export default class Player {
         if (bodies.length > 0)
             return false;
 
-        if (!Utils.isTileFree(rect, level))
+        if (!map.isFree(rect))
             return false;
         
         return true;
