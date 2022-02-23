@@ -71,7 +71,7 @@ export default class Entities {
 
         me.exits = scene.physics.add.staticGroup();
         me._build(config.exits, (cfg) => {
-            me.exits.create(cfg.x, cfg.y, 'sprites', 11);
+            me.exits.create(cfg.x, cfg.y, 'items', 8);
         });
 
         me.turrets = scene.add.group();

@@ -22,6 +22,9 @@ export default class Portal extends BaseEntity {
         me.toFuture = toFuture;
 
         const sprite = group.create(x, y, 'sprites', toFuture ? 8 : 9);
+        sprite.play(toFuture ? 'portal_red' : 'portal_blue');
+        sprite.setFlipX(!toFuture);
+        
         me._initOrigin(sprite);
     }    
 }

@@ -143,5 +143,19 @@ export default class Game extends Phaser.Scene {
             repeat: -1,
             yoyo: true
         });
+
+        me.anims.create({
+            key: 'portal_red',
+            frames: me.anims.generateFrameNames('items', { frames: [ 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ]}),
+            frameRate: 20,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'portal_blue',
+            frames: me.anims.generateFrameNames('items', { frames: [ 25, 26, 27, 28, 29, 30, 20, 21, 22, 23, 24,  ]}),
+            frameRate: 20,
+            repeat: -1
+        });
     }
 }
