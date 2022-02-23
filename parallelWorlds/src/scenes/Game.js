@@ -20,11 +20,13 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         me.load.tilemapCSV('level', 'assets/level.csv');
+        me.load.tilemapCSV('level2', 'assets/level2.csv');
 
         me._loadImage('fade');
         me._loadImage('sprites_small');
         me._loadImage('sky_past');
         me._loadImage('sky_present');
+        me._loadImage('sky_future');
 
         me._loadSpriteSheet('tiles', Consts.Unit.Small);
         me._loadSpriteSheet('small', Consts.Unit.Small);

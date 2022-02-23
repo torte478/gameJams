@@ -37,6 +37,11 @@ export default class LevelMap {
             Enums.Layer.PRESENT * Consts.Viewport.Height + Consts.Viewport.Height / 2,
             'sky_present')
             .setDepth(Consts.Depth.Background);
+        scene.add.image(
+            Consts.Viewport.Width / 2, 
+            Enums.Layer.FUTURE * Consts.Viewport.Height + Consts.Viewport.Height / 2,
+            'sky_future')
+            .setDepth(Consts.Depth.Background);
     }
 
     getCollider() {
