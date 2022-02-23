@@ -1,17 +1,13 @@
 import Phaser from '../lib/phaser.js';
 
-import Button from './Entities/Button.js';
-import ButtonConfig from './Entities/ButtonConfig.js';
-import Door from './Entities/Door.js';
-
+import Entities from './Entities/Entities.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Controls from './Controls.js';
 import Enums from './Enums.js';
+import Levels from './Levels.js';
 import Player from './Player.js';
 import Utils from './Utils.js';
-import Entities from './Entities/Entities.js';
-import Levels from './Levels/Levels.js';
 
 export default class Core {
 
