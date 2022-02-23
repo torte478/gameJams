@@ -1,6 +1,7 @@
 import Phaser from '../lib/phaser.js';
 
 import Consts from './Consts.js';
+import Enums from './Enums.js';
 
 export default class LevelMap {
 
@@ -21,10 +22,16 @@ export default class LevelMap {
 
         const tileset = me._level.addTilesetImage('tiles');
 
-        me._level.setCollisionBetween(1, 3);
+        me._level.setCollisionBetween(200, 399);
 
         me._tiles = me._level.createLayer(0, tileset)
             .setDepth(Consts.Depth.Tiles);
+
+        scene.add.image(
+            Consts.Viewport.Width / 2, 
+            Enums.Layer.PRESENT * Consts.Viewport.Height + Consts.Viewport.Height / 2,
+            'sky_present')
+            .setDepth(Consts.Depth.Background);
     }
 
     getCollider() {

@@ -23,6 +23,7 @@ export default class Game extends Phaser.Scene {
 
         me._loadImage('fade');
         me._loadImage('sprites_small');
+        me._loadImage('sky_present');
 
         me._loadSpriteSheet('tiles', Consts.Unit.Small);
         me._loadSpriteSheet('small', Consts.Unit.Small);
@@ -153,7 +154,7 @@ export default class Game extends Phaser.Scene {
 
         me.anims.create({
             key: 'portal_blue',
-            frames: me.anims.generateFrameNames('items', { frames: [ 25, 26, 27, 28, 29, 30, 20, 21, 22, 23, 24,  ]}),
+            frames: me.anims.generateFrameNames('items', { frames: [ 25, 26, 27, 28, 29, 30, 20, 21, 22, 23, 24 ]}),
             frameRate: 20,
             repeat: -1
         });
