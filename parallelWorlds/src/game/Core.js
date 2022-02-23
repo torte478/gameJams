@@ -8,8 +8,8 @@ import Enums from './Enums.js';
 import Levels from './Levels.js';
 import Player from './Player.js';
 import Utils from './Utils.js';
-import LevelMap from './LevelMap.js';
 import Graphics from './Graphics.js';
+import Sound from './Sound.js';
 
 export default class Core {
 
@@ -31,6 +31,9 @@ export default class Core {
     /** @type {Graphics} */
     _graphics;
 
+    /** @type {Sound} */
+    _sound;
+
     /** @type {Phaser.Cameras.Scene2D.Camera[]} */
     _debugCameras;
 
@@ -50,7 +53,9 @@ export default class Core {
 
         me._graphics = new Graphics(scene);
 
-        me._entities = new Entities(scene, Levels.Config[levelIndex]);
+        me._sound = new Sound(me._scene.sound, 1); //TODO
+
+        me._entities = new Entities(scene, Levels.Config[levelIndex], me._sound);
 
         me._initColliders();
 
@@ -105,7 +110,7 @@ export default class Core {
         if (me._controls.isDownOnce(Enums.Keyboard.JUMP)) {
             const jump = me._player.tryJump();
             if (jump)
-                me._scene.sound.play('jump');
+                me._sound.play('jump');
         }
 
         let signX = 0;
@@ -209,7 +214,7 @@ export default class Core {
 
         const pushed = button.entity.tryPush(me._entities);
         if (pushed)
-            me._scene.sound.play('button_push');
+            me._sound.tryPlaySingleton('button_push', Utils.getLayer(button.y));
     }
 
     _tryLookPhantom() {
@@ -233,6 +238,8 @@ export default class Core {
             me._layer,
             nextLayer,
             me._entities);
+
+        me._sound.play('phantom');
 
         return true;
     }
@@ -260,7 +267,7 @@ export default class Core {
         if (!target)
             return;
 
-        me._scene.sound.play('teleport');
+        me._sound.play('teleport');
         me._player.teleport(target, me._scene.tweens);
         me._graphics.runFade(
             me._player, 
@@ -268,6 +275,7 @@ export default class Core {
                 me._scene.cameras.main.setScroll(0, nextLayer * Consts.Viewport.Height);
                 me._player.setPositionY(target.y);
                 me._layer = nextLayer;
+                me._sound.setLayer(nextLayer);
 
                 if (Config.DebugCameras) {
                     const first = nextLayer == 0 ? 1 : 0;

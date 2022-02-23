@@ -1,4 +1,5 @@
 import Phaser from '../../lib/phaser.js';
+import Utils from '../Utils.js';
 
 import BaseEntity from './BaseEntity.js';
 
@@ -7,6 +8,7 @@ export default class Door extends BaseEntity {
     static CLOSED_FRAME = 2;
     static OPEN_FRAME = 7;
 
+    /** @type {Sound} */
     _sound;
 
     /**
@@ -36,8 +38,7 @@ export default class Door extends BaseEntity {
         if (me.origin.frame.name == Door.CLOSED_FRAME){
             me.origin.play('door_open');
 
-            me._sound.stopByKey('door');
-            me._sound.play('door');
+            me._sound.tryPlaySingleton('door', Utils.getLayer(me.origin.y));
         }
         else {
             me.origin.stop();
@@ -53,8 +54,7 @@ export default class Door extends BaseEntity {
         if (me.origin.frame.name == Door.OPEN_FRAME) {
             me.origin.playReverse('door_open');
 
-            me._sound.stopByKey('door');
-            me._sound.play('door');
+            me._sound.tryPlaySingleton('door', Utils.getLayer(me.origin.y));
         }
         else {
             me.origin.stop();

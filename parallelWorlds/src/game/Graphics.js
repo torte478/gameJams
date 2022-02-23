@@ -2,7 +2,6 @@ import Phaser from '../lib/phaser.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
-import Utils from './Utils.js';
 
 export default class Graphics {
 

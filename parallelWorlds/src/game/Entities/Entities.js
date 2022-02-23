@@ -10,6 +10,7 @@ import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import LevelMap from '../LevelMap.js';
 import Utils from '../Utils.js';
+import Sound from '../Sound.js';
 
 
 export default class Entities {
@@ -45,8 +46,9 @@ export default class Entities {
      * 
      * @param {Phaser.Scene} scene 
      * @param {Object} config 
+     * @param {Sound} sound
      */
-    constructor(scene, config) {
+    constructor(scene, config, sound) {
         const me = this;
 
         me.tweens = new Set();
@@ -55,7 +57,7 @@ export default class Entities {
 
         me.doors = scene.physics.add.staticGroup();
         me._build(config.doors, (cfg) => {
-            new Door(cfg.id, me.doors, cfg.x, cfg.y, cfg.horizontal, scene.sound);
+            new Door(cfg.id, me.doors, cfg.x, cfg.y, cfg.horizontal, sound);
         });    
 
         me.buttons = scene.physics.add.staticGroup();
@@ -76,7 +78,7 @@ export default class Entities {
 
         me.turrets = scene.add.group();
         me.bullets = scene.physics.add.group();
-        me._build(config.turrets, (cfg) => me._createTurret(cfg, scene));
+        me._build(config.turrets, (cfg) => me._createTurret(cfg, scene, sound));
 
         me.enemies = scene.physics.add.group();
         me._build(config.enemies, (cfg) => {
@@ -120,8 +122,9 @@ export default class Entities {
     /**
      * @param {Object} cfg 
      * @param {Phaser.Scene} scene 
+     * @param {Sound} sound
      */
-    _createTurret(cfg, scene) {
+    _createTurret(cfg, scene, sound) {
         const me = this;
 
         /** @type {Phaser.GameObjects.Sprite} */
@@ -155,7 +158,7 @@ export default class Entities {
                     bulletTween.restart();
                     turret.play('turret_fire');
                     turret.playAfterRepeat('turret_idle');
-                    scene.sound.play('turret_shot');
+                    sound.tryPlaySingleton('turret_shot', layer);
                 }
             }})
             .setTimeScale(timeScale);
