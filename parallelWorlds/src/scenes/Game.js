@@ -23,6 +23,7 @@ export default class Game extends Phaser.Scene {
 
         me._loadImage('fade');
         me._loadImage('sprites_small');
+        me._loadImage('sky_past');
         me._loadImage('sky_present');
 
         me._loadSpriteSheet('tiles', Consts.Unit.Small);
