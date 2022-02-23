@@ -8,8 +8,12 @@ import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
+import Portal from './Portal.js';
 
 export default class Entities {
+
+    /** @type {Set<Phaser.Tweens.Tween>} */
+    tweens;
 
     /** @type {Phaser.Physics.Arcade.StaticGroup} */
     doors;
@@ -26,8 +30,11 @@ export default class Entities {
     /** @type {Phaser.Physics.Arcade.Group} */
     bullets;
 
-    /** @type {Set<Phaser.Tweens.Tween>} */
-    tweens;
+    /** @type {Phaser.Physics.Arcade.Group} */
+    enemies;
+
+    /** @type {Phaser.Physics.Arcade.StaticGroup} */
+    portals;
 
     /**
      * 
@@ -63,40 +70,33 @@ export default class Entities {
 
         me.turrets = scene.add.group();
         me.bullets = scene.physics.add.group();
-        me._build(config.turrets, (cfg) => {
-            /** @type {Phaser.GameObjects.Sprite} */
-            const turret = me.turrets.create(cfg.x, cfg.y, 'sprites', 1);
-            turret.setFlipX(cfg.flip);
+        me._build(config.turrets, (cfg) => me._createTurret(cfg, scene, level));
 
-            const bullet = me.bullets.create(cfg.x, cfg.y, 'sprites_small')
-            bullet.body.setAllowGravity(false); // TODO
+        me.enemies = scene.physics.add.group();
+        me._build(config.enemies, (cfg) => {
+            const enemy = me.enemies.create(cfg.x, cfg.y, 'sprites', 10);
+            enemy.setFlipX(cfg.flip);
+            enemy.body.setAllowGravity(false); // TODO : disable global gravity
 
-            const target = cfg.flip
-                ? 0 - Consts.Unit.Small
-                : Consts.Viewport.Width + Consts.Unit.Small;
+            const enemyDuration = Math.abs(enemy.x - 75) / Config.Speed.Enemy * 1000;
 
-            const layer = Math.floor(cfg.y / Consts.Viewport.Height);
-            const timeScale = layer == Enums.Layer.PRESENT
-                ? 1
-                : layer == Enums.Layer.PAST ? 1 / Config.TimeScale : Config.TimeScale;
-
-            const speed = Config.Speed.Bullet * (!!cfg.speed ? cfg.speed : 1);
-
-            const bulletTween = scene.tweens.add({
-                targets: bullet,
-                x: { from: cfg.x, to: target },
-                duration:Math.abs(target - cfg.x) / speed * 1000,
+            const tween = scene.tweens.add({
+                targets: enemy,
+                x: cfg.target,
+                yoyo: true,
                 repeat: -1,
-                onUpdate: () => {
-                    if (!Utils.isTileFree(bullet.getBounds(), level))
-                        bulletTween.restart();
-                }})
-                .setTimeScale(timeScale);
+                flipX: true,
+                duration: enemyDuration
+            });
 
-            bullet.parentTween = bulletTween;
+            enemy.tween = tween;
+            tween.layer = Utils.getLayer(cfg.y);
+            me.tweens.add(tween);
+        });
 
-            bulletTween.layer = layer;
-            me.tweens.add(bulletTween);
+        me.portals = scene.physics.add.staticGroup();
+        me._build(config.portals, (cfg) => {
+            new Portal(cfg.id, me.portals, cfg.x, cfg.y, cfg.toFuture);
         });
     }
 
@@ -108,5 +108,43 @@ export default class Entities {
             const item = config[i];
             f(item);
         }
+    }
+
+    _createTurret(cfg, scene, level) {
+        const me = this;
+
+        /** @type {Phaser.GameObjects.Sprite} */
+        const turret = me.turrets.create(cfg.x, cfg.y, 'sprites', 1);
+        turret.setFlipX(cfg.flip);
+
+        const bullet = me.bullets.create(cfg.x, cfg.y, 'sprites_small')
+        bullet.body.setAllowGravity(false); // TODO
+
+        const target = cfg.flip
+            ? 0 - Consts.Unit.Small
+            : Consts.Viewport.Width + Consts.Unit.Small;
+
+        const layer = Utils.getLayer(cfg.y);
+        const timeScale = layer == Enums.Layer.PRESENT
+            ? 1
+            : layer == Enums.Layer.PAST ? 1 / Config.TimeScale : Config.TimeScale;
+
+        const speed = Config.Speed.Bullet * (!!cfg.speed ? cfg.speed : 1);
+
+        const bulletTween = scene.tweens.add({
+            targets: bullet,
+            x: { from: cfg.x, to: target },
+            duration:Math.abs(target - cfg.x) / speed * 1000,
+            repeat: -1,
+            onUpdate: () => {
+                if (!Utils.isTileFree(bullet.getBounds(), level))
+                    bulletTween.restart();
+            }})
+            .setTimeScale(timeScale);
+
+        bullet.parentTween = bulletTween;
+
+        bulletTween.layer = layer;
+        me.tweens.add(bulletTween);
     }
 }

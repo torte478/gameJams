@@ -125,4 +125,8 @@ export default class Utils {
 
         return !tiles;
     }
+
+    static getLayer(y) {
+        return Math.floor(y / Consts.Viewport.Height);
+    }
 }

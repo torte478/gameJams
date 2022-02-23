@@ -59,6 +59,43 @@ export default class Levels {
                     speed: 0.5
                 }
             ],
+
+            enemies: [
+                {
+                    id: 1,
+                    x: 875,
+                    y: 2325,
+                    target: 75,
+                    flip: true,
+                }
+            ],
+
+            portals: [
+                {
+                    id: 1,
+                    x: 475,
+                    y: 2325,
+                    toFuture: false,
+                },
+                {
+                    id: 2,
+                    x: 700,
+                    y: 1525,
+                    toFuture: false,
+                },
+                {
+                    id: 3,
+                    x: 250,
+                    y: 1525,
+                    toFuture: true,
+                },
+                {
+                    id: 4,
+                    x: 475,
+                    y: 725,
+                    toFuture: true,
+                }
+            ],
         }
     ];
 }

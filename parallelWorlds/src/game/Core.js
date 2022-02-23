@@ -24,8 +24,11 @@ export default class Core {
     /** @type {Player} */
     _player;
 
+    /** @type {Entities} */
+    _entities;
+
     /** @type {Number} */
-    _layer;
+    _layer; // TODO : to status
 
     /** @type {Phaser.Tilemaps.Tilemap} */
     _level;
@@ -33,17 +36,11 @@ export default class Core {
     /** @type {Phaser.GameObjects.Image} */
     _fade; 
 
-    /** @type {Phaser.Tweens.Tween[][]}*/
-    _layers;
-
     /** @type {Phaser.Cameras.Scene2D.Camera[]} */
     _debugCameras;
 
     /** @type {Phaser.GameObjects.Group} */
     _phantom;
-
-    /** @type {Entities} */
-    _entities;
 
     /**
      * @param {Phaser.Scene} scene
@@ -80,83 +77,13 @@ export default class Core {
 
         me._scene.physics.add.collider(me._player.getCollider(), tiles);
 
-        me._layers = [ [], [], [] ];
-
         me._entities = new Entities(scene, Levels.Config[levelIndex], me._level);
 
-        me._scene.physics.add.overlap(me._player.getCollider(), me._entities.bullets, (p, b) => {
-            b.parentTween.restart();
-            console.log('hit');
-        });
+        me._initColliders();
 
-        me._scene.physics.add.overlap(
-            me._player.getCollider(), 
-            me._entities.bullets,
-            (p, b) => {
-                b.parentTween.restart();
-                console.log('hit');
-        });
-        
-        me._scene.physics.add.collider(me._player.getCollider(), me._entities.doors);
-
-        me._scene.physics.add.overlap(
-            me._entities.buttons, 
-            me._player.getCollider(),
-            me._onButtonPush,
-            () => true,
-            me);
-
-        me._scene.physics.add.overlap(
-            me._entities.buttons,
-            me._bulletGroup, 
-            me._onButtonPush,
-            () => true,
-            me);
-
-        me._scene.physics.add.overlap(
-            me._player.getCollider(),
-            me._entities.exits,
-            () => { console.log('YOU WIN!!!') });
-
-        // TODO : extract method (to factory?)
-        const enemy = scene.physics.add.sprite(875, 2325, 'sprites', 10)
-            .setFlipX(true);
-        enemy.body.setAllowGravity(false); // TODO : disable global gravity
-
-        const enemyDuration = Math.abs(enemy.x - 75) / Config.Speed.Enemy * 1000;
-
-        scene.physics.add.overlap(me._player.getCollider(), enemy, () => {
-            console.log('You lose!')
-        });
-
-        me._layers[2].push(scene.tweens.add({
-            targets: enemy,
-            x: 75,
-            yoyo: true,
-            repeat: -1,
-            flipX: true,
-            duration: enemyDuration
-        }));
-
-        const portal1 = scene.physics.add.staticImage(475, 2325, 'sprites', 9);
-        const portal2 = scene.physics.add.staticImage(700, 1525, 'sprites', 9);
-        const portal3 = scene.physics.add.staticImage(250, 1525, 'sprites', 8);
-        const portal4 = scene.physics.add.staticImage(475, 725, 'sprites', 8);
-
-        scene.physics.add.overlap(portal1, enemy, () => {
-            enemy.y -= 800;
-        });
-
-        scene.physics.add.overlap(portal2, enemy, () => {
-            enemy.y -= 800;
-        });
-
-        scene.physics.add.overlap(portal3, enemy, () => {
-            enemy.y += 800;
-        });
-
-        scene.physics.add.overlap(portal4, enemy, () => {
-            enemy.y += 800;
+        const timeScale = me._getPlayerTimeScale(me._layer);
+        me._entities.tweens.forEach((t) => {
+            t.timeScale = timeScale[t.layer];
         });
 
         me._scene.cameras.main.setScroll(0, me._layer * Consts.Viewport.Height);
@@ -221,6 +148,80 @@ export default class Core {
         me._tryTeleport();
     }
 
+    _initColliders() {
+        const me = this;
+        const player = me._player.getCollider();
+
+        // Player
+
+        me._scene.physics.add.overlap(
+            player,
+            me._entities.bullets,
+            (p, b) => {
+                b.parentTween.restart();
+                console.log('hit');
+            });
+
+        me._scene.physics.add.overlap(
+            player,
+            me._entities.bullets,
+            (p, b) => {
+                b.parentTween.restart();
+                console.log('hit');
+            });
+
+        me._scene.physics.add.collider(
+            player,
+            me._entities.doors);
+
+        me._scene.physics.add.overlap(
+            player,
+            me._entities.buttons,
+            me._onButtonPush,
+            () => true,
+            me);
+
+        me._scene.physics.add.overlap(
+            player,
+            me._entities.exits,
+            () => { console.log('YOU WIN!!!'); });
+
+        me._scene.physics.add.overlap(
+            player,
+            me._entities.enemies,
+            () => { console.log('You lose!'); });
+
+        me._scene.physics.add.overlap(
+            player,
+            me._entities.portals,
+            (p, portal) => { 
+                const nextLayer = me._layer + (portal.entity.toFuture ? 1 : -1);
+                me._tryTeleportTo(nextLayer);
+        });
+
+        // other
+
+        me._scene.physics.add.overlap(
+            me._entities.buttons,
+            me._entities.bullets,
+            me._onButtonPush,
+            () => true,
+            me);
+
+        me._scene.physics.add.overlap(
+            me._entities.portals,
+            me._entities.enemies,
+            (portal, enemy) => {
+                const sign = portal.entity.toFuture ? 1 : -1;
+                enemy.y += sign * Consts.Viewport.Height;
+
+                const layer = Utils.getLayer(enemy.y);
+                const timeScale = me._getPlayerTimeScale(me._layer);
+                enemy.tween.layer = layer;
+                enemy.tween.setTimeScale(timeScale[layer]);
+            });
+    }
+
     _onButtonPush(first, second) {
         const me = this;
 
@@ -247,10 +248,14 @@ export default class Core {
 
         const targets = [];
 
-        for (let i = 0; i < me._layers[nextLayer].length; ++i)
-            for (let j = 0; j < me._layers[nextLayer][i].targets.length; ++j) {
+        me._entities.tweens.forEach((tween) => {
+            for (let i = 0; i < tween.targets.length; ++i) {
+
+                if (tween.layer != nextLayer)
+                    continue;
+
                 /** @type {Phaser.GameObjects.Sprite} */
-                const origin = me._layers[nextLayer][i].targets[j];
+                const origin = tween.targets[i];
 
                 /** @type {Phaser.GameObjects.Sprite} */
                 const sprite = me._phantom.create(
@@ -262,6 +267,7 @@ export default class Core {
 
                 targets.push(sprite);
             }
+        });
 
         const playerPos = me._player.getPosition();
         const playerY = nextLayer * Consts.Viewport.Height + playerPos.y % Consts.Viewport.Height;
@@ -314,6 +320,11 @@ export default class Core {
             shift = 1;
 
         const nextLayer = me._layer + shift;
+        me._tryTeleportTo(nextLayer);
+    }
+
+    _tryTeleportTo(nextLayer) {
+        const me = this;
 
         if (nextLayer == me._layer || nextLayer < 0 || nextLayer >= Consts.Layers)
             return;
