@@ -26,7 +26,7 @@ export default class Button extends BaseEntity {
 
         me._config = config;
 
-        const sprite =  group.create(x, y, 'sprites', config.isPushed ? 3 : 2).setAngle(angle);
+        const sprite =  group.create(x, y, 'items', config.isPushed ? 1 : 0).setAngle(angle);
 
         me._initOrigin(sprite);
     }
@@ -63,7 +63,7 @@ export default class Button extends BaseEntity {
                         button.entity.tryPull();
                 });
 
-        me.origin.setFrame(3);
+        me.origin.setFrame(1);
         me._config.isPushed = true;
     }
 
@@ -73,7 +73,7 @@ export default class Button extends BaseEntity {
         if (!me._config.isPushed)
             return;
 
-        me.origin.setFrame(2);
+        me.origin.setFrame(0);
         me._config.isPushed = false;
     }
 }

@@ -28,7 +28,7 @@ export default class Graphics {
         me._phantom = scene.add.group();
     }
 
-    runFade(player,  callBack){
+    runFade(player,  callback){
         const me = this;
 
         const children = me._phantom.getChildren();
@@ -58,7 +58,7 @@ export default class Graphics {
                 duration: Config.Speed.Teleport / 2,
                 ease: 'Sine.easeOut',
                 onComplete: () => {
-                    callBack();
+                    callback();
                     phantom.setY(player._sprite.y);
                 }
             })

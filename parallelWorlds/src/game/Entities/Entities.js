@@ -81,6 +81,7 @@ export default class Entities {
         me.enemies = scene.physics.add.group();
         me._build(config.enemies, (cfg) => {
             const enemy = me.enemies.create(cfg.x, cfg.y, 'sprites', 10);
+            enemy.play('enemy_run');
             enemy.setFlipX(cfg.flip);
             enemy.body.setAllowGravity(false); // TODO : disable global gravity
 
@@ -120,11 +121,14 @@ export default class Entities {
         const me = this;
 
         /** @type {Phaser.GameObjects.Sprite} */
-        const turret = me.turrets.create(cfg.x, cfg.y, 'sprites', 1);
+        const turret = me.turrets.create(cfg.x, cfg.y, 'enemy', 1);
         turret.setFlipX(cfg.flip);
+        turret.play('turret_fire');
+        turret.playAfterRepeat('turret_idle');
 
-        const bullet = me.bullets.create(cfg.x, cfg.y, 'sprites_small')
+        const bullet = me.bullets.create(cfg.x, cfg.y, 'small', 0);
         bullet.body.setAllowGravity(false); // TODO
+        bullet.play('bullet');
 
         const target = cfg.flip
             ? 0 - Consts.Unit.Small
@@ -143,12 +147,16 @@ export default class Entities {
             duration:Math.abs(target - cfg.x) / speed * 1000,
             repeat: -1,
             onUpdate: () => {
-                if (!me.map.isFree(bullet.getBounds()))
+                if (!me.map.isFree(bullet.getBounds())) {
                     bulletTween.restart();
+                    turret.play('turret_fire');
+                    turret.playAfterRepeat('turret_idle');
+                }
             }})
             .setTimeScale(timeScale);
 
         bullet.parentTween = bulletTween;
+        bullet.turret = turret;
 
         bulletTween.layer = layer;
         me.tweens.add(bulletTween);

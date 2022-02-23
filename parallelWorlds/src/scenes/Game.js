@@ -25,8 +25,11 @@ export default class Game extends Phaser.Scene {
         me._loadImage('sprites_small');
 
         me._loadSpriteSheet('tiles', Consts.Unit.Small);
+        me._loadSpriteSheet('small', Consts.Unit.Small);
         me._loadSpriteSheet('sprites', Consts.Unit.Default);
         me._loadSpriteSheet('player', Consts.Unit.Default);
+        me._loadSpriteSheet('enemy', Consts.Unit.Default);
+        me._loadSpriteSheet('items', Consts.Unit.Default);
     }
 
     create() {
@@ -78,6 +81,8 @@ export default class Game extends Phaser.Scene {
     _createAnimation() {
         const me = this;
 
+        // player
+
         me.anims.create({
             key: 'player_idle',
             frames: me.anims.generateFrameNames('player', { frames: [ 0, 1 ]}),
@@ -97,6 +102,46 @@ export default class Game extends Phaser.Scene {
             frames: me.anims.generateFrameNames('player', { frames: [ 3 ]}),
             frameRate: 1,
             repeat: -1
+        });
+
+        // enemies
+
+        me.anims.create({
+            key: 'enemy_run',
+            frames: me.anims.generateFrameNames('enemy', { frames: [ 1, 2, 3, 2 ]}),
+            frameRate: 6,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'turret_idle',
+            frames: me.anims.generateFrameNames('enemy', { frames: [ 4, 5 ]}),
+            frameRate: 2,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'turret_fire',
+            frames: me.anims.generateFrameNames('enemy', { frames: [ 6, 7, 8, 4 ]}),
+            frameRate: 8,
+            repeat: 0
+        });
+
+        // items
+
+        me.anims.create({
+            key: 'door_open',
+            frames: me.anims.generateFrameNames('items', { frames: [ 2, 3, 4, 5, 6, 7 ]}),
+            frameRate: 8,
+            repeat: 0
+        });
+
+        me.anims.create({
+            key: 'bullet',
+            frames: me.anims.generateFrameNames('small', { frames: [ 0, 1, 2, 3, 4, 5 ]}),
+            frameRate: 16,
+            repeat: -1,
+            yoyo: true
         });
     }
 }
