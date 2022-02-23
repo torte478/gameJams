@@ -34,6 +34,14 @@ export default class Game extends Phaser.Scene {
         me._loadSpriteSheet('player', Consts.Unit.Default);
         me._loadSpriteSheet('enemy', Consts.Unit.Default);
         me._loadSpriteSheet('items', Consts.Unit.Default);
+
+        me._loadAudio('button_pull');
+        me._loadAudio('button_push');
+        me._loadAudio('door');
+        me._loadAudio('jump');
+        me._loadAudio('phantom');
+        me._loadAudio('teleport');
+        me._loadAudio('turret_shot');
     }
 
     create() {
@@ -80,6 +88,12 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         return me.load.image(name, `assets/${name}.png`);
+    }
+
+    _loadAudio(name) {
+        const me = this;
+
+        return me.load.audio(name, `assets/sfx/${name}.wav`);
     }
 
     _createAnimation() {

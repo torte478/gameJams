@@ -46,7 +46,7 @@ export default class Entities {
      * @param {Phaser.Scene} scene 
      * @param {Object} config 
      */
-    constructor(scene, config, level) {
+    constructor(scene, config) {
         const me = this;
 
         me.tweens = new Set();
@@ -55,7 +55,7 @@ export default class Entities {
 
         me.doors = scene.physics.add.staticGroup();
         me._build(config.doors, (cfg) => {
-            new Door(cfg.id, me.doors, cfg.x, cfg.y, cfg.horizontal);
+            new Door(cfg.id, me.doors, cfg.x, cfg.y, cfg.horizontal, scene.sound);
         });    
 
         me.buttons = scene.physics.add.staticGroup();
@@ -117,6 +117,10 @@ export default class Entities {
         }
     }
 
+    /**
+     * @param {Object} cfg 
+     * @param {Phaser.Scene} scene 
+     */
     _createTurret(cfg, scene) {
         const me = this;
 
@@ -151,6 +155,7 @@ export default class Entities {
                     bulletTween.restart();
                     turret.play('turret_fire');
                     turret.playAfterRepeat('turret_idle');
+                    scene.sound.play('turret_shot');
                 }
             }})
             .setTimeScale(timeScale);

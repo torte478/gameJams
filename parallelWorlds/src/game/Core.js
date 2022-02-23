@@ -102,8 +102,11 @@ export default class Core {
             return;
 
         // movement
-        if (me._controls.isDownOnce(Enums.Keyboard.JUMP))
-            me._player.tryJump();
+        if (me._controls.isDownOnce(Enums.Keyboard.JUMP)) {
+            const jump = me._player.tryJump();
+            if (jump)
+                me._scene.sound.play('jump');
+        }
 
         let signX = 0;
         if (me._controls.isDown(Enums.Keyboard.LEFT))
@@ -204,7 +207,9 @@ export default class Core {
 
         const button = !!first.entity ? first : second;
 
-        button.entity.tryPush(me._entities);
+        const pushed = button.entity.tryPush(me._entities);
+        if (pushed)
+            me._scene.sound.play('button_push');
     }
 
     _tryLookPhantom() {
@@ -255,25 +260,31 @@ export default class Core {
         if (!target)
             return;
 
+        me._scene.sound.play('teleport');
         me._player.teleport(target, me._scene.tweens);
-        me._graphics.runFade(me._player, () => {
-            me._scene.cameras.main.setScroll(0, nextLayer * Consts.Viewport.Height);
-            me._player.setPositionY(target.y);
-            me._layer = nextLayer;
+        me._graphics.runFade(
+            me._player, 
+            () => {
+                me._scene.cameras.main.setScroll(0, nextLayer * Consts.Viewport.Height);
+                me._player.setPositionY(target.y);
+                me._layer = nextLayer;
 
-            if (Config.DebugCameras) {
-                const first = nextLayer == 0 ? 1 : 0;
-                const second = nextLayer == 2 ? 1 : 2;
+                if (Config.DebugCameras) {
+                    const first = nextLayer == 0 ? 1 : 0;
+                    const second = nextLayer == 2 ? 1 : 2;
 
-                me._debugCameras[0].setScroll(
-                    Consts.Viewport.Width / 2, 
-                    first * Consts.Viewport.Height + Consts.Viewport.Height / 4);
+                    me._debugCameras[0].setScroll(
+                        Consts.Viewport.Width / 2, 
+                        first * Consts.Viewport.Height + Consts.Viewport.Height / 4);
 
-                me._debugCameras[1].setScroll(
-                    Consts.Viewport.Width / 2, 
-                    second * Consts.Viewport.Height + Consts.Viewport.Height / 4);
-            }
-        });
+                    me._debugCameras[1].setScroll(
+                        Consts.Viewport.Width / 2, 
+                        second * Consts.Viewport.Height + Consts.Viewport.Height / 4);
+                }
+            },
+            () => {
+                me._scene.sound.stopByKey('teleport');
+            });
 
         const timeScale = me._getPlayerTimeScale(nextLayer);
         me._entities.tweens.forEach((t) => {

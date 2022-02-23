@@ -39,7 +39,7 @@ export default class Button extends BaseEntity {
         const me = this;
 
         if (me._config.isPushed)
-            return;
+            return false;
 
         entities.doors
             .getChildren()
@@ -65,6 +65,7 @@ export default class Button extends BaseEntity {
 
         me.origin.setFrame(1);
         me._config.isPushed = true;
+        return true;
     }
 
     tryPull() {
