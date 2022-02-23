@@ -102,16 +102,16 @@ export default class Core {
             return;
 
         // movement
+        if (me._controls.isDownOnce(Enums.Keyboard.JUMP))
+            me._player.tryJump();
+
         let signX = 0;
         if (me._controls.isDown(Enums.Keyboard.LEFT))
             signX = -1;
         else if (me._controls.isDown(Enums.Keyboard.RIGHT))
             signX = 1;
 
-        me._player.setDirectionX(signX);
-
-        if (me._controls.isDownOnce(Enums.Keyboard.JUMP))
-            me._player.tryJump();
+        me._player.setVelocityX(signX);
 
         // phantom
         if (me._tryLookPhantom())
@@ -256,7 +256,7 @@ export default class Core {
             return;
 
         me._player.teleport(target, me._scene.tweens);
-        me._graphics.runFade(() => {
+        me._graphics.runFade(me._player, () => {
             me._scene.cameras.main.setScroll(0, nextLayer * Consts.Viewport.Height);
             me._player.setPositionY(target.y);
             me._layer = nextLayer;

@@ -28,8 +28,28 @@ export default class Graphics {
         me._phantom = scene.add.group();
     }
 
-    runFade(callBack){
+    runFade(player,  callBack){
         const me = this;
+
+        const children = me._phantom.getChildren();
+        for (let i in me._phantom.getChildren())
+            me._phantom.killAndHide(children[i]);
+
+        const position = player.getPosition();
+        /**  @type {Phaser.GameObjects.Sprite} */
+        const phantom = me._phantom.create(position.x, position.y, 'player', 2)
+            .setDepth(Consts.Depth.Player)
+            .setFlipX(player._sprite.flipX);
+
+        me._scene.tweens.add({
+            targets: phantom,
+            props: {
+                tint: { from: 0x000000, to: 0xffffff }
+            },
+            duration: Config.Speed.Teleport,
+            yoyo: true,
+            ease: 'Sine.easeInOut'
+        });
 
         me._scene.tweens.createTimeline()
             .add({
@@ -37,15 +57,23 @@ export default class Graphics {
                 alpha: { from: 0, to: 1 },
                 duration: Config.Speed.Teleport / 2,
                 ease: 'Sine.easeOut',
-                onComplete: () => callBack()
+                onComplete: () => {
+                    callBack();
+                    phantom.setY(player._sprite.y);
+                }
             })
             .add({
                 targets: me._fade,
                 alpha: { from: 1, to: 0 },
                 duration: Config.Speed.Teleport / 2,
                 ease: 'Sine.easeOut',
+                onComplete: () => {
+                    me._phantom.killAndHide(phantom);
+                }
             })
             .play();
+
+        return player;
     }
 
     runPhantom(position, layer, nextLayer, entities) {

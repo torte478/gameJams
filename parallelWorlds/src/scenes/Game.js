@@ -21,24 +21,18 @@ export default class Game extends Phaser.Scene {
 
         me.load.tilemapCSV('level', 'assets/level.csv');
 
-        me.load.image('fade', 'assets/fade.png');
-        me.load.image('sprites_small', 'assets/sprites_small.png');
+        me._loadImage('fade');
+        me._loadImage('sprites_small');
 
-        me.load.spritesheet('tiles', 'assets/tiles.png', {
-            frameWidth: Consts.Unit.Small,
-            frameHeight: Consts.Unit.Small
-        });
-
-        me.load.spritesheet('sprites', 'assets/sprites.png', {
-            frameWidth: Consts.Unit.Default,
-            frameHeight: Consts.Unit.Default,
-        })
+        me._loadSpriteSheet('tiles', Consts.Unit.Small);
+        me._loadSpriteSheet('sprites', Consts.Unit.Default);
+        me._loadSpriteSheet('player', Consts.Unit.Default);
     }
 
     create() {
         const me = this;
 
-        me.input.mouse.disableContextMenu();
+        me._createAnimation();
 
         me._core = new Core(me, 0);
 
@@ -64,5 +58,45 @@ export default class Game extends Phaser.Scene {
                 `mse: ${me.input.activePointer.worldX} ${me.input.activePointer.worldY}\n` +
                 `plr: ${me._core._player.getPosition().x.toFixed(0)} ${me._core._player.getPosition().y.toFixed(0)}`;
         }
+    }
+
+    _loadSpriteSheet(name, width, height) {
+        const me = this;
+
+        return me.load.spritesheet(name, `assets/${name}.png`, {
+            frameWidth: width,
+            frameHeight: !!height ? height : width
+        });
+    }
+
+    _loadImage(name) {
+        const me = this;
+
+        return me.load.image(name, `assets/${name}.png`);
+    }
+
+    _createAnimation() {
+        const me = this;
+
+        me.anims.create({
+            key: 'player_idle',
+            frames: me.anims.generateFrameNames('player', { frames: [ 0, 1 ]}),
+            frameRate: 2,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'player_run',
+            frames: me.anims.generateFrameNames('player', { frames: [ 4, 5, 6, 5 ]}),
+            frameRate: 6,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'player_jump',
+            frames: me.anims.generateFrameNames('player', { frames: [ 3 ]}),
+            frameRate: 1,
+            repeat: -1
+        });
     }
 }

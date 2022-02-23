@@ -20,6 +20,7 @@ export default class Player {
 
         me._sprite = scene.physics.add.sprite(Config.Player.X, Config.Player.Y, 'sprites', 0)
             .setDepth(Consts.Depth.Player);
+        me._sprite.play('player_idle');
 
         me.isBusy = false;
     }
@@ -36,13 +37,23 @@ export default class Player {
     /**
      * @param {Number} sign 
      */
-    setDirectionX(sign) {
+    setVelocityX(sign) {
         const me = this;
 
         if (sign != 0)
             me._sprite.setFlipX(sign < 0);
 
         me._sprite.setVelocityX(sign * Config.Physics.VelocityX);
+
+        if (!me._sprite.body.blocked.down) {
+            me._sprite.play('player_jump', true);
+        }
+        else if (sign != 0) {
+            me._sprite.play('player_run', true);
+        }
+        else {
+            me._sprite.play('player_idle', true);
+        }
     }
 
     /**
@@ -109,6 +120,8 @@ export default class Player {
         me._sprite.disableBody(false, false);
         me._sprite.body.setAllowGravity(false);
         me.isBusy = true;
+        me._sprite.anims.stop();
+        me._sprite.setFrame(2);
 
         tweens.add({
             targets: me._sprite,
@@ -119,6 +132,7 @@ export default class Player {
                 me._sprite.enableBody(true, position.x, position.y, true, true);
                 me._sprite.body.setAllowGravity(true);
                 me.isBusy = false;
+                me._sprite.setVisible(true);
             }
         })
     }
