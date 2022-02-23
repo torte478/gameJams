@@ -38,16 +38,20 @@ export default class Entities {
     /** @type {Phaser.Physics.Arcade.StaticGroup} */
     portals;
 
+    /** @type {LevelMap} */
+    map;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
      * @param {Object} config 
-     * @param {LevelMap} map
      */
     constructor(scene, config, level) {
         const me = this;
 
         me.tweens = new Set();
+
+        me.map = new LevelMap(scene);
 
         me.doors = scene.physics.add.staticGroup();
         me._build(config.doors, (cfg) => {
@@ -72,7 +76,7 @@ export default class Entities {
 
         me.turrets = scene.add.group();
         me.bullets = scene.physics.add.group();
-        me._build(config.turrets, (cfg) => me._createTurret(cfg, scene, level));
+        me._build(config.turrets, (cfg) => me._createTurret(cfg, scene));
 
         me.enemies = scene.physics.add.group();
         me._build(config.enemies, (cfg) => {
@@ -112,7 +116,7 @@ export default class Entities {
         }
     }
 
-    _createTurret(cfg, scene, map) {
+    _createTurret(cfg, scene) {
         const me = this;
 
         /** @type {Phaser.GameObjects.Sprite} */
@@ -139,7 +143,7 @@ export default class Entities {
             duration:Math.abs(target - cfg.x) / speed * 1000,
             repeat: -1,
             onUpdate: () => {
-                if (!map.isFree(bullet.getBounds()))
+                if (!me.map.isFree(bullet.getBounds()))
                     bulletTween.restart();
             }})
             .setTimeScale(timeScale);

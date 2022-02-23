@@ -1,8 +1,6 @@
 import Phaser from '../lib/phaser.js';
 
-import Config from './Config.js';
 import Consts from './Consts.js';
-import Utils from './Utils.js';
 
 export default class LevelMap {
 
@@ -22,10 +20,11 @@ export default class LevelMap {
         });
 
         const tileset = me._level.addTilesetImage('tiles');
-        me._tiles = me._level.createLayer(0, tileset)
-            .setDepth(Consts.Depth.Tiles);
 
         me._level.setCollisionBetween(1, 3);
+
+        me._tiles = me._level.createLayer(0, tileset)
+            .setDepth(Consts.Depth.Tiles);
     }
 
     getCollider() {
@@ -52,7 +51,7 @@ export default class LevelMap {
         return !tiles;
     }
 
-    foo(from, distance, layer, nextLayer) {
+    getSolidTiles(from, distance, layer, nextLayer) {
         const me = this;
         const res = [];
 

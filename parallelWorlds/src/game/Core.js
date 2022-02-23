@@ -9,6 +9,7 @@ import Levels from './Levels.js';
 import Player from './Player.js';
 import Utils from './Utils.js';
 import LevelMap from './LevelMap.js';
+import Graphics from './Graphics.js';
 
 export default class Core {
 
@@ -27,17 +28,11 @@ export default class Core {
     /** @type {Number} */
     _layer; // TODO : to status
 
-    /** @type {Phaser.GameObjects.Image} */
-    _fade; 
+    /** @type {Graphics} */
+    _graphics;
 
     /** @type {Phaser.Cameras.Scene2D.Camera[]} */
     _debugCameras;
-
-    /** @type {Phaser.GameObjects.Group} */
-    _phantom;
-
-    /** @type {LevelMap} */
-    _map;
 
     /**
      * @param {Phaser.Scene} scene
@@ -53,16 +48,9 @@ export default class Core {
         me._player = new Player(scene);
         me._layer = Enums.Layer.PRESENT;
 
-        me._map = new LevelMap(scene);
+        me._graphics = new Graphics(scene);
 
-        me._fade = scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
-            .setDepth(Consts.Depth.Fade)
-            .setScrollFactor(0)
-            .setAlpha(0);
-
-        me._phantom = scene.add.group();
-
-        me._entities = new Entities(scene, Levels.Config[levelIndex], me._map);
+        me._entities = new Entities(scene, Levels.Config[levelIndex]);
 
         me._initColliders();
 
@@ -100,8 +88,8 @@ export default class Core {
                     Consts.Viewport.Height * 2 + Consts.Viewport.Height / 4)
                 .setZoom(0.5));   
                 
-            me._debugCameras[0].ignore(me._fade);
-            me._debugCameras[1].ignore(me._fade);
+            me._debugCameras[0].ignore(me._graphics._fade);
+            me._debugCameras[1].ignore(me._graphics._fade);
         }
     }
 
@@ -186,7 +174,7 @@ export default class Core {
 
         me._scene.physics.add.collider(
             player, 
-            me._map.getCollider());
+            me._entities.map.getCollider());
 
         // other
 
@@ -235,56 +223,11 @@ export default class Core {
         if (nextLayer == me._layer || nextLayer < 0 || nextLayer >= Consts.Layers)
             return false;
 
-        const targets = [];
-
-        me._entities.tweens.forEach((tween) => {
-            for (let i = 0; i < tween.targets.length; ++i) {
-
-                if (tween.layer != nextLayer)
-                    continue;
-
-                /** @type {Phaser.GameObjects.Sprite} */
-                const origin = tween.targets[i];
-
-                /** @type {Phaser.GameObjects.Sprite} */
-                const sprite = me._phantom.create(
-                    origin.x, 
-                    me._layer * Consts.Viewport.Height + origin.y % Consts.Viewport.Height, 
-                    origin.texture, 
-                    origin.frame.name);
-                sprite.setFlipX(origin.flipX);
-
-                targets.push(sprite);
-            }
-        });
-
-        const tiles = me._map.foo(
+        me._graphics.runPhantom(
             me._player.getPosition(),
-            200,
             me._layer,
-            nextLayer);
-
-        for (let i = 0; i < tiles.length; ++i) {
-            const item = tiles[i]
-            targets.push(me._phantom.create(item.x, item.y, 'tiles', item.index));
-        }
-
-        for (let i = 0; i < targets.length; ++i) {
-            targets[i]
-                .setDepth(Consts.Depth.Phantom)
-                .setTintFill(nextLayer > me._layer ? 0xe9ac00 : 0x230fcf);
-        }
-
-        me._scene.tweens.add({
-            targets: targets,
-            alpha: { from: 1, to: 0 },
-            duration: 2000,
-            ease: 'Sine.easeOut',
-            onComplete: () => {
-                for (let obj in targets)
-                    me._phantom.killAndHide(obj);
-            }
-        });
+            nextLayer,
+            me._entities);
 
         return true;
     }
@@ -308,44 +251,29 @@ export default class Core {
         if (nextLayer == me._layer || nextLayer < 0 || nextLayer >= Consts.Layers)
             return;
 
-        const target = me._player.canTeleport(nextLayer, me._scene.physics, me._map);
+        const target = me._player.canTeleport(nextLayer, me._scene.physics, me._entities.map);
         if (!target)
             return;
 
         me._player.teleport(target, me._scene.tweens);
-        me._scene.tweens.createTimeline()
-            .add({
-                targets: me._fade,
-                alpha: { from: 0, to: 1 },
-                duration: Config.Speed.Teleport / 2,
-                ease: 'Sine.easeOut',
-                onComplete: () => {
-                    me._scene.cameras.main.setScroll(0, nextLayer * Consts.Viewport.Height);
-                    me._player.setPositionY(target.y);
-                    me._layer = nextLayer;
+        me._graphics.runFade(() => {
+            me._scene.cameras.main.setScroll(0, nextLayer * Consts.Viewport.Height);
+            me._player.setPositionY(target.y);
+            me._layer = nextLayer;
 
-                    if (Config.DebugCameras) {
-                        const first = nextLayer == 0 ? 1 : 0;
-                        const second = nextLayer == 2 ? 1 : 2;
+            if (Config.DebugCameras) {
+                const first = nextLayer == 0 ? 1 : 0;
+                const second = nextLayer == 2 ? 1 : 2;
 
-                        me._debugCameras[0].setScroll(
-                            Consts.Viewport.Width / 2, 
-                            first * Consts.Viewport.Height + Consts.Viewport.Height / 4);
+                me._debugCameras[0].setScroll(
+                    Consts.Viewport.Width / 2, 
+                    first * Consts.Viewport.Height + Consts.Viewport.Height / 4);
 
-                        me._debugCameras[1].setScroll(
-                            Consts.Viewport.Width / 2, 
-                            second * Consts.Viewport.Height + Consts.Viewport.Height / 4);
-                    }
-                }
-            })
-            .add({
-                targets: me._fade,
-                alpha: { from: 1, to: 0 },
-                duration: Config.Speed.Teleport / 2,
-                ease: 'Sine.easeOut',
-            })
-            .play();
-            
+                me._debugCameras[1].setScroll(
+                    Consts.Viewport.Width / 2, 
+                    second * Consts.Viewport.Height + Consts.Viewport.Height / 4);
+            }
+        });
 
         const timeScale = me._getPlayerTimeScale(nextLayer);
         me._entities.tweens.forEach((t) => {

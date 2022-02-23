@@ -67,9 +67,6 @@ export default class Player {
     canTeleport(nextLayer, physics, map) {
         const me = this;
 
-        if (!me._sprite.body.blocked.down)
-            return null;
-
         const bounds = me._sprite.getBounds();
 
         const relativeY = bounds.centerY % Consts.Viewport.Height;
