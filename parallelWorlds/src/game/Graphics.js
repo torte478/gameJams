@@ -88,7 +88,7 @@ export default class Graphics {
         for (let i = 0; i < targets.length; ++i) {
             targets[i]
                 .setDepth(Consts.Depth.Phantom)
-                .setTintFill(nextLayer > me._layer ? 0xe9ac00 : 0x230fcf);
+                .setTintFill(nextLayer > layer ? 0xe9ac00 : 0x230fcf);
         }
 
         me._scene.tweens.add({

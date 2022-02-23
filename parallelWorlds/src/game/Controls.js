@@ -45,15 +45,15 @@ export default class Controls {
     constructor(input) {
         const me = this;
 
-        me._keys.left.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-        me._keys.right.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-        me._keys.up.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        me._keys.left.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        me._keys.right.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        me._keys.up.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
 
-        me._keys.futureAction.key = input.activePointer;
-        me._keys.pastAction.key = input.activePointer;
+        me._keys.futureAction.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
+        me._keys.pastAction.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z); //input.activePointer;
 
-        me._keys.lookPast.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-        me._keys.lookFuture.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+        me._keys.lookPast.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        me._keys.lookFuture.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
     }
 
     isDown(key) {
@@ -102,15 +102,15 @@ export default class Controls {
             const item = me._keys[name];
 
             switch (name) {
-                case 'pastAction':
-                    item.once = !item.isDown && item.key.isDown && !item.key.rightButtonDown();
-                    item.isDown = item.key.isDown;
-                    break;
+                // case 'pastAction':
+                //     item.once = !item.isDown && item.key.isDown && !item.key.rightButtonDown();
+                //     item.isDown = item.key.isDown;
+                //     break;
 
-                case 'futureAction':
-                    item.once = !item.isDown && item.key.isDown && item.key.rightButtonDown();
-                    item.isDown = item.key.isDown;
-                    break;
+                // case 'futureAction':
+                //     item.once = !item.isDown && item.key.isDown && item.key.rightButtonDown();
+                //     item.isDown = item.key.isDown;
+                //     break;
 
                 default:
                     item.once = Phaser.Input.Keyboard.JustDown(item.key);
