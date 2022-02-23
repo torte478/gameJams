@@ -5,8 +5,8 @@ export default class Config {
     static DebugCameras = true;
 
     static Player = {
-        X: 75,
-        Y: 1400
+        X: 825,
+        Y: 1250
     };
 
     static Physics = {

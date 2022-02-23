@@ -1,13 +1,14 @@
 import Phaser from '../lib/phaser.js';
-import Button from './Button.js';
+import Button from './Entities/Button.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Controls from './Controls.js';
-import Door from './Door.js';
+import Door from './Entities/Door.js';
 import Enums from './Enums.js';
 import Player from './Player.js';
 import Utils from './Utils.js';
+import ButtonConfig from './Entities/ButtonConfig.js';
 
 export default class Core {
 
@@ -100,23 +101,38 @@ export default class Core {
         });
 
         me._doorGroup = me._scene.physics.add.staticGroup();
-        new Door(me._doorGroup, 1, 100, 1300, true);
+        new Door(1, me._doorGroup, 75, 1300, true);
+        new Door(2, me._doorGroup, 125, 1300, true);
         me._scene.physics.add.collider(me._player.getCollider(), me._doorGroup);
 
         me._buttonGroup = me._scene.physics.add.staticGroup();
-        new Button(me._buttonGroup, 1, 925, 1250, 0, [ 1 ], [], [], [ 2 ]);
-        new Button(me._buttonGroup, 2, 275, 1400, 90, [], [ 1 ], [], [ 1 ]);
-        me._scene.physics.add.overlap(
-            me._player.getCollider(), 
-            me._buttonGroup, 
-            (p, b) => { me._onButtonPush(b) });
+
+        const config1 = new ButtonConfig();
+        config1.doorsToOpen = [ 1, 2];
+        config1.buttonsToPull = [ 2 ];
+        new Button(1, me._buttonGroup, 925, 1250, 0, config1);
+
+        const config2 = new ButtonConfig();
+        config2.doorsToClose = [ 1, 2 ];
+        config2.buttonsToPull = [ 1];
+        new Button(2, me._buttonGroup, 275, 1400, 90, config2);
 
         me._scene.physics.add.overlap(
+            me._buttonGroup, 
+            me._player.getCollider(),
+            me._onButtonPush,
+            () => true,
+            me);
+
+        me._scene.physics.add.overlap(
+            me._buttonGroup, 
             me._bulletGroup, 
-            me._buttonGroup, 
-            (p, b) => { me._onButtonPush(b) });
+            me._onButtonPush,
+            () => true,
+            me);
 
-        const enemy = scene.physics.add.sprite(875, 1525, 'sprites', 10)
+        // TODO : extract method (to factory?)
+        const enemy = scene.physics.add.sprite(875, 2325, 'sprites', 10)
             .setFlipX(true);
         enemy.body.setAllowGravity(false); // TODO : disable global gravity
 
@@ -126,7 +142,9 @@ export default class Core {
             console.log('You lose!')
         });
 
-        me._layers[1].push(scene.tweens.add({
+        const ttt = scene.tweens.timeline();
+
+        me._layers[2].push(scene.tweens.add({
             targets: enemy,
             x: 75,
             yoyo: true,
@@ -134,6 +152,27 @@ export default class Core {
             flipX: true,
             duration: enemyDuration
         }));
+
+        const portal1 = scene.physics.add.staticImage(475, 2325, 'sprites', 9);
+        const portal2 = scene.physics.add.staticImage(700, 1525, 'sprites', 9);
+        const portal3 = scene.physics.add.staticImage(250, 1525, 'sprites', 8);
+        const portal4 = scene.physics.add.staticImage(475, 725, 'sprites', 8);
+
+        scene.physics.add.overlap(portal1, enemy, () => {
+            enemy.y -= 800;
+        });
+
+        scene.physics.add.overlap(portal2, enemy, () => {
+            enemy.y -= 800;
+        });
+
+        scene.physics.add.overlap(portal3, enemy, () => {
+            enemy.y += 800;
+        });
+
+        scene.physics.add.overlap(portal4, enemy, () => {
+            enemy.y += 800;
+        });
 
         me._scene.cameras.main.setScroll(0, me._layer * Consts.Viewport.Height);
 
@@ -197,38 +236,12 @@ export default class Core {
         me._tryTeleport();
     }
 
-    /**
-     * @param {Button} button 
-     */
-    _onButtonPush(buttonCollider) {
+    _onButtonPush(first, second) {
         const me = this;
 
-        const button = buttonCollider.parentButton;
+        const button = !!first.entity ? first : second;
 
-        if (button.isPushed)        
-            return;
-
-        button.push();
-
-        me._doorGroup
-            .getChildren()
-            .filter((d) => Utils.any(button.doorsToOpen, (id) => d.parentDoor.id == id))
-            .forEach((d) => { d.parentDoor.open() });
-        
-        me._doorGroup
-            .getChildren()
-            .filter((d) => Utils.any(button.doorsToClose, (id) => d.parentDoor.id == id))
-            .forEach((d) => { d.parentDoor.close() });
-
-        me._buttonGroup
-            .getChildren()
-            .filter((b) => Utils.any(button.buttonsToPush, (id) => b.parentButton.id == id))
-            .forEach((d) => { me._onButtonPush(b) });
-
-        me._buttonGroup
-            .getChildren()
-            .filter((b) => Utils.any(button.buttonsToPull, (id) => b.parentButton.id == id))
-            .forEach((b) => { b.parentButton.pull(); });
+        button.entity.tryPush(me._doorGroup, me._buttonGroup);
     }
 
     _tryLookPhantom() {
