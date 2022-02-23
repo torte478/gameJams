@@ -40,7 +40,7 @@ export default class Game extends Phaser.Scene {
 
         me.input.mouse.disableContextMenu();
 
-        me._core = new Core(me);
+        me._core = new Core(me, 0);
 
         if (Config.Debug) {
             me._logger = me.add.text(10, 10, 'DEBUG', { fontSize: 14, backgroundColor: '#000' })

@@ -1,8 +1,10 @@
 import Phaser from '../../lib/phaser.js';
+
 import Utils from '../Utils.js';
 
 import BaseEntity from './BaseEntity.js';
 import ButtonConfig from './ButtonConfig.js';
+import Entities from './Entities.js';
 
 export default class Button extends BaseEntity {
 
@@ -29,13 +31,17 @@ export default class Button extends BaseEntity {
         me._initOrigin(sprite);
     }
 
-    tryPush(doors, buttons) {
+    /**
+     * 
+     * @param {Entities} entities 
+     */
+    tryPush(entities) {
         const me = this;
 
         if (me._config.isPushed)
             return;
 
-        doors
+        entities.doors
             .getChildren()
             .forEach((door) => { 
 
@@ -46,7 +52,7 @@ export default class Button extends BaseEntity {
                     door.entity.close();
             });
 
-        buttons
+            entities.buttons
             .getChildren()
                 .forEach((button) => { 
 

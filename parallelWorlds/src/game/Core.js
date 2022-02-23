@@ -1,14 +1,17 @@
 import Phaser from '../lib/phaser.js';
+
 import Button from './Entities/Button.js';
+import ButtonConfig from './Entities/ButtonConfig.js';
+import Door from './Entities/Door.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Controls from './Controls.js';
-import Door from './Entities/Door.js';
 import Enums from './Enums.js';
 import Player from './Player.js';
 import Utils from './Utils.js';
-import ButtonConfig from './Entities/ButtonConfig.js';
+import Entities from './Entities/Entities.js';
+import Levels from './Levels/Levels.js';
 
 export default class Core {
 
@@ -39,19 +42,14 @@ export default class Core {
     /** @type {Phaser.GameObjects.Group} */
     _phantom;
 
-    /** @type {Phaser.Physics.Arcade.Group} */
-    _bulletGroup;
-
-    /** @type {Phaser.Physics.Arcade.Group} */
-    _doorGroup;
-
-    /** @type {Phaser.Physics.Arcade.Group} */
-    _buttonGroup;
+    /** @type {Entities} */
+    _entities;
 
     /**
      * @param {Phaser.Scene} scene
+     * @param {Number} levelIndex
      */
-    constructor(scene) {
+    constructor(scene, levelIndex) {
         const me = this;
 
         me._scene = scene;
@@ -80,56 +78,45 @@ export default class Core {
 
         me._level.setCollisionBetween(1, 3);
 
-        const exit = me._scene.physics.add.image(925, 1525, 'sprites', 11);
-        exit.body.setAllowGravity(false);
-
         me._scene.physics.add.collider(me._player.getCollider(), tiles);
-        me._scene.physics.add.overlap(me._player.getCollider(), exit, () => {
-            console.log('YOU WIN!!!');
-        })
-
-        me._bulletGroup = scene.physics.add.group();
 
         me._layers = [ [], [], [] ];
 
-        me._createTurret(150, 1050, false);
-        me._createTurret(925, 1400, true, 0.5);
+        me._entities = new Entities(scene, Levels.Config[levelIndex], me._level);
 
-        me._scene.physics.add.overlap(me._player.getCollider(), me._bulletGroup, (p, b) => {
+        me._scene.physics.add.overlap(me._player.getCollider(), me._entities.bullets, (p, b) => {
             b.parentTween.restart();
             console.log('hit');
         });
 
-        me._doorGroup = me._scene.physics.add.staticGroup();
-        new Door(1, me._doorGroup, 75, 1300, true);
-        new Door(2, me._doorGroup, 125, 1300, true);
-        me._scene.physics.add.collider(me._player.getCollider(), me._doorGroup);
-
-        me._buttonGroup = me._scene.physics.add.staticGroup();
-
-        const config1 = new ButtonConfig();
-        config1.doorsToOpen = [ 1, 2];
-        config1.buttonsToPull = [ 2 ];
-        new Button(1, me._buttonGroup, 925, 1250, 0, config1);
-
-        const config2 = new ButtonConfig();
-        config2.doorsToClose = [ 1, 2 ];
-        config2.buttonsToPull = [ 1];
-        new Button(2, me._buttonGroup, 275, 1400, 90, config2);
+        me._scene.physics.add.overlap(
+            me._player.getCollider(), 
+            me._entities.bullets,
+            (p, b) => {
+                b.parentTween.restart();
+                console.log('hit');
+        });
+        
+        me._scene.physics.add.collider(me._player.getCollider(), me._entities.doors);
 
         me._scene.physics.add.overlap(
-            me._buttonGroup, 
+            me._entities.buttons, 
             me._player.getCollider(),
             me._onButtonPush,
             () => true,
             me);
 
         me._scene.physics.add.overlap(
-            me._buttonGroup, 
+            me._entities.buttons,
             me._bulletGroup, 
             me._onButtonPush,
             () => true,
             me);
+
+        me._scene.physics.add.overlap(
+            me._player.getCollider(),
+            me._entities.exits,
+            () => { console.log('YOU WIN!!!') });
 
         // TODO : extract method (to factory?)
         const enemy = scene.physics.add.sprite(875, 2325, 'sprites', 10)
@@ -141,8 +128,6 @@ export default class Core {
         scene.physics.add.overlap(me._player.getCollider(), enemy, () => {
             console.log('You lose!')
         });
-
-        const ttt = scene.tweens.timeline();
 
         me._layers[2].push(scene.tweens.add({
             targets: enemy,
@@ -241,7 +226,7 @@ export default class Core {
 
         const button = !!first.entity ? first : second;
 
-        button.entity.tryPush(me._doorGroup, me._buttonGroup);
+        button.entity.tryPush(me._entities);
     }
 
     _tryLookPhantom() {
@@ -373,12 +358,15 @@ export default class Core {
             
 
         const timeScale = me._getPlayerTimeScale(nextLayer);
-        for (let i = 0; i < Consts.Layers; ++i)
+        me._entities.tweens.forEach((t) => {
             me._scene.tweens.add({
-                targets: me._layers[i],
-                timeScale: timeScale[i],
+                targets: t,
+                timeScale: {
+                    getEnd: () => timeScale[t.layer],
+                },
                 duration: Config.Speed.Teleport
             });
+        });
     }
 
     _getPlayerTimeScale(to) {
@@ -407,40 +395,5 @@ export default class Core {
             default:
                 throw `Unknown layer ${to}`;
         }
-    }
-
-    _createTurret(x, y, flip, speedFactor) {
-        const me = this;
-
-        const turret = me._scene.add.sprite(x, y, 'sprites', 1)
-            .setFlipX(flip);
-        const bullet = me._bulletGroup.create(x, y, 'sprites_small')
-        bullet.body.setAllowGravity(false);
-
-        const target = flip
-            ? 0 - Consts.Unit.Small
-            : Consts.Viewport.Width + Consts.Unit.Small;
-
-        const layer = Math.floor(y / Consts.Viewport.Height);
-        const timeScale = layer == Enums.Layer.PRESENT
-            ? 1
-            : layer == Enums.Layer.PAST ? 1 / Config.TimeScale : Config.TimeScale;
-
-        const speed = Config.Speed.Bullet * (!!speedFactor ? speedFactor : 1);
-
-        const bulletTween = me._scene.tweens.add({
-            targets: bullet,
-            x: { from: x, to: target },
-            duration:Math.abs(target - x) / speed * 1000,
-            repeat: -1,
-            onUpdate: () => {
-                if (!Utils.isTileFree(bullet.getBounds(), me._level))
-                    bulletTween.restart();
-            }})
-            .setTimeScale(timeScale);
-
-        bullet.parentTween = bulletTween;
-
-        me._layers[layer].push(bulletTween);
     }
 }
