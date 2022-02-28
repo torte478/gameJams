@@ -201,11 +201,36 @@ export default class Player {
 
     /**
      * @param {Number} index 
+     * @returns {Number}
      */
-    removeProperty(index) {
+    trySell(index, fieldPos) {
         const me = this;
 
-        me._fields = me._fields.filter((f) => f.index != index);
+        const field = Utils.single(me._fields, (f) => f.index == index);
+        const config = Config.Fields[index];
+
+        if (!!field.hotel) {
+            me._groups.kill(field.hotel);
+            field.hotel = null;
+            for (let i = 0; i < Consts.MaxHouseCount; ++i)
+                me.addHouse(index, fieldPos);
+
+            return config.costHouse / 2;
+        }
+        else if (field.houses.length > 0) {
+            const count = field.houses.length;
+            for (let i = 0; i < field.houses.length; ++i)
+                me._groups.kill(field.houses[i]);
+
+            field.houses = [];
+            for (let i = 0; i < count - 1; ++i)
+                me.addHouse(index, fieldPos);
+
+            return config.costHouse / 2;
+        } else {
+            me._fields = me._fields.filter((f) => f.index != index);
+            return config.cost / 2    
+        }
     }
 
     /**
@@ -242,14 +267,17 @@ export default class Player {
      * @param {Number} index
      * @param {Phaser.Geom.Point[]} positions
      */
-    addHouse(index, positions) {
+    addHouse(index, pos) {
         const me = this;
+
+        const count = me._getHouseCount(index);
+        const positions = me._getHousePositions(index, count, pos);
 
         const field = me._getProperty(index);
         if (!field)
             throw `can't find property with index ${index}`;
 
-        const angle = Helper.getFieldAngle(field.index);
+        const angle = Helper.getFieldAngle(index);
 
         if (field.houses.length >= Consts.MaxHouseCount) {
             for (let i = 0; i < field.houses.length; ++i)
@@ -274,7 +302,7 @@ export default class Player {
      * @param {Number} index 
      * @returns {Number}
      */
-    getHouseCount(index) {
+    _getHouseCount(index) {
         const me = this;
 
         const field = me._getProperty(index);
@@ -283,6 +311,40 @@ export default class Player {
             return 0;
 
         return field.houses.length;
+    }
+
+    /**
+     * @param {Number} index 
+     * @param {Number} existingHouseCount 
+     * @param {Phaser.Geom.Point} fieldPos
+     * @returns {Phaser.Geom.Point[]}
+     */
+     _getHousePositions(index, existingHouseCount, fieldPos) {
+        const me = this;
+
+        const total = (existingHouseCount + 1) * 50;
+        const start = -total / 2 + 25;
+
+        const positions = [];
+        for (let i = 0; i < existingHouseCount + 1; ++i) {
+            const point = new Phaser.Geom.Point(
+                fieldPos.x + start + 50 * i,
+                fieldPos.y - 95
+            );
+    
+            const angle = Helper.getFieldAngle(index);
+    
+            const result = Phaser.Math.RotateAround(
+                point,
+                fieldPos.x,
+                fieldPos.y,
+                Phaser.Math.DegToRad(angle)
+            );
+
+            positions.push(result);
+        }
+
+        return positions;
     }
 
     _getProperty(index) {

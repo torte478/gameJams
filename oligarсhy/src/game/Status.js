@@ -26,7 +26,7 @@ export default class Status {
     stateToReturn;
 
     /** @type {Boolean} */
-    buyBuildingOnCurrentTurn; // TODO : refactor management
+    buyHouseOnCurrentTurn; // TODO : refactor management
 
     /** @type {Number} */
     payAmount;
@@ -53,7 +53,7 @@ export default class Status {
 
         me.selectedField = null;
         me.stateToReturn = null;
-        me.buyBuildingOnCurrentTurn = false;
+        me.buyHouseOnCurrentTurn = false;
         me.payAmount = 0;
 
         me.state = Enums.GameState.UNKNOWN;
@@ -84,7 +84,7 @@ export default class Status {
         me.targetPieceIndex = null;
         me.selectedField = null;
         me.stateToReturn = null;
-        me.buyBuildingOnCurrentTurn = false;
+        me.buyHouseOnCurrentTurn = false;
         me.payAmount = 0;
     }
 

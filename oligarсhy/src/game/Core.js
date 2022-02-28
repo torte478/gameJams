@@ -316,13 +316,15 @@ export default class Core {
             case Enums.GameState.OWN_FIELD_SELECTED: {
 
                 if (player.isButtonClick(point, Enums.ButtonType.SELL)) {
-                    player.removeProperty(me._status.selectedField);
-                    const money = Helper.splitValueToBills(
-                        Config.Fields[me._status.selectedField].cost / 2);
+                    const index = me._status.selectedField;
+                    const result = player.trySell(index, me._fields.getFieldPosition(index));
+                    if (result == null)
+                        return;
+
+                    const money = Helper.splitValueToBills(result);
                     player.addMoney(money);
                 
                     player.showButtons([]);
-                    Utils.debugLog(`sell field ${me._status.selectedField}`);
                     return me._setState(me._status.stateToReturn);
                 }
                 
@@ -345,17 +347,17 @@ export default class Core {
 
                 const handMoney = me._hand.getTotalMoney();
                 me._hand.dropMoney();
-                const change = me._status.updatePayAmount(handMoney);
-                if (change > 0)
+                const diff = me._status.updatePayAmount(handMoney);
+                if (diff > 0)
                     return;
 
-                const changeBills = Helper.splitValueToBills(-bills);
+                const changeBills = Helper.splitValueToBills(-diff);
                 player.addMoney(changeBills);
 
-                const count = player.getHouseCount(me._status.selectedField);
-                const positions = me._fields.getHousePositions(me._status.selectedField, count);
-                player.addHouse(me._status.selectedField, positions);
-                me._status.buyBuildingOnCurrentTurn = true;
+                const fieldIndex = me._status.selectedField;
+                player.addHouse(fieldIndex, me._fields.getFieldPosition(fieldIndex));
+
+                me._status.buyHouseOnCurrentTurn = true;
                 return me._setState(me._status.stateToReturn);
 
                 break;
@@ -527,7 +529,7 @@ export default class Core {
 
         const buttons = [];
         const action = player.getBuyAction(field);
-        if (action != null && !me._status.buyBuildingOnCurrentTurn)
+        if (action != null && !me._status.buyHouseOnCurrentTurn)
             buttons.push(action);
         buttons.push(Enums.ButtonType.SELL);
         player.showButtons(buttons);
