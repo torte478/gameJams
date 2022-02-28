@@ -34,6 +34,11 @@ export default class Consts {
         Button: {
             Width: 360,
             Height: 200
+        },
+
+        HUD: {
+            Width: 200,
+            Height: 800
         }
     };
 

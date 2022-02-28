@@ -59,18 +59,13 @@ export default class Game extends Phaser.Scene {
 
         me.core = new Core(me.add);
 
-        me.add.image(0, 0, 'hud')
-            .setOrigin(0)
-            .setScrollFactor(0)
-            .setDepth(Consts.Depth.HUD)
-            .setVisible(false); // TODO
-
         me.cursor = me.createCursor();
 
         // events
 
         me.input.on('pointerdown', me.onPointerDown, me);
         me.input.keyboard.on('keydown', (e) => me.onKeyDown(e), me);
+        me.input.on('wheel', (p, objs, deltaX, deltaY) => me.onMouseWheel(deltaY), me);
 
         // debug
 
@@ -117,6 +112,12 @@ export default class Game extends Phaser.Scene {
             const point = new Phaser.Geom.Point(me.cursor.x, me.cursor.y);
             me.core.processTurn(point, pointer.rightButtonDown());
         }
+    }
+
+    onMouseWheel(deltaY) {
+        const me = this;
+
+        me.core.updateHud(deltaY);
     }
 
     createCursor() {

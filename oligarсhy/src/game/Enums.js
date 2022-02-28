@@ -1,5 +1,6 @@
 export default class Enums {
 
+    // TODO : unitize
     static GameState = {
         UNKNOWN: 0,
         BEGIN: 10,
@@ -82,4 +83,11 @@ export default class Enums {
         BUY_HOTEL: 4,
         SELL: 5,
     };
+
+    static HudState = {
+        UNKNOWN: 0,
+        HIDDEN: 1,
+        MOVING: 2,
+        VISIBLE: 3
+    }
 }

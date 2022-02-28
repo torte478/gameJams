@@ -6,6 +6,7 @@ import Enums from '../game/Enums.js';
 import Fields from '../game/Fields.js';
 import Groups from './Groups.js';
 import Hand from '../game/Hand.js';
+import HUD from './HUD.js';
 import Player from './Player.js';
 import Status from './Status.js';
 import Utils from './Utils.js';
@@ -32,6 +33,9 @@ export default class Core {
 
     /** @type {Player[]} */
     _players;
+
+    /** @type {HUD} */
+    _hud;
 
     /**
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
@@ -71,6 +75,8 @@ export default class Core {
             const player = new Player(factory, i, Config.Start.Money, Config.Start.Fields[i], groups);
             me._players.push(player);
         }
+
+        me._hud = new HUD(factory);
 
         me._setState(Enums.GameState.BEGIN);
     }
@@ -429,6 +435,15 @@ export default class Core {
             console.log(`debug drop: ${value}`); // TODO : to debug log
             me._applyDiceDrop(value, 0);
         }
+    }
+
+    updateHud(deltaY) {
+        const me = this;
+
+        if (deltaY > 0)
+            me._hud.show();
+        else if (deltaY < 0)
+            me._hud.hide();
     }
 
     _applyDiceDrop(first, second) {
