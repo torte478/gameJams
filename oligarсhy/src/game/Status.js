@@ -26,7 +26,7 @@ export default class Status {
     stateToReturn;
 
     /** @type {Boolean} */
-    useBuy; // TODO : what is it?
+    buyBuildingOnCurrentTurn; // TODO : refactor management
 
     /** @type {Number} */
     payAmount;
@@ -51,10 +51,9 @@ export default class Status {
         
         me.targetPieceIndex = me.pieceIndicies[me.player];
 
-        // TODO : add validators
         me.selectedField = null;
         me.stateToReturn = null;
-        me.useBuy = false;
+        me.buyBuildingOnCurrentTurn = false;
         me.payAmount = 0;
 
         me.state = Enums.GameState.UNKNOWN;
@@ -70,7 +69,7 @@ export default class Status {
     setState(value) {
         const me = this;
 
-        if (Config.DebugStateLog)
+        if (Config.Debug.Global && Config.Debug.StateLog)
             console.log(
                 `(${me.player + 1}): `
                 + `${Utils.enumToString(Enums.GameState, me.state)} => `
@@ -85,7 +84,7 @@ export default class Status {
         me.targetPieceIndex = null;
         me.selectedField = null;
         me.stateToReturn = null;
-        me.useBuy = false;
+        me.buyBuildingOnCurrentTurn = false;
     }
 
     setPayAmount(value) {

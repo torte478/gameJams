@@ -1,8 +1,5 @@
 import Config from "./Config.js";
-import Consts from "./Consts.js";
-import Enums from "./Enums.js";
 
-// TODO : split to general Utils and Game Utils
 export default class Utils {
 
     /**
@@ -42,35 +39,6 @@ export default class Utils {
         }
 
         return `UNDEFINED (${value})`;
-    }
-
-    /**
-     * @param {Number} side 
-     * @param {Boolean} vertical
-     * @returns {Number}
-     */
-    static getAngle(side, vertical) {
-
-        const index = vertical
-            ? (side + 1) % 4
-            : side;
-
-        switch (index) {
-            case 0:
-                return 0;
-
-            case 1:
-                return 90;
-
-            case 2:
-                return 180;
-
-            case 3: 
-                return 270;
-
-            default:
-                throw `can't calculate angle for side ${side}`;
-        }
     }
 
     /**
@@ -140,67 +108,6 @@ export default class Utils {
     }
 
     /**
-     * @param {Number[]} money 
-     */
-    static getTotalMoney(money) {
-        let result = 0;
-
-        for (let i = 0; i < money.length; ++i)
-            result += money[i] * Consts.BillValue[i];
-
-        return result;
-    }
-
-    /**
-     * @param {Number[]} money 
-     * @param {Number} value 
-     */
-    static valueToBills(money, value) {
-
-        if (Utils.getTotalMoney(money) < value)
-            throw `not enough money for pay ${value}`;
-
-        const result = Utils.buildArray(Consts.BillCount, 0);
-
-        const temp = [];
-        for (let i = 0; i < money.length; ++i)
-            temp.push(money[i]);
-
-        let i = result.length - 1;
-        while (value > 0 && i >= 0) {
-
-            while (temp[i] == 0)
-                i -= 1; //TODO : fix all occurrences (--i)
-
-            result[i] += 1;
-            temp[i] -= 1;
-            value -= Consts.BillValue[i];
-        }
-
-        return result;
-    }
-
-    /**
-     * @param {Number} value 
-     * @returns {Number[]}
-     */
-     static splitValueToBills(value) {
-        const result = Utils.buildArray(Consts.BillCount, 0);
-
-        let i = result.length - 1;
-        while (value > 0) {
-
-            while (value < Consts.BillValue[i])
-                i -= 1;
-
-            result[i] += 1;
-            value -= Consts.BillValue[i];
-        }
-
-        return result;
-    }
-
-    /**
      * @param {Number} length 
      * @param {Object} value 
      * @returns {Object[]}
@@ -218,13 +125,64 @@ export default class Utils {
      * @param {String} msg 
      */
     static debugLog(msg) {
-        if (Config.DebugLog)
+        if (Config.Debug.Global && Config.Debug.Log)
             console.log(msg);
     }
 
+    /**
+     * @param {Number} from 
+     * @param {Number} to 
+     * @param {Number} debug 
+     * @returns {Number}
+     */
     static GetRandom(from, to, debug) {
-        return debug !== undefined && Config.DebugRandom
+        return debug !== undefined && Config.Debug.Global && Config.Debug.Random
             ? debug
             : Phaser.Math.Between(from, to);
+    }
+
+    /**
+     * @param {Number} x 
+     * @param {Number} y 
+     * @returns {Phaser.Geom.Point}
+     */
+    static buildPoint(x, y) {
+        return new Phaser.Geom.Point(x, y);
+    }
+
+    /**
+     * @param {Object} obj 
+     * @returns {Phaser.Geom.Point}
+     */
+    static toPoint(obj) {
+        if (obj.x == undefined)
+            throw 'obj is not contains property X';
+
+        if (obj.y == undefined)
+            throw 'obj is not contains property Y';
+
+        return new Phaser.Geom.Point(obj.x, obj.y);
+    }
+
+    /**
+     * 
+     * @param {Phaser.Scene} scene 
+     * @param {String} name 
+     * @param {Number} width 
+     * @param {Number} height 
+     */
+    static loadSpriteSheet(scene, name, width, height) {
+        return scene.load.spritesheet(name, `assets/${name}.png`, {
+            frameWidth: width,
+            frameHeight: !!height ? height : width
+        });
+    }
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {String} name 
+     */
+    static loadImage(scene, name) {
+        return scene.load.image(name, `assets/${name}.png`);
     }
 }

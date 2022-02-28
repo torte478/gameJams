@@ -1,30 +1,29 @@
 export default class Enums {
 
-    // TODO : unitize
     static GameState = {
         UNKNOWN: 0,
-        BEGIN: 10,
-        FIRST_DICE_TAKED: 20,
-        SECOND_DICE_TAKED: 30,
-        DICES_DROPED: 40,
-        PIECE_TAKED: 50,
-        PIECE_ON_FREE_PROPERTY: 60,
-        PIECE_ON_ENEMY_PROPERTY: 70,
-        OWN_FIELD_SELECTED: 80,
-        FINAL: 90
+        BEGIN: 1,
+        FIRST_DICE_TAKED: 2,
+        SECOND_DICE_TAKED: 3,
+        DICES_DROPED: 4,
+        PIECE_TAKED: 5,
+        PIECE_ON_FREE_PROPERTY: 6,
+        PIECE_ON_ENEMY_PROPERTY: 7,
+        OWN_FIELD_SELECTED: 8,
+        FINAL: 9
     };
 
     static FieldType = {
         UNKNOW: 0,
-        PROPERTY: 10,
-        CHANCE: 20,
+        PROPERTY: 1,
+        CHANCE: 2,
         TAX: 30,
-        RAILSTATION: 40,
-        JAIL: 50,
-        UTILITY: 60,
-        FREE: 70,
-        GOTOJAIL: 80,
-        START: 90
+        RAILSTATION: 4,
+        JAIL: 5,
+        UTILITY: 6,
+        FREE: 7,
+        GOTOJAIL: 8,
+        START: 9
     };
 
     static FieldColorIndex = {
@@ -49,10 +48,10 @@ export default class Enums {
 
     static HandState = {
         UNKNOWN: 0,
-        EMPTY: 10,
-        DICES: 20,
-        PIECE: 30,
-        MONEY: 40
+        EMPTY: 1,
+        DICES: 2,
+        PIECE: 3,
+        MONEY: 4
     };
 
     static Money = {

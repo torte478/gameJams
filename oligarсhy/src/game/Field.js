@@ -30,7 +30,7 @@ export default class Field {
     getBounds() {
         const me = this;
 
-        return me._container.first.getBounds(); //TODO : first?
+        return me._container.getBounds();
     }
 
     /**

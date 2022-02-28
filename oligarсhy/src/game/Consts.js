@@ -109,6 +109,8 @@ export default class Consts {
         ],
     };
 
+    static MaxHouseCount = 4;
+
     static TextColor = '#232429';
     static Font = 'Arial';
 

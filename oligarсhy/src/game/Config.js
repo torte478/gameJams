@@ -2,12 +2,13 @@ import Enums from "./Enums.js";
 
 export default class Config {
 
-    // TODO: combine + Debug is main
-    static Debug = true;
-    
-    static DebugStateLog = true;
-    static DebugLog = true;
-    static DebugRandom = true;
+    static Debug = {
+        Global: true,
+
+        StateLog: true,
+        Log: true,
+        Random: true
+    };
 
     static PlayerCount = 2;
 
@@ -41,8 +42,8 @@ export default class Config {
         //Money: [ 0, 0, 0, 0, 0, 0, 0 ],
 
         Fields: [
-            [ 1, 3 ],
-            [],
+            [  ],
+            [ 3 ],
             [],
             []
         ]

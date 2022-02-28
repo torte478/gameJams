@@ -1,0 +1,106 @@
+import Consts from "./Consts.js";
+import Utils from "./Utils.js";
+
+export default class Helper {
+
+    /**
+     * @param {Number} side 
+     * @param {Boolean} vertical
+     * @returns {Number}
+     */
+    static getAngle(side, vertical) {
+
+        const index = vertical
+            ? (side + 1) % 4
+            : side;
+
+        switch (index) {
+            case 0:
+                return 0;
+
+            case 1:
+                return 90;
+
+            case 2:
+                return 180;
+
+            case 3: 
+                return 270;
+
+            default:
+                throw `can't calculate angle for side ${side}`;
+        }
+    }
+
+    /**
+     * @param {Number[]} money 
+     * @return {Number}
+     */
+     static getTotalMoney(money) {
+        let result = 0;
+
+        for (let i = 0; i < money.length; ++i)
+            result += money[i] * Consts.BillValue[i];
+
+        return result;
+    }
+
+    /**
+     * @param {Number[]} money 
+     * @param {Number} value 
+     */
+     static getOptimalBills(money, value) {
+
+        if (Helper.getTotalMoney(money) < value)
+            throw `not enough money for pay ${value}`;
+
+        const result = Utils.buildArray(Consts.BillCount, 0);
+
+        const temp = [];
+        for (let i = 0; i < money.length; ++i)
+            temp.push(money[i]);
+
+        let i = result.length - 1;
+        while (value > 0 && i >= 0) {
+
+            while (temp[i] == 0)
+                --i;
+
+            ++result[i];
+            --temp[i];
+            value -= Consts.BillValue[i];
+        }
+
+        return result;
+    }
+
+    /**
+     * @param {Number} value 
+     * @returns {Number[]}
+     */
+     static splitValueToBills(value) {
+        const result = Utils.buildArray(Consts.BillCount, 0);
+
+        let i = result.length - 1;
+        while (value > 0) {
+
+            while (value < Consts.BillValue[i])
+                --i;
+
+            ++result[i];
+            value -= Consts.BillValue[i];
+        }
+
+        return result;
+    }
+
+    /**
+     * @param {Number} index 
+     * @returns {Number}
+     */
+     static getFieldAngle(index) {
+        const quotient = index / (Consts.FieldCount / 4);
+        const angle = Helper.getAngle(Math.floor(quotient));
+        return angle;
+    }
+}

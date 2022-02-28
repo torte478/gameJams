@@ -2,7 +2,7 @@ import Phaser from '../lib/phaser.js';
 
 import Consts from './Consts.js';
 import Enums from './Enums.js';
-import Utils from './Utils.js';
+import Helper from './Helper.js';
 
 export default class Hand {
     
@@ -122,10 +122,10 @@ export default class Hand {
     takeBill(index) {
         const me = this;
 
-        me._money[index] += 1;
+        ++me._money[index];
         me._state = Enums.HandState.MONEY;
 
-        console.log(`money: ${me._money.join(';')} (${Utils.getTotalMoney(me._money)})`);
+        console.log(`money: ${me._money.join(';')} (${Helper.getTotalMoney(me._money)})`);
     }
     
     dropMoney() {
@@ -148,6 +148,6 @@ export default class Hand {
     getTotalMoney() {
         const me = this;
 
-        return Utils.getTotalMoney(me._money);
+        return Helper.getTotalMoney(me._money);
     }
 }

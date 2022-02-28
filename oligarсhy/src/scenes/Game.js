@@ -3,6 +3,7 @@ import Phaser from '../lib/phaser.js';
 import Config from '../game/Config.js';
 import Consts from '../game/Consts.js';
 import Core from '../game/Core.js';
+import Utils from '../game/Utils.js';
 
 export default class Game extends Phaser.Scene {
 
@@ -22,20 +23,21 @@ export default class Game extends Phaser.Scene {
     preload() {
         const me = this;
 
-        me.loadImage('temp');
-        me.loadImage('hud');
-        me.loadImage('cursor');
-        me.loadSpriteSheet('dice', 50);
-        me.loadSpriteSheet('field', Consts.Sizes.Field.Width, Consts.Sizes.Field.Height);
-        me.loadSpriteSheet('field_corner', 240);
-        me.loadSpriteSheet('icons', 100);
-        me.loadSpriteSheet('field_header', 160, 50);
-        me.loadSpriteSheet('icons_big', 150, 200);
-        me.loadSpriteSheet('icons_corner', 240);
-        me.loadSpriteSheet('pieces', 50);
-        me.loadSpriteSheet('money', Consts.Sizes.Bill.Width, Consts.Sizes.Bill.Height);
-        me.loadSpriteSheet('buttons', 360, 200);
-        me.loadSpriteSheet('houses', 50);
+        Utils.loadImage(me, 'temp');
+        Utils.loadImage(me, 'hud');
+        Utils.loadImage(me, 'cursor');
+
+        Utils.loadSpriteSheet(me, 'dice', 50);
+        Utils.loadSpriteSheet(me, 'field', Consts.Sizes.Field.Width, Consts.Sizes.Field.Height);
+        Utils.loadSpriteSheet(me, 'field_corner', 240);
+        Utils.loadSpriteSheet(me, 'icons', 100);
+        Utils.loadSpriteSheet(me, 'field_header', 160, 50);
+        Utils.loadSpriteSheet(me, 'icons_big', 150, 200);
+        Utils.loadSpriteSheet(me, 'icons_corner', 240);
+        Utils.loadSpriteSheet(me, 'pieces', 50);
+        Utils.loadSpriteSheet(me, 'money', Consts.Sizes.Bill.Width, Consts.Sizes.Bill.Height);
+        Utils.loadSpriteSheet(me, 'buttons', 360, 200);
+        Utils.loadSpriteSheet(me, 'houses', 50);
     }
 
     create() {
@@ -69,7 +71,7 @@ export default class Game extends Phaser.Scene {
 
         // debug
 
-        if (Config.Debug) {
+        if (Config.Debug.Global) {
             me.log = me.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
@@ -79,11 +81,11 @@ export default class Game extends Phaser.Scene {
     update() {
         const me = this;
 
-        if (!me.core.isHumanTurn()) {
+        if (!me.core._isHumanTurn()) {
             me.core.processCpuTurn();
         }
 
-        if (Config.Debug) {
+        if (Config.Debug.Global) {
             me.log.text = 
             `ptr: ${me.cursor.x | 0} ${me.cursor.y | 0}\n` + 
             `mse: ${me.input.activePointer.worldX} ${me.input.activePointer.worldY}`;
@@ -93,7 +95,7 @@ export default class Game extends Phaser.Scene {
     onKeyDown(event) {
         const me = this;
 
-        if (Config.Debug) {
+        if (Config.Debug.Global) {
             
             if (isNaN(event.key))
                 return;
@@ -108,10 +110,8 @@ export default class Game extends Phaser.Scene {
     onPointerDown(pointer) {
         const me = this;
 
-        if (me.core.isHumanTurn()) { //TODO : to Core (it's logic)
-            const point = new Phaser.Geom.Point(me.cursor.x, me.cursor.y);
-            me.core.processTurn(point, pointer.rightButtonDown());
-        }
+        const point = new Phaser.Geom.Point(me.cursor.x, me.cursor.y);
+        me.core.processHumanTurn(point, pointer.rightButtonDown());
     }
 
     onMouseWheel(deltaY) {
@@ -153,21 +153,5 @@ export default class Game extends Phaser.Scene {
         }, me);
 
         return cursor;
-    }
-
-    // TODO : to Utils
-    loadSpriteSheet(name, width, height) {
-        const me = this;
-
-        return me.load.spritesheet(name, `assets/${name}.png`, {
-            frameWidth: width,
-            frameHeight: !!height ? height : width
-        });
-    }
-
-    loadImage(name) {
-        const me = this;
-
-        return me.load.image(name, `assets/${name}.png`);
     }
 }

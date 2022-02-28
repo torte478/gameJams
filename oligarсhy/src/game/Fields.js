@@ -4,6 +4,7 @@ import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Field from './Field.js';
+import Helper from './Helper.js';
 import Utils from './Utils.js';
 
 export default class Fields {
@@ -121,7 +122,7 @@ export default class Fields {
                 field.y - 95
             );
     
-            const angle = me._getAngle(index);
+            const angle = Helper.getFieldAngle(index);
     
             const result = Phaser.Math.RotateAround(
                 point,
@@ -146,13 +147,8 @@ export default class Fields {
 
         return {
             offset: me._getPiecePosOffset(to)[position],
-            angle: me._getAngle(to)
+            angle: Helper.getFieldAngle(to)
         };
-    }
-
-    _getAngle(field) {
-        const quotient = field / (Consts.FieldCount / 4);
-        return Utils.getAngle(Math.floor(quotient));
     }
 
     /**

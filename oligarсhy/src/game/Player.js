@@ -5,6 +5,7 @@ import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Groups from './Groups.js';
+import Helper from './Helper.js';
 import Utils from './Utils.js';
 
 export default class Player {
@@ -36,29 +37,7 @@ export default class Player {
 
         me.index = index;
 
-        const shift = Consts.Sizes.Bill.Height  + 25;
-
-        const billAngle = Utils.getAngle(index, true);
-        const sideAngle = Phaser.Math.DegToRad(
-            Utils.getAngle(index));
-
-        // TODO: refactor
-        me._money = [];
-        for (let i = 0; i < Consts.BillCount; ++i) {
-
-            const origin = new Phaser.Geom.Point(-860 + i * shift, 1250);
-            const point = Phaser.Math.RotateAround(origin, 0, 0, sideAngle);
-
-            const bills = {
-                count: money[i],
-                image: factory.image(point.x, point.y, 'money', i)
-                    .setAngle(billAngle)
-                    .setVisible(money[i] > 0)
-            };
-
-            me._money.push(bills);
-        }
-
+        me._money = me._createStartBills(factory, money, index);
         me._buttons = new Buttons(factory, index);
 
         me._groups = groups;
@@ -80,7 +59,7 @@ export default class Player {
             )
 
             if (contains && me._money[i].count > 0) {
-                me._money[i].count -= 1;
+                --me._money[i].count;
                 me._money[i].image.setVisible(
                     me._money[i].count > 0);
 
@@ -158,7 +137,7 @@ export default class Player {
     getTotalMoney() {
         const me = this;
 
-        return Utils.getTotalMoney(me._enumBills());
+        return Helper.getTotalMoney(me._enumBills());
     }
 
     /**
@@ -168,7 +147,7 @@ export default class Player {
     getNextOptimalBillPosition(cost) {
         const me = this;
 
-        const counts = Utils.valueToBills(me._enumBills(), cost);
+        const counts = Helper.getOptimalBills(me._enumBills(), cost);
         for (let i = counts.length - 1; i >= 0; --i)
             if (counts[i] > 0) {
                 const bill = me._money[i].image;
@@ -248,9 +227,8 @@ export default class Player {
         if (sameColorFields.length != Consts.PropertyColorCounts[colorStr])
             return null;
 
-        // TODO: limitations
-        if (field.houses.length == 4)
-            return Utils.all(sameColorFields, (f) => f.houses.length == 4 || f.hotel != null)
+        if (field.houses.length == Consts.MaxHouseCount)
+            return Utils.all(sameColorFields, (f) => f.houses.length == Consts.MaxHouseCount || f.hotel != null)
                 ? Enums.ButtonType.BUY_HOTEL
                 : null;
         else
@@ -270,11 +248,9 @@ export default class Player {
         if (!field)
             throw `can't find property with index ${index}`;
 
-        // TODO : to Utils (+ duplicate from Fields)
-        const quotient = field.index / (Consts.FieldCount / 4);
-        const angle = Utils.getAngle(Math.floor(quotient));
+        const angle = Helper.getFieldAngle(field.index);
 
-        if (field.houses.length >= 4) {
+        if (field.houses.length >= Consts.MaxHouseCount) {
             for (let i = 0; i < field.houses.length; ++i)
                 me._groups.kill(field.houses[i]);
 
@@ -348,6 +324,32 @@ export default class Player {
                 });
         }
         
+        return result;
+    }
+
+    _createStartBills(factory, money, index) {
+        const shift = Consts.Sizes.Bill.Height  + 25;
+
+        const billAngle = Helper.getAngle(index, true);
+        const sideAngle = Phaser.Math.DegToRad(
+            Helper.getAngle(index));
+
+        const result = [];
+        for (let i = 0; i < Consts.BillCount; ++i) {
+
+            const origin = new Phaser.Geom.Point(-860 + i * shift, 1250);
+            const point = Phaser.Math.RotateAround(origin, 0, 0, sideAngle);
+
+            const bills = {
+                count: money[i],
+                image: factory.image(point.x, point.y, 'money', i)
+                    .setAngle(billAngle)
+                    .setVisible(money[i] > 0)
+            };
+
+            result.push(bills);
+        }
+
         return result;
     }
 }

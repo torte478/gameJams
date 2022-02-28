@@ -2,6 +2,7 @@ import Phaser from "../lib/phaser.js";
 import Consts from "./Consts.js";
 
 import Enums from "./Enums.js";
+import Helper from "./Helper.js";
 import Utils from "./Utils.js";
 
 export default class Buttons {
@@ -22,7 +23,7 @@ export default class Buttons {
             content.push(button);
         }
 
-        const angle = Utils.getAngle(index);
+        const angle = Helper.getAngle(index);
 
         const location = Phaser.Math.RotateAround(
             new Phaser.Geom.Point(0, 450), 0, 0, Phaser.Math.DegToRad(angle));
