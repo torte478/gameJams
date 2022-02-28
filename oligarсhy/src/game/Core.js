@@ -121,6 +121,16 @@ export default class Core {
             me._hud.hide();
     }
 
+    onPointerMove(point) {
+        const me = this;
+
+        const index = me._fields.getFieldIndex(point);
+
+        index != null
+            ? me._hud.showField(index)
+            : me._hud.hideField();
+    }
+
     _isHumanTurn() {
         const me = this;
 

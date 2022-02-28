@@ -151,6 +151,8 @@ export default class Game extends Phaser.Scene {
 
             cursor.x += pointer.movementX;
             cursor.y += pointer.movementY;
+
+            me._core.onPointerMove(Utils.toPoint(cursor));
         }, me);
 
         return cursor;
