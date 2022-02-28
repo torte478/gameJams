@@ -61,9 +61,19 @@ export default class Buttons {
         /** @type {Phaser.GameObjects.Image} */
         const button = me._container.getAll()[type];
 
-        return new Phaser.Geom.Point(
-            button.x + me._container.x, 
-            button.y + me._container.y);
+        const rotated = Phaser.Math.RotateAround(
+            new Phaser.Geom.Point(
+                button.x, 
+                button.y),
+            0,
+            0,
+            Phaser.Math.DegToRad(me._container.angle)) 
+
+        const world = new Phaser.Geom.Point(
+            rotated.x + me._container.x, 
+            rotated.y + me._container.y);
+
+        return world;
     }
 
     /**
