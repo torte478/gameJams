@@ -2,10 +2,12 @@ import Enums from "./Enums.js";
 
 export default class Config {
 
+    // TODO: combine + Debug is main
     static Debug = true;
     
     static DebugStateLog = true;
     static DebugLog = true;
+    static DebugRandom = true;
 
     static PlayerCount = 2;
 

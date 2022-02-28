@@ -124,8 +124,8 @@ export default class Core {
                 if (!success)
                     return;
 
-                const first = 1; //Phaser.Math.Between(1, 6);
-                const second = 0; //Phaser.Math.Between(1, 6);
+                const first = Utils.GetRandom(1, 6, 1);
+                const second = Utils.GetRandom(1, 6, 0);
 
                 console.log(`${first} ${second} (${first + second})`);
 
@@ -338,8 +338,8 @@ export default class Core {
             }
 
             case Enums.GameState.SECOND_DICE_TAKED: {
-                x = Phaser.Math.Between(-100, 100);
-                y = Phaser.Math.Between(-100, 100);
+                x = Utils.GetRandom(-100, 100, 0);
+                y = Utils.GetRandom(-100, 100, 0);
                 break;
             }
 

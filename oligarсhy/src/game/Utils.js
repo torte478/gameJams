@@ -221,4 +221,10 @@ export default class Utils {
         if (Config.DebugLog)
             console.log(msg);
     }
+
+    static GetRandom(from, to, debug) {
+        return debug !== undefined && Config.DebugRandom
+            ? debug
+            : Phaser.Math.Between(from, to);
+    }
 }
