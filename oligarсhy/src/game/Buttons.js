@@ -1,6 +1,6 @@
 import Phaser from "../lib/phaser.js";
-import Consts from "./Consts.js";
 
+import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Helper from "./Helper.js";
 import Utils from "./Utils.js";
@@ -46,10 +46,9 @@ export default class Buttons {
             (b) => b.visible
                    && Phaser.Geom.Rectangle.ContainsPoint(b.getBounds(), point));
 
-        if (!button)
-            return null;
-
-        return button.frame.name;
+        return !!button
+            ? button.frame.name
+            : null;
     }
 
     /**
@@ -79,27 +78,32 @@ export default class Buttons {
 
     /**
      * @param {Number[]} types 
-     * @param {Boolean} add
+     * @param {Boolean} concat
      */
-    show(types, add) {
+    show(types, concat) {
         const me = this;
 
         const buttons = me._container.getAll();
-        for (let i = 0; i < buttons.length; ++i)
-            buttons[i].setVisible(!!add && buttons[i].visible || Utils.contains(types, i));
+        for (let i = 0; i < buttons.length; ++i) {
+            const visible = !!concat && buttons[i].visible 
+                            || Utils.contains(types, i);
+            buttons[i].setVisible(visible);
+        }
 
-        const visible = buttons.filter((b) => b.visible);
+        const visibleButtons = buttons.filter((b) => b.visible);
 
         const offset = 20;
         const width = Consts.Sizes.Button.Width;
 
-        const total = visible.length * width + (visible.length - 1) * offset;
+        const total = visibleButtons.length * width 
+                      + (visibleButtons.length - 1) * offset;
+                      
         const start = -total / 2 + width / 2;
        
-        for (let i = 0; i < visible.length; ++i) 
-            visible[i].setPosition(
+        for (let i = 0; i < visibleButtons.length; ++i) 
+            visibleButtons[i].setPosition(
                 start + i  * width + (i > 0 ? offset : 0),
-                visible[i].y
+                visibleButtons[i].y
             );
     }
 }

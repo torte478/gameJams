@@ -85,6 +85,7 @@ export default class Status {
         me.selectedField = null;
         me.stateToReturn = null;
         me.buyBuildingOnCurrentTurn = false;
+        me.payAmount = 0;
     }
 
     setPayAmount(value) {

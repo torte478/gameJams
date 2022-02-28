@@ -17,7 +17,7 @@ export default class Enums {
         UNKNOW: 0,
         PROPERTY: 1,
         CHANCE: 2,
-        TAX: 30,
+        TAX: 3,
         RAILSTATION: 4,
         JAIL: 5,
         UTILITY: 6,

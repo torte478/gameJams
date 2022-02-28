@@ -79,12 +79,12 @@ export default class Consts {
     ];
 
     static PropertyColorCounts = {
-        LIGHTBLUE: 4,
-        PURPLE: 4,
-        ORANGE: 4,
-        RED: 4,
-        YELLOW: 4,
-        GREEN: 4,
+        LIGHTBLUE: 3,
+        PURPLE: 3,
+        ORANGE: 3,
+        RED: 3,
+        YELLOW: 3,
+        GREEN: 3,
         BLUE: 2,
         BROWN: 2,
     };

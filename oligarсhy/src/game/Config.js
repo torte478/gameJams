@@ -7,7 +7,7 @@ export default class Config {
 
         StateLog: true,
         Log: true,
-        Random: true
+        Random: false
     };
 
     static PlayerCount = 2;

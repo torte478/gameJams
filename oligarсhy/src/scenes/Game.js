@@ -5,16 +5,17 @@ import Consts from '../game/Consts.js';
 import Core from '../game/Core.js';
 import Utils from '../game/Utils.js';
 
+// TODO : all logic to Core
 export default class Game extends Phaser.Scene {
 
     /** @type {Phaser.GameObjects.Text} */
-    log;
+    _log;
 
     /** @type {Phaser.GameObjects.Image} */
-    cursor;
+    _cursor;
 
     /** @type {Core} */
-    core;
+    _core;
 
     constructor() {
         super('game');
@@ -59,20 +60,20 @@ export default class Game extends Phaser.Scene {
 
         // custom
 
-        me.core = new Core(me.add);
+        me._core = new Core(me.add);
 
-        me.cursor = me.createCursor();
+        me._cursor = me._createCursor();
 
         // events
 
-        me.input.on('pointerdown', me.onPointerDown, me);
-        me.input.keyboard.on('keydown', (e) => me.onKeyDown(e), me);
-        me.input.on('wheel', (p, objs, deltaX, deltaY) => me.onMouseWheel(deltaY), me);
+        me.input.on('pointerdown', me._onPointerDown, me);
+        me.input.keyboard.on('keydown', (e) => me._onKeyDown(e), me);
+        me.input.on('wheel', (p, objs, deltaX, deltaY) => me._onMouseWheel(deltaY), me);
 
         // debug
 
         if (Config.Debug.Global) {
-            me.log = me.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
+            me._log = me.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
         }
@@ -81,18 +82,18 @@ export default class Game extends Phaser.Scene {
     update() {
         const me = this;
 
-        if (!me.core._isHumanTurn()) {
-            me.core.processCpuTurn();
+        if (!me._core._isHumanTurn()) {
+            me._core.processCpuTurn();
         }
 
         if (Config.Debug.Global) {
-            me.log.text = 
-            `ptr: ${me.cursor.x | 0} ${me.cursor.y | 0}\n` + 
+            me._log.text = 
+            `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
             `mse: ${me.input.activePointer.worldX} ${me.input.activePointer.worldY}`;
         }
     }
 
-    onKeyDown(event) {
+    _onKeyDown(event) {
         const me = this;
 
         if (Config.Debug.Global) {
@@ -100,27 +101,27 @@ export default class Game extends Phaser.Scene {
             if (isNaN(event.key))
                 return;
 
-            me.core.debugDropDices(+event.key);
+            me._core.debugDropDices(+event.key);
         }
     }
 
     /**
      * @param {Phaser.Input.Pointer} pointer 
      */
-    onPointerDown(pointer) {
+    _onPointerDown(pointer) {
         const me = this;
 
-        const point = new Phaser.Geom.Point(me.cursor.x, me.cursor.y);
-        me.core.processHumanTurn(point, pointer.rightButtonDown());
+        const point = new Phaser.Geom.Point(me._cursor.x, me._cursor.y);
+        me._core.processHumanTurn(point, pointer.rightButtonDown());
     }
 
-    onMouseWheel(deltaY) {
+    _onMouseWheel(deltaY) {
         const me = this;
 
-        me.core.updateHud(deltaY);
+        me._core.updateHud(deltaY);
     }
 
-    createCursor() {
+    _createCursor() {
         const me = this;
 
         const cursor = me.physics.add.image(
