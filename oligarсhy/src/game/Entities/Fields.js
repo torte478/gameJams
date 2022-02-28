@@ -1,11 +1,11 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
-import Config from './Config.js';
-import Consts from './Consts.js';
-import Enums from './Enums.js';
+import Config from '../Config.js';
+import Consts from '../Consts.js';
+import Enums from '../Enums.js';
 import Field from './Field.js';
-import Helper from './Helper.js';
-import Utils from './Utils.js';
+import Helper from '../Helper.js';
+import Utils from '../Utils.js';
 
 export default class Fields {
 

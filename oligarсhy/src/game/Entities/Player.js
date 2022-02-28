@@ -1,12 +1,13 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
 import Buttons from './Buttons.js';
-import Config from './Config.js';
-import Consts from './Consts.js';
-import Enums from './Enums.js';
-import Groups from './Groups.js';
-import Helper from './Helper.js';
-import Utils from './Utils.js';
+
+import Config from '../Config.js';
+import Consts from '../Consts.js';
+import Enums from '../Enums.js';
+import Groups from '../Groups.js';
+import Helper from '../Helper.js';
+import Utils from '../Utils.js';
 
 export default class Player {
 

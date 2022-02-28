@@ -1,7 +1,7 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
-import Consts from './Consts.js';
-import Enums from './Enums.js';
+import Consts from '../Consts.js';
+import Enums from '../Enums.js';
 
 export default class HUD {
 

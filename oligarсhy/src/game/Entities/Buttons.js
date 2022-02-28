@@ -1,9 +1,9 @@
-import Phaser from "../lib/phaser.js";
+import Phaser from "../../lib/phaser.js";
 
-import Consts from "./Consts.js";
-import Enums from "./Enums.js";
-import Helper from "./Helper.js";
-import Utils from "./Utils.js";
+import Consts from "../Consts.js";
+import Enums from "../Enums.js";
+import Helper from "../Helper.js";
+import Utils from "../Utils.js";
 
 export default class Buttons {
 

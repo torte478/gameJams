@@ -1,7 +1,7 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
-import Config from './Config.js';
-import Enums from './Enums.js';
+import Config from '../Config.js';
+import Enums from '../Enums.js';
 
 export default class Field {
 

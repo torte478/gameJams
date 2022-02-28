@@ -1,13 +1,14 @@
 import Phaser from '../lib/phaser.js';
 
-import Config from '../game/Config.js';
-import Consts from '../game/Consts.js';
-import Enums from '../game/Enums.js';
-import Fields from '../game/Fields.js';
+import Fields from './Entities/Fields.js';
+import Hand from './Entities/Hand.js';
+import Player from './Entities/Player.js';
+
+import Config from './Config.js';
+import Consts from './/Consts.js';
+import Enums from './/Enums.js';
 import Groups from './Groups.js';
-import Hand from '../game/Hand.js';
-import HUD from './HUD.js';
-import Player from './Player.js';
+import HUD from './Entities/HUD.js';
 import Status from './Status.js';
 import Utils from './Utils.js';
 import Helper from './Helper.js';
