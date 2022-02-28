@@ -93,6 +93,9 @@ export default class Utils {
         return result;
     }
 
+    /**
+     * @param {String} msg 
+     */
     static debugLog(msg) {
         if (Config.DebugLog)
             console.log(msg);
