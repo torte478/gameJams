@@ -68,13 +68,14 @@ export default class Buttons {
 
     /**
      * @param {Number[]} types 
+     * @param {Boolean} add
      */
-    show(types) {
+    show(types, add) {
         const me = this;
 
         const buttons = me._container.getAll();
         for (let i = 0; i < buttons.length; ++i)
-            buttons[i].setVisible(Utils.contains(types, i));
+            buttons[i].setVisible(!!add && buttons[i].visible || Utils.contains(types, i));
 
         const visible = buttons.filter((b) => b.visible);
 

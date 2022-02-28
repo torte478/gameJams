@@ -144,11 +144,12 @@ export default class Player {
 
     /**
      * @param {Number[]} types
+     * @param {Boolean}
      */
-    showButtons(types) {
+    showButtons(types, add) {
         const me = this;
 
-        me._buttons.show(types);
+        me._buttons.show(types, add);
     }
 
     /**

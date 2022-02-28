@@ -558,7 +558,7 @@ export default class Core {
         const me = this;
 
         if (Utils.contains(Consts.States.Final, state)) {
-            me._getCurrentPlayer().showButtons([Enums.ButtonType.NEXT_TURN]);
+            me._getCurrentPlayer().showButtons([Enums.ButtonType.NEXT_TURN], true);
         }
 
         if (state == Enums.GameState.BEGIN)
