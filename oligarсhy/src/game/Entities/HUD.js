@@ -102,7 +102,7 @@ export default class HUD {
         me._setFieldInfoVisible(true);
 
         switch (config.type) {
-            case Enums.FieldType.PROPERTY:
+            case Enums.FieldType.PROPERTY: {
                 me._infoItems.icon
                     .setTexture('icons', config.icon);
 
@@ -126,22 +126,36 @@ export default class HUD {
                 me._infoItems.details.setText(details)
 
                 break;
+            }
 
-            case Enums.FieldType.UTILITY:
+            case Enums.FieldType.UTILITY: {
+
+                me._infoItems.caption
+                    .setText(config.name);
+
+                me._infoItems.icon
+                    .setTexture('icons_big', config.icon);
+
+                    const details = 
+                    'RENT\n' + 
+                    `1 utility:\n`+
+                    `   ${config.rent[0]} X dices\n\n` + 
+                    `2 utilities:\n` + 
+                    `   ${config.rent[1]} x dices\n\n` + 
+                    `SELL: ${config.cost / 2}`;
+                me._infoItems.details.setText(details)
+
+                break;
+            }
+
+            case Enums.FieldType.RAILSTATION: {
                 me._infoItems.caption
                     .setText('TODO');
 
                 me._infoItems.details.setVisible(false);
 
                 break;
-
-            case Enums.FieldType.RAILSTATION:
-                me._infoItems.caption
-                    .setText('TODO');
-
-                me._infoItems.details.setVisible(false);
-
-                break;
+            }
 
             default:
                 me._setFieldInfoVisible(false);

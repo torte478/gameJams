@@ -170,12 +170,24 @@ export default class Player {
 
     /**
      * @param {Number} field 
+     * @param {Number} dices
      * @returns {Number}
      */
-    getRent(field) {
+    getRent(field, dices) {
         const me = this;
 
         const config = Config.Fields[field];
+        if (!Utils.contains(Consts.BuyableFieldTypes, config.type))
+            throw `Field hasn't rent`;
+
+        if (config.type == Enums.FieldType.UTILITY) {
+            const total = me._fields
+                .filter((f) => Config.Fields[f.index].type == Enums.FieldType.UTILITY)
+                .length;
+
+            return config.rent[total - 1] * dices;
+        } 
+
         const property = Utils.firstOrDefault(me._fields, (f) => f.index == field);
         if (!property)
             throw `Player hasn't field ${field}`;

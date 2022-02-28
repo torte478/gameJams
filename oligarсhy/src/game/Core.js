@@ -226,7 +226,7 @@ export default class Core {
 
                 const fieldConfig = Config.Fields[field.index];
 
-                if (fieldConfig.type != Enums.FieldType.PROPERTY)
+                if (!Utils.contains(Consts.BuyableFieldTypes, fieldConfig.type))
                     return me._setState(Enums.GameState.FINAL);
                     
                 const enemy = Utils.firstOrDefault(
@@ -234,7 +234,7 @@ export default class Core {
                     (p) => p.index != me._status.player && p.hasField(field.index));
 
                 if (!!enemy) {
-                    const rent = enemy.getRent(field.index);
+                    const rent = enemy.getRent(field.index, me._status.diceResult);
                     
                     if (rent > player.getTotalMoney())
                         return me._killPlayer();
@@ -437,6 +437,7 @@ export default class Core {
 
         const current = me._status.pieceIndicies[me._status.player];
         me._status.targetPieceIndex = (current + first + second) % Consts.FieldCount;
+        me._status.diceResult = first + second;
         me._setState(Enums.GameState.DICES_DROPED);
     }
 

@@ -31,6 +31,9 @@ export default class Status {
     /** @type {Number} */
     payAmount;
 
+    /** @type {Number} */
+    diceResult;
+
     /**
      * @param {Number[]} pieceIndicies 
      * @param {Number} player
@@ -55,6 +58,7 @@ export default class Status {
         me.stateToReturn = null;
         me.buyHouseOnCurrentTurn = false;
         me.payAmount = 0;
+        me.diceResult = 0;
 
         me.state = Enums.GameState.UNKNOWN;
     }
@@ -86,6 +90,7 @@ export default class Status {
         me.stateToReturn = null;
         me.buyHouseOnCurrentTurn = false;
         me.payAmount = 0;
+        me.diceResult = 0;
     }
 
     setPayAmount(value) {
