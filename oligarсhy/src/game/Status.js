@@ -26,7 +26,10 @@ export default class Status {
     stateToReturn;
 
     /** @type {Boolean} */
-    useBuy;
+    useBuy; // TODO : what is it?
+
+    /** @type {Number} */
+    payAmount;
 
     /**
      * @param {Number[]} pieceIndicies 
@@ -52,6 +55,7 @@ export default class Status {
         me.selectedField = null;
         me.stateToReturn = null;
         me.useBuy = false;
+        me.payAmount = 0;
 
         me.state = Enums.GameState.UNKNOWN;
     }
@@ -82,5 +86,30 @@ export default class Status {
         me.selectedField = null;
         me.stateToReturn = null;
         me.useBuy = false;
+    }
+
+    setPayAmount(value) {
+        const me = this;
+
+        if (me.payAmount !== 0)
+            throw `payAmount isn't empty!`;
+
+        me.payAmount = value;
+        Utils.debugLog(`should pay ${value}`);
+    }
+
+    updatePayAmount(value) {
+        const me = this;
+
+        const diff = me.payAmount - value;
+        if (diff < 0) {
+            me.payAmount = 0;
+            Utils.debugLog(`pay complete`);
+        } else {
+            me.payAmount -= value;
+            Utils.debugLog(`should pay ${me.payAmount}`);   
+        }
+            
+        return diff;
     }
 }

@@ -186,6 +186,7 @@ export default class Core {
                             return;
                         }
 
+                        me._status.setPayAmount(rent);
                         const msg = `player ${Utils.enumToString(Enums.PlayerIndex, me._status.player)} should pay rent: ${rent}`;
                         Utils.debugLog(msg);
 
@@ -196,6 +197,7 @@ export default class Core {
 
                     const canBuyProperty = fieldConfig.cost <= player.getTotalMoney();
                     if (!player.hasField(field.index) && canBuyProperty) {
+                        me._status.setPayAmount(fieldConfig.cost);
                         player.showButtons([Enums.ButtonType.BUY_FIELD, Enums.ButtonType.NEXT_TURN]);
                         me._setState(Enums.GameState.PIECE_ON_FREE_PROPERTY);
                         return;
@@ -222,17 +224,16 @@ export default class Core {
                     if (!player.isButtonClick(point, Enums.ButtonType.BUY_FIELD))
                         return;
 
-                    const field = Config.Fields[me._status.targetPieceIndex];
                     const handMoney = me._hand.getTotalMoney();
-                    if (handMoney < field.cost)
-                        return;
-
                     me._hand.dropMoney();
-                    const diff = Utils.splitValueToBills(handMoney - field.cost);
-                    player.addMoney(diff);
-                    player.addProperty(me._status.targetPieceIndex);
+                    const change = me._status.updatePayAmount(handMoney);
+                    if (change <= 0) {
+                        const changeBills = Utils.splitValueToBills(-change);
+                        player.addMoney(changeBills);
+                        player.addProperty(me._status.targetPieceIndex);
 
-                    me._setState(Enums.GameState.FINAL);
+                        me._setState(Enums.GameState.FINAL);
+                    }
                 }
 
                 break;
@@ -254,16 +255,17 @@ export default class Core {
 
                     const rent = enemy.getRent(me._status.targetPieceIndex);
                     const handMoney = me._hand.getTotalMoney();
-                    if (handMoney < rent)
-                        return;
+                    me._hand.dropMoney();
 
-                    const money = me._hand.dropMoney();
-                    const diff = Utils.splitValueToBills(handMoney - rent);
-                    player.addMoney(diff);                 
-                    enemy.addMoney(Utils.splitValueToBills(rent));
-                    enemy.showButtons([]);
+                    const change = me._status.updatePayAmount(handMoney);
+                    if (change <= 0) {
+                        const changeBills = Utils.splitValueToBills(-change);
+                        player.addMoney(changeBills);                 
+                        enemy.addMoney(Utils.splitValueToBills(rent));
+                        enemy.showButtons([]);
 
-                    me._setState(Enums.GameState.FINAL);
+                        me._setState(Enums.GameState.FINAL);
+                    }   
                 }
 
                 break;
@@ -291,22 +293,27 @@ export default class Core {
                 // TODO : duplication
                 if (player.isButtonClick(point, Enums.ButtonType.BUY_HOUSE) 
                     || player.isButtonClick(point, Enums.ButtonType.BUY_HOTEL)) {
+
                     const field = Config.Fields[me._status.selectedField];
+
+                    if (me._status.payAmount == 0) {
+                        me._status.setPayAmount(field.costHouse);
+                    }
+
                     const handMoney = me._hand.getTotalMoney();
-                    if (handMoney < field.costHouse)
-                        return;
-
                     me._hand.dropMoney();
-                    const diff = Utils.splitValueToBills(handMoney - field.costHouse);
-                    player.addMoney(diff);
+                    const change = me._status.updatePayAmount(handMoney);
+                    if (change <= 0) {
+                        const changeBills = Utils.splitValueToBills(-bills);
+                        player.addMoney(changeBills);
 
-                    // TODO : shit
-                    const count = player.getHouseCount(me._status.selectedField);
-                    const positions = me._fields.getHousePositions(me._status.selectedField, count);
-                    player.addHouse(me._status.selectedField, positions);
-                    me._status.useBuy = true;
-
-                    return me._setState(me._status.stateToReturn);
+                        // TODO : shit
+                        const count = player.getHouseCount(me._status.selectedField);
+                        const positions = me._fields.getHousePositions(me._status.selectedField, count);
+                        player.addHouse(me._status.selectedField, positions);
+                        me._status.useBuy = true;
+                        return me._setState(me._status.stateToReturn);
+                    }
                 }
 
                 break;
