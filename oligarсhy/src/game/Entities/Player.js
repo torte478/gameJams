@@ -208,6 +208,8 @@ export default class Player {
 
         const field = Utils.single(me._fields, (f) => f.index == index);
         const config = Config.Fields[index];
+        const sameColorFields = me._fields
+            .filter((f) => Config.Fields[f.index].color == config.color);
 
         if (!!field.hotel) {
             me._groups.kill(field.hotel);
@@ -219,6 +221,9 @@ export default class Player {
         }
         else if (field.houses.length > 0) {
             const count = field.houses.length;
+            if (Utils.any(sameColorFields, (f) => f.houses.length > count || !!f.hotel))
+                throw "can't sell - to many houses";
+
             for (let i = 0; i < field.houses.length; ++i)
                 me._groups.kill(field.houses[i]);
 
@@ -228,6 +233,9 @@ export default class Player {
 
             return config.costHouse / 2;
         } else {
+            if (Utils.any(sameColorFields, (f) => f.houses.length > 0))
+                throw "can't sell - to many houses";
+
             me._fields = me._fields.filter((f) => f.index != index);
             return config.cost / 2    
         }
