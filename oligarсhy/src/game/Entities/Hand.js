@@ -125,7 +125,7 @@ export default class Hand {
         ++me._money[index];
         me._state = Enums.HandState.MONEY;
 
-        console.log(`money: ${me._money.join(';')} (${Helper.getTotalMoney(me._money)})`);
+        console.log(`money: ${me._money.join(';')} (${Helper.getTotalMoney(me._money)})`); // TODO : fix all console.log
     }
     
     dropMoney() {
@@ -149,5 +149,23 @@ export default class Hand {
         const me = this;
 
         return Helper.getTotalMoney(me._money);
+    }
+
+    getMoneyAction() {
+        const me = this;
+
+        let billCount = 0;
+        for (let i = 0; i < me._money.length; ++i)
+            billCount += me._money[i];
+
+        const total = me.getTotalMoney();
+
+        if (billCount == 1 && total >= Consts.BillValue[1])
+            return Enums.ActionType.SPLIT_MONEY;
+
+        if (billCount > 1 && total >= Consts.BillValue[1])
+            return Enums.ActionType.MERGE_MONEY;
+        
+        return null;
     }
 }

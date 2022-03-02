@@ -43,7 +43,7 @@ export default class Consts {
     };
 
     static FieldCount = 40;
-    static BillCount = 7;
+    static  BillCount = 7;
 
     static PiecePosition = {
         Usual: [
@@ -96,13 +96,6 @@ export default class Consts {
     ];
 
     static States = {
-        Management: [
-            Enums.GameState.BEGIN,
-            Enums.GameState.PIECE_ON_ENEMY_PROPERTY,
-            Enums.GameState.PIECE_ON_FREE_PROPERTY,
-            Enums.GameState.FINAL
-        ],
-
         Final: [
             Enums.GameState.PIECE_ON_FREE_PROPERTY,
             Enums.GameState.FINAL

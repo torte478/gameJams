@@ -95,6 +95,43 @@ export default class Helper {
     }
 
     /**
+     * @param {Number[]} money 
+     * @returns {Number[]}
+     */
+    static splitBillToBills(money) {
+        let totalCount = 0;
+        money.forEach((x) => totalCount += x);
+        if (totalCount != 1)
+            throw `can't split money array. wrong bill count`;
+
+        let billIndex = Consts.BillCount - 1;
+        while (money[billIndex] == 0)
+            --billIndex;
+
+        if (billIndex == 0)
+            throw `can't split min bill`;
+
+        const amount = Consts.BillValue[billIndex] - Consts.BillValue[billIndex - 1];
+        const result = Helper.splitValueToBills(amount);
+        result[billIndex - 1]++;
+        
+        return result;
+    }
+
+    /**
+     * @param {Number[]} money 
+     * @returns {Number[]}
+     */
+    static mergeBills(money) {
+        const total = Helper.getTotalMoney(money);
+        
+        if (total == 0)
+            throw `can't merge zero money`;
+
+        return Helper.splitValueToBills(total);
+    }
+
+    /**
      * @param {Number} index 
      * @returns {Number}
      */

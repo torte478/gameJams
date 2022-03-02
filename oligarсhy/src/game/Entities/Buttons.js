@@ -17,7 +17,7 @@ export default class Buttons {
         const me = this;
 
         const content = [];
-        for (let i = 0; i < Object.keys(Enums.ButtonType).length; ++i) {
+        for (let i = 0; i < Object.keys(Enums.ActionType).length; ++i) {
             const button = factory.image(0, 0, 'buttons', i)
                 .setVisible(false);
             content.push(button);

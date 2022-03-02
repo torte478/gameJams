@@ -74,13 +74,15 @@ export default class Enums {
         HOTEL: 6
     }
 
-    static ButtonType = {
+    static ActionType = {
         UNKNOWN: 0,
         NEXT_TURN: 1,
         BUY_FIELD: 2,
         BUY_HOUSE: 3,
         BUY_HOTEL: 4,
         SELL: 5,
+        SPLIT_MONEY: 6,
+        MERGE_MONEY: 7
     };
 
     static HudState = {

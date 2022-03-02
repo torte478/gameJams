@@ -82,6 +82,10 @@ export default class Player {
             me._money[i].image.setVisible(
                 me._money[i].count > 0);
         }
+
+        const msg = `${Utils.enumToString(Enums.PlayerIndex, me.index)} get: ` + 
+                    `${money.join(';')} (${Helper.getTotalMoney(money)})`;
+        Utils.debugLog(msg);
     }
 
     /**
@@ -260,6 +264,9 @@ export default class Player {
     getBuyAction(index) {
         const me = this;
 
+        if (Config.Fields[index].type != Enums.FieldType.PROPERTY)
+            return null;
+
         const field = me._getProperty(index);
 
         if (field.hotel != null)
@@ -275,11 +282,11 @@ export default class Player {
 
         if (field.houses.length == Consts.MaxHouseCount)
             return Utils.all(sameColorFields, (f) => f.houses.length == Consts.MaxHouseCount || f.hotel != null)
-                ? Enums.ButtonType.BUY_HOTEL
+                ? Enums.ActionType.BUY_HOTEL
                 : null;
         else
             return Utils.all(sameColorFields, (f) => f.houses.length >= field.houses.length)
-                ? Enums.ButtonType.BUY_HOUSE
+                ? Enums.ActionType.BUY_HOUSE
                 : null;
     }
 
