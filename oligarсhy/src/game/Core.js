@@ -147,7 +147,7 @@ export default class Core {
         if (isCancel)
             return me._cancelTurn();
 
-        if (me._status.state == Enums.GameState.FINAL && me._trySelectOwnField(point)) {
+        if (Utils.contains(Consts.States.SellField, me._status.state) && me._trySelectOwnField(point)) {
                 return me._setState(Enums.GameState.OWN_FIELD_SELECTED);
         }
 
@@ -408,6 +408,7 @@ export default class Core {
             player.addMoney(merged);
             return true;
         }
+        
 
         return false;
     }
@@ -483,7 +484,9 @@ export default class Core {
         const money = me._hand.dropMoney();
         me._hand.cancel();
 
-        me._getCurrentPlayer().addMoney(money);
+        const player = me._getCurrentPlayer();
+        player.addMoney(money);
+        player.showButtons([]);
 
         me._status.selectedField = null;
         const next = me._getNextStateAfterCancel();
@@ -564,12 +567,19 @@ export default class Core {
         me._status.selectedField = field;
         me._status.stateToReturn = me._status.state;
 
-        const buttons = [];
+        const actions = [];
+
+        if (player.canSellSmth(field))
+            actions.push(Enums.ActionType.SELL);
+        
         const action = player.getBuyAction(field);
-        if (action != null && !me._status.buyHouseOnCurrentTurn)
-            buttons.push(action);
-        buttons.push(Enums.ActionType.SELL);
-        player.showButtons(buttons);
+        const canBuyHouse = action != null 
+                            && !me._status.buyHouseOnCurrentTurn 
+                            && me._status.state == Enums.GameState.FINAL;
+        if (canBuyHouse) 
+            actions.push(action);
+
+        player.showButtons(actions);
 
         Utils.debugLog(`select field ${field}`);
         return true;

@@ -259,6 +259,30 @@ export default class Player {
 
     /**
      * @param {Number} index 
+     * @returns {Boolean}
+     */
+    canSellSmth(index) {
+        const me = this;
+
+        const field = Utils.single(me._fields, (f) => f.index == index);
+        const config = Config.Fields[index];
+
+        const sameColorFields = me._fields
+            .filter((f) => Config.Fields[f.index].color == config.color);
+
+        if (!!field.hotel) 
+            return true;
+            
+        if (field.houses.length > 0)
+            return !Utils.any(sameColorFields, 
+                (f) => f.houses.length > field.houses.length 
+                       || !!f.hotel);
+          
+        return !Utils.any(sameColorFields, (f) => f.houses.length > 0);
+    }
+
+    /**
+     * @param {Number} index 
      * @returns {Number}
      */
     getBuyAction(index) {
