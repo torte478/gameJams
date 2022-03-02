@@ -141,6 +141,31 @@ export default class Player {
      */
     getTotalMoney() {
         const me = this;
+        let result = me.getBillsMoney();
+
+        for (let i = 0; i < me._fields.length; ++i) {
+            const field = me._fields[i];
+            const config = Config.Fields[field.index];
+            
+            result += config.cost / 2;
+
+            if (config.type == Enums.FieldType.PROPERTY) {
+                if (!!field.hotel)
+                    result += 5 * (config.costHouse / 2);
+                else 
+                    result += field.houses.length * (Config.costHouse / 2);
+            }
+                        
+        }
+
+        return result;
+    }
+
+    /**
+     * @returns {Number}
+     */
+    getBillsMoney() {
+        const me = this;
 
         return Helper.getTotalMoney(me._enumBills());
     }
@@ -224,6 +249,7 @@ export default class Player {
 
         const field = Utils.single(me._fields, (f) => f.index == index);
         const config = Config.Fields[index];
+        
         const sameColorFields = me._fields
             .filter((f) => Config.Fields[f.index].color == config.color);
 
@@ -356,6 +382,49 @@ export default class Player {
         const me = this;
 
         me._buttons.hide(type);
+    }
+
+    /**
+     * @returns {Number}
+     */
+    getRichestField() {
+        const me = this;
+
+        let result = [ me._fields[0].index ];
+        let max = me._getCost(result[0]);
+
+        for (let i = 1; i < me._fields.length; ++i) {
+            const index = me._fields[i].index;
+            const cost = me._getCost(index);
+
+            if (cost > max) {
+                result = [ index];
+                max = cost;
+            }
+            else if (cost == max)
+                result.push(index);
+        }
+
+        if (result.length == 0)
+            throw `can't sell anything`;
+
+        return Utils.getRandomEl(result);
+    }
+
+    _getCost(index) {
+        const me = this;
+
+        const config = Config.Fields[index];
+        if (config.type == Enums.FieldType.PROPERTY) {
+
+            const field = Utils.single(me._fields, (f) => f.index == index);
+            return !!field.hotel || field.houses.length > 0
+                ? config.costHouse / 2
+                : config.cost / 2;
+        }
+        else {
+            return config.cost / 2;
+        }
     }
 
     /**

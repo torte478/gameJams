@@ -185,4 +185,13 @@ export default class Utils {
     static loadImage(scene, name) {
         return scene.load.image(name, `assets/${name}.png`);
     }
+
+    /**
+     * @param {Object[]} arr 
+     * @returns {Object}
+     */
+    static getRandomEl(arr) {
+        const index = Phaser.Math.Between(0, arr.length - 1);
+        return arr[index];
+    }
 }

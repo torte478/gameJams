@@ -312,14 +312,15 @@ export default class Core {
 
                 if (player.isButtonClick(point, Enums.ActionType.SELL)) {
                     const index = me._status.selectedField;
-                    const result = player.trySell(index, me._fields.getFieldPosition(index));
-                    if (result == null)
+                    const cost = player.trySell(index, me._fields.getFieldPosition(index));
+                    if (cost == null)
                         return;
 
-                    const money = Helper.splitValueToBills(result);
+                    const money = Helper.splitValueToBills(cost);
                     player.addMoney(money);
                 
                     player.showButtons([]);
+                    Utils.debugLog(`SELL: ${Utils.enumToString(Enums.PlayerIndex, player.index)} => ${index}`);
                     return me._setState(me._status.stateToReturn);
                 }
                 
@@ -447,6 +448,13 @@ export default class Core {
             }
 
             case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
+
+                const total = player.getBillsMoney() + me._hand.getTotalMoney();
+                if (total < me._status.payAmount) {
+                    const index = player.getRichestField();
+                    return me._fields.getFieldPosition(index);
+                }
+                
                 /** @type {Player} */
                 const enemy = Utils.single(me._players, (p) => p.hasField(me._status.targetPieceIndex));
                 const handMoney = me._hand.getTotalMoney();
@@ -457,9 +465,14 @@ export default class Core {
                     : enemy.getButtonPosition(Enums.ActionType.UNKNOWN);
             }
 
-            case Enums.GameState.OWN_FIELD_SELECTED: 
-                throw 'cpu OWN_FIELD_SELECTED state not implemented';
+            case Enums.GameState.OWN_FIELD_SELECTED:  {
+                if (me._status.stateToReturn != Enums.GameState.PIECE_ON_ENEMY_PROPERTY)
+                    throw `ai on OWN_FIELD_SELECTED from ` + 
+                        `${Utils.enumToString(Enums.GameState, me._status.stateToReturn)} not implemented`;
 
+                return player.getButtonPosition(Enums.ActionType.SELL);
+            }
+                
             case Enums.GameState.FINAL:
                return player.getButtonPosition(Enums.ActionType.NEXT_TURN);
 
