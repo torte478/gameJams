@@ -153,7 +153,7 @@ export default class Player {
                 if (!!field.hotel)
                     result += 5 * (config.costHouse / 2);
                 else 
-                    result += field.houses.length * (Config.costHouse / 2);
+                    result += field.houses.length * (config.costHouse / 2);
             }
                         
         }
@@ -537,6 +537,7 @@ export default class Player {
                 image: factory.image(point.x, point.y, 'money', i)
                     .setAngle(billAngle)
                     .setVisible(money[i] > 0)
+                    .setDepth(Consts.Depth.Money)
             };
 
             result.push(bills);
