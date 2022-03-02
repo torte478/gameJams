@@ -258,10 +258,8 @@ export default class Core {
 
             case Enums.GameState.PIECE_ON_FREE_PROPERTY: {
 
-                const billIndex = player.findBillOnPoint(point);
-
-                if (billIndex >= 0)
-                    return me._hand.takeBill(billIndex);
+                if (me._tryManageMoney(point))
+                    return;
 
                 if (player.isButtonClick(point, Enums.ActionType.NEXT_TURN))
                     return me._finishTurn();
@@ -285,10 +283,8 @@ export default class Core {
 
             case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
 
-                const billIndex = player.findBillOnPoint(point);
-
-                if (billIndex >= 0) 
-                    return me._hand.takeBill(billIndex);
+                if (me._tryManageMoney(point))
+                    return;
                 
                 /** @type {Player} */
                 const enemy = Utils.single(me._players, (p) => p.hasField(me._status.targetPieceIndex));
@@ -327,10 +323,8 @@ export default class Core {
                     return me._setState(me._status.stateToReturn);
                 }
                 
-                const billIndex = player.findBillOnPoint(point);
-
-                if (billIndex >= 0)
-                    return me._hand.takeBill(billIndex);
+                if (me._tryManageMoney(point))
+                    return;
 
                 const buyBuilding = player.isButtonClick(point, Enums.ActionType.BUY_HOUSE) 
                                     || player.isButtonClick(point, Enums.ActionType.BUY_HOTEL);
@@ -367,31 +361,8 @@ export default class Core {
                 if (player.isButtonClick(point, Enums.ActionType.NEXT_TURN))
                     return me._finishTurn();
 
-                const billIndex = player.findBillOnPoint(point);
-
-                if (billIndex >= 0) {
-                    me._hand.takeBill(billIndex);
-
-                    const button = me._hand.getMoneyAction();
-                    if (!!button)
-                        player.showButtons([ button ]);
-
+                if (me._tryManageMoney(point))
                     return;
-                }
-
-                if (player.isButtonClick(point, Enums.ActionType.SPLIT_MONEY)) {
-                    const money = me._hand.dropMoney();
-                    const splited = Helper.splitBillToBills(money);
-                    player.addMoney(splited);
-                    return me._setState(Enums.GameState.FINAL);
-                }
-
-                if (player.isButtonClick(point, Enums.ActionType.MERGE_MONEY)) {
-                    const money = me._hand.dropMoney();
-                    const merged = Helper.mergeBills(money);
-                    player.addMoney(merged);
-                    return me._setState(Enums.GameState.FINAL);
-                }
 
                 break;
             }
@@ -399,6 +370,46 @@ export default class Core {
             default: 
                 throw `can't process state: ${Utils.enumToString(Enums.GameState, me._status.state)}`;
         }
+    }
+
+    _tryManageMoney(point) {
+        const me = this;
+
+        const player = me._getCurrentPlayer();
+        const billIndex = player.findBillOnPoint(point);
+
+        if (billIndex >= 0) {
+            me._hand.takeBill(billIndex);
+
+            const action = me._hand.getMoneyAction();
+            if (action == null)
+                return false;
+
+            if (action == Enums.ActionType.MERGE_MONEY)
+                player.hideButton(Enums.ActionType.SPLIT_MONEY);
+
+            player.showButtons([ action ], true);
+
+            return true;
+        }
+
+        if (player.isButtonClick(point, Enums.ActionType.SPLIT_MONEY)) {
+            const money = me._hand.dropMoney();
+            const splited = Helper.splitBillToBills(money);
+            player.hideButton(Enums.ActionType.SPLIT_MONEY);
+            player.addMoney(splited);
+            return true;
+        }
+
+        if (player.isButtonClick(point, Enums.ActionType.MERGE_MONEY)) {
+            const money = me._hand.dropMoney();
+            const merged = Helper.mergeBills(money);
+            player.hideButton(Enums.ActionType.MERGE_MONEY);
+            player.addMoney(merged);
+            return true;
+        }
+
+        return false;
     }
 
     _getCpuPoint() {

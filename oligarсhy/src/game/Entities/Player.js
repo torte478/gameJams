@@ -326,6 +326,15 @@ export default class Player {
     }
 
     /**
+     * @param {Number} type 
+     */
+    hideButton(type) {
+        const me = this;
+
+        me._buttons.hide(type);
+    }
+
+    /**
      * @param {Number} index 
      * @returns {Number}
      */

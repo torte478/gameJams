@@ -106,4 +106,14 @@ export default class Buttons {
                 visibleButtons[i].y
             );
     }
+
+    /**
+     * @param {Number} type 
+     */
+    hide(type) {
+        const me = this;
+
+        me._container.getAll()[type].setVisible(false);
+        me.show([], true);
+    }
 }
