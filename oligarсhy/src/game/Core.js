@@ -15,6 +15,9 @@ import Helper from './Helper.js';
 
 export default class Core {
 
+    /** @type {Phaser.Scene} */
+    _scene;
+
     /** @type {Fields} */
     _fields;
 
@@ -39,11 +42,20 @@ export default class Core {
     /** @type {HUD} */
     _hud;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _cursor;
+
     /**
-     * @param {Phaser.GameObjects.GameObjectFactory} factory 
+     * @param {Phaser.Scene} scene 
      */
-    constructor(factory) {
+    constructor(scene) {
         const me = this;
+
+        me._scene = scene;
+
+        const factory = scene.add;
+
+        me._cursor = me._createCursor(scene);
 
         me._status = new Status(Config.Start.PiecePositions, Config.Start.Player, Config.Start.State);
 
@@ -69,7 +81,7 @@ export default class Core {
             1)
             .setDepth(Consts.Depth.Pieces);
 
-        me._hand = new Hand();
+        me._hand = new Hand(scene);
 
         const groups = new Groups(factory);
         me._players = [];
@@ -81,6 +93,57 @@ export default class Core {
         me._hud = new HUD(factory);
 
         me._setState(Config.Start.State);
+
+        scene.input.on('pointermove', (p) => {
+            /** @type {Phaser.Input.Pointer} */
+            const pointer = p;
+
+            if (!scene.input.mouse.locked) 
+                return;
+
+            me._cursor.x += pointer.movementX;
+            me._cursor.y += pointer.movementY;
+
+            me.onPointerMove(Utils.toPoint(me._cursor));
+        }, me);
+    }
+
+    update() {
+        const me = this;
+
+        if (!me._isHumanTurn()) {
+            me._processCpuTurn();
+        }
+
+        const target = me._getCursorOffset();
+        me._hand.checkTarget(target);
+    }
+
+    onPointerMove(point) {
+        const me = this;
+
+        const index = me._fields.getFieldIndex(point);
+
+        index != null
+            ? me._hud.showField(index)
+            : me._hud.hideField();
+
+        me._hand.moveTo(me._getCursorOffset());
+    }
+
+    onPointerDown(pointer) {
+        const me = this;
+
+        if (me._scene.input.mouse.locked) {
+            const point = Utils.toPoint(me._cursor);
+            me.processHumanTurn(point, pointer.rightButtonDown());
+        }
+        else {
+            me._scene.input.mouse.requestPointerLock();
+            me._cursor.setVisible(true);
+
+            me._scene.cameras.main.startFollow(me._cursor, true, 0.05, 0.05);    
+        }
     }
     
     /**
@@ -94,13 +157,6 @@ export default class Core {
             return;
 
         me._processTurn(point, isRightButton);
-    }
-
-    processCpuTurn() {
-        const me = this;
-
-        const point = me._getCpuPoint();
-        me._processTurn(point, false);
     }
 
     debugDropDices(value) {
@@ -121,14 +177,11 @@ export default class Core {
             me._hud.hide();
     }
 
-    onPointerMove(point) {
+    _processCpuTurn() {
         const me = this;
 
-        const index = me._fields.getFieldIndex(point);
-
-        index != null
-            ? me._hud.showField(index)
-            : me._hud.hideField();
+        const point = me._getCpuPoint();
+        me._processTurn(point, false);
     }
 
     _isHumanTurn() {
@@ -607,5 +660,27 @@ export default class Core {
             me._getCurrentPlayer().showButtons([ Enums.ActionType.NEXT_TURN ]);
 
         me._status.setState(state);
+    }
+
+    _createCursor(scene) {
+        const me = this;
+
+        const cursor = scene.physics.add.image(
+            Config.Start.CameraPosition.x, 
+            Config.Start.CameraPosition.y, 
+            'cursor')
+            .setDepth(Consts.Depth.Max)
+            .setVisible(false)
+            .setCollideWorldBounds(true);
+
+        return cursor;
+    }
+
+    _getCursorOffset() {
+        const me = this;
+
+        return Utils.buildPoint(
+            me._cursor.x + 100,
+            me._cursor.y + 200);
     }
 }

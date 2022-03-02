@@ -11,9 +11,6 @@ export default class Game extends Phaser.Scene {
     /** @type {Phaser.GameObjects.Text} */
     _log;
 
-    /** @type {Phaser.GameObjects.Image} */
-    _cursor;
-
     /** @type {Core} */
     _core;
 
@@ -39,6 +36,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'money', Consts.Sizes.Bill.Width, Consts.Sizes.Bill.Height);
         Utils.loadSpriteSheet(me, 'buttons', 360, 200);
         Utils.loadSpriteSheet(me, 'houses', 50);
+        Utils.loadSpriteSheet(me, 'hand', 300, 360);
     }
 
     create() {
@@ -60,9 +58,7 @@ export default class Game extends Phaser.Scene {
 
         // custom
 
-        me._core = new Core(me.add);
-
-        me._cursor = me._createCursor();
+        me._core = new Core(me);
 
         // events
 
@@ -82,13 +78,11 @@ export default class Game extends Phaser.Scene {
     update() {
         const me = this;
 
-        if (!me._core._isHumanTurn()) {
-            me._core.processCpuTurn();
-        }
+        me._core.update();
 
         if (Config.Debug.Global) {
             me._log.text = 
-            `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
+            `ptr: ${me._core._cursor.x | 0} ${me._core._cursor.y | 0}\n` + 
             `mse: ${me.input.activePointer.worldX} ${me.input.activePointer.worldY}`;
         }
     }
@@ -111,50 +105,12 @@ export default class Game extends Phaser.Scene {
     _onPointerDown(pointer) {
         const me = this;
 
-        const point = new Phaser.Geom.Point(me._cursor.x, me._cursor.y);
-        me._core.processHumanTurn(point, pointer.rightButtonDown());
+        me._core.onPointerDown(pointer);
     }
 
     _onMouseWheel(deltaY) {
         const me = this;
 
         me._core.updateHud(deltaY);
-    }
-
-    _createCursor() {
-        const me = this;
-
-        const cursor = me.physics.add.image(
-            Config.Start.CameraPosition.x, 
-            Config.Start.CameraPosition.y, 
-            'cursor')
-            .setDepth(Consts.Depth.Max)
-            .setVisible(false)
-            .setCollideWorldBounds(true);
-
-        me.input.on('pointerdown', (p) => {
-            if (me.input.mouse.locked)
-                return;
-
-            me.input.mouse.requestPointerLock();
-            cursor.setVisible(true);
-
-            me.cameras.main.startFollow(cursor, true, 0.05, 0.05);
-        }, me);
-
-        me.input.on('pointermove', (p) => {
-            /** @type {Phaser.Input.Pointer} */
-            const pointer = p;
-
-            if (!me.input.mouse.locked) 
-                return;
-
-            cursor.x += pointer.movementX;
-            cursor.y += pointer.movementY;
-
-            me._core.onPointerMove(Utils.toPoint(cursor));
-        }, me);
-
-        return cursor;
     }
 }

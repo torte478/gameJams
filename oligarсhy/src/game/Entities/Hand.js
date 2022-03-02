@@ -3,8 +3,12 @@ import Phaser from '../../lib/phaser.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Helper from '../Helper.js';
+import Utils from '../Utils.js';
 
 export default class Hand {
+
+    /** @type {Phaser.Scene} */
+    _scene;
     
     /** @type {Phaser.GameObjects.Image[]} */
     _content;
@@ -15,8 +19,17 @@ export default class Hand {
     /** @type {Number[]} */
     _money;
 
-    constructor() {
+    /** @type {Phaser.GameObjects.Container} */
+    _container;
+
+
+    /**
+     * @param {Phaser.Scene} scene
+     */
+    constructor(scene) {
         const me = this;
+
+        me._scene = scene;
 
         me._content = [];
         me._state = Enums.HandState.EMPTY;
@@ -25,6 +38,10 @@ export default class Hand {
         for (let x in Enums.Money) {
             me._money.push(0);
         }
+
+        const image = scene.physics.add.image(0, 0, 'hand', 0);
+        me._container = scene.add.container(0, 0, [ image ])
+            .setDepth(Consts.Depth.Hand);
     }
 
     /**
@@ -167,5 +184,29 @@ export default class Hand {
             return Enums.ActionType.MERGE_MONEY;
         
         return null;
+    }
+
+    /**
+     * @param {Phaser.Geom.Point} pos 
+     */
+    moveTo(pos) {
+        const me = this;
+
+        me._container.getAll().forEach((obj) => {
+            me._scene.physics.moveTo(obj, pos.x, pos.y, 300, 1000);
+        });
+    }
+
+    checkTarget(pos) {
+        const me = this;
+
+        const dist = Phaser.Math.Distance.BetweenPoints(
+            pos,
+            Utils.toPoint(me._container.first));
+
+        if (dist < 10)
+        me._container.getAll().forEach((obj) => {
+            obj.setVelocity(0);
+        });
     }
 }
