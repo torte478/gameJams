@@ -22,6 +22,8 @@ export default class Hand {
     /** @type {Phaser.GameObjects.Container} */
     _container;
 
+    /** @type {Phaser.Tweens.Timeline} */
+    _timeline;
 
     /**
      * @param {Phaser.Scene} scene
@@ -39,7 +41,7 @@ export default class Hand {
             me._money.push(0);
         }
 
-        const image = scene.physics.add.image(0, 0, 'hand', 0);
+        const image = scene.add.image(0, 0, 'hand', 0);
         me._container = scene.add.container(0, 0, [ image ])
             .setDepth(Consts.Depth.Hand);
     }
@@ -48,75 +50,95 @@ export default class Hand {
      * @param {Phaser.GameObjects.Image} image //TODO : image?
      * @param {Phaser.Geom.Point} point 
      * @param {Number} type
+     * @param {Function} callback
      */
-    tryTake(image, point, type) {
+    tryTake(image, point, type, callback) {
         const me = this;
+
+        if (me._isBusy())
+            return false;
 
         if (!image.visible)
             return false;
 
-        const success = Phaser.Geom.Rectangle.ContainsPoint(
+        const canTake = Phaser.Geom.Rectangle.ContainsPoint(
             image.getBounds(), 
             point);
 
-        if (success) {
-            image.setVisible(false);
-            me._content.push(image);
-            me._state = type;
-        }
+        if (!canTake)
+            return false;
 
-        return success;
+        me._startTimeline(
+            Utils.toPoint(image),
+            () => {
+                if (!!callback)
+                    callback();
+
+                me._timeline = null;
+                image.setVisible(false);
+                me._content.push(image);
+                me._state = type;
+            }
+        );
+
+        return true;
     }
 
     /**
      * @param {Phaser.Geom.Point} point 
+     * @param {Function} callback
      */
-    tryDrop(point) {
+    tryDrop(point, callback) {
         const me = this;
 
-        switch (me._state) {
-            case Enums.HandState.DICES: {
-                
-                if (me._content.length != 2)
+        if (me._isBusy())
+            return false;
+
+        if (me._state == Enums.HandState.DICES) {
+            if (me._content.length != 2)
                     throw `Wrong hand content length: ${me._content.length}`;
 
-                const inside = Phaser.Geom.Rectangle.ContainsPoint(
-                    new Phaser.Geom.Rectangle(-690, -690, 1380, 1380),
-                    point);
+            const inside = Phaser.Geom.Rectangle.ContainsPoint(
+                new Phaser.Geom.Rectangle(-690, -690, 1380, 1380),
+                point);
 
-                if (!inside)
-                    return false;
+            if (!inside)
+                return false;
+        }
 
-                const first = me._content.pop();
-                const second = me._content.pop();
+        me._startTimeline(
+            point,
+            () => {
+                if (!!callback)
+                    callback();     
 
-                first
-                    .setPosition(point.x, point.y)
-                    .setVisible(true);
-        
-                second
-                    .setPosition(
-                        point.x + Consts.SecondDiceOffset.X, 
-                        point.y + Consts.SecondDiceOffset.Y)
-                    .setVisible(true);
+                if (me._state == Enums.HandState.DICES) {
+                    const first = me._content.pop();
+                    const second = me._content.pop();
 
-                me._state = Enums.HandState.EMPTY;
-
-                break;
-            }
-
-            default: {
-                while (me._content.length > 0) {
-                    const item = me._content.pop();
-
-                    item
+                    first
                         .setPosition(point.x, point.y)
                         .setVisible(true);
-                }               
+            
+                    second
+                        .setPosition(
+                            point.x + Consts.SecondDiceOffset.X, 
+                            point.y + Consts.SecondDiceOffset.Y)
+                        .setVisible(true);
+                }
+                else { 
+                    while (me._content.length > 0) {
+                        const item = me._content.pop();
+    
+                        item
+                            .setPosition(point.x, point.y)
+                            .setVisible(true);
+                    }   
+                }
 
                 me._state = Enums.HandState.EMPTY;
             }
-        }
+        );
 
         return true;
     }
@@ -136,13 +158,26 @@ export default class Hand {
         me._state = Enums.HandState.EMPTY;
     }
 
-    takeBill(index) {
+    takeBill(index, point, callback) {
         const me = this;
 
-        ++me._money[index];
-        me._state = Enums.HandState.MONEY;
+        if (me._isBusy())
+            return false;
 
-        console.log(`money: ${me._money.join(';')} (${Helper.getTotalMoney(me._money)})`); // TODO : fix all console.log
+        me._startTimeline(
+            point,
+            () => {
+                if (!!callback)
+                    callback();
+
+                ++me._money[index];
+                me._state = Enums.HandState.MONEY;
+        
+                console.log(`money: ${me._money.join(';')} (${Helper.getTotalMoney(me._money)})`); // TODO : fix all console.log        
+            }
+        );
+
+        return true;
     }
     
     dropMoney() {
@@ -189,24 +224,91 @@ export default class Hand {
     /**
      * @param {Phaser.Geom.Point} pos 
      */
-    moveTo(pos) {
+    moveTo(pos, delta) {
         const me = this;
 
-        me._container.getAll().forEach((obj) => {
-            me._scene.physics.moveTo(obj, pos.x, pos.y, 300, 1000);
-        });
-    }
+        if (me._isBusy())
+            return;
 
-    checkTarget(pos) {
-        const me = this;
-
-        const dist = Phaser.Math.Distance.BetweenPoints(
-            pos,
-            Utils.toPoint(me._container.first));
+        const dist = Phaser.Math.Distance.Between(
+            pos.x,
+            pos.y,
+            me._container.x,
+            me._container.y);
 
         if (dist < 10)
-        me._container.getAll().forEach((obj) => {
-            obj.setVelocity(0);
+            return;
+
+        const distance = {
+            x: pos.x - me._container.x,
+            y: pos.y - me._container.y
+        };
+
+        const shift = {
+            x: Math.min(Math.abs(distance.x), Consts.HandSpeed.Idle),
+            y: Math.min(Math.abs(distance.y), Consts.HandSpeed.Idle)
+        };
+
+        const movement = {
+            x: shift.x * Math.sign(distance.x) * (delta / 1000),
+            y: shift.y * Math.sign(distance.y) * (delta / 1000)
+        };
+
+        me._container.setPosition(
+            me._container.x + movement.x,
+            me._container.y + movement.y,
+        );
+    }
+
+    _isBusy() {
+        const me = this;
+
+        return me._timeline != null 
+               && me._timeline.isPlaying();
+    }
+
+    /**
+     * @param {Phaser.Geom.Point} target 
+     */
+    _getTweenDuration(target) {
+        const me = this;
+
+        const dist = Phaser.Math.Distance.Between(
+            me._container.x,
+            me._container.y,
+            target.x,
+            target.y
+        );
+
+        const time = (dist / Consts.HandSpeed.Action) * 1000; // TODO : to const
+        return time;
+    }
+
+    _startTimeline(target, callback) {
+        const me = this;
+
+        me._timeline = me._scene.tweens.timeline({
+            targets: me._container,
+
+            tweens: [
+            {
+                x: target.x,
+                y: target.y,
+                ease: 'Sine.easeInOut',
+                duration: me._getTweenDuration(target),
+            },
+            {
+                scale: { from: 1, to: 0.75 },
+                duration: Consts.HandSpeed.Grab / 2,
+                onComplete: () => {
+                    if (!!callback)
+                        callback();    
+                }
+            },
+            {
+                scale: { from: 0.75, to: 1 },
+                duration: Consts.HandSpeed.Grab
+            }]
         });
     }
 }

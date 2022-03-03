@@ -112,6 +112,12 @@ export default class Consts {
 
     static MaxHouseCount = 4;
 
+    static HandSpeed = {
+        Idle: 300,
+        Action: 600,
+        Grab: 250
+    };
+
     static TextColor = '#232429';
     static Font = 'Arial';
 

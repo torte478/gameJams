@@ -75,10 +75,10 @@ export default class Game extends Phaser.Scene {
         }
     }
 
-    update() {
+    update(time, delta) {
         const me = this;
 
-        me._core.update();
+        me._core.update(delta);
 
         if (Config.Debug.Global) {
             me._log.text = 

@@ -59,16 +59,19 @@ export default class Player {
                 point
             )
 
-            if (contains && me._money[i].count > 0) {
-                --me._money[i].count;
-                me._money[i].image.setVisible(
-                    me._money[i].count > 0);
-
+            if (contains && me._money[i].count > 0) 
                 return i;
-            }
         }
 
         return -1;
+    }
+
+    takeBill(index) {
+        const me = this;
+
+        --me._money[index].count;
+        me._money[index].image.setVisible(
+            me._money[index].count > 0);
     }
 
     /**
