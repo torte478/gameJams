@@ -198,6 +198,9 @@ export default class Core {
         if (isCancel)
             return me._cancelTurn();
 
+        if (me._trySelectOwnField(point))
+            return;
+
         if (Utils.contains(Consts.States.SellField, me._status.state) && me._trySelectOwnField(point)) {
                 return me._setState(Enums.GameState.OWN_FIELD_SELECTED);
         }
@@ -331,18 +334,26 @@ export default class Core {
                 if (!player.canClickButton(point, Enums.ActionType.BUY_FIELD))
                     return;
 
-                const handMoney = me._hand.getTotalMoney();
-                me._hand.dropMoney();
-                const diff = me._status.updatePayAmount(handMoney);
+                me._hand.tryMakeAction(
+                    point,
+                    Enums.HandAction.CLICK_BUTTON,
+                    null,
+                    () => {
+                        const handMoney = me._hand.getTotalMoney();
+                        me._hand.dropMoney();
+                        const diff = me._status.updatePayAmount(handMoney);
 
-                if (diff > 0)
-                    return;
+                        if (diff > 0)
+                            return;
 
-                const changeBills = Helper.splitValueToBills(-diff);
-                player.addMoney(changeBills);
-                player.addProperty(me._status.targetPieceIndex);
+                        const changeBills = Helper.splitValueToBills(-diff);
+                        player.addMoney(changeBills);
+                        player.addProperty(me._status.targetPieceIndex);
 
-                return me._setState(Enums.GameState.FINAL);
+                        me._setState(Enums.GameState.FINAL);
+                    }
+                );
+                break;
             }
 
             case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
@@ -355,37 +366,52 @@ export default class Core {
                 if (!enemy.canClickButton(point, Enums.ActionType.UNKNOWN))
                     return;
 
-                const handMoney = me._hand.getTotalMoney();
-                me._hand.dropMoney();
+                me._hand.tryMakeAction(
+                    point,
+                    Enums.HandAction.CLICK_BUTTON,
+                    null,
+                    () => {
+                        const handMoney = me._hand.getTotalMoney();
+                        me._hand.dropMoney();
 
-                const change = me._status.updatePayAmount(handMoney);
-                if (change > 0)
-                    return;
+                        const change = me._status.updatePayAmount(handMoney);
+                        if (change > 0)
+                            return;
 
-                const changeBills = Helper.splitValueToBills(-change);
-                player.addMoney(changeBills);                 
-                
-                const rent = enemy.getRent(me._status.targetPieceIndex);
-                enemy.addMoney(Helper.splitValueToBills(rent));
-                enemy.showButtons([]);
+                        const changeBills = Helper.splitValueToBills(-change);
+                        player.addMoney(changeBills);                 
+                        
+                        const rent = enemy.getRent(me._status.targetPieceIndex);
+                        enemy.addMoney(Helper.splitValueToBills(rent));
+                        enemy.showButtons([]);
 
-                return me._setState(Enums.GameState.FINAL);
+                        me._setState(Enums.GameState.FINAL);
+                    }
+                );
+
+                break;
             }
 
             case Enums.GameState.OWN_FIELD_SELECTED: {
 
                 if (player.canClickButton(point, Enums.ActionType.SELL)) {
-                    const index = me._status.selectedField;
-                    const cost = player.trySell(index, me._fields.getFieldPosition(index));
-                    if (cost == null)
-                        return;
+                    return me._hand.tryMakeAction(
+                        point,
+                        Enums.HandAction.CLICK_BUTTON,
+                        null,
+                        () => {
+                            const index = me._status.selectedField;
+                            const cost = player.trySell(index, me._fields.getFieldPosition(index));
+                            if (cost == null)
+                                return;
 
-                    const money = Helper.splitValueToBills(cost);
-                    player.addMoney(money);
-                
-                    player.showButtons([]);
-                    Utils.debugLog(`SELL: ${Utils.enumToString(Enums.PlayerIndex, player.index)} => ${index}`);
-                    return me._setState(me._status.stateToReturn);
+                            const money = Helper.splitValueToBills(cost);
+                            player.addMoney(money);
+                        
+                            player.showButtons([]);
+                            Utils.debugLog(`SELL: ${Utils.enumToString(Enums.PlayerIndex, player.index)} => ${index}`);
+                            return me._setState(me._status.stateToReturn);
+                        });
                 }
                 
                 if (me._tryManageMoney(point))
@@ -397,26 +423,32 @@ export default class Core {
                 if (!buyBuilding)
                     return;
 
-                const field = Config.Fields[me._status.selectedField];
+                me._hand.tryMakeAction(
+                    point,
+                    Enums.HandAction.CLICK_BUTTON,
+                    null,
+                    () => {
+                        const field = Config.Fields[me._status.selectedField];
 
-                if (me._status.payAmount == 0) {
-                    me._status.setPayAmount(field.costHouse);
-                }
+                        if (me._status.payAmount == 0) {
+                            me._status.setPayAmount(field.costHouse);
+                        }
 
-                const handMoney = me._hand.getTotalMoney();
-                me._hand.dropMoney();
-                const diff = me._status.updatePayAmount(handMoney);
-                if (diff > 0)
-                    return;
+                        const handMoney = me._hand.getTotalMoney();
+                        me._hand.dropMoney();
+                        const diff = me._status.updatePayAmount(handMoney);
+                        if (diff > 0)
+                            return;
 
-                const changeBills = Helper.splitValueToBills(-diff);
-                player.addMoney(changeBills);
+                        const changeBills = Helper.splitValueToBills(-diff);
+                        player.addMoney(changeBills);
 
-                const fieldIndex = me._status.selectedField;
-                player.addHouse(fieldIndex, me._fields.getFieldPosition(fieldIndex));
+                        const fieldIndex = me._status.selectedField;
+                        player.addHouse(fieldIndex, me._fields.getFieldPosition(fieldIndex));
 
-                me._status.buyHouseOnCurrentTurn = true;
-                return me._setState(me._status.stateToReturn);
+                        me._status.buyHouseOnCurrentTurn = true;
+                        me._setState(me._status.stateToReturn);
+                });
 
                 break;
             }
@@ -650,6 +682,9 @@ export default class Core {
     _trySelectOwnField(point) {
         const me = this;
 
+        if (!Utils.contains(Consts.States.SellField, me._status.state))
+            return false;
+
         const field = me._fields.getFieldIndex(point);
         if (!field)       
             return false;
@@ -661,24 +696,33 @@ export default class Core {
         if (!player.hasField(field))
             return false;
 
-        me._status.selectedField = field;
-        me._status.stateToReturn = me._status.state;
+        me._hand.tryMakeAction(
+            point,
+            Enums.HandAction.CLICK_BUTTON,
+            null,
+            () => {
+                me._status.selectedField = field;
+                me._status.stateToReturn = me._status.state;
 
-        const actions = [];
+                const actions = [];
 
-        if (player.canSellSmth(field))
-            actions.push(Enums.ActionType.SELL);
-        
-        const action = player.getBuyAction(field);
-        const canBuyHouse = action != null 
-                            && !me._status.buyHouseOnCurrentTurn 
-                            && me._status.state == Enums.GameState.FINAL;
-        if (canBuyHouse) 
-            actions.push(action);
+                if (player.canSellSmth(field))
+                    actions.push(Enums.ActionType.SELL);
+                
+                const action = player.getBuyAction(field);
+                const canBuyHouse = action != null 
+                                    && !me._status.buyHouseOnCurrentTurn 
+                                    && me._status.state == Enums.GameState.FINAL;
+                if (canBuyHouse) 
+                    actions.push(action);
 
-        player.showButtons(actions);
+                player.showButtons(actions);
 
-        Utils.debugLog(`select field ${field}`);
+                Utils.debugLog(`select field ${field}`);
+                me._setState(Enums.GameState.OWN_FIELD_SELECTED);
+            }
+        );
+
         return true;
     }
 
