@@ -95,7 +95,7 @@ export default class Player {
      * @param {Phaser.Geom.Point} point 
      * @param {Number}
      */
-    isButtonClick(point, type) {
+    canClickButton(point, type) {
         const me = this;
 
         const result = me._buttons.checkClick(point);

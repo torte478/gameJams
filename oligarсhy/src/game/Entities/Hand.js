@@ -46,97 +46,19 @@ export default class Hand {
             .setDepth(Consts.Depth.Hand);
     }
 
-    /**
-     * @param {Phaser.GameObjects.Image} image //TODO : image?
-     * @param {Phaser.Geom.Point} point 
-     * @param {Number} type
-     * @param {Function} callback
-     */
-    tryTake(image, point, type, callback) {
+    tryMakeAction(point, type, config, callback) {
         const me = this;
 
-        if (me._isBusy())
+        if (!me._validateAction(point, type, config))
             return false;
-
-        if (!image.visible)
-            return false;
-
-        const canTake = Phaser.Geom.Rectangle.ContainsPoint(
-            image.getBounds(), 
-            point);
-
-        if (!canTake)
-            return false;
-
-        me._startTimeline(
-            Utils.toPoint(image),
-            () => {
-                if (!!callback)
-                    callback();
-
-                me._timeline = null;
-                image.setVisible(false);
-                me._content.push(image);
-                me._state = type;
-            }
-        );
-
-        return true;
-    }
-
-    /**
-     * @param {Phaser.Geom.Point} point 
-     * @param {Function} callback
-     */
-    tryDrop(point, callback) {
-        const me = this;
-
-        if (me._isBusy())
-            return false;
-
-        if (me._state == Enums.HandState.DICES) {
-            if (me._content.length != 2)
-                    throw `Wrong hand content length: ${me._content.length}`;
-
-            const inside = Phaser.Geom.Rectangle.ContainsPoint(
-                new Phaser.Geom.Rectangle(-690, -690, 1380, 1380),
-                point);
-
-            if (!inside)
-                return false;
-        }
 
         me._startTimeline(
             point,
             () => {
+                me._innerTimelineCallback(point, type, config);
+
                 if (!!callback)
-                    callback();     
-
-                if (me._state == Enums.HandState.DICES) {
-                    const first = me._content.pop();
-                    const second = me._content.pop();
-
-                    first
-                        .setPosition(point.x, point.y)
-                        .setVisible(true);
-            
-                    second
-                        .setPosition(
-                            point.x + Consts.SecondDiceOffset.X, 
-                            point.y + Consts.SecondDiceOffset.Y)
-                        .setVisible(true);
-                }
-                else { 
-                    while (me._content.length > 0) {
-                        const item = me._content.pop();
-    
-                        item
-                            .setPosition(point.x, point.y)
-                            .setVisible(true);
-                    }   
-                }
-
-                me._state = Enums.HandState.EMPTY;
+                    callback();
             }
         );
 
@@ -156,28 +78,6 @@ export default class Hand {
             me._money[i] = 0;
 
         me._state = Enums.HandState.EMPTY;
-    }
-
-    takeBill(index, point, callback) {
-        const me = this;
-
-        if (me._isBusy())
-            return false;
-
-        me._startTimeline(
-            point,
-            () => {
-                if (!!callback)
-                    callback();
-
-                ++me._money[index];
-                me._state = Enums.HandState.MONEY;
-        
-                console.log(`money: ${me._money.join(';')} (${Helper.getTotalMoney(me._money)})`); // TODO : fix all console.log        
-            }
-        );
-
-        return true;
     }
     
     dropMoney() {
@@ -310,5 +210,114 @@ export default class Hand {
                 duration: Consts.HandSpeed.Grab
             }]
         });
+    }
+
+    _validateAction(point, type, config) {
+        const me = this;
+
+        if (me._isBusy())
+            return false;
+
+        switch (type) {
+            case Enums.HandAction.TAKE_DICE:
+            case Enums.HandAction.TAKE_PIECE: {
+                if (!config.image.visible)
+                    return false;
+
+                const canTake = Phaser.Geom.Rectangle.ContainsPoint(
+                    config.image.getBounds(), 
+                    point);
+
+                if (!canTake)
+                    return false;
+                
+                break;
+            }
+
+            case Enums.HandAction.DROP_DICES: {
+                if (me._content.length != 2)
+                    throw `Wrong hand content length: ${me._content.length}`;
+
+                const inside = Phaser.Geom.Rectangle.ContainsPoint(
+                    new Phaser.Geom.Rectangle(-690, -690, 1380, 1380),
+                    point);
+
+                if (!inside)
+                    return false;
+
+                break;
+            }
+
+            case Enums.HandAction.DROP_PIECE:
+            case Enums.HandAction.TAKE_BILL:
+            case Enums.HandAction.CLICK_BUTTON:
+                return true;
+
+            default: 
+                throw `Unknown hand action ${Utils.enumToString(Enums.HandAction, type)}`;
+        }
+
+        return true;
+    }
+
+    _innerTimelineCallback(point, type, config) {
+        const me = this;
+
+        switch (type) {
+            case Enums.HandAction.TAKE_DICE:
+            case Enums.HandAction.TAKE_PIECE: {
+                config.image.setVisible(false);
+                me._content.push(config.image);
+                me._state = config.type;
+                break;
+            }
+
+            case Enums.HandAction.DROP_DICES: {
+                const first = me._content.pop();
+                const second = me._content.pop();
+
+                first
+                    .setPosition(point.x, point.y)
+                    .setVisible(true);
+        
+                second
+                    .setPosition(
+                        point.x + Consts.SecondDiceOffset.X, 
+                        point.y + Consts.SecondDiceOffset.Y)
+                    .setVisible(true);
+
+                me._state = Enums.HandState.EMPTY;
+                break;
+            }
+
+            case Enums.HandAction.DROP_PIECE: {
+                while (me._content.length > 0) {
+                    const item = me._content.pop();
+
+                    item
+                        .setPosition(point.x, point.y)
+                        .setVisible(true);
+                }   
+
+                me._state = Enums.HandState.EMPTY;
+                break;
+            }
+
+            case Enums.HandAction.TAKE_BILL: {
+                ++me._money[config.index];
+                me._state = Enums.HandState.MONEY;
+        
+                console.log(`money: ${me._money.join(';')} (${Helper.getTotalMoney(me._money)})`); // TODO : fix all console.log    
+
+                break;
+            }
+
+            case Enums.HandAction.CLICK_BUTTON: {            
+                break;
+            }
+
+            default: 
+                throw `Unknown hand action callback ${Utils.enumToString(Enums.HandAction, type)}`;
+        }
     }
 }

@@ -91,4 +91,14 @@ export default class Enums {
         MOVING: 2,
         VISIBLE: 3
     }
+
+    static HandAction = {
+        UNKNOWN: 0,
+        TAKE_DICE: 1,
+        DROP_DICES: 2,
+        TAKE_PIECE: 3,
+        DROP_PIECE: 4,
+        TAKE_BILL: 5,
+        CLICK_BUTTON: 6
+    }
 }

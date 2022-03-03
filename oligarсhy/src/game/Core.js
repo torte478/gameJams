@@ -108,7 +108,7 @@ export default class Core {
         }, me);
     }
 
-    update() {
+    update(delta) {
         const me = this;
 
         if (!me._isHumanTurn()) {
@@ -116,7 +116,7 @@ export default class Core {
         }
 
         const target = me._getCursorOffset();
-        me._hand.checkTarget(target);
+        me._hand.moveTo(target, delta);
     }
 
     onPointerMove(point) {
@@ -127,8 +127,6 @@ export default class Core {
         index != null
             ? me._hud.showField(index)
             : me._hud.hideField();
-
-        me._hand.moveTo(me._getCursorOffset());
     }
 
     onPointerDown(pointer) {
@@ -209,54 +207,94 @@ export default class Core {
         switch (me._status.state) {
             case Enums.GameState.BEGIN: {
 
-                const diceTaked = 
-                    me._hand.tryTake(me._dice1, point, Enums.HandState.DICES)
-                    || me._hand.tryTake(me._dice2, point, Enums.HandState.DICES)
-
-                if (!diceTaked)
-                    return;
+                let canTakeDice = me._hand.tryMakeAction(
+                    point,
+                    Enums.HandAction.TAKE_DICE,
+                    {
+                        image: me._dice1,
+                        type: Enums.HandState.DICES
+                    },
+                    () => {
+                        me._setState(Enums.GameState.FIRST_DICE_TAKED)
+                    });
                 
-                return me._setState(Enums.GameState.FIRST_DICE_TAKED);
+                if (canTakeDice)
+                    return;
+
+                me._hand.tryMakeAction(
+                    point,
+                    Enums.HandAction.TAKE_DICE,
+                    {
+                        image: me._dice2,
+                        type: Enums.HandState.DICES
+                    },
+                    () => {
+                        me._setState(Enums.GameState.FIRST_DICE_TAKED)
+                    });
+
+                break;
             }
 
             case Enums.GameState.FIRST_DICE_TAKED: {
 
-                const diceTaked = 
-                    me._hand.tryTake(me._dice1, point, Enums.HandState.DICES)
-                    || me._hand.tryTake(me._dice2, point, Enums.HandState.DICES)
-
-                if (!diceTaked)
+                let canTakeDice = me._hand.tryMakeAction(
+                    point,
+                    Enums.HandAction.TAKE_DICE,
+                    {
+                        image: me._dice1,
+                        type: Enums.HandState.DICES
+                    },
+                    () => {
+                        me._setState(Enums.GameState.SECOND_DICE_TAKED)
+                    });
+                
+                if (canTakeDice)
                     return;
 
-                return me._setState(Enums.GameState.SECOND_DICE_TAKED);
+                me._hand.tryMakeAction(
+                    point,
+                    Enums.HandAction.TAKE_DICE,
+                    {
+                        image: me._dice2,
+                        type: Enums.HandState.DICES
+                    },
+                    () => {
+                        me._setState(Enums.GameState.SECOND_DICE_TAKED)
+                    });
+
+                break;
             }
 
             case Enums.GameState.SECOND_DICE_TAKED: {
 
-                var dropped = me._hand.tryDrop(point);
+                me._hand.tryMakeAction(
+                    point,
+                    Enums.HandAction.DROP_DICES,
+                    null,
+                    () => {
+                        const first = Utils.GetRandom(1, 6, 1);
+                        const second = Utils.GetRandom(1, 6, 0);
 
-                if (!dropped)
-                    return;
+                        Utils.debugLog(`${first} ${second} (${first + second})`);
 
-                const first = Utils.GetRandom(1, 6, 1);
-                const second = Utils.GetRandom(1, 6, 0);
+                        me._applyDiceDrop(first, second);    
+                });
 
-                Utils.debugLog(`${first} ${second} (${first + second})`);
-
-                return me._applyDiceDrop(first, second);
+                break;
             }
 
             case Enums.GameState.DICES_DROPED: {
                 
-                const pieceTaked = me._hand.tryTake(
-                    me._pieces[me._status.player], 
-                    point, 
-                    Enums.HandState.PIECE);
+                me._hand.tryMakeAction(
+                    point,
+                    Enums.HandAction.TAKE_PIECE,
+                    {
+                        image: me._pieces[me._status.player],
+                        type: Enums.HandState.PIECE,
+                    },
+                    () => { me._setState(Enums.GameState.PIECE_TAKED) });
 
-                if (!pieceTaked)
-                    return;
-                
-                return me._setState(Enums.GameState.PIECE_TAKED);
+                break;
             }
 
             case Enums.GameState.PIECE_TAKED: {
@@ -272,41 +310,14 @@ export default class Core {
                 if (field.index != me._status.targetPieceIndex)
                     return;
 
-                me._hand.tryDrop(field.position);
+                me._hand.tryMakeAction(
+                    field.position,
+                    Enums.HandAction.DROP_PIECE,
+                    null,
+                    () => { me._onPieceDrop(field)}
+                );
 
-                me._status.pieceIndicies[me._status.player] = me._status.targetPieceIndex;
-
-                const fieldConfig = Config.Fields[field.index];
-
-                if (!Utils.contains(Consts.BuyableFieldTypes, fieldConfig.type))
-                    return me._setState(Enums.GameState.FINAL);
-                    
-                const enemy = Utils.firstOrDefault(
-                    me._players, 
-                    (p) => p.index != me._status.player && p.hasField(field.index));
-
-                if (!!enemy) {
-                    const rent = enemy.getRent(field.index, me._status.diceResult);
-                    
-                    if (rent > player.getTotalMoney())
-                        return me._killPlayer();
-
-                    me._status.setPayAmount(rent);
-
-                    enemy.showButtons([Enums.ActionType.UNKNOWN]);
-                    return me._setState(Enums.GameState.PIECE_ON_ENEMY_PROPERTY);
-                }
-
-                const canBuyProperty = fieldConfig.cost <= player.getTotalMoney();
-
-                if (!player.hasField(field.index) && canBuyProperty) {
-                    me._status.setPayAmount(fieldConfig.cost);
-                    player.showButtons([Enums.ActionType.BUY_FIELD, Enums.ActionType.NEXT_TURN]);
-                    me._setState(Enums.GameState.PIECE_ON_FREE_PROPERTY);
-                    return;
-                }
-
-                return me._setState(Enums.GameState.FINAL)
+                break;
             }
 
             case Enums.GameState.PIECE_ON_FREE_PROPERTY: {
@@ -314,10 +325,10 @@ export default class Core {
                 if (me._tryManageMoney(point))
                     return;
 
-                if (player.isButtonClick(point, Enums.ActionType.NEXT_TURN))
+                if (player.canClickButton(point, Enums.ActionType.NEXT_TURN))
                     return me._finishTurn();
 
-                if (!player.isButtonClick(point, Enums.ActionType.BUY_FIELD))
+                if (!player.canClickButton(point, Enums.ActionType.BUY_FIELD))
                     return;
 
                 const handMoney = me._hand.getTotalMoney();
@@ -341,7 +352,7 @@ export default class Core {
                 
                 /** @type {Player} */
                 const enemy = Utils.single(me._players, (p) => p.hasField(me._status.targetPieceIndex));
-                if (!enemy.isButtonClick(point, Enums.ActionType.UNKNOWN))
+                if (!enemy.canClickButton(point, Enums.ActionType.UNKNOWN))
                     return;
 
                 const handMoney = me._hand.getTotalMoney();
@@ -363,7 +374,7 @@ export default class Core {
 
             case Enums.GameState.OWN_FIELD_SELECTED: {
 
-                if (player.isButtonClick(point, Enums.ActionType.SELL)) {
+                if (player.canClickButton(point, Enums.ActionType.SELL)) {
                     const index = me._status.selectedField;
                     const cost = player.trySell(index, me._fields.getFieldPosition(index));
                     if (cost == null)
@@ -380,8 +391,8 @@ export default class Core {
                 if (me._tryManageMoney(point))
                     return;
 
-                const buyBuilding = player.isButtonClick(point, Enums.ActionType.BUY_HOUSE) 
-                                    || player.isButtonClick(point, Enums.ActionType.BUY_HOTEL);
+                const buyBuilding = player.canClickButton(point, Enums.ActionType.BUY_HOUSE) 
+                                    || player.canClickButton(point, Enums.ActionType.BUY_HOTEL);
 
                 if (!buyBuilding)
                     return;
@@ -412,7 +423,7 @@ export default class Core {
 
             case Enums.GameState.FINAL: {
 
-                if (player.isButtonClick(point, Enums.ActionType.NEXT_TURN))
+                if (player.canClickButton(point, Enums.ActionType.NEXT_TURN))
                     return me._finishTurn();
 
                 if (me._tryManageMoney(point))
@@ -433,36 +444,56 @@ export default class Core {
         const billIndex = player.findBillOnPoint(point);
 
         if (billIndex >= 0) {
-            me._hand.takeBill(billIndex);
+            const taked = me._hand.tryMakeAction(
+                point,
+                Enums.HandAction.TAKE_BILL,
+                { index: billIndex },
+                () => {
+                    player.takeBill(billIndex);
 
-            const action = me._hand.getMoneyAction();
-            if (action == null)
-                return false;
+                    const action = me._hand.getMoneyAction();
+                    if (action == null)
+                        return false;
 
-            if (action == Enums.ActionType.MERGE_MONEY)
-                player.hideButton(Enums.ActionType.SPLIT_MONEY);
+                    if (action == Enums.ActionType.MERGE_MONEY)
+                        player.hideButton(Enums.ActionType.SPLIT_MONEY);
 
-            player.showButtons([ action ], true);
+                    player.showButtons([ action ], true);
+                }
+            );
+            return taked;
+        }
 
+        if (player.canClickButton(point, Enums.ActionType.SPLIT_MONEY)) {
+            me._hand.tryMakeAction(
+                point,
+                Enums.HandAction.CLICK_BUTTON,
+                null,
+                () => {
+                    const money = me._hand.dropMoney();
+                    const splited = Helper.splitBillToBills(money);
+                    player.hideButton(Enums.ActionType.SPLIT_MONEY);
+                    player.addMoney(splited);        
+                }
+            );
             return true;
         }
 
-        if (player.isButtonClick(point, Enums.ActionType.SPLIT_MONEY)) {
-            const money = me._hand.dropMoney();
-            const splited = Helper.splitBillToBills(money);
-            player.hideButton(Enums.ActionType.SPLIT_MONEY);
-            player.addMoney(splited);
+        if (player.canClickButton(point, Enums.ActionType.MERGE_MONEY)) {
+            const money = me._hand.getTotalMoney();
+            me._hand.tryMakeAction(
+                point,
+                Enums.HandAction.CLICK_BUTTON,
+                null,
+                () => {
+                    const money = me._hand.dropMoney();
+                    const merged = Helper.mergeBills(money);
+                    player.hideButton(Enums.ActionType.MERGE_MONEY);
+                    player.addMoney(merged);
+                }
+            );
             return true;
         }
-
-        if (player.isButtonClick(point, Enums.ActionType.MERGE_MONEY)) {
-            const money = me._hand.dropMoney();
-            const merged = Helper.mergeBills(money);
-            player.hideButton(Enums.ActionType.MERGE_MONEY);
-            player.addMoney(merged);
-            return true;
-        }
-        
 
         return false;
     }
@@ -683,4 +714,42 @@ export default class Core {
             me._cursor.x + 100,
             me._cursor.y + 200);
     }
+
+    _onPieceDrop(field) {
+        const me = this;
+
+        const player = me._getCurrentPlayer();
+        me._status.pieceIndicies[me._status.player] = me._status.targetPieceIndex;
+
+        const fieldConfig = Config.Fields[field.index];
+
+        if (!Utils.contains(Consts.BuyableFieldTypes, fieldConfig.type))
+            return me._setState(Enums.GameState.FINAL);
+            
+        const enemy = Utils.firstOrDefault(
+            me._players, 
+            (p) => p.index != me._status.player && p.hasField(field.index));
+
+        if (!!enemy) {
+            const rent = enemy.getRent(field.index, me._status.diceResult);
+            
+            if (rent > player.getTotalMoney())
+                return me._killPlayer();
+
+            me._status.setPayAmount(rent);
+
+            enemy.showButtons([Enums.ActionType.UNKNOWN]);
+            return me._setState(Enums.GameState.PIECE_ON_ENEMY_PROPERTY);
+        }
+
+        const canBuyProperty = fieldConfig.cost <= player.getTotalMoney();
+
+        if (!player.hasField(field.index) && canBuyProperty) {
+            me._status.setPayAmount(fieldConfig.cost);
+            player.showButtons([Enums.ActionType.BUY_FIELD, Enums.ActionType.NEXT_TURN]);
+            return me._setState(Enums.GameState.PIECE_ON_FREE_PROPERTY);
+        }
+
+        return me._setState(Enums.GameState.FINAL)
+}
 }
