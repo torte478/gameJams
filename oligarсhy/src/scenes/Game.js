@@ -32,7 +32,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'field_header', 160, 50);
         Utils.loadSpriteSheet(me, 'icons_big', 150, 200);
         Utils.loadSpriteSheet(me, 'icons_corner', 240);
-        Utils.loadSpriteSheet(me, 'pieces', 50);
+        Utils.loadSpriteSheet(me, 'pieces', 75);
         Utils.loadSpriteSheet(me, 'money', Consts.Sizes.Bill.Width, Consts.Sizes.Bill.Height);
         Utils.loadSpriteSheet(me, 'buttons', 360, 200);
         Utils.loadSpriteSheet(me, 'houses', 50);

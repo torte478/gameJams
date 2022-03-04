@@ -85,7 +85,7 @@ export default class Field {
             .setVisible(true);
 
         items[items.length - 2]
-            .setFrame(player)
+            .setFrame(player * 2)
             .setVisible(true);
 
         items[items.length - 1].setVisible(true);

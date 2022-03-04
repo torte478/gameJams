@@ -72,7 +72,7 @@ export default class Core {
         for (let player = 0; player < Config.Start.PlayerCount; ++player) {
             const position = me._fields.movePiece(player, 0, Config.Start.PiecePositions[player]);
 
-            const piece = factory.image(position.x, position.y, 'pieces', player)
+            const piece = factory.image(position.x, position.y, 'pieces', player * 2)
                 .setDepth(Consts.Depth.Pieces);
 
             me._pieces.push(piece);
