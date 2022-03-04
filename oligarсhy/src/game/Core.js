@@ -139,7 +139,9 @@ export default class Core {
     onPointerMove(point) {
         const me = this;
 
-        const index = me._fields.getFieldIndex(point);
+        let index = me._fields.getFieldIndex(point);
+        if (index == null)
+            index = me._cards.getFieldIndex(point);
 
         index != null
             ? me._hud.showField(index)
@@ -736,8 +738,11 @@ export default class Core {
         if (!Utils.contains(Consts.States.SellField, me._status.state))
             return false;
 
-        const field = me._fields.getFieldIndex(point);
-        if (!field)       
+        let field = me._fields.getFieldIndex(point);
+        if (field == null)       
+            field = me._cards.getFieldIndex(point);
+
+        if (field == null)
             return false;
 
         if (!Utils.contains(Consts.BuyableFieldTypes, Config.Fields[field].type))

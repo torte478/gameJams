@@ -80,7 +80,9 @@ export default class Field {
 
         const items = me._container.getAll();
 
-        items[items.length - 3].setVisible(true);
+        items[items.length - 3]
+            .setFrame(player == Enums.PlayerIndex.HUMAN ? 9 : 10)
+            .setVisible(true);
 
         items[items.length - 2]
             .setFrame(player)

@@ -65,6 +65,21 @@ export default class Cards {
         me._updateGrid(player, grid, field, false);
     }
 
+    getFieldIndex(point) {
+        const me = this;
+
+        const card =  Utils.firstOrDefault(
+            me._cards,
+            (c) => c.container.visible
+                   && Phaser.Geom.Rectangle.ContainsPoint(
+                        c.container.getBounds(),
+                        point))
+
+        return card != null
+            ? card.index
+            : null;
+    }
+
     _updateGrid(player, grid, field, buy, ignoreTween) {
         const me = this;
 
