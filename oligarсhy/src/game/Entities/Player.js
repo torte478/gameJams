@@ -30,10 +30,9 @@ export default class Player {
      * @param {Phaser.Scene} scene 
      * @param {Number} index
      * @param {Number[]} money
-     * @param {Array} fields
      * @param {Groups} groups
      */
-    constructor(scene, index, money, fields, groups) {
+    constructor(scene, index, money, groups) {
         const me = this;
 
         const factory = scene.add;
@@ -44,7 +43,7 @@ export default class Player {
         me._buttons = new Buttons(scene, index, groups);
 
         me._groups = groups;
-        me._fields = me._buildFields(fields);
+        me._fields = [];
     }
 
     /**
@@ -110,7 +109,7 @@ export default class Player {
     /**
      * @param {Number} field 
      */
-    addProperty(field) {
+    addField(field) {
         const me = this;
 
         me._fields.push({
@@ -118,7 +117,9 @@ export default class Player {
             houses: [],
             hotel: null
         });
-        console.log(`player ${Utils.enumToString(Enums.PlayerIndex, me.index)} buys property ${field}!`);
+        Utils.debugLog(`player ${Utils.enumToString(Enums.PlayerIndex, me.index)} buys property ${field}!`);
+
+        return me.getCardGrid();
     }
 
     /**
@@ -423,6 +424,34 @@ export default class Player {
         me._buttons.updateButtonSelection(point);
     }
 
+    getCardGrid() {
+        const me = this;
+
+        const grid = Utils.buildArray(10, -1);
+        for (let i = 0; i < me._fields.length; ++i) {
+            let column = -1;
+            const config = Config.Fields[me._fields[i].index];
+            if (config.type == Enums.FieldType.PROPERTY)
+                column = config.color - 1;
+            else if (config.type == Enums.FieldType.RAILSTATION)
+                column = 8;
+            else 
+                column = 9;
+
+            if (grid[column] == -1)
+                grid[column] = [ me._fields[i].index ];
+            else
+                grid[column].push(me._fields[i].index);
+        }
+
+        const result = [];
+        for (let i = 0; i < grid.length; ++i)
+            if (grid[i] != -1)
+                result.push(grid[i]);
+
+        return result;
+    }
+
     _getCost(index) {
         const me = this;
 
@@ -505,30 +534,6 @@ export default class Player {
         const me = this;
 
         return me._money.map((x) => x.count);
-    }
-
-    /**
-     * @param {Array} fields 
-     */
-    _buildFields(fields) {
-        const me = this;
-
-        const result = [];
-
-        for (let i = 0; i < fields.length; ++i) {
-            const item = fields[i];
-
-            if (isNaN(item)) 
-                result.push(item);
-            else
-                result.push({
-                    index: item,
-                    houses: [],
-                    hotel: null
-                });
-        }
-        
-        return result;
     }
 
     _createStartBills(factory, money, index) {

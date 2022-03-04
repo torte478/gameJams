@@ -1,14 +1,15 @@
 import Phaser from '../lib/phaser.js';
 
-import Fields from './Entities/Fields.js';
-import Hand from './Entities/Hand.js';
 import Player from './Entities/Player.js';
+import Fields from './Entities/Fields.js';
+import Cards from './Entities/Cards.js';
+import Hand from './Entities/Hand.js';
+import HUD from './Entities/HUD.js';
 
 import Config from './Config.js';
 import Consts from './/Consts.js';
 import Enums from './/Enums.js';
-import Groups from './Groups.js';
-import HUD from './Entities/HUD.js';
+import Groups from './Groups.js'; // TODO : to Entities/
 import Status from './Status.js';
 import Utils from './Utils.js';
 import Helper from './Helper.js';
@@ -47,6 +48,9 @@ export default class Core {
 
     /** @type {Phaser.GameObjects.Image} */
     _cursor;
+
+    /** @type {Cards} */
+    _cards;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -89,12 +93,15 @@ export default class Core {
             me._hands.push(new Hand(scene, i));
 
         const groups = new Groups(scene);
+        me._cards = new Cards(scene);
+
         me._players = [];
         for (let i = 0; i < Config.Start.PlayerCount; ++ i) {
             const player = new Player(scene, i, Config.Start.Money, Config.Start.Fields[i], groups);
-            for (let j = 0; j < Config.Start.Fields[i].length; ++j)
-                me._fields.buyField(Config.Start.Fields[i][j]);
             me._players.push(player);
+
+            for (let j = 0; j < Config.Start.Fields[i].length; ++j)
+                me._buyField(Config.Start.Fields[i][j], i);
 
             if (Config.Start.Fields[i].length > 0)
                 me._updateRent(i);
@@ -367,9 +374,8 @@ export default class Core {
                         const changeBills = Helper.splitValueToBills(-diff);
                         player.addMoney(changeBills);
                         const field = me._status.targetPieceIndex;
-                        player.addProperty(field);
 
-                        me._fields.buyField(field, player.index);
+                        me._buyField(field, player.index);
                         me._updateRent(player.index);
 
                         me._status.buyHouseOnCurrentTurn = true;
@@ -438,8 +444,10 @@ export default class Core {
                             player.showButtons([]);
 
                             me._updateRent(player.index);
-                            if (sellField)
+                            if (sellField) {
                                 me._fields.sellField(index);
+                                me._cards.sell(index, player.index, player.getCardGrid());
+                            }
 
                             Utils.debugLog(`SELL: ${Utils.enumToString(Enums.PlayerIndex, player.index)} => ${index}`);
                             return me._setState(me._status.stateToReturn);
@@ -855,5 +863,13 @@ export default class Core {
                 const rent = player.getRent(i, me._status.diceResult);
                 me._fields.updateRent(i, playerIndex, rent)
             }      
+    }
+
+    _buyField(field, playerIndex) {
+        const me = this;
+
+        const cardGrid = me._players[playerIndex].addField(field);
+        me._fields.buyField(field, playerIndex);
+        me._cards.buy(field, playerIndex, cardGrid);
     }
 }

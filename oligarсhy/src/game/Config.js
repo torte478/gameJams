@@ -7,45 +7,38 @@ export default class Config {
 
         StateLog: true,
         Log: true,
-        Random: false
+        Random: true
     };
 
-    static PlayerCount = 2;
-
     static Start = {
+        PlayerCount: 2,
+
         CameraPosition: {
-            x: 800,
-            y: 600
+            x: 300,
+            y: 400
         },
 
         PiecePositions: [
-            2,
             0,
             0,
-            2
+            0,
+            0
         ],
 
-        Player: 0,
+        Player: Enums.PlayerIndex.HUMAN,
 
         State: Enums.GameState.BEGIN,
 
-        Money: [
-            5,
-            1,
-            2,
-            1,
-            1,
-            4,
-            2
-        ],
+        Money: [5, 1, 2, 1, 1, 4, 2 ],
 
-        //Money: [ 0, 0, 0, 0, 0, 0, 0 ],
+        // Money: [ 0, 0, 0, 0, 0, 0, 0 ],
 
         Fields: [
-            [  ],
-            [ 3 ],
+            [3, 1],
             [],
-            []
+            [],
+            [],
+            // [ 1, 3, 5, 6, 8, 9, 11, 12, 13, 14, 15, 16, 18, 19, 21, 23, 24, 25, 26, 27, 28, 29, 31, 32, 34, 35, 37, 39  ],
         ]
     }
 

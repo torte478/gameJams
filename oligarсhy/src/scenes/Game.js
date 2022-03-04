@@ -37,6 +37,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'buttons', 360, 200);
         Utils.loadSpriteSheet(me, 'houses', 50);
         Utils.loadSpriteSheet(me, 'hand', 300, 360);
+        Utils.loadSpriteSheet(me, 'cards', 160, 200);
     }
 
     create() {
@@ -44,7 +45,7 @@ export default class Game extends Phaser.Scene {
 
         // Phaser
 
-        me.physics.world.setBounds(-1500, -1500, 3000, 3000);
+        me.physics.world.setBounds(-2500, -2500, 5000, 5000);
 
         me.cameras.main
             .setScroll(
