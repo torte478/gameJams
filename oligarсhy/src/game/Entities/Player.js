@@ -300,21 +300,26 @@ export default class Player {
             .filter((f) => Config.Fields[f.index].color == config.color);
 
         if (!!field.hotel) 
-            return true;
+            return Enums.ActionType.SELL_HOUSE;
             
-        if (field.houses.length > 0)
-            return !Utils.any(sameColorFields, 
-                (f) => f.houses.length > field.houses.length 
-                       || !!f.hotel);
+        const canSellHouse = field.houses.length > 0
+            && !Utils.any(sameColorFields, 
+                    (f) => f.houses.length > field.houses.length 
+                        || !!f.hotel)
+        if (canSellHouse)
+            return Enums.ActionType.SELL_HOUSE;
           
-        return !Utils.any(sameColorFields, (f) => f.houses.length > 0);
+        const canSellField = !Utils.any(sameColorFields, (f) => f.houses.length > 0);
+        return canSellField
+            ? Enums.ActionType.SELL_FIELD
+            : null;
     }
 
     /**
      * @param {Number} index 
      * @returns {Number}
      */
-    getBuyAction(index) {
+    canBuyHouse(index) {
         const me = this;
 
         if (Config.Fields[index].type != Enums.FieldType.PROPERTY)
@@ -334,13 +339,9 @@ export default class Player {
             return null;
 
         if (field.houses.length == Consts.MaxHouseCount)
-            return Utils.all(sameColorFields, (f) => f.houses.length == Consts.MaxHouseCount || f.hotel != null)
-                ? Enums.ActionType.BUY_HOTEL
-                : null;
+            return Utils.all(sameColorFields, (f) => f.houses.length == Consts.MaxHouseCount || f.hotel != null);
         else
-            return Utils.all(sameColorFields, (f) => f.houses.length >= field.houses.length)
-                ? Enums.ActionType.BUY_HOUSE
-                : null;
+            return Utils.all(sameColorFields, (f) => f.houses.length >= field.houses.length);
     }
 
     /**

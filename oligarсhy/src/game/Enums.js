@@ -76,13 +76,13 @@ export default class Enums {
 
     static ActionType = {
         UNKNOWN: 0,
-        NEXT_TURN: 1,
-        BUY_FIELD: 2,
-        BUY_HOUSE: 3,
-        BUY_HOTEL: 4,
-        SELL: 5,
-        SPLIT_MONEY: 6,
-        MERGE_MONEY: 7
+        MERGE_MONEY: 1,
+        SPLIT_MONEY: 2,
+        BUY_FIELD: 3,
+        BUY_HOUSE: 4,
+        SELL_FIELD: 5,
+        SELL_HOUSE: 6,
+        NEXT_TURN: 7
     };
 
     static HudState = {
