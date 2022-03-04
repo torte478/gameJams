@@ -11,10 +11,10 @@ export default class Helper {
     static getAngle(side, vertical) {
 
         const index = vertical
-            ? (side + 1) % 4
+            ? side + 1
             : side;
 
-        switch (index) {
+        switch (index % 4) {
             case 0:
                 return 0;
 

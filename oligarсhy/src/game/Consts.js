@@ -114,8 +114,13 @@ export default class Consts {
 
     static HandSpeed = {
         Idle: 300,
-        Action: 600,
-        Grab: 250
+        Action: 1200,
+        GrabDuration: 200
+    };
+
+    static HandWaitPosition = {
+        x: 800,
+        y: 1200
     };
 
     static TextColor = '#232429';

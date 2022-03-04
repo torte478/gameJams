@@ -33,6 +33,9 @@ export default class Core {
     /** @type {Hand} */
     _hand;
 
+    /** @type {Hand[]} */
+    _hands;
+
     /** @type {Status} */
     _status;
 
@@ -62,7 +65,7 @@ export default class Core {
         me._fields = new Fields(factory, Config.Start.PiecePositions);
 
         me._pieces = [];
-        for (let player = 0; player < Config.PlayerCount; ++player) {
+        for (let player = 0; player < Config.Start.PlayerCount; ++player) {
             const position = me._fields.movePiece(player, 0, Config.Start.PiecePositions[player]);
 
             const piece = factory.image(position.x, position.y, 'pieces', player)
@@ -81,11 +84,13 @@ export default class Core {
             1)
             .setDepth(Consts.Depth.Pieces);
 
-        me._hand = new Hand(scene);
+        me._hands = [];
+        for (let i = 0; i < Config.Start.PlayerCount; ++i)
+            me._hands.push(new Hand(scene, i));
 
         const groups = new Groups(factory);
         me._players = [];
-        for (let i = 0; i < Config.PlayerCount; ++ i) {
+        for (let i = 0; i < Config.Start.PlayerCount; ++ i) {
             const player = new Player(factory, i, Config.Start.Money, Config.Start.Fields[i], groups);
             me._players.push(player);
         }
@@ -116,7 +121,7 @@ export default class Core {
         }
 
         const target = me._getCursorOffset();
-        me._hand.moveTo(target, delta);
+        me._getCurrentPlayer().hand.moveTo(target, delta);
     }
 
     onPointerMove(point) {
@@ -195,6 +200,13 @@ export default class Core {
      _processTurn(point, isCancel) {
         const me = this;
 
+        const currentPlayer = me._getCurrentPlayer();
+        const player = currentPlayer.player;
+        const hand = currentPlayer.hand;
+
+        if (hand.isBusy())
+            return;
+
         if (isCancel)
             return me._cancelTurn();
 
@@ -205,12 +217,10 @@ export default class Core {
                 return me._setState(Enums.GameState.OWN_FIELD_SELECTED);
         }
 
-        const player = me._getCurrentPlayer();
-
         switch (me._status.state) {
             case Enums.GameState.BEGIN: {
 
-                let canTakeDice = me._hand.tryMakeAction(
+                let canTakeDice = hand.tryMakeAction(
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
@@ -224,7 +234,7 @@ export default class Core {
                 if (canTakeDice)
                     return;
 
-                me._hand.tryMakeAction(
+                hand.tryMakeAction(
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
@@ -240,7 +250,7 @@ export default class Core {
 
             case Enums.GameState.FIRST_DICE_TAKED: {
 
-                let canTakeDice = me._hand.tryMakeAction(
+                let canTakeDice = hand.tryMakeAction(
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
@@ -254,7 +264,7 @@ export default class Core {
                 if (canTakeDice)
                     return;
 
-                me._hand.tryMakeAction(
+               hand.tryMakeAction(
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
@@ -270,7 +280,7 @@ export default class Core {
 
             case Enums.GameState.SECOND_DICE_TAKED: {
 
-                me._hand.tryMakeAction(
+                hand.tryMakeAction(
                     point,
                     Enums.HandAction.DROP_DICES,
                     null,
@@ -288,7 +298,7 @@ export default class Core {
 
             case Enums.GameState.DICES_DROPED: {
                 
-                me._hand.tryMakeAction(
+                hand.tryMakeAction(
                     point,
                     Enums.HandAction.TAKE_PIECE,
                     {
@@ -313,7 +323,7 @@ export default class Core {
                 if (field.index != me._status.targetPieceIndex)
                     return;
 
-                me._hand.tryMakeAction(
+                hand.tryMakeAction(
                     field.position,
                     Enums.HandAction.DROP_PIECE,
                     null,
@@ -334,13 +344,13 @@ export default class Core {
                 if (!player.canClickButton(point, Enums.ActionType.BUY_FIELD))
                     return;
 
-                me._hand.tryMakeAction(
+                hand.tryMakeAction(
                     point,
                     Enums.HandAction.CLICK_BUTTON,
                     null,
                     () => {
-                        const handMoney = me._hand.getTotalMoney();
-                        me._hand.dropMoney();
+                        const handMoney = hand.getTotalMoney();
+                        hand.dropMoney();
                         const diff = me._status.updatePayAmount(handMoney);
 
                         if (diff > 0)
@@ -366,13 +376,13 @@ export default class Core {
                 if (!enemy.canClickButton(point, Enums.ActionType.UNKNOWN))
                     return;
 
-                me._hand.tryMakeAction(
+                hand.tryMakeAction(
                     point,
                     Enums.HandAction.CLICK_BUTTON,
                     null,
                     () => {
-                        const handMoney = me._hand.getTotalMoney();
-                        me._hand.dropMoney();
+                        const handMoney = hand.getTotalMoney();
+                        hand.dropMoney();
 
                         const change = me._status.updatePayAmount(handMoney);
                         if (change > 0)
@@ -395,7 +405,7 @@ export default class Core {
             case Enums.GameState.OWN_FIELD_SELECTED: {
 
                 if (player.canClickButton(point, Enums.ActionType.SELL)) {
-                    return me._hand.tryMakeAction(
+                    return hand.tryMakeAction(
                         point,
                         Enums.HandAction.CLICK_BUTTON,
                         null,
@@ -423,7 +433,7 @@ export default class Core {
                 if (!buyBuilding)
                     return;
 
-                me._hand.tryMakeAction(
+                hand.tryMakeAction(
                     point,
                     Enums.HandAction.CLICK_BUTTON,
                     null,
@@ -434,8 +444,8 @@ export default class Core {
                             me._status.setPayAmount(field.costHouse);
                         }
 
-                        const handMoney = me._hand.getTotalMoney();
-                        me._hand.dropMoney();
+                        const handMoney = hand.getTotalMoney();
+                        hand.dropMoney();
                         const diff = me._status.updatePayAmount(handMoney);
                         if (diff > 0)
                             return;
@@ -472,56 +482,55 @@ export default class Core {
     _tryManageMoney(point) {
         const me = this;
 
-        const player = me._getCurrentPlayer();
-        const billIndex = player.findBillOnPoint(point);
+        const current = me._getCurrentPlayer();
+        const billIndex = current.player.findBillOnPoint(point);
 
         if (billIndex >= 0) {
-            const taked = me._hand.tryMakeAction(
+            const taked = current.hand.tryMakeAction(
                 point,
                 Enums.HandAction.TAKE_BILL,
                 { index: billIndex },
                 () => {
-                    player.takeBill(billIndex);
+                    current.player.takeBill(billIndex);
 
-                    const action = me._hand.getMoneyAction();
+                    const action = current.hand.getMoneyAction();
                     if (action == null)
                         return false;
 
                     if (action == Enums.ActionType.MERGE_MONEY)
-                        player.hideButton(Enums.ActionType.SPLIT_MONEY);
+                        current.player.hideButton(Enums.ActionType.SPLIT_MONEY);
 
-                    player.showButtons([ action ], true);
+                    current.player.showButtons([ action ], true);
                 }
             );
             return taked;
         }
 
-        if (player.canClickButton(point, Enums.ActionType.SPLIT_MONEY)) {
-            me._hand.tryMakeAction(
+        if (current.player.canClickButton(point, Enums.ActionType.SPLIT_MONEY)) {
+            current.hand.tryMakeAction(
                 point,
                 Enums.HandAction.CLICK_BUTTON,
                 null,
                 () => {
-                    const money = me._hand.dropMoney();
+                    const money = current.hand.dropMoney();
                     const splited = Helper.splitBillToBills(money);
-                    player.hideButton(Enums.ActionType.SPLIT_MONEY);
-                    player.addMoney(splited);        
+                    current.player.hideButton(Enums.ActionType.SPLIT_MONEY);
+                    current.player.addMoney(splited);        
                 }
             );
             return true;
         }
 
-        if (player.canClickButton(point, Enums.ActionType.MERGE_MONEY)) {
-            const money = me._hand.getTotalMoney();
-            me._hand.tryMakeAction(
+        if (current.player.canClickButton(point, Enums.ActionType.MERGE_MONEY)) {
+            current.hand.tryMakeAction(
                 point,
                 Enums.HandAction.CLICK_BUTTON,
                 null,
                 () => {
-                    const money = me._hand.dropMoney();
+                    const money = current.hand.dropMoney();
                     const merged = Helper.mergeBills(money);
-                    player.hideButton(Enums.ActionType.MERGE_MONEY);
-                    player.addMoney(merged);
+                    current.player.hideButton(Enums.ActionType.MERGE_MONEY);
+                    current.player.addMoney(merged);
                 }
             );
             return true;
@@ -533,7 +542,7 @@ export default class Core {
     _getCpuPoint() {
         const me = this;
 
-        const player = me._getCurrentPlayer();
+        const current = me._getCurrentPlayer();
 
         switch (me._status.state) {
             case Enums.GameState.BEGIN:
@@ -555,29 +564,29 @@ export default class Core {
 
             case Enums.GameState.PIECE_ON_FREE_PROPERTY: {
                 const cost = Config.Fields[me._status.targetPieceIndex].cost;
-                const handMoney = me._hand.getTotalMoney();
+                const handMoney = current.hand.getTotalMoney();
                 const diff = cost - handMoney;
 
                 return diff > 0
-                    ? player.getNextOptimalBillPosition(diff)
-                    : player.getButtonPosition(Enums.ActionType.BUY_FIELD);
+                    ? current.player.getNextOptimalBillPosition(diff)
+                    : current.player.getButtonPosition(Enums.ActionType.BUY_FIELD);
             }
 
             case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
 
-                const total = player.getBillsMoney() + me._hand.getTotalMoney();
+                const total = current.player.getBillsMoney() + current.hand.getTotalMoney();
                 if (total < me._status.payAmount) {
-                    const index = player.getRichestField();
+                    const index = current.player.getRichestField();
                     return me._fields.getFieldPosition(index);
                 }
                 
                 /** @type {Player} */
                 const enemy = Utils.single(me._players, (p) => p.hasField(me._status.targetPieceIndex));
-                const handMoney = me._hand.getTotalMoney();
+                const handMoney = current.hand.getTotalMoney();
                 const diff = me._status.payAmount - handMoney;
 
                 return diff > 0
-                    ? player.getNextOptimalBillPosition(diff)
+                    ? current.player.getNextOptimalBillPosition(diff)
                     : enemy.getButtonPosition(Enums.ActionType.UNKNOWN);
             }
 
@@ -586,11 +595,11 @@ export default class Core {
                     throw `ai on OWN_FIELD_SELECTED from ` + 
                         `${Utils.enumToString(Enums.GameState, me._status.stateToReturn)} not implemented`;
 
-                return player.getButtonPosition(Enums.ActionType.SELL);
+                return current.player.getButtonPosition(Enums.ActionType.SELL);
             }
                 
             case Enums.GameState.FINAL:
-               return player.getButtonPosition(Enums.ActionType.NEXT_TURN);
+               return current.player.getButtonPosition(Enums.ActionType.NEXT_TURN);
 
             default:
                 const stateStr = Utils.enumToString(Enums.GameState, me._status.state);
@@ -610,12 +619,12 @@ export default class Core {
     _cancelTurn() {
         const me = this;
 
-        const money = me._hand.dropMoney();
-        me._hand.cancel();
+        const current = me._getCurrentPlayer();
+        const money = current.hand.dropMoney();
+        current.hand.cancel();
 
-        const player = me._getCurrentPlayer();
-        player.addMoney(money);
-        player.showButtons([]);
+        current.player.addMoney(money);
+        current.player.showButtons([]);
 
         me._status.selectedField = null;
         const next = me._getNextStateAfterCancel();
@@ -644,8 +653,10 @@ export default class Core {
     _finishTurn() {
         const me = this;
 
+        me._getCurrentPlayer().hand.toWait();
+
         do {
-            me._status.player = (me._status.player + 1) % Config.PlayerCount;
+            me._status.player = (me._status.player + 1) % Config.Start.PlayerCount;
         } while (Utils.all(me._status.activePlayers, (p) => p != me._status.player));
         
         for (let i = 0; i < me._players.length; ++i)
@@ -658,7 +669,10 @@ export default class Core {
     _getCurrentPlayer() {
         const me = this;
 
-        return me._players[me._status.player];
+        return {
+           player: me._players[me._status.player],
+           hand: me._hands[me._status.player]
+        };
     }
 
     _killPlayer() {
@@ -692,11 +706,11 @@ export default class Core {
         if (!Utils.contains(Consts.BuyableFieldTypes, Config.Fields[field].type))
             return false;
 
-        const player = me._getCurrentPlayer();
-        if (!player.hasField(field))
+        const current = me._getCurrentPlayer();
+        if (!current.player.hasField(field))
             return false;
 
-        me._hand.tryMakeAction(
+            current.hand.tryMakeAction(
             point,
             Enums.HandAction.CLICK_BUTTON,
             null,
@@ -706,17 +720,17 @@ export default class Core {
 
                 const actions = [];
 
-                if (player.canSellSmth(field))
+                if (current.player.canSellSmth(field))
                     actions.push(Enums.ActionType.SELL);
                 
-                const action = player.getBuyAction(field);
+                const action = current.player.getBuyAction(field);
                 const canBuyHouse = action != null 
                                     && !me._status.buyHouseOnCurrentTurn 
                                     && me._status.state == Enums.GameState.FINAL;
                 if (canBuyHouse) 
                     actions.push(action);
 
-                player.showButtons(actions);
+                current.player.showButtons(actions);
 
                 Utils.debugLog(`select field ${field}`);
                 me._setState(Enums.GameState.OWN_FIELD_SELECTED);
@@ -730,9 +744,9 @@ export default class Core {
         const me = this;
 
         if (state == Enums.GameState.BEGIN)
-            me._getCurrentPlayer().showButtons([]);
+            me._getCurrentPlayer().player.showButtons([]);
         else if (state == Enums.GameState.FINAL)
-            me._getCurrentPlayer().showButtons([ Enums.ActionType.NEXT_TURN ]);
+            me._getCurrentPlayer().player.showButtons([ Enums.ActionType.NEXT_TURN ]);
 
         me._status.setState(state);
     }
@@ -762,7 +776,7 @@ export default class Core {
     _onPieceDrop(field) {
         const me = this;
 
-        const player = me._getCurrentPlayer();
+        const player = me._getCurrentPlayer().player;
         me._status.pieceIndicies[me._status.player] = me._status.targetPieceIndex;
 
         const fieldConfig = Config.Fields[field.index];

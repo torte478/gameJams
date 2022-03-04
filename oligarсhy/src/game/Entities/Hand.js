@@ -25,10 +25,13 @@ export default class Hand {
     /** @type {Phaser.Tweens.Timeline} */
     _timeline;
 
+    /** @type {Phaser.Geom.Point} */
+    _waitPosition;
+
     /**
      * @param {Phaser.Scene} scene
      */
-    constructor(scene) {
+    constructor(scene, index) {
         const me = this;
 
         me._scene = scene;
@@ -42,8 +45,17 @@ export default class Hand {
         }
 
         const image = scene.add.image(0, 0, 'hand', 0);
-        me._container = scene.add.container(0, 0, [ image ])
-            .setDepth(Consts.Depth.Hand);
+
+        const angle = Helper.getAngle(index);
+        me._waitPosition = Phaser.Math.RotateAround(
+            Utils.toPoint(Consts.HandWaitPosition),
+            0,
+            0,
+            Phaser.Math.DegToRad(angle));
+
+        me._container = scene.add.container(me._waitPosition.x, me._waitPosition.y, [ image ])
+            .setDepth(Consts.Depth.Hand)
+            .setAngle(angle);
     }
 
     tryMakeAction(point, type, config, callback) {
@@ -127,7 +139,7 @@ export default class Hand {
     moveTo(pos, delta) {
         const me = this;
 
-        if (me._isBusy())
+        if (me.isBusy())
             return;
 
         const dist = Phaser.Math.Distance.Between(
@@ -160,7 +172,21 @@ export default class Hand {
         );
     }
 
-    _isBusy() {
+    toWait() {
+        const me = this;
+
+        me._timeline.stop();
+        me._timeline = me._scene.tweens.timeline({
+            targets: me._container,
+            tweens: [{
+                x: me._waitPosition.x,
+                y: me._waitPosition.y,
+                duration: me._getTweenDuration(me._waitPosition)
+            }]            
+        });
+    }
+
+    isBusy() {
         const me = this;
 
         return me._timeline != null 
@@ -199,7 +225,7 @@ export default class Hand {
             },
             {
                 scale: { from: 1, to: 0.75 },
-                duration: Consts.HandSpeed.Grab / 2,
+                duration: Consts.HandSpeed.GrabDuration / 2,
                 onComplete: () => {
                     if (!!callback)
                         callback();    
@@ -207,7 +233,7 @@ export default class Hand {
             },
             {
                 scale: { from: 0.75, to: 1 },
-                duration: Consts.HandSpeed.Grab
+                duration: Consts.HandSpeed.GrabDuration / 2
             }]
         });
     }
@@ -215,7 +241,7 @@ export default class Hand {
     _validateAction(point, type, config) {
         const me = this;
 
-        if (me._isBusy())
+        if (me.isBusy())
             return false;
 
         switch (type) {

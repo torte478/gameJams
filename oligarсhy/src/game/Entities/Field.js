@@ -19,7 +19,7 @@ export default class Field {
         me._container = container;
         
         me._pieces = [];
-        for (let i = 0; i < Config.PlayerCount; ++i) {
+        for (let i = 0; i < Config.Start.PlayerCount; ++i) {
             me._pieces.push(Enums.PlayerIndex.NOONE)
         }
     }
