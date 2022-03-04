@@ -92,7 +92,12 @@ export default class Core {
         me._players = [];
         for (let i = 0; i < Config.Start.PlayerCount; ++ i) {
             const player = new Player(scene, i, Config.Start.Money, Config.Start.Fields[i], groups);
+            for (let j = 0; j < Config.Start.Fields[i].length; ++j)
+                me._fields.buyField(Config.Start.Fields[i][j]);
             me._players.push(player);
+
+            if (Config.Start.Fields[i].length > 0)
+                me._updateRent(i);
         }
 
         me._hud = new HUD(factory);
@@ -361,7 +366,12 @@ export default class Core {
 
                         const changeBills = Helper.splitValueToBills(-diff);
                         player.addMoney(changeBills);
-                        player.addProperty(me._status.targetPieceIndex);
+                        const field = me._status.targetPieceIndex;
+                        player.addProperty(field);
+
+                        me._fields.buyField(field, player.index);
+                        me._updateRent(player.index);
+
                         me._status.buyHouseOnCurrentTurn = true;
 
                         me._setState(Enums.GameState.FINAL);
@@ -426,6 +436,7 @@ export default class Core {
                             player.addMoney(money);
                         
                             player.showButtons([]);
+                            me._updateRent(player.index);
                             Utils.debugLog(`SELL: ${Utils.enumToString(Enums.PlayerIndex, player.index)} => ${index}`);
                             return me._setState(me._status.stateToReturn);
                         });
@@ -464,6 +475,7 @@ export default class Core {
 
                         const fieldIndex = me._status.selectedField;
                         player.addHouse(fieldIndex, me._fields.getFieldPosition(fieldIndex));
+                        me._updateRent(player.index);
 
                         me._status.buyHouseOnCurrentTurn = true;
                         me._setState(me._status.stateToReturn);
@@ -622,6 +634,10 @@ export default class Core {
         const current = me._status.pieceIndicies[me._status.player];
         me._status.targetPieceIndex = (current + first + second) % Consts.FieldCount;
         me._status.diceResult = first + second;
+
+        for (let i = 0; i < Config.Start.PlayerCount; ++i)
+            me._updateRent(i);
+
         me._setState(Enums.GameState.DICES_DROPED);
     }
 
@@ -823,5 +839,17 @@ export default class Core {
         }
 
         return me._setState(Enums.GameState.FINAL)
-}
+    }
+
+    _updateRent(playerIndex) {
+        const me = this;
+
+        const player = me._players[playerIndex];
+
+        for (let i = 0; i < Consts.FieldCount; ++i)
+            if (player.hasField(i)) {
+                const rent = player.getRent(i, me._status.diceResult);
+                me._fields.updateRent(i, playerIndex, rent)
+            }      
+    }
 }

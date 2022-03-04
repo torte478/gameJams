@@ -11,12 +11,16 @@ export default class Field {
     /** @type {Number[]} */
     _pieces;
 
+    /** @type {Number} */
+    _index;
+
     /**
      * @param {Phaser.GameObjects.Container} container 
      */
-    constructor(container) {
+    constructor(container, index) {
         const me = this;
         me._container = container;
+        me._index = index;
         
         me._pieces = [];
         for (let i = 0; i < Config.Start.PlayerCount; ++i) {
@@ -69,5 +73,27 @@ export default class Field {
         }
 
         throw `can't find free space for player: ${player}`;
+    }
+
+    buy(player, rent) {
+        const me = this;
+
+        const items = me._container.getAll();
+
+        items[items.length - 3].setVisible(true);
+
+        items[items.length - 2]
+            .setFrame(player)
+            .setVisible(true);
+
+        items[items.length - 1].setVisible(true);
+    }
+
+    updateRent(player, rent) {
+        const me = this;
+
+        const items = me._container.getAll();
+        const text = `${player == Enums.PlayerIndex.HUMAN ? '+' : '-'} ${rent}`;
+        items[items.length - 1].setText(text);
     }
 }

@@ -102,6 +102,18 @@ export default class Fields {
                 point));
     }
 
+    buyField(index, player) {
+        const me = this;
+
+        me._fields[index].buy(player);
+    }
+
+    updateRent(index, player, rent) {
+        const me = this;
+
+        me._fields[index].updateRent(player, rent);
+    }
+
     _getNextPointConfig(player, from, to) {
         const me = this;
 
@@ -191,7 +203,7 @@ export default class Fields {
 
         const container = factory.container(x, y, children)
             .setAngle(angle);
-        return new Field(container);
+        return new Field(container, index);
     }
 
     /**
@@ -208,7 +220,10 @@ export default class Fields {
                     factory.image(0, -95, 'field_header', config.color),
                     factory.image(0, 20, 'icons', config.icon),
                     factory.text(0, -40, config.name, Consts.TextStyle.FieldSmall).setOrigin(0.5),
-                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5)
+                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
+                    factory.image(0, 144, 'field_header', 9).setVisible(false),
+                    factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
+                    factory.text(20, 144, 'TODO', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
                 ];
 
             case Enums.FieldType.CHANCE:
@@ -228,14 +243,20 @@ export default class Fields {
                 return [
                     factory.image(0, 0, 'icons_big', 4),
                     factory.text(0, -90, config.name, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
-                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5)
+                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
+                    factory.image(0, 144, 'field_header', 9).setVisible(false),
+                    factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
+                    factory.text(20, 144, 'TODO', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
                 ];
 
             case Enums.FieldType.UTILITY:
                 return [
                     factory.image(0, 0, 'icons_big', config.icon),
                     factory.text(0, -90, config.name, Consts.TextStyle.FieldSmall).setOrigin(0.5),
-                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5)
+                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
+                    factory.image(0, 144, 'field_header', 9).setVisible(false),
+                    factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
+                    factory.text(20, 144, 'TODO', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
                 ];
 
             case Enums.FieldType.START:
