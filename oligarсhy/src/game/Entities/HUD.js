@@ -37,7 +37,7 @@ export default class HUD {
         const background = factory.image(0, 0, 'hud');
         me._infoItems.caption = factory.text(-25, 0, 'TEST');
         me._infoItems.icon = factory.image(0, 60, 'icons', 0)
-            .setScale(0.75); //TODO
+            .setScale(0.75);
 
         me._infoItems.details = factory.text(-75, 125, '');
 
@@ -150,7 +150,7 @@ export default class HUD {
 
             case Enums.FieldType.RAILSTATION: {
                 me._infoItems.caption
-                    .setText('TODO');
+                    .setText(config.name);
 
                 me._infoItems.details.setVisible(false);
 

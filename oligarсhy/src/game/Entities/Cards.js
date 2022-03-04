@@ -90,14 +90,12 @@ export default class Cards {
         for (let j = 0; j < grid[i].length; ++j) {
             const item = Utils.single(me._cards, (c) => c.index == grid[i][j]);
 
-            const position = Phaser.Math.RotateAround(
+            const position = Helper.rotate(
                 Utils.buildPoint(
                     startX + i * 190,    
                     1600 + j * 220
                 ),
-                0,
-                0,
-                Phaser.Math.DegToRad(angle));
+                player);
 
             if (!!ignoreTween) {
                 item.container.setPosition(position.x, position.y);

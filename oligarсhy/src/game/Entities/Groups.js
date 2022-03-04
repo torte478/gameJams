@@ -1,5 +1,5 @@
-import Phaser from '../lib/phaser.js';
-import Consts from './Consts.js';
+import Phaser from '../../lib/phaser.js';
+import Consts from '../Consts.js';
 
 export default class Groups {
 

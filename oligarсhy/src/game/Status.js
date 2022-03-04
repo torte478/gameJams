@@ -26,7 +26,7 @@ export default class Status {
     stateToReturn;
 
     /** @type {Boolean} */
-    buyHouseOnCurrentTurn; // TODO : refactor management
+    buyHouseOnCurrentTurn;
 
     /** @type {Number} */
     payAmount;
@@ -74,7 +74,7 @@ export default class Status {
         const me = this;
 
         if (Config.Debug.Global && Config.Debug.StateLog)
-            console.log(
+            Utils.debugLog(
                 `(${me.player + 1}): `
                 + `${Utils.enumToString(Enums.GameState, me.state)} => `
                 + `${Utils.enumToString(Enums.GameState, value)}`);

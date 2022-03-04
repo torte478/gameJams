@@ -143,17 +143,27 @@ export default class Helper {
 
     /**
      * 
-     * @param {Number} index 
+     * @param {Number} side 
      * @returns {Phaser.Geom.Point}
      */
-    static getOuterPos(index) {
-        const me = this;
+    static getOuterPos(side) {
 
-        const angle = Helper.getAngle(index);
-
-        // TODO : to helper func
-        return Phaser.Math.RotateAround(
+        return Helper.rotate(
             Utils.buildPoint(0, -3000),
+            side);
+    }
+
+    /**
+     * 
+     * @param {Phaser.Geom.Point} point 
+     * @param {Number} side 
+     * @returns {Phaser.Geom.Point}
+     */
+    static rotate(point, side) {
+        const angle = Helper.getAngle(side);
+
+        return Phaser.Math.RotateAround(
+            point,
             0,
             0,
             Phaser.Math.DegToRad(angle)

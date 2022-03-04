@@ -3,13 +3,13 @@ import Phaser from '../lib/phaser.js';
 import Player from './Entities/Player.js';
 import Fields from './Entities/Fields.js';
 import Cards from './Entities/Cards.js';
+import Groups from './Entities/Groups.js'; 
 import Hand from './Entities/Hand.js';
 import HUD from './Entities/HUD.js';
 
 import Config from './Config.js';
 import Consts from './/Consts.js';
 import Enums from './/Enums.js';
-import Groups from './Groups.js'; // TODO : to Entities/
 import Status from './Status.js';
 import Utils from './Utils.js';
 import Helper from './Helper.js';
@@ -52,11 +52,30 @@ export default class Core {
     /** @type {Cards} */
     _cards;
 
+    /** @type {Phaser.GameObjects.Text} */
+    _log;
+
     /**
      * @param {Phaser.Scene} scene 
      */
     constructor(scene) {
         const me = this;
+
+        // Phaser
+
+        scene.physics.world.setBounds(-2500, -2500, 5000, 5000);
+
+        scene.cameras.main
+            .setScroll(
+                Config.Start.CameraPosition.x - Consts.Viewport.Width / 2,
+                Config.Start.CameraPosition.y - Consts.Viewport.Height / 2)
+            .setBounds(
+                scene.physics.world.bounds.x,
+                scene.physics.world.bounds.y,
+                scene.physics.world.bounds.width,
+                scene.physics.world.bounds.height);
+
+        // Custom
 
         me._scene = scene;
 
@@ -111,18 +130,13 @@ export default class Core {
 
         me._setState(Config.Start.State);
 
-        scene.input.on('pointermove', (p) => {
-            /** @type {Phaser.Input.Pointer} */
-            const pointer = p;
+        // Debug
 
-            if (!scene.input.mouse.locked) 
-                return;
-
-            me._cursor.x += pointer.movementX;
-            me._cursor.y += pointer.movementY;
-
-            me.onPointerMove(Utils.toPoint(me._cursor));
-        }, me);
+        if (Config.Debug.Global) {
+            me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
+                .setScrollFactor(0)
+                .setDepth(Consts.Depth.Max);
+        }
     }
 
     update(delta) {
@@ -134,10 +148,24 @@ export default class Core {
 
         const target = me._getCursorOffset();
         me._getCurrentPlayer().hand.moveTo(target, delta);
+
+        if (Config.Debug.Global) {
+            me._log.text = 
+            `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
+            `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}`;
+        }
     }
 
-    onPointerMove(point) {
+    onPointerMove(pointer) {
         const me = this;
+
+        if (!me._scene.input.mouse.locked) 
+                return;
+
+        me._cursor.x += pointer.movementX;
+        me._cursor.y += pointer.movementY;
+
+        const point = Utils.toPoint(me._cursor);
 
         let index = me._fields.getFieldIndex(point);
         if (index == null)

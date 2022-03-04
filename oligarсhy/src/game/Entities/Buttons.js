@@ -2,7 +2,7 @@ import Phaser from "../../lib/phaser.js";
 
 import Consts from "../Consts.js";
 import Enums from "../Enums.js";
-import Groups from "../Groups.js";
+import Groups from "./Groups.js";
 import Helper from "../Helper.js";
 import Utils from "../Utils.js";
 
@@ -14,13 +14,15 @@ export default class Buttons {
     /** @type {Phaser.GameObjects.Container} */
     _finishTurnPos;
 
+    /** @type {Number} */
+    _side;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
      * @param {Number} index 
-     * @param {Groups} groups 
      */
-    constructor(scene, index, groups) {
+    constructor(scene, index) {
         const me = this;
 
         const content = [];
@@ -31,10 +33,10 @@ export default class Buttons {
             content.push(button);
         }
 
+        me._side = index;
         const angle = Helper.getAngle(index);
 
-        const location = Phaser.Math.RotateAround(
-            new Phaser.Geom.Point(0, 450), 0, 0, Phaser.Math.DegToRad(angle));
+        const location = Helper.rotate(Utils.buildPoint(0, 450), index);
 
         me._container = scene.add.container(location.x, location.y, content)
             .setAngle(angle);
@@ -71,13 +73,7 @@ export default class Buttons {
         /** @type {Phaser.GameObjects.Image} */
         const button = me._container.getAll()[type];
 
-        const rotated = Phaser.Math.RotateAround(
-            new Phaser.Geom.Point(
-                button.x, 
-                button.y),
-            0,
-            0,
-            Phaser.Math.DegToRad(me._container.angle)) 
+        const rotated = Helper.rotate(Utils.toPoint(button), me._side);
 
         const world = new Phaser.Geom.Point(
             rotated.x + me._container.x, 
@@ -102,7 +98,9 @@ export default class Buttons {
                 buttons[i].clearTint();
         }
 
-        const visibleButtons = buttons.filter((b) => b.visible);
+        const visibleButtons = buttons.filter(
+            (b, i) => b.visible 
+                      && i != Enums.ActionType.NEXT_TURN);
 
         const offset = 20;
         const width = Consts.Sizes.Button.Width;
@@ -113,14 +111,19 @@ export default class Buttons {
         const start = -total / 2 + width / 2;
        
         for (let i = 0; i < visibleButtons.length; ++i)  {
-            const position = visibleButtons[i].frame.name == Enums.ActionType.NEXT_TURN
-                ? me._finishTurnPos
-                : Utils.buildPoint(
+            const position = Utils.buildPoint(
                     start + i  * width + (i > 0 ? offset : 0),
                     visibleButtons[i].y        
                 );
             visibleButtons[i].setPosition(position.x, position.y);
         }   
+
+        if (Utils.contains(types, Enums.ActionType.NEXT_TURN)) {
+            buttons[Enums.ActionType.NEXT_TURN].setPosition(
+                me._finishTurnPos.x,
+                me._finishTurnPos.y
+            );
+        }
     }
 
     /**

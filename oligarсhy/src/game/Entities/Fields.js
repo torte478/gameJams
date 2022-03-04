@@ -229,7 +229,7 @@ export default class Fields {
                     factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
                     factory.image(0, 144, 'field_header', 9).setVisible(false),
                     factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
-                    factory.text(20, 144, 'TODO', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
+                    factory.text(20, 144, 'RENT', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
                 ];
 
             case Enums.FieldType.CHANCE:
@@ -252,7 +252,7 @@ export default class Fields {
                     factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
                     factory.image(0, 144, 'field_header', 9).setVisible(false),
                     factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
-                    factory.text(20, 144, 'TODO', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
+                    factory.text(20, 144, 'RENT', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
                 ];
 
             case Enums.FieldType.UTILITY:
@@ -262,7 +262,7 @@ export default class Fields {
                     factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
                     factory.image(0, 144, 'field_header', 9).setVisible(false),
                     factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
-                    factory.text(20, 144, 'TODO', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
+                    factory.text(20, 144, 'RENT', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
                 ];
 
             case Enums.FieldType.START:

@@ -28,6 +28,9 @@ export default class Hand {
     /** @type {Phaser.Geom.Point} */
     _waitPosition;
 
+    /** @type {Number} */
+    _side;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -35,6 +38,7 @@ export default class Hand {
         const me = this;
 
         me._scene = scene;
+        me._side = index;
 
         me._content = [];
         me._state = Enums.HandState.EMPTY;
@@ -47,11 +51,9 @@ export default class Hand {
         const image = scene.add.image(0, 0, 'hand', 0);
 
         const angle = Helper.getAngle(index);
-        me._waitPosition = Phaser.Math.RotateAround(
+        me._waitPosition =  Helper.rotate(
             Utils.toPoint(Consts.HandWaitPosition),
-            0,
-            0,
-            Phaser.Math.DegToRad(angle));
+            index);
 
         me._container = scene.add.container(me._waitPosition.x, me._waitPosition.y, [ image ])
             .setDepth(Consts.Depth.Hand)
@@ -190,12 +192,9 @@ export default class Hand {
     prepareToRent() {
         const me = this;
 
-        const point = Phaser.Math.RotateAround(
+        const point = Helper.rotate(
             Utils.buildPoint(80, 550),
-            0,
-            0,
-            Phaser.Math.DegToRad(me._container.angle)
-        );
+            me._side);
 
         me._timeline = me._scene.tweens.timeline({
             targets: me._container,
@@ -238,7 +237,7 @@ export default class Hand {
             target.y
         );
 
-        const time = (dist / Consts.Speed.HandAction) * 1000; // TODO : to const
+        const time = (dist / Consts.Speed.HandAction) * 1000;
         return time;
     }
 
@@ -365,7 +364,7 @@ export default class Hand {
                 ++me._money[config.index];
                 me._state = Enums.HandState.MONEY;
         
-                console.log(`money: ${me._money.join(';')} (${Helper.getTotalMoney(me._money)})`); // TODO : fix all console.log    
+                Utils.debugLog(`money: ${me._money.join(';')} (${Helper.getTotalMoney(me._money)})`);
 
                 break;
             }
