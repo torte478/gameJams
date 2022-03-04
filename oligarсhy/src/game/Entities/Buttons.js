@@ -2,6 +2,7 @@ import Phaser from "../../lib/phaser.js";
 
 import Consts from "../Consts.js";
 import Enums from "../Enums.js";
+import Groups from "../Groups.js";
 import Helper from "../Helper.js";
 import Utils from "../Utils.js";
 
@@ -10,16 +11,23 @@ export default class Buttons {
     /** @type {Phaser.GameObjects.Container} */
     _container;
 
+    /** @type {Phaser.GameObjects.Container} */
+    _finishTurnPos;
+
     /**
-     * @param {Phaser.GameObjects.GameObjectFactory} factory 
+     * 
+     * @param {Phaser.Scene} scene 
+     * @param {Number} index 
+     * @param {Groups} groups 
      */
-    constructor(factory, index) {
+    constructor(scene, index, groups) {
         const me = this;
 
         const content = [];
         for (let i = 0; i < Object.keys(Enums.ActionType).length; ++i) {
-            const button = factory.image(0, 0, 'buttons', i)
-                .setVisible(false);
+            const button = scene.add.image(0, 0, 'buttons', i)
+                .setVisible(false)
+                .setTintFill();
             content.push(button);
         }
 
@@ -28,8 +36,10 @@ export default class Buttons {
         const location = Phaser.Math.RotateAround(
             new Phaser.Geom.Point(0, 450), 0, 0, Phaser.Math.DegToRad(angle));
 
-        me._container = factory.container(location.x, location.y, content)
+        me._container = scene.add.container(location.x, location.y, content)
             .setAngle(angle);
+
+        me._finishTurnPos = Utils.buildPoint(800, 800);
     }
 
     /**
@@ -87,7 +97,9 @@ export default class Buttons {
         for (let i = 0; i < buttons.length; ++i) {
             const visible = !!concat && buttons[i].visible 
                             || Utils.contains(types, i);
-            buttons[i].setVisible(visible);
+            buttons[i].setVisible(visible)
+            if (!visible)
+                buttons[i].clearTint();
         }
 
         const visibleButtons = buttons.filter((b) => b.visible);
@@ -100,11 +112,15 @@ export default class Buttons {
                       
         const start = -total / 2 + width / 2;
        
-        for (let i = 0; i < visibleButtons.length; ++i) 
-            visibleButtons[i].setPosition(
-                start + i  * width + (i > 0 ? offset : 0),
-                visibleButtons[i].y
-            );
+        for (let i = 0; i < visibleButtons.length; ++i)  {
+            const position = visibleButtons[i].frame.name == Enums.ActionType.NEXT_TURN
+                ? me._finishTurnPos
+                : Utils.buildPoint(
+                    start + i  * width + (i > 0 ? offset : 0),
+                    visibleButtons[i].y        
+                );
+            visibleButtons[i].setPosition(position.x, position.y);
+        }   
     }
 
     /**
@@ -113,7 +129,24 @@ export default class Buttons {
     hide(type) {
         const me = this;
 
-        me._container.getAll()[type].setVisible(false);
+        me._container.getAll()[type]
+            .setVisible(false)
+            .clearTint();
         me.show([], true);
+    }
+
+    updateButtonSelection(point) {
+        const me = this;
+
+        me._container.getAll('visible', true).forEach((button) => {
+            const selected = Phaser.Geom.Rectangle.ContainsPoint(
+                button.getBounds(),
+                point);
+
+            if (selected)
+                button.setTintFill(0xd4d6e1);
+            else
+                button.clearTint();
+        });
     }
 }

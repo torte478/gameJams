@@ -88,10 +88,10 @@ export default class Core {
         for (let i = 0; i < Config.Start.PlayerCount; ++i)
             me._hands.push(new Hand(scene, i));
 
-        const groups = new Groups(factory);
+        const groups = new Groups(scene);
         me._players = [];
         for (let i = 0; i < Config.Start.PlayerCount; ++ i) {
-            const player = new Player(factory, i, Config.Start.Money, Config.Start.Fields[i], groups);
+            const player = new Player(scene, i, Config.Start.Money, Config.Start.Fields[i], groups);
             me._players.push(player);
         }
 
@@ -132,6 +132,9 @@ export default class Core {
         index != null
             ? me._hud.showField(index)
             : me._hud.hideField();
+
+        me._players.forEach(
+            (p) => p.updateButtonSelection(point));
     }
 
     onPointerDown(pointer) {
@@ -374,7 +377,7 @@ export default class Core {
                 
                 /** @type {Player} */
                 const enemy = Utils.single(me._players, (p) => p.hasField(me._status.targetPieceIndex));
-                if (!enemy.canClickButton(point, Enums.ActionType.UNKNOWN))
+                if (!me._hands[enemy.index].isClick(point))
                     return;
 
                 hand.tryMakeAction(
@@ -394,7 +397,7 @@ export default class Core {
                         
                         const rent = enemy.getRent(me._status.targetPieceIndex);
                         enemy.addMoney(Helper.splitValueToBills(rent));
-                        enemy.showButtons([]);
+                        me._hands[enemy.index].toWait();
 
                         me._setState(Enums.GameState.FINAL);
                     }
@@ -787,7 +790,7 @@ export default class Core {
     _onPieceDrop(field) {
         const me = this;
 
-        const player = me._getCurrentPlayer().player;
+        const current = me._getCurrentPlayer(); 
         me._status.pieceIndicies[me._status.player] = me._status.targetPieceIndex;
 
         const fieldConfig = Config.Fields[field.index];
@@ -795,25 +798,26 @@ export default class Core {
         if (!Utils.contains(Consts.BuyableFieldTypes, fieldConfig.type))
             return me._setState(Enums.GameState.FINAL);
             
-        const enemy = Utils.firstOrDefault(
+        const enemyIndex = Utils.firstOrDefaultIndex(
             me._players, 
             (p) => p.index != me._status.player && p.hasField(field.index));
 
-        if (!!enemy) {
-            const rent = enemy.getRent(field.index, me._status.diceResult);
+        if (enemyIndex != null) {
+            const rent = me._players[enemyIndex].getRent(field.index, me._status.diceResult);
             
-            if (rent > player.getTotalMoney())
+            if (rent > current.player.getTotalMoney())
                 return me._killPlayer();
 
             me._status.setPayAmount(rent);
 
-            enemy.showButtons([Enums.ActionType.UNKNOWN]);
+            me._hands[enemyIndex].prepareToRent();
+            
             return me._setState(Enums.GameState.PIECE_ON_ENEMY_PROPERTY);
         }
 
-        const canBuyProperty = fieldConfig.cost <= player.getTotalMoney();
+        const canBuyProperty = fieldConfig.cost <= current.player.getTotalMoney();
 
-        if (!player.hasField(field.index) && canBuyProperty) {
+        if (!current.player.hasField(field.index) && canBuyProperty) {
             me._status.setPayAmount(fieldConfig.cost);
             return me._setState(Enums.GameState.PIECE_ON_FREE_PROPERTY);
         }

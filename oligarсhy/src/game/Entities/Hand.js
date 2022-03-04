@@ -181,7 +181,29 @@ export default class Hand {
             tweens: [{
                 x: me._waitPosition.x,
                 y: me._waitPosition.y,
-                duration: me._getTweenDuration(me._waitPosition)
+                duration: me._getTweenDuration(me._waitPosition),
+                ease: 'Sine.easeInOut'
+            }]            
+        });
+    }
+
+    prepareToRent() {
+        const me = this;
+
+        const point = Phaser.Math.RotateAround(
+            Utils.buildPoint(80, 550),
+            0,
+            0,
+            Phaser.Math.DegToRad(me._container.angle)
+        );
+
+        me._timeline = me._scene.tweens.timeline({
+            targets: me._container,
+            tweens: [{
+                x: point.x,
+                y: point.y,
+                duration: me._getTweenDuration(point),
+                ease: 'Sine.easeInOut'
             }]            
         });
     }
@@ -191,6 +213,16 @@ export default class Hand {
 
         return me._timeline != null 
                && me._timeline.isPlaying();
+    }
+
+    isClick(point) {
+        const me = this;
+
+        return !me._timeline.isPlaying()
+            &&  Phaser.Geom.Rectangle.ContainsPoint(
+                me._container.getBounds(),
+                point
+        );
     }
 
     /**

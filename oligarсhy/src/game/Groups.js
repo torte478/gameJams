@@ -4,15 +4,15 @@ import Consts from './Consts.js';
 export default class Groups {
 
     /** @type {Phaser.GameObjects.Group} */
-    _group;
+    _houseGroup;
 
     /**
-     * @param {Phaser.GameObjects.GameObjectFactory} factory 
+     * @param {Phaser.Scene} scene
      */
-    constructor(factory) {
+    constructor(scene) {
         const me = this;
 
-        me._group = factory.group();
+        me._houseGroup = scene.add.group();
     }
 
     /**
@@ -21,7 +21,7 @@ export default class Groups {
     createHouse() {
         const me = this;
 
-        return me._group.create(0, 0, 'houses', 0)
+        return me._houseGroup.create(0, 0, 'houses', 0)
             .setDepth(Consts.Depth.Houses);
     }
 
@@ -31,15 +31,15 @@ export default class Groups {
     createHotel() {
         const me = this;
 
-        return me._group.create(0, 0, 'houses', 2);
+        return me._houseGroup.create(0, 0, 'houses', 2);
     }
 
     /**
      * @param {Phaser.GameObjects.GameObject} obj 
      */
-    kill(obj) {
+    killBuilding(obj) {
         const me = this;
 
-        me._group.killAndHide(obj);
+        me._houseGroup.killAndHide(obj);
     }
 }

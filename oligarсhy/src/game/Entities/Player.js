@@ -27,19 +27,21 @@ export default class Player {
     index;
 
     /**
-     * @param {Phaser.GameObjects.GameObjectFactory} factory 
+     * @param {Phaser.Scene} scene 
      * @param {Number} index
      * @param {Number[]} money
      * @param {Array} fields
      * @param {Groups} groups
      */
-    constructor(factory, index, money, fields, groups) {
+    constructor(scene, index, money, fields, groups) {
         const me = this;
+
+        const factory = scene.add;
 
         me.index = index;
 
         me._money = me._createStartBills(factory, money, index);
-        me._buttons = new Buttons(factory, index);
+        me._buttons = new Buttons(scene, index, groups);
 
         me._groups = groups;
         me._fields = me._buildFields(fields);
@@ -257,7 +259,7 @@ export default class Player {
             .filter((f) => Config.Fields[f.index].color == config.color);
 
         if (!!field.hotel) {
-            me._groups.kill(field.hotel);
+            me._groups.killBuilding(field.hotel);
             field.hotel = null;
             for (let i = 0; i < Consts.MaxHouseCount; ++i)
                 me.addHouse(index, fieldPos);
@@ -270,7 +272,7 @@ export default class Player {
                 throw "can't sell - to many houses";
 
             for (let i = 0; i < field.houses.length; ++i)
-                me._groups.kill(field.houses[i]);
+                me._groups.killBuilding(field.houses[i]);
 
             field.houses = [];
             for (let i = 0; i < count - 1; ++i)
@@ -362,7 +364,7 @@ export default class Player {
 
         if (field.houses.length >= Consts.MaxHouseCount) {
             for (let i = 0; i < field.houses.length; ++i)
-                me._groups.kill(field.houses[i]);
+                me._groups.killBuilding(field.houses[i]);
 
             field.houses = [];
 
@@ -413,6 +415,12 @@ export default class Player {
             throw `can't sell anything`;
 
         return Utils.getRandomEl(result);
+    }
+
+    updateButtonSelection(point) {
+        const me = this;
+
+        me._buttons.updateButtonSelection(point);
     }
 
     _getCost(index) {
