@@ -96,4 +96,13 @@ export default class Field {
         const text = `${player == Enums.PlayerIndex.HUMAN ? '+' : '-'} ${rent}`;
         items[items.length - 1].setText(text);
     }
+
+    sell() {
+        const me = this;
+
+        const items = me._container.getAll();
+        items[items.length - 3].setVisible(false);
+        items[items.length - 2].setVisible(false);
+        items[items.length - 1].setVisible(false);
+    }
 }

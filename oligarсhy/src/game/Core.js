@@ -418,10 +418,10 @@ export default class Core {
 
             case Enums.GameState.OWN_FIELD_SELECTED: {
 
-                const sell = player.canClickButton(point, Enums.ActionType.SELL_FIELD) 
-                            || player.canClickButton(point, Enums.ActionType.SELL_HOUSE);
+                const sellField = player.canClickButton(point, Enums.ActionType.SELL_FIELD);
+                const sellHouse = player.canClickButton(point, Enums.ActionType.SELL_HOUSE);
 
-                if (sell) {
+                if (sellField || sellHouse) {
                     return hand.tryMakeAction(
                         point,
                         Enums.HandAction.CLICK_BUTTON,
@@ -436,7 +436,11 @@ export default class Core {
                             player.addMoney(money);
                         
                             player.showButtons([]);
+
                             me._updateRent(player.index);
+                            if (sellField)
+                                me._fields.sellField(index);
+
                             Utils.debugLog(`SELL: ${Utils.enumToString(Enums.PlayerIndex, player.index)} => ${index}`);
                             return me._setState(me._status.stateToReturn);
                         });

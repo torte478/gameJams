@@ -114,6 +114,12 @@ export default class Fields {
         me._fields[index].updateRent(player, rent);
     }
 
+    sellField(index) {
+        const me = this;
+
+        me._fields[index].sell();
+    }
+
     _getNextPointConfig(player, from, to) {
         const me = this;
 
