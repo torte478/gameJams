@@ -876,7 +876,7 @@ export default class Core {
             return me._setState(Enums.GameState.PIECE_ON_ENEMY_PROPERTY);
         }
 
-        const canBuyProperty = fieldConfig.cost <= current.player.getTotalMoney();
+        const canBuyProperty = fieldConfig.cost <= current.player.getBillsMoney();
 
         if (!current.player.hasField(field.index) && canBuyProperty) {
             me._status.setPayAmount(fieldConfig.cost);
