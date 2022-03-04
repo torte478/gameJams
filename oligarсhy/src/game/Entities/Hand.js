@@ -157,8 +157,8 @@ export default class Hand {
         };
 
         const shift = {
-            x: Math.min(Math.abs(distance.x), Consts.HandSpeed.Idle),
-            y: Math.min(Math.abs(distance.y), Consts.HandSpeed.Idle)
+            x: Math.min(Math.abs(distance.x), Consts.Speed.HandFollow),
+            y: Math.min(Math.abs(distance.y), Consts.Speed.HandFollow)
         };
 
         const movement = {
@@ -238,7 +238,7 @@ export default class Hand {
             target.y
         );
 
-        const time = (dist / Consts.HandSpeed.Action) * 1000; // TODO : to const
+        const time = (dist / Consts.Speed.HandAction) * 1000; // TODO : to const
         return time;
     }
 
@@ -257,7 +257,7 @@ export default class Hand {
             },
             {
                 scale: { from: 1, to: 0.75 },
-                duration: Consts.HandSpeed.GrabDuration / 2,
+                duration: Consts.Speed.HandGrabDuration / 2,
                 onComplete: () => {
                     if (!!callback)
                         callback();    
@@ -265,7 +265,7 @@ export default class Hand {
             },
             {
                 scale: { from: 0.75, to: 1 },
-                duration: Consts.HandSpeed.GrabDuration / 2
+                duration: Consts.Speed.HandGrabDuration / 2
             }]
         });
     }

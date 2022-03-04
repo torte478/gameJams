@@ -8,6 +8,9 @@ import Utils from "../Utils.js";
 
 export default class Cards {
 
+    /** @type {Phaser.Scene} */
+    _scene;
+
     /** @type {Object[]} */
     _cards;
 
@@ -16,6 +19,8 @@ export default class Cards {
      */
     constructor (scene) {
         const me = this;
+
+        me._scene = scene;
 
         me._cards = [];
         for (let i = 0; i < Consts.FieldCount; ++i) {
@@ -28,12 +33,13 @@ export default class Cards {
                 index: i,
                 container: scene.add.container(0, 300, me._getContent(scene, config))
                     .setVisible(false)
+                    .setDepth(Consts.Depth.Cards)
             };
             me._cards.push(card);
         }
     }
 
-    buy(field, player, grid) {
+    buy(field, player, grid, ignoreTween) {
         const me = this;
 
         const card = Utils.single(me._cards, (c) => c.index == field);
@@ -41,9 +47,11 @@ export default class Cards {
         if (card.container.visible)
             throw `card ${field} already visible`;
 
-        card.container.setVisible(true);
+        card.container
+            .setVisible(true)
+            .setAngle(Helper.getAngle(player));
 
-        me._updateGrid(player, grid);
+        me._updateGrid(player, grid, field, true, ignoreTween);
     }
 
     sell(field, player, grid) {
@@ -54,19 +62,17 @@ export default class Cards {
         if (!card.container.visible)
             throw `card ${field} already hidden`;
 
-        card.container.setVisible(false);
-
-        me._updateGrid(player, grid);
+        me._updateGrid(player, grid, field, false);
     }
 
-    _updateGrid(player, grid) {
+    _updateGrid(player, grid, field, buy, ignoreTween) {
         const me = this;
 
         const startX = grid.length * 190 / -2;
         const angle = Helper.getAngle(player);
 
         for (let i = 0; i < grid.length; ++i) 
-            for (let j = 0; j < grid[i].length; ++j) {
+        for (let j = 0; j < grid[i].length; ++j) {
             const item = Utils.single(me._cards, (c) => c.index == grid[i][j]);
 
             const position = Phaser.Math.RotateAround(
@@ -78,9 +84,45 @@ export default class Cards {
                 0,
                 Phaser.Math.DegToRad(angle));
 
-            item.container
-                .setPosition(position.x, position.y)
-                .setAngle(angle);
+            if (!!ignoreTween) {
+                item.container.setPosition(position.x, position.y);
+                continue;
+            }
+
+            if (item.index != field) {
+                me._scene.tweens.add({
+                    targets: item.container,
+                    x: position.x,
+                    y: position.y,
+                    duration: Consts.Speed.CardShiftDuration,
+                    ease: 'Sine.easeInOut'
+                });
+            } else if (buy) {
+                const point = Helper.getOuterPos(player);
+                item.container.setPosition(point.x, point.y);
+
+                me._scene.tweens.add({
+                    targets: item.container,
+                    x: position.x,
+                    y: position.y,
+                    duration: Consts.Speed.CardOuterDuration,
+                    ease: 'Sine.easeInOut'
+                });
+            }
+        }
+
+        if (!buy) {
+            const item = Utils.single(me._cards, (c) => c.index == field);
+            const point = Helper.getOuterPos(player);
+
+            me._scene.tweens.add({
+                targets: item.container,
+                x: point.x,
+                y: point.y,
+                duration: Consts.Speed.CardOuterDuration,
+                ease: 'Sine.easeInOut',
+                onComplete: () => { item.container.setVisible(false); }
+            });
         }
     }
 

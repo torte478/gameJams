@@ -135,9 +135,28 @@ export default class Helper {
      * @param {Number} index 
      * @returns {Number}
      */
-     static getFieldAngle(index) {
+    static getFieldAngle(index) {
         const quotient = index / (Consts.FieldCount / 4);
         const angle = Helper.getAngle(Math.floor(quotient));
         return angle;
+    }
+
+    /**
+     * 
+     * @param {Number} index 
+     * @returns {Phaser.Geom.Point}
+     */
+    static getOuterPos(index) {
+        const me = this;
+
+        const angle = Helper.getAngle(index);
+
+        // TODO : to helper func
+        return Phaser.Math.RotateAround(
+            Utils.buildPoint(0, -3000),
+            0,
+            0,
+            Phaser.Math.DegToRad(angle)
+        );
     }
 }

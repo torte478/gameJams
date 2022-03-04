@@ -12,6 +12,7 @@ export default class Consts {
         Money: 50,
         Houses: 100,
         Pieces: 200,
+        Cards: 300,
         Hand: 500,
         HUD: 1000,
         Max: 10000
@@ -112,10 +113,13 @@ export default class Consts {
 
     static MaxHouseCount = 4;
 
-    static HandSpeed = {
-        Idle: 300,
-        Action: 1200,
-        GrabDuration: 200
+    static Speed = {
+        HandFollow: 300,
+        HandAction: 1200,
+        HandGrabDuration: 200,
+
+        CardShiftDuration: 1000,
+        CardOuterDuration: 2000
     };
 
     static HandWaitPosition = {

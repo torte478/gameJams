@@ -101,7 +101,7 @@ export default class Core {
             me._players.push(player);
 
             for (let j = 0; j < Config.Start.Fields[i].length; ++j)
-                me._buyField(Config.Start.Fields[i][j], i);
+                me._buyField(Config.Start.Fields[i][j], i, true);
 
             if (Config.Start.Fields[i].length > 0)
                 me._updateRent(i);
@@ -865,11 +865,11 @@ export default class Core {
             }      
     }
 
-    _buyField(field, playerIndex) {
+    _buyField(field, playerIndex, ignoreTween) {
         const me = this;
 
         const cardGrid = me._players[playerIndex].addField(field);
         me._fields.buyField(field, playerIndex);
-        me._cards.buy(field, playerIndex, cardGrid);
+        me._cards.buy(field, playerIndex, cardGrid, ignoreTween);
     }
 }
