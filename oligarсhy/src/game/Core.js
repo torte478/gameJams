@@ -85,6 +85,24 @@ export default class Core {
 
         me._status = new Status(Config.Start.PiecePositions, Config.Start.Player, Config.Start.State);
 
+        const level = [
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+        ];
+
+        const map = scene.make.tilemap({ data: level, tileWidth: 500, tileHeight: 500 });
+        const tiles = map.addTilesetImage('table');
+        const layer = map.createLayer(0, tiles, -2750, -2750);
+
         me._fields = new Fields(factory, Config.Start.PiecePositions);
 
         me._pieces = [];

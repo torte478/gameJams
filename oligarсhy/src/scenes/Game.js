@@ -34,6 +34,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'houses', 50);
         Utils.loadSpriteSheet(me, 'hand', 300, 360);
         Utils.loadSpriteSheet(me, 'cards', 160, 200);
+        Utils.loadSpriteSheet(me, 'table', 500);
     }
 
     create() {
