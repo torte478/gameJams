@@ -25,10 +25,10 @@ export default class Core {
     /** @type {Phaser.GameObjects.Image[]} */
     _pieces;
 
-    /** @type {Phaser.GameObjects.Sprite} */
+    /** @type {Phaser.Physics.Arcade.Sprite} */
     _dice1;
 
-    /** @type {Phaser.GameObjects.Sprite} */
+    /** @type {Phaser.Physics.Arcade.Sprite} */
     _dice2;
 
     /** @type {Hand} */
@@ -118,15 +118,24 @@ export default class Core {
             me._pieces.push(piece);
         }
 
-        me._dice1 = factory.sprite(0, 0, 'dice', 0)
-            .setDepth(Consts.Depth.Pieces);
+        me._dice1 = scene.physics.add.sprite(0, 0, 'dice', 2)
+            .setDepth(Consts.Depth.Pieces)
+            .setBounce(1, 1)
+            .setCollideWorldBounds(true);
+        me._dice1.body.setBoundsRectangle(new Phaser.Geom.Rectangle(-700, -700, 1400, 1400));
 
-        me._dice2 = factory.sprite(
+
+        me._dice2 = scene.physics.add.sprite(
             Consts.SecondDiceOffset.X, 
             Consts.SecondDiceOffset.Y,
             'dice', 
-            1)
-            .setDepth(Consts.Depth.Pieces);
+            6)
+            .setDepth(Consts.Depth.Pieces)
+            .setBounce(1, 1)
+            .setCollideWorldBounds(true);
+        me._dice2.body.setBoundsRectangle(new Phaser.Geom.Rectangle(-700, -700, 1400, 1400));;
+
+        scene.physics.add.collider(me._dice1, me._dice2);
 
         me._hands = [];
         for (let i = 0; i < Config.Start.PlayerCount; ++i)
@@ -352,6 +361,11 @@ export default class Core {
 
             case Enums.GameState.SECOND_DICE_TAKED: {
 
+                if (me._status.diceRoll)
+                    return;
+
+                
+
                 hand.tryMakeAction(
                     point,
                     Enums.HandAction.DROP_DICES,
@@ -360,9 +374,33 @@ export default class Core {
                         const first = Utils.getRandom(1, 6, 1);
                         const second = Utils.getRandom(1, 6, 0);
 
-                        Utils.debugLog(`${first} ${second} (${first + second})`);
+                        me._dice1.play('first_dice_roll');
+                        me._dice1.setVelocity(
+                            Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0),
+                            Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0)
+                        );
 
-                        me._applyDiceDrop(first, second);    
+                        me._dice2.play('second_dice_roll');
+                        me._dice2.setVelocity(
+                            Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0),
+                            Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0)
+                        );
+
+                        me._status.diceRoll = true;
+
+                        me._scene.time.delayedCall(
+                            Utils.getRandom(1000, 2000, 1000),
+                            () => {
+                                me._dice1.stop().setFrame(first).setVelocity(0);
+                                me._dice2.stop().setFrame(second).setVelocity(0);
+
+                                Utils.debugLog(`${first} ${second} (${first + second})`);
+
+                                me._status.diceRoll = false;
+                                me._applyDiceDrop(first, second);    
+                            },
+                            null,
+                            me);
                 });
 
                 break;
@@ -637,10 +675,30 @@ export default class Core {
             case Enums.GameState.FIRST_DICE_TAKED:
                 return Utils.toPoint(me._dice2);
 
-            case Enums.GameState.SECOND_DICE_TAKED:
-                return Utils.buildPoint(
-                    Utils.getRandom(-100, 100, 0),
-                    Utils.getRandom(-100, 100, 0));
+            case Enums.GameState.SECOND_DICE_TAKED: {
+
+                if (me._status.diceRoll)
+                    return null;
+
+                const zone = Consts.DiceZoneRect;
+
+                if (me._getNextPlayerIndex() != Enums.PlayerIndex.HUMAN)
+                    return Utils.buildPoint(
+                        Utils.getRandom(zone.x, zone.x + zone.width, 0),
+                        Utils.getRandom(zone.y, zone.y + zone.height, 0));
+
+                const humanPos = Utils.toPoint(me._pieces[Enums.PlayerIndex.HUMAN]);
+
+                const randomPos = Utils.buildPoint(
+                    humanPos.x + Utils.getRandom(-200, 200, 0),
+                    humanPos.y + Utils.getRandom(-200, 200, 0));
+
+                const target = Utils.buildPoint(
+                    Math.max(zone.x, Math.min(zone.x + zone.width, randomPos.x)),
+                    Math.max(zone.y, Math.min(zone.y + zone.height, randomPos.y)));
+
+                return target;
+            }
 
             case Enums.GameState.DICES_DROPED:
                 return Utils.toPoint(me._pieces[me._status.player]);
@@ -744,16 +802,24 @@ export default class Core {
         const me = this;
 
         me._getCurrentPlayer().hand.toWait();
-
-        do {
-            me._status.player = (me._status.player + 1) % Config.Start.PlayerCount;
-        } while (Utils.all(me._status.activePlayers, (p) => p != me._status.player));
+        me._status.player = me._getNextPlayerIndex();
         
         for (let i = 0; i < me._players.length; ++i)
             me._players[i].showButtons(i == me._status.player);
 
         me._status.reset();
         me._setState(Enums.GameState.BEGIN);
+    }
+
+    _getNextPlayerIndex() {
+        const me = this;
+
+        let result = me._status.player;
+        do {
+            result = (result + 1) % Config.Start.PlayerCount;
+        } while (Utils.all(me._status.activePlayers, (p) => p != result));
+
+        return result;
     }
 
     _getCurrentPlayer() {

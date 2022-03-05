@@ -128,6 +128,17 @@ export default class Consts {
         y: 1200
     };
 
+    static DicePhysics = {
+        Speed: 200
+    };
+
+    static DiceZoneRect = {
+        x: -650,
+        y: -650,
+        width: 1300,
+        height: 1300
+    };
+
     static FieldTextColor = '#232429';
     static Font = 'Arial';
 

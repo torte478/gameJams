@@ -306,8 +306,9 @@ export default class Hand {
                 if (me._content.length != 2)
                     throw `Wrong hand content length: ${me._content.length}`;
 
+                const zone = Consts.DiceZoneRect;
                 const inside = Phaser.Geom.Rectangle.ContainsPoint(
-                    new Phaser.Geom.Rectangle(-690, -690, 1380, 1380),
+                    new Phaser.Geom.Rectangle(zone.x, zone.y, zone.width, zone.height),
                     point);
 
                 if (!inside)

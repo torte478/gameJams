@@ -34,6 +34,9 @@ export default class Status {
     /** @type {Number} */
     diceResult;
 
+    /** @type {Boolean} */
+    diceRoll;
+
     /**
      * @param {Number[]} pieceIndicies 
      * @param {Number} player
@@ -59,6 +62,7 @@ export default class Status {
         me.buyHouseOnCurrentTurn = false;
         me.payAmount = 0;
         me.diceResult = 0;
+        me.diceRoll = false;
 
         me.state = Enums.GameState.UNKNOWN;
     }

@@ -21,7 +21,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadImage(me, 'hud');
         Utils.loadImage(me, 'cursor');
 
-        Utils.loadSpriteSheet(me, 'dice', 50);
+        Utils.loadSpriteSheet(me, 'dice', 75);
         Utils.loadSpriteSheet(me, 'field', Consts.Sizes.Field.Width, Consts.Sizes.Field.Height);
         Utils.loadSpriteSheet(me, 'field_corner', 240);
         Utils.loadSpriteSheet(me, 'icons', 100);
@@ -39,6 +39,8 @@ export default class Game extends Phaser.Scene {
 
     create() {
         const me = this;
+
+        me._createAnimation();
 
         me._core = new Core(me);
 
@@ -85,5 +87,23 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         me._core.onPointerMove(pointer);
+    }
+
+    _createAnimation() {
+        const me = this;
+
+        me.anims.create({
+            key: 'first_dice_roll',
+            frames: me.anims.generateFrameNames('dice', { frames: [ 7, 8, 9, 10, 11, 12, 13, 14 ]}),
+            frameRate: 24,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'second_dice_roll',
+            frames: me.anims.generateFrameNames('dice', { frames: [ 10, 11, 12, 13, 14, 7, 8, 9 ]}),
+            frameRate: 25,
+            repeat: -1
+        });
     }
 }
