@@ -26,6 +26,9 @@ export default class HUD {
         details: null
     }
 
+    /** @type {Object[]} */
+    _playerItems;
+
     /**
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
      */
@@ -41,15 +44,34 @@ export default class HUD {
 
         me._infoItems.details = factory.text(-75, 125, '');
 
+        let content = [ background ];
+
+        me._playerItems = [];
+        const start = -360;
+        const offset = 100;
+        for (let i = 0; i < Config.Start.PlayerCount; ++i) {
+            content.push(factory.image(-60, start + i * offset + 10, 'pieces', i*2).setScale(0.75));
+            me._playerItems.push({
+                hand: factory.text(85, start + i * offset - 25, '12', Consts.TextStyle.HudMoney).setOrigin(1, 0),
+                cards: factory.text(85, start + i * offset, '34', Consts.TextStyle.HudMoney).setOrigin(1, 0),
+                total: factory.text(85, start + i * offset + 25 , '56', Consts.TextStyle.HudMoney).setOrigin(1, 0),
+            })
+            content.push(factory.text(-20, start + i * offset - 25, 'money:', Consts.TextStyle.HudMoney));
+            content.push(me._playerItems[i].hand);
+            content.push(factory.text(-20, start + i * offset, 'cards:', Consts.TextStyle.HudMoney));
+            content.push(me._playerItems[i].cards);
+            content.push(factory.text(-20, start + i * offset + 25, 'total:', Consts.TextStyle.HudMoney));
+            content.push(me._playerItems[i].total);
+        }
+
+        content.push(me._infoItems.caption);
+        content.push(me._infoItems.icon);
+        content.push(me._infoItems.details);
+
         me._container = factory.container(
             Consts.Sizes.HUD.Width / -2, 
             Consts.Sizes.HUD.Height / 2,
-            [
-                background,
-                me._infoItems.caption,
-                me._infoItems.icon,
-                me._infoItems.details,
-            ])
+            content)
             .setScrollFactor(0)
             .setDepth(Consts.Depth.HUD);
 
@@ -166,6 +188,14 @@ export default class HUD {
         const me = this;
         
         me._setFieldInfoVisible(false);
+    }
+
+    updateMoney(player, hand, cards) {
+        const me = this;
+        
+        me._playerItems[player].hand.setText(hand);
+        me._playerItems[player].cards.setText(cards);
+        me._playerItems[player].total.setText(hand + cards);
     }
 
     _setFieldInfoVisible(visible) {

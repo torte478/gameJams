@@ -75,21 +75,11 @@ export default class Player {
             me._money[index].count > 0);
     }
 
-    /**
-     * @param {Number[]} money 
-     */
-    addMoney(money) {
+    addBill(index) {
         const me = this;
 
-        for (let i = 0; i < money.length; ++i) {
-            me._money[i].count += money[i];
-            me._money[i].image.setVisible(
-                me._money[i].count > 0);
-        }
-
-        const msg = `${Utils.enumToString(Enums.PlayerIndex, me.index)} get: ` + 
-                    `${money.join(';')} (${Helper.getTotalMoney(money)})`;
-        Utils.debugLog(msg);
+        ++me._money[index].count;
+        me._money[index].image.setVisible(true);
     }
 
     /**
@@ -147,7 +137,14 @@ export default class Player {
      */
     getTotalMoney() {
         const me = this;
-        let result = me.getBillsMoney();
+
+        return me.getBillsMoney() + me.getFieldsCost();
+    }
+
+    getFieldsCost() {
+        const me = this;
+
+        let result = 0;
 
         for (let i = 0; i < me._fields.length; ++i) {
             const field = me._fields[i];
@@ -191,6 +188,12 @@ export default class Player {
             }
 
         throw `can't find bill to pay ${cost}`;
+    }
+
+    getBillPosition(index) {
+        const me = this;
+
+        return Utils.toPoint(me._money[index].image);
     }
 
     /**
@@ -551,7 +554,7 @@ export default class Player {
 
             const bills = {
                 count: money[i],
-                image: factory.image(point.x, point.y, 'money', i)
+                image: factory.image(point.x, point.y, 'money', i * 2)
                     .setAngle(billAngle)
                     .setVisible(money[i] > 0)
                     .setDepth(Consts.Depth.Money)

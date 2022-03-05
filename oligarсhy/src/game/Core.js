@@ -55,6 +55,9 @@ export default class Core {
     /** @type {Phaser.GameObjects.Text} */
     _log;
 
+    /** @type {Groups} */
+    _groups;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -129,12 +132,12 @@ export default class Core {
         for (let i = 0; i < Config.Start.PlayerCount; ++i)
             me._hands.push(new Hand(scene, i));
 
-        const groups = new Groups(scene);
+        me._groups = new Groups(scene);
         me._cards = new Cards(scene);
 
         me._players = [];
         for (let i = 0; i < Config.Start.PlayerCount; ++ i) {
-            const player = new Player(scene, i, Config.Start.Money, Config.Start.Fields[i], groups);
+            const player = new Player(scene, i, Config.Start.Money, me._groups);
             me._players.push(player);
 
             for (let j = 0; j < Config.Start.Fields[i].length; ++j)
@@ -145,6 +148,12 @@ export default class Core {
         }
 
         me._hud = new HUD(factory);
+
+        for (let i = 0; i < me._players.length; ++i)
+            me._hud.updateMoney(
+                i, 
+                me._players[i].getBillsMoney(),
+                me._players[i].getFieldsCost());
 
         me._setState(Config.Start.State);
 
@@ -348,8 +357,8 @@ export default class Core {
                     Enums.HandAction.DROP_DICES,
                     null,
                     () => {
-                        const first = Utils.GetRandom(1, 6, 1);
-                        const second = Utils.GetRandom(1, 6, 0);
+                        const first = Utils.getRandom(1, 6, 1);
+                        const second = Utils.getRandom(1, 6, 0);
 
                         Utils.debugLog(`${first} ${second} (${first + second})`);
 
@@ -419,12 +428,11 @@ export default class Core {
                         if (diff > 0)
                             return;
 
-                        const changeBills = Helper.splitValueToBills(-diff);
-                        player.addMoney(changeBills);
                         const field = me._status.targetPieceIndex;
 
                         me._buyField(field, player.index);
                         me._updateRent(player.index);
+                        me._addMoney(-diff, point, player);
 
                         me._status.buyHouseOnCurrentTurn = true;
 
@@ -449,18 +457,18 @@ export default class Core {
                     Enums.HandAction.CLICK_BUTTON,
                     null,
                     () => {
-                        const handMoney = hand.getTotalMoney();
+                        const total = hand.getTotalMoney();
                         hand.dropMoney();
 
-                        const change = me._status.updatePayAmount(handMoney);
+                        const change = me._status.updatePayAmount(total);
                         if (change > 0)
                             return;
 
-                        const changeBills = Helper.splitValueToBills(-change);
-                        player.addMoney(changeBills);                 
-                        
+                        me._addMoney(-change, point, player);
+
                         const rent = enemy.getRent(me._status.targetPieceIndex);
-                        enemy.addMoney(Helper.splitValueToBills(rent));
+                        me._addMoney(rent, point, enemy);
+
                         me._hands[enemy.index].toWait();
 
                         me._setState(Enums.GameState.FINAL);
@@ -485,9 +493,6 @@ export default class Core {
                             const cost = player.trySell(index, me._fields.getFieldPosition(index));
                             if (cost == null)
                                 return;
-
-                            const money = Helper.splitValueToBills(cost);
-                            player.addMoney(money);
                         
                             player.showButtons([]);
 
@@ -496,6 +501,8 @@ export default class Core {
                                 me._fields.sellField(index);
                                 me._cards.sell(index, player.index, player.getCardGrid());
                             }
+
+                            me._addMoney(cost, point, player);
 
                             Utils.debugLog(`SELL: ${Utils.enumToString(Enums.PlayerIndex, player.index)} => ${index}`);
                             return me._setState(me._status.stateToReturn);
@@ -530,12 +537,10 @@ export default class Core {
                         if (diff > 0)
                             return;
 
-                        const changeBills = Helper.splitValueToBills(-diff);
-                        player.addMoney(changeBills);
-
                         const fieldIndex = me._status.selectedField;
                         player.addHouse(fieldIndex, me._fields.getFieldPosition(fieldIndex));
                         me._updateRent(player.index);
+                        me._addMoney(-diff, point, player);
 
                         me._status.buyHouseOnCurrentTurn = true;
                         me._setState(me._status.stateToReturn);
@@ -596,7 +601,7 @@ export default class Core {
                     const money = current.hand.dropMoney();
                     const splited = Helper.splitBillToBills(money);
                     current.player.hideButton(Enums.ActionType.SPLIT_MONEY);
-                    current.player.addMoney(splited);        
+                    me._addBills(splited, point, current.player);
                 }
             );
             return true;
@@ -611,7 +616,7 @@ export default class Core {
                     const money = current.hand.dropMoney();
                     const merged = Helper.mergeBills(money);
                     current.player.hideButton(Enums.ActionType.MERGE_MONEY);
-                    current.player.addMoney(merged);
+                    me._addBills(merged, point, current.player);
                 }
             );
             return true;
@@ -634,8 +639,8 @@ export default class Core {
 
             case Enums.GameState.SECOND_DICE_TAKED:
                 return Utils.buildPoint(
-                    Utils.GetRandom(-100, 100, 0),
-                    Utils.GetRandom(-100, 100, 0));
+                    Utils.getRandom(-100, 100, 0),
+                    Utils.getRandom(-100, 100, 0));
 
             case Enums.GameState.DICES_DROPED:
                 return Utils.toPoint(me._pieces[me._status.player]);
@@ -706,9 +711,9 @@ export default class Core {
 
         const current = me._getCurrentPlayer();
         const money = current.hand.dropMoney();
+        me._addBills(money, current.hand.toPoint(), current.player);
         current.hand.cancel();
 
-        current.player.addMoney(money);
         current.player.showButtons([]);
 
         me._status.selectedField = null;
@@ -922,5 +927,51 @@ export default class Core {
         const cardGrid = me._players[playerIndex].addField(field);
         me._fields.buyField(field, playerIndex);
         me._cards.buy(field, playerIndex, cardGrid, ignoreTween);
+    }
+
+    _addMoney(value, from, player) {
+        const me = this;
+
+        const bills = Helper.splitValueToBills(value);
+
+        me._addBills(bills, from, player);
+    }
+
+    _addBills(bills, from, player) {
+        const me = this;
+
+        const billIndicies = Helper.enumBills(bills);
+
+        const billsValue = Helper.getTotalMoney(bills);
+
+        me._hud.updateMoney(
+            player.index, 
+            player.getBillsMoney() + billsValue,
+            player.getFieldsCost())
+
+        for (let i = 0; i < billIndicies.length; ++i) {
+            const bill = me._groups.createBill(
+                from.x,
+                from.y,
+                player.index,
+                billIndicies[i]);
+            const target = player.getBillPosition(billIndicies[i]);
+
+            me._scene.tweens.add({
+                targets: bill,
+                x: target.x,
+                y: target.y,
+                ease: 'Sine.easeOut',
+                duration: Utils.calclTweenDuration(
+                    from, 
+                    target, 
+                    Consts.Speed.CardOuterDuration),
+                delay: i * 50,
+                onComplete: () => {
+                    player.addBill(billIndicies[i])
+                    me._groups.killBill(bill);
+                }
+            });
+        }
     }
 }

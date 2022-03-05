@@ -31,6 +31,9 @@ export default class Hand {
     /** @type {Number} */
     _side;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _sprite;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -48,14 +51,14 @@ export default class Hand {
             me._money.push(0);
         }
 
-        const image = scene.add.image(0, 0, 'hand', 0);
+        me._sprite = scene.add.image(0, 0, 'hand', 0);
 
         const angle = Helper.getAngle(index);
         me._waitPosition =  Helper.rotate(
             Utils.toPoint(Consts.HandWaitPosition),
             index);
 
-        me._container = scene.add.container(me._waitPosition.x, me._waitPosition.y, [ image ])
+        me._container = scene.add.container(me._waitPosition.x, me._waitPosition.y, [ me._sprite ])
             .setDepth(Consts.Depth.Hand)
             .setAngle(angle);
     }
@@ -90,6 +93,8 @@ export default class Hand {
 
         for (let i = 0; i < me._money.length; ++i)
             me._money[i] = 0;
+
+        me._sprite.setFrame(0);
 
         me._state = Enums.HandState.EMPTY;
     }
@@ -224,6 +229,12 @@ export default class Hand {
         );
     }
 
+    toPoint() {
+        const me = this;
+
+        return Utils.toPoint(me._container);
+    }
+
     /**
      * @param {Phaser.Geom.Point} target 
      */
@@ -326,6 +337,7 @@ export default class Hand {
                 config.image.setVisible(false);
                 me._content.push(config.image);
                 me._state = config.type;
+                me._sprite.setFrame(2);
                 break;
             }
 
@@ -344,6 +356,7 @@ export default class Hand {
                     .setVisible(true);
 
                 me._state = Enums.HandState.EMPTY;
+                me._sprite.setFrame(0);
                 break;
             }
 
@@ -357,6 +370,7 @@ export default class Hand {
                 }   
 
                 me._state = Enums.HandState.EMPTY;
+                me._sprite.setFrame(0);
                 break;
             }
 

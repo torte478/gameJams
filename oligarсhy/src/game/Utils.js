@@ -135,7 +135,7 @@ export default class Utils {
      * @param {Number} debug 
      * @returns {Number}
      */
-    static GetRandom(from, to, debug) {
+    static getRandom(from, to, debug) {
         return debug !== undefined && Config.Debug.Global && Config.Debug.Random
             ? debug
             : Phaser.Math.Between(from, to);
@@ -193,5 +193,24 @@ export default class Utils {
     static getRandomEl(arr) {
         const index = Phaser.Math.Between(0, arr.length - 1);
         return arr[index];
+    }
+
+    // TODO : replace all occurences
+    /**
+     * @param {Phaser.Geom.Point} from 
+     * @param {Phaser.Geom.Point} to 
+     * @param {Number} speed 
+     * @returns {Number}
+     */
+    static calclTweenDuration(from, to, speed) {
+        const dist = Phaser.Math.Distance.Between(
+            from.x,
+            from.y,
+            to.x,
+            to.y
+        );
+
+        const time = (dist / speed) * 1000;
+        return time;
     }
 }

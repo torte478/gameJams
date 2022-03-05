@@ -169,4 +169,28 @@ export default class Helper {
             Phaser.Math.DegToRad(angle)
         );
     }
+
+    /**
+     * @param {Number[]} money 
+     * @returns {Number[]}
+     */
+    static enumBills(money) {
+        const result = [];
+        let iteration = 1;
+        while (true) {
+            let added = false;
+            for (let i = 0; i < money.length; ++i)
+                if (money[i] >= iteration) {
+                    added = true;
+                    result.push(i);
+                }
+
+            if (added)
+                ++iteration;
+            else
+                break;
+        }
+
+        return result;
+    }
 }

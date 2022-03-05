@@ -14,6 +14,7 @@ export default class Consts {
         Pieces: 200,
         Cards: 300,
         Hand: 500,
+        ActiveItem: 750,
         HUD: 1000,
         Max: 10000
     };
@@ -127,29 +128,33 @@ export default class Consts {
         y: 1200
     };
 
-    static TextColor = '#232429';
+    static FieldTextColor = '#232429';
     static Font = 'Arial';
 
     static TextStyle = {
         FieldSmall: {
-            color: Consts.TextColor,
+            color: Consts.FieldTextColor,
             fontFamily: Consts.Font,
             align: 'center',
             fontSize: 18
         },
 
         FieldMiddle: {
-            color: Consts.TextColor,
+            color: Consts.FieldTextColor,
             fontFamily: Consts.Font,
             align: 'center',
             fontSize: 22
         },
 
         FieldBig: {
-            color: Consts.TextColor,
+            color: Consts.FieldTextColor,
             fontFamily: Consts.Font,
             align: 'center',
             fontSize: 28
+        },
+
+        HudMoney: {
+            fontSize: 16
         },
     }
 }
