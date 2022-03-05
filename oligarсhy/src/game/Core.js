@@ -682,12 +682,9 @@ export default class Core {
 
                 const zone = Consts.DiceZoneRect;
 
-                if (me._getNextPlayerIndex() != Enums.PlayerIndex.HUMAN)
-                    return Utils.buildPoint(
-                        Utils.getRandom(zone.x, zone.x + zone.width, 0),
-                        Utils.getRandom(zone.y, zone.y + zone.height, 0));
+                const playerIndex = me._getNextPlayerIndex();
 
-                const humanPos = Utils.toPoint(me._pieces[Enums.PlayerIndex.HUMAN]);
+                const humanPos = Utils.toPoint(me._pieces[playerIndex]);
 
                 const randomPos = Utils.buildPoint(
                     humanPos.x + Utils.getRandom(-200, 200, 0),
