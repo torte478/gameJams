@@ -16,6 +16,7 @@ export default class Consts {
         Hand: 500,
         ActiveItem: 750,
         HUD: 1000,
+        Fade: 2000,
         Max: 10000
     };
 

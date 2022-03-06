@@ -37,6 +37,9 @@ export default class Status {
     /** @type {Boolean} */
     isBusy;
 
+    /** @type {Boolean} */
+    isPause;
+
     /**
      * @param {Number[]} pieceIndicies 
      * @param {Number} player
@@ -57,12 +60,7 @@ export default class Status {
         
         me.targetPieceIndex = me.pieceIndicies[me.player];
 
-        me.selectedField = null;
-        me.stateToReturn = null;
-        me.buyHouseOnCurrentTurn = false;
-        me.payAmount = 0;
-        me.diceResult = 0;
-        me.isBusy = false;
+        me.reset();
 
         me.state = Enums.GameState.UNKNOWN;
     }
@@ -95,6 +93,7 @@ export default class Status {
         me.buyHouseOnCurrentTurn = false;
         me.payAmount = 0;
         me.diceResult = 0;
+        me.isPause = false;
     }
 
     setPayAmount(value) {

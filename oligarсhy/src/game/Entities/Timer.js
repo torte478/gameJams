@@ -1,44 +1,58 @@
 export default class Timer { 
 
     /** @type {Number} */
-    _turn;
+    _duration;
 
     /** @type {Number} */
-    _finishTurn;
+    _finishTime;
 
     /** @type {Boolean} */
-    _isTurnRunning;
+    _isPause;
+
+    /** @type {Number} */
+    _remain;
 
     /**
-     * @param {Number} turn 
+     * @param {Number} duration 
      */
-    constructor(turn) {
+    constructor(duration) {
         const me = this;
 
-        me._turn = turn;
-        me.resetTurn();
+        me._duration = duration;
+        me._remain = 0;
+        me._isPause = false;
+        me.reset();
     }
 
-    checkTurnFinish() {
+    check() {
         const me = this;
 
-        if (!me._isTurnRunning)
+        if (me._isPause)
             return false;
 
         const time = new Date().getTime();
-        return time >= me._finishTurn;
+        return time >= me._finishTime;
     }
 
-    resetTurn() {
+    reset() {
         const me = this;
 
-        me._finishTurn = new Date().getTime() + me._turn;
-        me._isTurnRunning = true;
+        me.resume();
+        me._finishTime = new Date().getTime() + me._duration;
     }
 
-    stopTurn() {
+    pause() {
         const me = this;
 
-        me._isTurnRunning = false;
+        me._isPause = true;
+        me._remain = me._finishTime - new Date().getTime();
+    }
+
+    resume() {
+        const me = this;
+
+        me._isPause = false;
+        me._finishTime = new Date().getTime() + me._remain;
+        me._remain = 0;
     }
 }

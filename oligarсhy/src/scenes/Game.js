@@ -17,9 +17,9 @@ export default class Game extends Phaser.Scene {
     preload() {
         const me = this;
 
-        Utils.loadImage(me, 'temp');
         Utils.loadImage(me, 'hud');
         Utils.loadImage(me, 'cursor');
+        Utils.loadImage(me, 'fade');
 
         Utils.loadSpriteSheet(me, 'dice', 75);
         Utils.loadSpriteSheet(me, 'field', Consts.Sizes.Field.Width, Consts.Sizes.Field.Height);
@@ -59,8 +59,6 @@ export default class Game extends Phaser.Scene {
     _onKeyDown(event) {
         const me = this;
 
-        console.log(event.key);
-
         if (Config.Debug.Global) {
             
             if (isNaN(event.key))
@@ -82,7 +80,7 @@ export default class Game extends Phaser.Scene {
     _onMouseWheel(deltaY) {
         const me = this;
 
-        me._core.updateHud(deltaY);
+        me._core.onMouseWheel(deltaY);
     }
 
     _onPointerMove(pointer) {

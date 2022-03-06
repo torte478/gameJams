@@ -60,7 +60,10 @@ export default class Core {
     _groups;
 
     /** @type {Timer} */
-    _timer;
+    _turnTimer;
+
+    /** @type {Phaser.GameObjects.Image} */
+    _fade;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -168,7 +171,12 @@ export default class Core {
                 me._players[i].getBillsMoney(),
                 me._players[i].getFieldsCost());
 
-        me._timer = new Timer(Config.Start.Time.TurnSec * 1000);
+        me._turnTimer = new Timer(Config.Start.Time.TurnSec * 1000);
+        me._fade = scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
+                .setScrollFactor(0)
+                .setDepth(Consts.Depth.Fade)
+                .setAlpha(0.75)
+                .setVisible(false);
 
         me._setState(Config.Start.State);
 
@@ -184,16 +192,32 @@ export default class Core {
     update(delta) {
         const me = this;
 
+        if (!me._scene.input.mouse.locked) {
+            if (!me._status.isPause) {
+                me._scene.tweens.pauseAll();
+                me._turnTimer.pause();
+                me._status.isPause = true;
+                me._fade.setVisible(true);
+            }
+
+            return;
+        } else if (me._status.isPause) {
+            me._scene.tweens.resumeAll();
+            me._status.isPause = false;
+            me._turnTimer.resume();
+            me._fade.setVisible(false);
+        }
+
         const skipTurn = Config.Debug.Global 
                          && Config.Debug.SkipHuman
                          && !me._status.isBusy 
                          && me._status.player == Enums.PlayerIndex.HUMAN;
 
-        if (me._timer.checkTurnFinish() || skipTurn) {
+        if (me._turnTimer.check() || skipTurn) {
             Utils.debugLog('Turn timeout!');
             me._cancelTurn();
             me._moveToJail(me._status.pieceIndicies[me._status.player]);
-            me._timer.stopTurn();
+            me._turnTimer.pause();
             return;
         }
 
@@ -208,7 +232,7 @@ export default class Core {
             me._log.text = 
             `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
             `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` + 
-            `trn: ${(me._timer._finishTurn - new Date().getTime()) / 1000 | 0}\n` +
+            `trn: ${(me._turnTimer._finishTime - new Date().getTime()) / 1000 | 0}\n` +
             `pse: ${!me._scene.input.mouse.locked}`;
         }
     }
@@ -216,8 +240,8 @@ export default class Core {
     onPointerMove(pointer) {
         const me = this;
 
-        if (!me._scene.input.mouse.locked) 
-                return;
+        if (me._status.isPause) 
+            return;
 
         me._cursor.x += pointer.movementX;
         me._cursor.y += pointer.movementY;
@@ -241,7 +265,7 @@ export default class Core {
 
         if (me._scene.input.mouse.locked) {
             const point = Utils.toPoint(me._cursor);
-            me.processHumanTurn(point, pointer.rightButtonDown());
+            me._processHumanTurn(point, pointer.rightButtonDown());
         }
         else {
             me._scene.input.mouse.requestPointerLock();
@@ -250,18 +274,17 @@ export default class Core {
             me._scene.cameras.main.startFollow(me._cursor, true, 0.05, 0.05);    
         }
     }
-    
-    /**
-     * @param {Phaser.Geom.Point} point 
-     * @param {Boolean} isRightButton 
-     */
-    processHumanTurn(point, isRightButton) {
+
+    onMouseWheel(deltaY) {
         const me = this;
 
-        if (!me._isHumanTurn())
+        if (me._status.isPause)
             return;
 
-        me._processTurn(point, isRightButton);
+        if (deltaY > 0)
+            me._hud.show();
+        else if (deltaY < 0)
+            me._hud.hide();
     }
 
     debugDropDices(value) {
@@ -273,13 +296,17 @@ export default class Core {
         }
     }
 
-    updateHud(deltaY) {
+    /**
+     * @param {Phaser.Geom.Point} point 
+     * @param {Boolean} isRightButton 
+     */
+     _processHumanTurn(point, isRightButton) {
         const me = this;
 
-        if (deltaY > 0)
-            me._hud.show();
-        else if (deltaY < 0)
-            me._hud.hide();
+        if (!me._isHumanTurn())
+            return;
+
+        me._processTurn(point, isRightButton);
     }
 
     _processCpuTurn() {
@@ -836,7 +863,7 @@ export default class Core {
             me._players[i].showButtons(i == me._status.player);
 
         me._status.reset();
-        me._timer.resetTurn();
+        me._turnTimer.reset();
         me._setState(Enums.GameState.BEGIN);
     }
 
