@@ -137,7 +137,7 @@ export default class Consts {
 
     static DicePhysics = {
         Speed: 200,
-        Angle: 45
+        Angle: 100
     };
 
     static DiceZoneRect = {
