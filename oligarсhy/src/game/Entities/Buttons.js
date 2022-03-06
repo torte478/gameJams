@@ -2,7 +2,6 @@ import Phaser from "../../lib/phaser.js";
 
 import Consts from "../Consts.js";
 import Enums from "../Enums.js";
-import Groups from "./Groups.js";
 import Helper from "../Helper.js";
 import Utils from "../Utils.js";
 

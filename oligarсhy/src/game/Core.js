@@ -14,6 +14,7 @@ import Status from './Status.js';
 import Utils from './Utils.js';
 import Helper from './Helper.js';
 import Timer from './Entities/Timer.js';
+import Dice from './Entities/Dice.js';
 
 export default class Core {
 
@@ -26,10 +27,10 @@ export default class Core {
     /** @type {Phaser.GameObjects.Image[]} */
     _pieces;
 
-    /** @type {Phaser.Physics.Arcade.Sprite} */
+    /** @type {Dice} */
     _dice1;
 
-    /** @type {Phaser.Physics.Arcade.Sprite} */
+    /** @type {Dice} */
     _dice2;
 
     /** @type {Hand} */
@@ -125,24 +126,15 @@ export default class Core {
             me._pieces.push(piece);
         }
 
-        me._dice1 = scene.physics.add.sprite(0, 0, 'dice', 2)
-            .setDepth(Consts.Depth.Pieces)
-            .setBounce(1, 1)
-            .setCollideWorldBounds(true);
-        me._dice1.body.setBoundsRectangle(new Phaser.Geom.Rectangle(-700, -700, 1400, 1400));
+        me._dice1 = new Dice(scene, 0, 0, 2);
 
-
-        me._dice2 = scene.physics.add.sprite(
+        me._dice2 = new Dice(
+            scene,
             Consts.SecondDiceOffset.X, 
             Consts.SecondDiceOffset.Y,
-            'dice', 
-            6)
-            .setDepth(Consts.Depth.Pieces)
-            .setBounce(1, 1)
-            .setCollideWorldBounds(true);
-        me._dice2.body.setBoundsRectangle(new Phaser.Geom.Rectangle(-700, -700, 1400, 1400));;
+            6);
 
-        scene.physics.add.collider(me._dice1, me._dice2);
+        scene.physics.add.collider(me._dice1.toGameObject(), me._dice2.toGameObject());
 
         me._hands = [];
         for (let i = 0; i < Config.Start.PlayerCount; ++i)
@@ -355,7 +347,7 @@ export default class Core {
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
-                        image: me._dice1,
+                        image: me._dice1.toGameObject(),
                         type: Enums.HandState.DICES
                     },
                     () => {
@@ -369,7 +361,7 @@ export default class Core {
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
-                        image: me._dice2,
+                        image: me._dice2.toGameObject(),
                         type: Enums.HandState.DICES
                     },
                     () => {
@@ -385,7 +377,7 @@ export default class Core {
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
-                        image: me._dice1,
+                        image: me._dice1.toGameObject(),
                         type: Enums.HandState.DICES
                     },
                     () => {
@@ -399,7 +391,7 @@ export default class Core {
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
-                        image: me._dice2,
+                        image: me._dice2.toGameObject(),
                         type: Enums.HandState.DICES
                     },
                     () => {
@@ -419,29 +411,16 @@ export default class Core {
                         const first = Utils.getRandom(1, 6, 1);
                         const second = Utils.getRandom(1, 6, 0);
 
-                        me._dice1
-                            .play('first_dice_roll')
-                            .setVelocity(
-                                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0),
-                                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0))
-                            .setAngularVelocity(
-                                Utils.getRandom(-Consts.DicePhysics.Angle, -Consts.DicePhysics.Angle, 10));
-
-                        me._dice2
-                            .play('second_dice_roll')
-                            .setVelocity(
-                                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0),
-                                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0))
-                            .setAngularVelocity(
-                                Utils.getRandom(-Consts.DicePhysics.Angle, -Consts.DicePhysics.Angle, 10));
+                        me._dice1.roll('first_dice_roll');
+                        me._dice2.roll('second_dice_roll');
 
                         me._status.isBusy = true;
 
                         me._scene.time.delayedCall(
                             Utils.getRandom(1000, 2000, 1000),
                             () => {
-                                me._dice1.stop().setFrame(first).setVelocity(0).setAngularVelocity(0);
-                                me._dice2.stop().setFrame(second).setVelocity(0).setAngularVelocity(0);
+                                me._dice1.stop(first);
+                                me._dice2.stop(second);
 
                                 Utils.debugLog(`${first} ${second} (${first + second})`);
 
@@ -722,10 +701,10 @@ export default class Core {
 
         switch (me._status.state) {
             case Enums.GameState.BEGIN:
-                return Utils.toPoint(me._dice1)
+                return Utils.toPoint(me._dice1.toGameObject())
 
             case Enums.GameState.FIRST_DICE_TAKED:
-                return Utils.toPoint(me._dice2);
+                return Utils.toPoint(me._dice2.toGameObject());
 
             case Enums.GameState.SECOND_DICE_TAKED: {
 
@@ -962,12 +941,31 @@ export default class Core {
 
         const player = me._getCurrentPlayer().player;
 
-        if (state == Enums.GameState.BEGIN)
-            player.showButtons([]);
-        else if (state == Enums.GameState.FINAL)
-            player.showButtons([ Enums.ActionType.NEXT_TURN ]);
-        else if (state == Enums.GameState.PIECE_ON_FREE_PROPERTY)
-            player.showButtons([Enums.ActionType.BUY_FIELD, Enums.ActionType.NEXT_TURN]);
+        switch (state) {
+            case Enums.GameState.BEGIN:
+                player.showButtons([]);
+
+                if (player.index == Enums.PlayerIndex.HUMAN) {
+                    me._dice1.select();
+                    me._dice2.select();
+                } else {
+                    me._dice1.unselect();
+                    me._dice2.unselect();
+                }
+                break;
+
+            case Enums.GameState.SECOND_DICE_TAKED:
+                me._dice1.unselect();
+                me._dice2.unselect();
+
+            case Enums.GameState.FINAL:
+                player.showButtons([ Enums.ActionType.NEXT_TURN ]);
+                break;
+
+            case Enums.GameState.PIECE_ON_FREE_PROPERTY:
+                player.showButtons([Enums.ActionType.BUY_FIELD, Enums.ActionType.NEXT_TURN]);
+                break;    
+        }
 
         me._status.setState(state);
     }
