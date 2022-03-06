@@ -220,7 +220,10 @@ export default class Hand {
             tweens: [{
                 x: me._waitPosition.x,
                 y: me._waitPosition.y,
-                duration: me._getTweenDuration(me._waitPosition),
+                duration: Utils.getTweenDuration(
+                    Utils.toPoint(me._container),
+                    me._waitPosition,
+                    Consts.Speed.HandAction),
                 ease: 'Sine.easeInOut'
             }]            
         });
@@ -238,7 +241,10 @@ export default class Hand {
             tweens: [{
                 x: point.x,
                 y: point.y,
-                duration: me._getTweenDuration(point),
+                duration: Utils.getTweenDuration(
+                    Utils.toPoint(me._container),
+                    point,
+                    Consts.Speed.HandAction),
                 ease: 'Sine.easeInOut'
             }]            
         });
@@ -267,23 +273,6 @@ export default class Hand {
         return Utils.toPoint(me._container);
     }
 
-    /**
-     * @param {Phaser.Geom.Point} target 
-     */
-    _getTweenDuration(target) {
-        const me = this;
-
-        const dist = Phaser.Math.Distance.Between(
-            me._container.x,
-            me._container.y,
-            target.x,
-            target.y
-        );
-
-        const time = (dist / Consts.Speed.HandAction) * 1000;
-        return time;
-    }
-
     _startTimeline(target, callback) {
         const me = this;
 
@@ -295,7 +284,10 @@ export default class Hand {
                 x: target.x,
                 y: target.y,
                 ease: 'Sine.easeInOut',
-                duration: me._getTweenDuration(target),
+                duration: Utils.getTweenDuration(
+                    Utils.toPoint(me._container),
+                    target,
+                    Consts.Speed.HandAction),
             },
             {
                 scale: { from: 1, to: 0.75 },

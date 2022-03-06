@@ -182,7 +182,7 @@ export default class Core {
 
         // Debug
 
-        if (Config.Debug.Global) {
+        if (Config.Debug.Global && Config.Debug.TextLog) {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
@@ -228,7 +228,7 @@ export default class Core {
         const target = me._getCursorOffset();
         me._getCurrentPlayer().hand.moveTo(target, delta);
 
-        if (Config.Debug.Global) {
+        if (Config.Debug.Global && Config.Debug.TextLog) {
             me._log.text = 
             `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
             `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` + 
@@ -858,6 +858,7 @@ export default class Core {
 
         me._getCurrentPlayer().hand.toWait();
         me._status.player = me._getNextPlayerIndex();
+        me._hud.select(me._status.player);
         
         for (let i = 0; i < me._players.length; ++i)
             me._players[i].showButtons(i == me._status.player);

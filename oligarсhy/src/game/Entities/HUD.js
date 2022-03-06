@@ -3,6 +3,8 @@ import Phaser from '../../lib/phaser.js';
 import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
+import Helper from '../Helper.js';
+import Utils from '../Utils.js';
 
 export default class HUD {
 
@@ -29,6 +31,9 @@ export default class HUD {
     /** @type {Object[]} */
     _playerItems;
 
+    /** @type {Phaser.GameObjects.image} */
+    _selection;
+
     /**
      * @param {Phaser.GameObjects.GameObjectFactory} factory 
      */
@@ -42,9 +47,11 @@ export default class HUD {
         me._infoItems.icon = factory.image(0, 60, 'icons', 0)
             .setScale(0.75);
 
+        me._selection = factory.image(0, 0, 'hud_select');
+
         me._infoItems.details = factory.text(-75, 125, '');
 
-        let content = [ background ];
+        let content = [ background, me._selection ];
 
         me._playerItems = [];
         const start = -360;
@@ -76,6 +83,7 @@ export default class HUD {
             .setDepth(Consts.Depth.HUD);
 
         me._state = Enums.HudState.HIDDEN;
+        me.select(Config.Start.Player);
     }
 
     show() {
@@ -196,6 +204,22 @@ export default class HUD {
         me._playerItems[player].hand.setText(hand);
         me._playerItems[player].cards.setText(cards);
         me._playerItems[player].total.setText(hand + cards);
+    }
+    
+    select(player) {
+        const me = this;
+
+        const target = Utils.buildPoint(0, -352 + player * 100);
+
+        me._factory.tween({
+            targets: me._selection,
+            y: target.y,
+            ease: 'Sine.easeInOut',
+            duration: Utils.getTweenDuration(
+                Utils.toPoint(me._selection),
+                target,
+                Consts.Speed.HandFollow)
+        });
     }
 
     _setFieldInfoVisible(visible) {

@@ -20,6 +20,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadImage(me, 'hud');
         Utils.loadImage(me, 'cursor');
         Utils.loadImage(me, 'fade');
+        Utils.loadImage(me, 'hud_select');
 
         Utils.loadSpriteSheet(me, 'dice', 75);
         Utils.loadSpriteSheet(me, 'field', Consts.Sizes.Field.Width, Consts.Sizes.Field.Height);
