@@ -82,14 +82,8 @@ export default class Hand {
         return true;
     }
 
-    cancel() {
+    cancel(callback) {
         const me = this;
-
-        while (me._content.length > 0) {
-            const item = me._content.pop();
-
-            item.setVisible(true);
-        }
 
         for (let i = 0; i < me._money.length; ++i)
             me._money[i] = 0;
@@ -99,6 +93,40 @@ export default class Hand {
             me._timeline.stop();
 
         me._state = Enums.HandState.EMPTY;
+
+        let index = 0;
+        const last = me._content.length - 1
+
+        if (last == -1 && !!callback)
+            return callback();
+
+        while (me._content.length > 0) {
+            const item = me._content.pop();
+            const target = Utils.toPoint(item);
+            item.setPosition(me._container.x, me._container.y);
+
+            item.setVisible(true);
+
+            const runCallback = index == last && !!callback;
+
+            me._scene.tweens.add({
+                targets: item,
+                x: target.x,
+                y: target.y,
+                delay: index * 200,
+                duration: Utils.getTweenDuration(
+                    Utils.toPoint(me._container),
+                    target,
+                    Consts.Speed.HandAction),
+                ease: 'Sine.easeOut',
+                onComplete:() => {
+                    if (runCallback)
+                        callback();
+                }
+            })
+
+            ++index;
+        }
     }
     
     dropMoney() {

@@ -202,7 +202,7 @@ export default class Utils {
      * @param {Number} speed 
      * @returns {Number}
      */
-    static calclTweenDuration(from, to, speed) {
+    static getTweenDuration(from, to, speed) {
         const dist = Phaser.Math.Distance.Between(
             from.x,
             from.y,

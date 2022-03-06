@@ -788,13 +788,17 @@ export default class Core {
         const current = me._getCurrentPlayer();
         const money = current.hand.dropMoney();
         me._addBills(money, current.hand.toPoint(), current.player);
-        current.hand.cancel();
 
         current.player.showButtons([]);
 
         me._status.selectedField = null;
         const next = me._getNextStateAfterCancel();
-        me._setState(next);
+
+        me._status.isBusy = true;
+        current.hand.cancel(() => {
+            me._status.isBusy = false;
+            me._setState(next);
+        });
     }
 
     _getNextStateAfterCancel() {
@@ -1014,7 +1018,7 @@ export default class Core {
             x: jail.x,
             y: jail.y,
             ease: 'Sine.easeInOut',
-            duration: Utils.calclTweenDuration(
+            duration: Utils.getTweenDuration(
                 Utils.toPoint(me._pieces[me._status.player]),
                 jail,
                 Consts.Speed.HandAction
@@ -1079,7 +1083,7 @@ export default class Core {
                 x: target.x,
                 y: target.y,
                 ease: 'Sine.easeOut',
-                duration: Utils.calclTweenDuration(
+                duration: Utils.getTweenDuration(
                     from, 
                     target, 
                     Consts.Speed.CardEntranceDuration),
