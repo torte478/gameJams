@@ -95,6 +95,8 @@ export default class Hand {
             me._money[i] = 0;
 
         me._sprite.setFrame(0);
+        if (!!me._timeline)
+            me._timeline.stop();
 
         me._state = Enums.HandState.EMPTY;
     }
@@ -182,7 +184,9 @@ export default class Hand {
     toWait() {
         const me = this;
 
-        me._timeline.stop();
+        if (!!me.timeline)
+            me._timeline.stop();
+
         me._timeline = me._scene.tweens.timeline({
             targets: me._container,
             tweens: [{
@@ -343,6 +347,9 @@ export default class Hand {
             }
 
             case Enums.HandAction.DROP_DICES: {
+                if (me._state == Enums.HandState.EMPTY)
+                    return;
+
                 const first = me._content.pop();
                 const second = me._content.pop();
 
@@ -362,6 +369,9 @@ export default class Hand {
             }
 
             case Enums.HandAction.DROP_PIECE: {
+                if (me._state == Enums.HandState.EMPTY)
+                    return;
+
                 while (me._content.length > 0) {
                     const item = me._content.pop();
 

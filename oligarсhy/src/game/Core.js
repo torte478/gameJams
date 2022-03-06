@@ -13,6 +13,7 @@ import Enums from './/Enums.js';
 import Status from './Status.js';
 import Utils from './Utils.js';
 import Helper from './Helper.js';
+import Timer from './Entities/Timer.js';
 
 export default class Core {
 
@@ -57,6 +58,9 @@ export default class Core {
 
     /** @type {Groups} */
     _groups;
+
+    /** @type {Timer} */
+    _timer;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -164,6 +168,8 @@ export default class Core {
                 me._players[i].getBillsMoney(),
                 me._players[i].getFieldsCost());
 
+        me._timer = new Timer(Config.Start.Time.TurnSec * 1000);
+
         me._setState(Config.Start.State);
 
         // Debug
@@ -178,6 +184,14 @@ export default class Core {
     update(delta) {
         const me = this;
 
+        if (me._timer.checkTurnFinish()) {
+            Utils.debugLog('Turn timeout!');
+            me._cancelTurn();
+            me._moveToJail(me._status.pieceIndicies[me._status.player]);
+            me._timer.stopTurn();
+            return;
+        }
+
         if (!me._isHumanTurn()) {
             me._processCpuTurn();
         }
@@ -188,7 +202,8 @@ export default class Core {
         if (Config.Debug.Global) {
             me._log.text = 
             `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
-            `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}`;
+            `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` + 
+            `trn: ${(me._timer._finishTurn - new Date().getTime()) / 1000 | 0}`;
         }
     }
 
@@ -811,6 +826,7 @@ export default class Core {
             me._players[i].showButtons(i == me._status.player);
 
         me._status.reset();
+        me._timer.resetTurn();
         me._setState(Enums.GameState.BEGIN);
     }
 
@@ -948,31 +964,8 @@ export default class Core {
 
         const fieldConfig = Config.Fields[field.index];
 
-        if (fieldConfig.type == Enums.FieldType.GOTOJAIL) {
-            const jail = me._fields.movePiece(
-                me._status.player, 
-                field.index, 
-                Consts.JailFieldIndex, 
-                true);
-            me._status.pieceIndicies[me._status.player] = Consts.JailFieldIndex;
-
-            me._status.isBusy = true;
-            return me._scene.tweens.add({
-                targets: me._pieces[me._status.player],
-                x: jail.x,
-                y: jail.y,
-                ease: 'Sine.easeInOut',
-                duration: Utils.calclTweenDuration(
-                    Utils.toPoint(me._pieces[me._status.player]),
-                    jail,
-                    Consts.Speed.HandAction
-                ),
-                onComplete: () => { 
-                    me._status.isBusy = false;
-                    me._finishTurn();
-                }
-            });
-        }
+        if (fieldConfig.type == Enums.FieldType.GOTOJAIL)
+            return me._moveToJail(field.index);
 
         if (!Utils.contains(Consts.BuyableFieldTypes, fieldConfig.type))
             return me._setState(Enums.GameState.FINAL);
@@ -1002,6 +995,35 @@ export default class Core {
         }
 
         return me._setState(Enums.GameState.FINAL)
+    }
+
+    _moveToJail(fieldFrom) {
+        const me = this;
+
+        const jail = me._fields.movePiece(
+            me._status.player, 
+            fieldFrom, 
+            Consts.JailFieldIndex, 
+            true);
+
+        me._status.pieceIndicies[me._status.player] = Consts.JailFieldIndex;
+
+        me._status.isBusy = true;
+        return me._scene.tweens.add({
+            targets: me._pieces[me._status.player],
+            x: jail.x,
+            y: jail.y,
+            ease: 'Sine.easeInOut',
+            duration: Utils.calclTweenDuration(
+                Utils.toPoint(me._pieces[me._status.player]),
+                jail,
+                Consts.Speed.HandAction
+            ),
+            onComplete: () => { 
+                me._status.isBusy = false;
+                me._finishTurn();
+            }
+        });
     }
 
     _updateRent(playerIndex) {
