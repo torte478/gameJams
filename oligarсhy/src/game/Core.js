@@ -184,7 +184,12 @@ export default class Core {
     update(delta) {
         const me = this;
 
-        if (me._timer.checkTurnFinish()) {
+        const skipTurn = Config.Debug.Global 
+                         && Config.Debug.SkipHuman
+                         && !me._status.isBusy 
+                         && me._status.player == Enums.PlayerIndex.HUMAN;
+
+        if (me._timer.checkTurnFinish() || skipTurn) {
             Utils.debugLog('Turn timeout!');
             me._cancelTurn();
             me._moveToJail(me._status.pieceIndicies[me._status.player]);
@@ -203,7 +208,8 @@ export default class Core {
             me._log.text = 
             `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
             `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` + 
-            `trn: ${(me._timer._finishTurn - new Date().getTime()) / 1000 | 0}`;
+            `trn: ${(me._timer._finishTurn - new Date().getTime()) / 1000 | 0}\n` +
+            `pse: ${!me._scene.input.mouse.locked}`;
         }
     }
 

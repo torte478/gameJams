@@ -59,6 +59,8 @@ export default class Game extends Phaser.Scene {
     _onKeyDown(event) {
         const me = this;
 
+        console.log(event.key);
+
         if (Config.Debug.Global) {
             
             if (isNaN(event.key))

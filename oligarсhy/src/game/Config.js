@@ -7,11 +7,12 @@ export default class Config {
 
         StateLog: true,
         Log: true,
-        Random: true
+        Random: false,
+        SkipHuman: true,
     };
 
     static Start = {
-        PlayerCount: 2,
+        PlayerCount: 4,
 
         CameraPosition: {
             x: 300,
@@ -34,12 +35,16 @@ export default class Config {
         // Money: [ 0, 0, 0, 0, 0, 0, 0 ],
 
         Fields: [
-            [3, 1],
+            [],
             [],
             [],
             [],
             // [ 1, 3, 5, 6, 8, 9, 11, 12, 13, 14, 15, 16, 18, 19, 21, 23, 24, 25, 26, 27, 28, 29, 31, 32, 34, 35, 37, 39  ],
-        ]
+        ],
+
+        Time: {
+            TurnSec: 30
+        }
     }
 
     static Fields = [
