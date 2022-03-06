@@ -15,6 +15,7 @@ import Utils from './Utils.js';
 import Helper from './Helper.js';
 import Timer from './Entities/Timer.js';
 import Dice from './Entities/Dice.js';
+import Piece from './Entities/Piece.js';
 
 export default class Core {
 
@@ -24,7 +25,7 @@ export default class Core {
     /** @type {Fields} */
     _fields;
 
-    /** @type {Phaser.GameObjects.Image[]} */
+    /** @type {Piece[]} */
     _pieces;
 
     /** @type {Dice} */
@@ -120,8 +121,7 @@ export default class Core {
         for (let player = 0; player < Config.Start.PlayerCount; ++player) {
             const position = me._fields.movePiece(player, 0, Config.Start.PiecePositions[player]);
 
-            const piece = factory.image(position.x, position.y, 'pieces', player * 2)
-                .setDepth(Consts.Depth.Pieces);
+            const piece = new Piece(scene, position.x, position.y, player);
 
             me._pieces.push(piece);
         }
@@ -185,19 +185,12 @@ export default class Core {
         const me = this;
 
         if (!me._scene.input.mouse.locked) {
-            if (!me._status.isPause) {
-                me._scene.tweens.pauseAll();
-                me._turnTimer.pause();
-                me._status.isPause = true;
-                me._fade.setVisible(true);
-            }
+            if (!me._status.isPause)
+                me._pause();
 
             return;
         } else if (me._status.isPause) {
-            me._scene.tweens.resumeAll();
-            me._status.isPause = false;
-            me._turnTimer.resume();
-            me._fade.setVisible(false);
+            me._unpause();
         }
 
         const skipTurn = Config.Debug.Global 
@@ -213,12 +206,13 @@ export default class Core {
             return;
         }
 
-        if (!me._isHumanTurn()) {
+        if (me._isHumanTurn()) {
+            const target = me._getCursorOffset();
+            me._getCurrentPlayer().hand.moveTo(target, delta);
+            
+        } else {
             me._processCpuTurn();
         }
-
-        const target = me._getCursorOffset();
-        me._getCurrentPlayer().hand.moveTo(target, delta);
 
         if (Config.Debug.Global && Config.Debug.TextLog) {
             me._log.text = 
@@ -248,8 +242,8 @@ export default class Core {
             ? me._hud.showField(index)
             : me._hud.hideField();
 
-        me._players.forEach(
-            (p) => p.updateButtonSelection(point));
+        if (me._isHumanTurn())
+            me._getCurrentPlayer().player.updateButtonSelection(point);
     }
 
     onPointerDown(pointer) {
@@ -440,7 +434,7 @@ export default class Core {
                     point,
                     Enums.HandAction.TAKE_PIECE,
                     {
-                        image: me._pieces[me._status.player],
+                        image: me._pieces[me._status.player].toGameObject(),
                         type: Enums.HandState.PIECE,
                     },
                     () => { me._setState(Enums.GameState.PIECE_TAKED) });
@@ -717,7 +711,7 @@ export default class Core {
                     ? me._status.player
                     : Enums.PlayerIndex.HUMAN;
 
-                const humanPos = Utils.toPoint(me._pieces[playerIndex]);
+                const humanPos = Utils.toPoint(me._pieces[playerIndex].toGameObject());
 
                 const randomPos = Utils.buildPoint(
                     humanPos.x + Utils.getRandom(-200, 200, 0),
@@ -731,7 +725,7 @@ export default class Core {
             }
 
             case Enums.GameState.DICES_DROPED:
-                return Utils.toPoint(me._pieces[me._status.player]);
+                return Utils.toPoint(me._pieces[me._status.player].toGameObject());
 
             case Enums.GameState.PIECE_TAKED:
                 return me._fields.getFieldPosition(me._status.targetPieceIndex);
@@ -944,19 +938,7 @@ export default class Core {
         switch (state) {
             case Enums.GameState.BEGIN:
                 player.showButtons([]);
-
-                if (player.index == Enums.PlayerIndex.HUMAN) {
-                    me._dice1.select();
-                    me._dice2.select();
-                } else {
-                    me._dice1.unselect();
-                    me._dice2.unselect();
-                }
                 break;
-
-            case Enums.GameState.SECOND_DICE_TAKED:
-                me._dice1.unselect();
-                me._dice2.unselect();
 
             case Enums.GameState.FINAL:
                 player.showButtons([ Enums.ActionType.NEXT_TURN ]);
@@ -968,6 +950,7 @@ export default class Core {
         }
 
         me._status.setState(state);
+        me._restoreSelection();
     }
 
     _createCursor(scene) {
@@ -1046,12 +1029,12 @@ export default class Core {
 
         me._status.isBusy = true;
         return me._scene.tweens.add({
-            targets: me._pieces[me._status.player],
+            targets: me._pieces[me._status.player].toGameObject(),
             x: jail.x,
             y: jail.y,
             ease: 'Sine.easeInOut',
             duration: Utils.getTweenDuration(
-                Utils.toPoint(me._pieces[me._status.player]),
+                Utils.toPoint(me._pieces[me._status.player].toGameObject()),
                 jail,
                 Consts.Speed.HandAction
             ),
@@ -1125,6 +1108,63 @@ export default class Core {
                     me._groups.killBill(bill);
                 }
             });
+        }
+    }
+
+    _pause() {
+        const me = this;
+
+        me._scene.input.mouse.releasePointerLock();
+        me._scene.tweens.pauseAll();
+        me._turnTimer.pause();
+        me._status.isPause = true;
+        me._fade.setVisible(true);
+    }
+
+    _unpause() {
+        const me = this;
+
+        me._scene.tweens.resumeAll();
+        me._status.isPause = false;
+        me._turnTimer.resume();
+        me._restoreSelection();
+        me._fade.setVisible(false);
+    }
+
+    _restoreSelection() {
+        const me = this;
+
+        const isHuman = me._isHumanTurn();
+
+        switch (me._status.state) {
+            case Enums.GameState.BEGIN:
+
+                if (!isHuman) {
+                    me._dice1.unselect();
+                    me._dice2.unselect();
+                    me._pieces[Enums.PlayerIndex.HUMAN].unselect();
+                } else {
+                    me._dice1.select();
+                    me._dice2.select();
+                }
+                break;
+
+            case Enums.GameState.SECOND_DICE_TAKED:
+                me._dice1.unselect();
+                me._dice2.unselect();
+
+                break;
+
+            case Enums.GameState.DICES_DROPED:
+                if (isHuman)
+                    me._pieces[Enums.PlayerIndex.HUMAN].select();
+
+                break;
+
+            case Enums.GameState.PIECE_TAKED:
+                if (isHuman)
+                    me._pieces[Enums.PlayerIndex.HUMAN].unselect();
+                break;
         }
     }
 }

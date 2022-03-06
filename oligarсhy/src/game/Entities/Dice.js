@@ -1,9 +1,6 @@
 import Phaser from "../../lib/phaser.js";
 
 import Consts from "../Consts.js";
-import Enums from "../Enums.js";
-import Groups from "./Groups.js";
-import Helper from "../Helper.js";
 import Utils from "../Utils.js";
 
 export default class Dice {
@@ -49,7 +46,7 @@ export default class Dice {
         me._tween = scene.tweens.add({
             targets: me._selection,
             scale: { from: 1, to: 0.9 },
-            duration: 500,
+            duration: Consts.Speed.Selection,
             yoyo: true,
             repeat: -1
         });

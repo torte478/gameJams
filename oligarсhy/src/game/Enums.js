@@ -38,6 +38,7 @@ export default class Enums {
         BROWN: 8,
     };
 
+    // TODO: rename
     static PlayerIndex = {
         NOONE: -1,
         HUMAN: 0,
