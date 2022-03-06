@@ -127,7 +127,7 @@ export default class Consts {
         HandGrabDuration: 200,
 
         CardShiftDuration: 1000,
-        CardOuterDuration: 2000
+        CardEntranceDuration: 1500
     };
 
     static HandWaitPosition = {

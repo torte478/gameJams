@@ -111,14 +111,16 @@ export default class Cards {
                     ease: 'Sine.easeInOut'
                 });
             } else if (buy) {
-                const point = Helper.getOuterPos(player);
-                item.container.setPosition(point.x, point.y);
+                item.container
+                    .setPosition(0, 0)
+                    .setAlpha(0);
 
                 me._scene.tweens.add({
                     targets: item.container,
                     x: position.x,
                     y: position.y,
-                    duration: Consts.Speed.CardOuterDuration,
+                    alpha: { from: 0, to: 1 },
+                    duration: Consts.Speed.CardEntranceDuration,
                     ease: 'Sine.easeInOut'
                 });
             }
@@ -132,7 +134,8 @@ export default class Cards {
                 targets: item.container,
                 x: point.x,
                 y: point.y,
-                duration: Consts.Speed.CardOuterDuration,
+                alpha: { from: 1, to: 0 },
+                duration: Consts.Speed.CardEntranceDuration,
                 ease: 'Sine.easeInOut',
                 onComplete: () => { item.container.setVisible(false); }
             });

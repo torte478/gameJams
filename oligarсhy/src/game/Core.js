@@ -1082,7 +1082,7 @@ export default class Core {
                 duration: Utils.calclTweenDuration(
                     from, 
                     target, 
-                    Consts.Speed.CardOuterDuration),
+                    Consts.Speed.CardEntranceDuration),
                 delay: i * 50,
                 onComplete: () => {
                     player.addBill(billIndicies[i])
