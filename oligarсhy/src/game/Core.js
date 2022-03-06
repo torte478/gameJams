@@ -265,7 +265,9 @@ export default class Core {
         const me = this;
 
         const point = me._getCpuPoint();
-        me._processTurn(point, false);
+
+        if (point != null)
+            me._processTurn(point, false);
     }
 
     _isHumanTurn() {
@@ -285,7 +287,7 @@ export default class Core {
         const player = currentPlayer.player;
         const hand = currentPlayer.hand;
 
-        if (hand.isBusy())
+        if (hand.isBusy() || me._status.isBusy)
             return;
 
         if (isCancel)
@@ -361,11 +363,6 @@ export default class Core {
 
             case Enums.GameState.SECOND_DICE_TAKED: {
 
-                if (me._status.diceRoll)
-                    return;
-
-                
-
                 hand.tryMakeAction(
                     point,
                     Enums.HandAction.DROP_DICES,
@@ -386,7 +383,7 @@ export default class Core {
                             Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0)
                         );
 
-                        me._status.diceRoll = true;
+                        me._status.isBusy = true;
 
                         me._scene.time.delayedCall(
                             Utils.getRandom(1000, 2000, 1000),
@@ -396,7 +393,7 @@ export default class Core {
 
                                 Utils.debugLog(`${first} ${second} (${first + second})`);
 
-                                me._status.diceRoll = false;
+                                me._status.isBusy = false;
                                 me._applyDiceDrop(first, second);    
                             },
                             null,
@@ -666,6 +663,9 @@ export default class Core {
     _getCpuPoint() {
         const me = this;
 
+        if (me._status.isBusy)
+            return null;
+
         const current = me._getCurrentPlayer();
 
         switch (me._status.state) {
@@ -677,12 +677,14 @@ export default class Core {
 
             case Enums.GameState.SECOND_DICE_TAKED: {
 
-                if (me._status.diceRoll)
+                if (me._status.isBusy)
                     return null;
 
                 const zone = Consts.DiceZoneRect;
 
-                const playerIndex = me._getNextPlayerIndex();
+                const playerIndex = me._getNextPlayerIndex() != Enums.PlayerIndex.HUMAN
+                    ? me._status.player
+                    : Enums.PlayerIndex.HUMAN;
 
                 const humanPos = Utils.toPoint(me._pieces[playerIndex]);
 
@@ -941,6 +943,32 @@ export default class Core {
         me._status.pieceIndicies[me._status.player] = me._status.targetPieceIndex;
 
         const fieldConfig = Config.Fields[field.index];
+
+        if (fieldConfig.type == Enums.FieldType.GOTOJAIL) {
+            const jail = me._fields.movePiece(
+                me._status.player, 
+                field.index, 
+                Consts.JailFieldIndex, 
+                true);
+            me._status.pieceIndicies[me._status.player] = Consts.JailFieldIndex;
+
+            me._status.isBusy = true;
+            return me._scene.tweens.add({
+                targets: me._pieces[me._status.player],
+                x: jail.x,
+                y: jail.y,
+                ease: 'Sine.easeInOut',
+                duration: Utils.calclTweenDuration(
+                    Utils.toPoint(me._pieces[me._status.player]),
+                    jail,
+                    Consts.Speed.HandAction
+                ),
+                onComplete: () => { 
+                    me._status.isBusy = false;
+                    me._finishTurn();
+                }
+            });
+        }
 
         if (!Utils.contains(Consts.BuyableFieldTypes, fieldConfig.type))
             return me._setState(Enums.GameState.FINAL);

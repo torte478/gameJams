@@ -69,6 +69,13 @@ export default class Consts {
             { x: -87, y: 30},
             { x: -20, y: 85},
             { x: 65, y: 85}
+        ],
+
+        JailInside: [
+            { x: -20, y: -70},
+            { x: 65, y: -70},
+            { x: -20, y: 15},
+            { x: 65, y: 15}
         ]
     };
 
@@ -138,6 +145,8 @@ export default class Consts {
         width: 1300,
         height: 1300
     };
+
+    static JailFieldIndex = 10;
 
     static FieldTextColor = '#232429';
     static Font = 'Arial';

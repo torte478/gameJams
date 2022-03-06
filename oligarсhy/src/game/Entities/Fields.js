@@ -55,12 +55,13 @@ export default class Fields {
      * @param {Number} player 
      * @param {Number} from
      * @param {Number} to 
+     * @param {Boolean} inJail
      * @returns {Phaser.Geom.Point}
      */
-    movePiece(player, from, to) {
+    movePiece(player, from, to, inJail) {
         const me = this;
 
-        const target = me._getNextPointConfig(player, from, to);
+        const target = me._getNextPointConfig(player, from, to, inJail);
 
         const fieldPosition = me._fields[to].toPoint();
 
@@ -120,7 +121,7 @@ export default class Fields {
         me._fields[index].sell();
     }
 
-    _getNextPointConfig(player, from, to) {
+    _getNextPointConfig(player, from, to, inJail) {
         const me = this;
 
         if (from >= 0)
@@ -129,15 +130,16 @@ export default class Fields {
         const position = me._fields[to].addPiece(player);
 
         return {
-            offset: me._getPiecePosOffset(to)[position],
+            offset: me._getPiecePosOffset(to, inJail)[position],
             angle: Helper.getFieldAngle(to)
         };
     }
 
     /**
      * @param {Number} field 
+     * @param {Boolean} inJail
      */
-    _getPiecePosOffset(field) {
+    _getPiecePosOffset(field, inJail) {
         const me = this;
 
         switch (Config.Fields[field].type) {
@@ -148,7 +150,9 @@ export default class Fields {
                 return Consts.PiecePosition.Corner;
 
             case Enums.FieldType.JAIL:
-                return Consts.PiecePosition.JailOutside;
+                return !!inJail
+                    ? Consts.PiecePosition.JailInside
+                    : Consts.PiecePosition.JailOutside;
 
             default:
                 return Consts.PiecePosition.Usual;
