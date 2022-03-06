@@ -371,25 +371,29 @@ export default class Core {
                         const first = Utils.getRandom(1, 6, 1);
                         const second = Utils.getRandom(1, 6, 0);
 
-                        me._dice1.play('first_dice_roll');
-                        me._dice1.setVelocity(
-                            Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0),
-                            Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0)
-                        );
+                        me._dice1
+                            .play('first_dice_roll')
+                            .setVelocity(
+                                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0),
+                                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0))
+                            .setAngularVelocity(
+                                Utils.getRandom(-Consts.DicePhysics.Angle, -Consts.DicePhysics.Angle, 10));
 
-                        me._dice2.play('second_dice_roll');
-                        me._dice2.setVelocity(
-                            Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0),
-                            Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0)
-                        );
+                        me._dice2
+                            .play('second_dice_roll')
+                            .setVelocity(
+                                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0),
+                                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0))
+                            .setAngularVelocity(
+                                Utils.getRandom(-Consts.DicePhysics.Angle, -Consts.DicePhysics.Angle, 10));
 
                         me._status.isBusy = true;
 
                         me._scene.time.delayedCall(
                             Utils.getRandom(1000, 2000, 1000),
                             () => {
-                                me._dice1.stop().setFrame(first).setVelocity(0);
-                                me._dice2.stop().setFrame(second).setVelocity(0);
+                                me._dice1.stop().setFrame(first).setVelocity(0).setAngularVelocity(0);
+                                me._dice2.stop().setFrame(second).setVelocity(0).setAngularVelocity(0);
 
                                 Utils.debugLog(`${first} ${second} (${first + second})`);
 
