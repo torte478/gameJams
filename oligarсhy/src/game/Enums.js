@@ -7,8 +7,11 @@ export default class Enums {
         SECOND_DICE_TAKED: 3,
         DICES_DROPED: 4,
         PIECE_TAKED: 5,
+
+        // TODO : rename Property => Field
         PIECE_ON_FREE_PROPERTY: 6,
         PIECE_ON_ENEMY_PROPERTY: 7,
+
         OWN_FIELD_SELECTED: 8,
         FINAL: 9
     };
@@ -101,5 +104,11 @@ export default class Enums {
         DROP_PIECE: 4,
         TAKE_BILL: 5,
         CLICK_BUTTON: 6
+    }
+
+    static AiAction = {
+        UNKNOWN: 0,
+        FINISH_TURN: 1,
+        SPLIT_MONEY: 2,
     }
 }

@@ -170,7 +170,7 @@ export default class Player {
     getBillsMoney() {
         const me = this;
 
-        return Helper.getTotalMoney(me._enumBills());
+        return Helper.getTotalMoney(me.enumBills());
     }
 
     /**
@@ -180,7 +180,7 @@ export default class Player {
     getNextOptimalBillPosition(cost) {
         const me = this;
 
-        const counts = Helper.getOptimalBills(me._enumBills(), cost);
+        const counts = Helper.getOptimalBills(me.enumBills(), cost);
         for (let i = counts.length - 1; i >= 0; --i)
             if (counts[i] > 0) {
                 const bill = me._money[i].image;
@@ -533,7 +533,10 @@ export default class Player {
         return field;
     }
 
-    _enumBills() {
+    /**
+     * @returns {Number[]}
+     */
+    enumBills() {
         const me = this;
 
         return me._money.map((x) => x.count);

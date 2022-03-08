@@ -59,6 +59,36 @@ export default class Utils {
     /**
      * @param {Array} array 
      * @param {Function} f 
+     * @returns {Object}
+     */
+     static lastOrDefault(array, f) {
+        for (let i = array.length - 1; i >= 0; --i) {
+            if (!!f(array[i])) {
+                return array[i];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param {Array} array 
+     * @param {Function} f 
+     * @returns {Object}
+     */
+     static lastOrDefaultIndex(array, f) {
+        for (let i = array.length - 1; i >= 0; --i) {
+            if (!!f(array[i])) {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param {Array} array 
+     * @param {Function} f 
      * @returns {Number}
      */
      static firstOrDefaultIndex(array, f) {

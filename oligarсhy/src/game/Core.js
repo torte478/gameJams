@@ -172,7 +172,7 @@ export default class Core {
 
         // Debug
 
-        if (Config.Debug.Global && Config.Debug.TextLog) {
+        if (Config.Debug.Global && Config.Debug.ShowTextLog) {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
@@ -206,7 +206,7 @@ export default class Core {
             me._processCpuTurn();
         }
 
-        if (Config.Debug.Global && Config.Debug.TextLog) {
+        if (Config.Debug.Global && Config.Debug.ShowTextLog) {
             me._log.text = 
             `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
             `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` + 
@@ -734,6 +734,8 @@ export default class Core {
         me._getCurrentPlayer().hand.toWait();
         me._context.status.player = me._context.status.getNextPlayerIndex();
         me._hud.select(me._context.status.player);
+        if (me._context.status.player != Enums.Player.HUMAN)
+            me._ai[me._context.status.player].resetState();
         
         for (let i = 0; i < me._context.players.length; ++i)
             me._context.players[i].showButtons(i == me._context.status.player);
@@ -746,9 +748,11 @@ export default class Core {
     _getCurrentPlayer() {
         const me = this;
 
+        const current = me._context.status.player;
         return {
-           player: me._context.players[me._context.status.player],
-           hand: me._hands[me._context.status.player]
+           player: me._context.players[current],
+           hand: me._hands[current],
+           ai: me._ai[current]
         };
     }
 
@@ -897,9 +901,9 @@ export default class Core {
             return me._setState(Enums.GameState.PIECE_ON_ENEMY_PROPERTY);
         }
 
-        const canBuyProperty = fieldConfig.cost <= current.player.getBillsMoney();
+        const canBuyField = me._isHumanTurn() || current.ai.canBuyField(field.index);
 
-        if (!current.player.hasField(field.index) && canBuyProperty) {
+        if (!current.player.hasField(field.index) && canBuyField) {
             me._context.status.setPayAmount(fieldConfig.cost);
             return me._setState(Enums.GameState.PIECE_ON_FREE_PROPERTY);
         }
@@ -1067,7 +1071,7 @@ export default class Core {
     _checkPause() {
         const me = this;
 
-        if (Config.Debug.Global && Config.Debug.Pause)
+        if (Config.Debug.Global && Config.Debug.IgnorePause)
             return false;
 
         if (!me._scene.input.mouse.locked) {

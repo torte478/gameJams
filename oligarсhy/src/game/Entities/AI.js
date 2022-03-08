@@ -19,6 +19,15 @@ export default class AI {
     /** @type {Context} */
     _context;
 
+    /** @type {Object} */
+    _state = {
+        /** @type {Number} */
+        action: null,
+
+        /** @type {Object} */
+        config: null
+    }
+
     constructor(player, hand, context) {
         const me = this;
 
@@ -27,10 +36,16 @@ export default class AI {
         me._context = context;
     }
 
+    resetState() {
+        const me = this;
+        me._state.action = null;
+        me._state.config = null;
+    }
+
     nextPoint() {
         const me = this;
 
-        if (me._context.status.isBusy)
+        if (me._context.status.isBusy || me._hand.isBusy())
             return null;
 
         switch (me._context.status.state) {
@@ -108,12 +123,56 @@ export default class AI {
                 return me._player.getButtonPosition(Enums.ActionType.SELL_FIELD);
             }
                 
-            case Enums.GameState.FINAL:
-               return me._player.getButtonPosition(Enums.ActionType.NEXT_TURN);
+            case Enums.GameState.FINAL: {
+
+                if (me._state.action == Enums.AiAction.FINISH_TURN)
+                    return me._player.getButtonPosition(Enums.ActionType.NEXT_TURN);
+
+                if (me._state.action == Enums.AiAction.SPLIT_MONEY) {
+                    me._state.action = Enums.AiAction.FINISH_TURN;
+                    return me._player.getButtonPosition(Enums.ActionType.SPLIT_MONEY);
+                }
+
+                const bill = me._tryFindBillToSplit();
+                if (bill != null) {
+                    me._state.action = Enums.AiAction.SPLIT_MONEY;
+                    return bill;
+                }
+
+                me._state.action = Enums.AiAction.FINISH_TURN;
+                return null;
+            }
 
             default:
                 const stateStr = Utils.enumToString(Enums.GameState, me._context.status.state);
                 throw `CPU Error! Unknown state ${stateStr}`;
         }
+    }
+
+    canBuyField(index) {
+        const me = this;
+
+        if (Config.Debug.Global && Config.Debug.CancelAiBuy)
+            return false;
+
+        return Config.Fields[index].cost <= me._player.getBillsMoney();
+    }
+
+    _tryFindBillToSplit() {
+        const me = this;
+
+        const bills = me._player.enumBills();
+
+        for (let i = Consts.BillCount - 2; i >= 0; --i) {
+            if (bills[i] != 0)
+                continue;
+
+            for (let j = i + 1; j < Consts.BillCount; ++j) {
+                if (bills[j] >= 2)
+                    return me._player.getBillPosition(j);
+            }
+        }
+
+        return null;
     }
 }
