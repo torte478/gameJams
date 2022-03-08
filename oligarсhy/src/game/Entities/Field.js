@@ -3,6 +3,7 @@ import Phaser from '../../lib/phaser.js';
 import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
+import Utils from '../Utils.js';
 
 export default class Field {
 
@@ -39,7 +40,8 @@ export default class Field {
 
         me._tween = scene.tweens.add({
             targets: me._selection,
-            scale: { from: 1, to: 1.25 },
+            scaleX: { from: 1.1, to: 1.25 },
+            scaleY: { from: 1.2, to: 1.4 },
             duration: Consts.Speed.Selection,
             yoyo: true,
             repeat: -1
@@ -144,7 +146,14 @@ export default class Field {
     select() {
         const me = this;
 
-        me._selection.setVisible(true);
+        const items = me._container.getAll();
+        const buyed = Utils.contains(Consts.BuyableFieldTypes, Config.Fields[me._index].type)
+                      &&  items[items.length - 3].visible;
+
+        me._selection
+            .setVisible(true)
+            .setPosition(0, buyed ? 25 : 0);
+
         me._tween.resume();
         me._container.setDepth(Consts.Depth.SelectedField);
     }
