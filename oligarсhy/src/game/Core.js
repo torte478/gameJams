@@ -24,9 +24,6 @@ export default class Core {
     /** @type {Phaser.Scene} */
     _scene;
 
-    /** @type {Hand[]} */
-    _hands;
-
     /** @type {HUD} */
     _hud;
 
@@ -124,9 +121,9 @@ export default class Core {
 
         scene.physics.add.collider(me._context.dice1.toGameObject(), me._context.dice2.toGameObject());
 
-        me._hands = [];
+        me._context.hands = [];
         for (let i = 0; i < Config.Start.PlayerCount; ++i)
-            me._hands.push(new Hand(scene, i));
+            me._context.hands.push(new Hand(scene, i));
 
         me._groups = new Groups(scene);
         me._cards = new Cards(scene);
@@ -170,11 +167,7 @@ export default class Core {
 
         me._ai = [ null ];
         for (let i = 1; i < me._context.players.length; ++i) {
-            const ai = new AI(
-                me._context.players[i],
-                me._hands[i],
-                me._context
-            );
+            const ai = new AI(i, me._context);
             me._ai.push(ai);
         }
 
@@ -514,7 +507,7 @@ export default class Core {
                 
                 /** @type {Player} */
                 const enemy = Utils.single(me._context.players, (p) => p.hasField(me._context.status.targetPieceIndex));
-                if (!me._hands[enemy.index].isClick(point))
+                if (!me._context.hands[enemy.index].isClick(point))
                     return;
 
                 hand.tryMakeAction(
@@ -534,7 +527,7 @@ export default class Core {
                         const rent = enemy.getRent(me._context.status.targetPieceIndex);
                         me._addMoney(rent, point, enemy);
 
-                        me._hands[enemy.index].toWait();
+                        me._context.hands[enemy.index].toWait();
 
                         me._setState(Enums.GameState.FINAL);
                     }
@@ -764,7 +757,7 @@ export default class Core {
         const current = me._context.status.player;
         return {
            player: me._context.players[current],
-           hand: me._hands[current],
+           hand: me._context.hands[current],
            ai: me._ai[current]
         };
     }
@@ -906,7 +899,7 @@ export default class Core {
 
             me._context.status.setPayAmount(rent);
 
-            me._hands[enemyIndex].prepareToRent();
+            me._context.hands[enemyIndex].prepareToRent();
             
             return me._setState(Enums.GameState.PIECE_ON_ENEMY_PROPERTY);
         }
@@ -981,14 +974,14 @@ export default class Core {
     _addBills(bills, from, player) {
         const me = this;
 
-        const billIndicies = Helper.enumBills(bills);
-
-        const billsValue = Helper.getTotalMoney(bills);
+        player.addBills(bills);
 
         me._hud.updateMoney(
             player.index, 
-            player.getBillsMoney() + billsValue,
-            player.getFieldsCost())
+            player.getBillsMoney(),
+            player.getFieldsCost());
+
+        const billIndicies = Helper.enumBills(bills);
 
         for (let i = 0; i < billIndicies.length; ++i) {
             const bill = me._groups.createBill(
@@ -1009,7 +1002,6 @@ export default class Core {
                     Consts.Speed.CardEntranceDuration),
                 delay: i * 50,
                 onComplete: () => {
-                    player.addBill(billIndicies[i])
                     me._groups.killBill(bill);
                 }
             });

@@ -28,11 +28,15 @@ export default class AI {
         config: null
     }
 
-    constructor(player, hand, context) {
+    /**
+     * @param {Number} index 
+     * @param {Context} context 
+     */
+    constructor(index, context) {
         const me = this;
 
-        me._player = player;
-        me._hand = hand;
+        me._player = context.players[index];
+        me._hand = context.hands[index];
         me._context = context;
     }
 
@@ -112,12 +116,16 @@ export default class AI {
 
                 return diff > 0
                     ? me._player.getNextOptimalBillPosition(diff)
-                    : enemy.getButtonPosition(Enums.ActionType.UNKNOWN);
+                    : me._context.hands[enemy.index].toPoint();
             }
 
             case Enums.GameState.OWN_FIELD_SELECTED:  {
-                if (me._context.status.stateToReturn == Enums.GameState.PIECE_ON_ENEMY_PROPERTY)
-                    return me._player.getButtonPosition(Enums.ActionType.SELL_FIELD);
+                if (me._context.status.stateToReturn == Enums.GameState.PIECE_ON_ENEMY_PROPERTY) {
+                    const button = me._player.hasHouse(me._context.status.selectedField)
+                        ? Enums.ActionType.SELL_HOUSE
+                        : Enums.ActionType.SELL_FIELD;
+                    return me._player.getButtonPosition(button);
+                }
 
                 const handMoney = me._hand.getTotalMoney();
                 const diff = me._context.status.payAmount - handMoney;

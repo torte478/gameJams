@@ -3,6 +3,7 @@ import Fields from "./Fields.js";
 import Piece from "./Piece.js";
 import Player from "./Player.js";
 import Status from "../Status.js";
+import Hand from "./Hand.js";
 
 export default class Context {
 
@@ -19,8 +20,11 @@ export default class Context {
     pieces;
 
     /** @type {Fields} */
-    fields
+    fields;
 
     /** @type {Player[]} */
-    players
+    players;
+
+    /** @type {Hand[]} */
+    hands;
 }

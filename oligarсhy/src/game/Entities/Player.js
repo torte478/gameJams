@@ -75,11 +75,13 @@ export default class Player {
             me._money[index].count > 0);
     }
 
-    addBill(index) {
+    addBills(bills) {
         const me = this;
 
-        ++me._money[index].count;
-        me._money[index].image.setVisible(true);
+        for (let i = 0; i < bills.length; ++i) {
+            me._money[i].count += bills[i];
+            me._money[i].image.setVisible(me._money[i].count > 0);
+        }
     }
 
     /**
@@ -120,6 +122,16 @@ export default class Player {
         const me = this;
 
         return Utils.any(me._fields, (f) => f.index == field);
+    }
+
+    hasHouse(field) {
+        const me = this;
+
+        return Utils.any(
+            me._fields, 
+            (f) => f.index == field 
+                   && (f.houses != null && f.houses.length > 0
+                        || f.hotel != null));
     }
 
     /**
@@ -460,15 +472,15 @@ export default class Player {
 
         const config = Config.Fields[index];
         if (config.type == Enums.FieldType.PROPERTY) {
-
             const field = Utils.single(me._fields, (f) => f.index == index);
-            return !!field.hotel || field.houses.length > 0
-                ? config.costHouse / 2
-                : config.cost / 2;
+
+            if (!!field.hotel || field.houses.length > 0)
+                return me.canSellSmth(index)
+                    ? config.costHouse / 2
+                    : 0;
         }
-        else {
-            return config.cost / 2;
-        }
+        
+        return config.cost / 2;
     }
 
     /**
