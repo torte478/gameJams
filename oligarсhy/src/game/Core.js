@@ -136,8 +136,18 @@ export default class Core {
             const player = new Player(scene, i, Config.Start.Money, me._groups);
             me._context.players.push(player);
 
-            for (let j = 0; j < Config.Start.Fields[i].length; ++j)
-                me._buyField(Config.Start.Fields[i][j], i, true);
+            for (let j = 0; j < Config.Start.Fields[i].length; ++j) {
+                const field = Config.Start.Fields[i][j];
+                if (isNaN(field)) {
+                    me._buyField(field.index, i, true);
+                    for (let k = 0; k < field.houses; ++k)
+                        player.addHouse(
+                            field.index, 
+                            me._context.fields.getFieldPosition(field.index));
+                } else {
+                    me._buyField(field, i, true);
+                }
+            }
 
             if (Config.Start.Fields[i].length > 0)
                 me._updateRent(i);

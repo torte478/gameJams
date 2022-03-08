@@ -7,12 +7,15 @@ export default class Config {
 
         StateLog: true,
         Log: true,
-        Random: false,
+        Random: true,
         SkipHuman: true,
+        ShowTextLog: true,
+        IgnorePause: true,
+        CancelAiBuy: false
     };
 
     static Start = {
-        PlayerCount: 4,
+        PlayerCount: 2,
 
         CameraPosition: {
             x: 300,
@@ -20,30 +23,30 @@ export default class Config {
         },
 
         PiecePositions: [
-            0,
+            4,
             0,
             0,
             0
         ],
 
-        Player: Enums.PlayerIndex.HUMAN,
+        Player: Enums.Player.AI1,
 
         State: Enums.GameState.BEGIN,
 
         Money: [5, 1, 2, 1, 1, 4, 2 ],
 
-        // Money: [ 0, 0, 0, 0, 0, 0, 0 ],
+        //Money: [ 15, 6, 6, 9, 6, 6, 0 ],
 
         Fields: [
             [],
-            [],
+            [ { index: 8, houses: 4 }, { index: 9, houses: 4 } ],
             [],
             [],
             // [ 1, 3, 5, 6, 8, 9, 11, 12, 13, 14, 15, 16, 18, 19, 21, 23, 24, 25, 26, 27, 28, 29, 31, 32, 34, 35, 37, 39  ],
         ],
 
         Time: {
-            TurnSec: 30
+            TurnSec: 300
         }
     }
 
