@@ -128,16 +128,27 @@ export default class AI {
                 if (me._state.action == Enums.AiAction.FINISH_TURN)
                     return me._player.getButtonPosition(Enums.ActionType.NEXT_TURN);
 
+                if (me._state.action == Enums.AiAction.MERGE_MONEY) {
+                    if (me._hand.getTotalMoney() >= me._state.config.total) {
+                        me._state.action = Enums.AiAction.FINISH_TURN;
+                        return me._player.getButtonPosition(Enums.ActionType.MERGE_MONEY);    
+                    } else {
+                        return me._state.config.pos;
+                    }
+                }
+
                 if (me._state.action == Enums.AiAction.SPLIT_MONEY) {
                     me._state.action = Enums.AiAction.FINISH_TURN;
                     return me._player.getButtonPosition(Enums.ActionType.SPLIT_MONEY);
                 }
 
-                const bill = me._tryFindBillToSplit();
-                if (bill != null) {
-                    me._state.action = Enums.AiAction.SPLIT_MONEY;
-                    return bill;
-                }
+                const billToMerge = me._tryFindBillToMerge();
+                if (billToMerge != null)
+                    return billToMerge;
+
+                const billToSplit = me._tryFindBillToSplit();
+                if (billToSplit != null)
+                    return billToSplit;
 
                 me._state.action = Enums.AiAction.FINISH_TURN;
                 return null;
@@ -168,10 +179,30 @@ export default class AI {
                 continue;
 
             for (let j = i + 1; j < Consts.BillCount; ++j) {
-                if (bills[j] >= 2)
+                if (bills[j] >= 2) {
+                    me._state.action = Enums.AiAction.SPLIT_MONEY;
                     return me._player.getBillPosition(j);
+                }
             }
         }
+
+        return null;
+    }
+
+    _tryFindBillToMerge() {
+        const me = this;
+
+        const bills = me._player.enumBills();
+
+        for (let i = 0; i < bills.length - 1; ++i)
+            if (bills[i] >= Consts.SplitBillLimit[i]) {
+                me._state.action = Enums.AiAction.MERGE_MONEY;
+                me._state.config = {
+                    total: Consts.BillValue[i + 1],
+                    pos: me._player.getBillPosition(i)
+                };
+                return me._state.config.pos;
+            }
 
         return null;
     }

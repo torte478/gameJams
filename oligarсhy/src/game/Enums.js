@@ -110,5 +110,6 @@ export default class Enums {
         UNKNOWN: 0,
         FINISH_TURN: 1,
         SPLIT_MONEY: 2,
+        MERGE_MONEY: 3,
     }
 }

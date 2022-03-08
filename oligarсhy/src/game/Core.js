@@ -207,11 +207,14 @@ export default class Core {
         }
 
         if (Config.Debug.Global && Config.Debug.ShowTextLog) {
-            me._log.text = 
+            let text = 
             `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
             `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` + 
             `trn: ${(me._turnTimer._finishTime - new Date().getTime()) / 1000 | 0}\n` +
             `pse: ${!me._scene.input.mouse.locked}`;
+            for (let i = 0; i < Config.Start.PlayerCount; ++i)
+                text += `\n[${me._context.players[i].enumBills().join(',')}]`;
+            me._log.setText(text)
         }
     }
 

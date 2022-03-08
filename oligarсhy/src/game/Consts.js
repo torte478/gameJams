@@ -153,6 +153,8 @@ export default class Consts {
 
     static JailFieldIndex = 10;
 
+    static SplitBillLimit = [ 15, 6, 6, 9, 6, 6 ];
+
     static FieldTextColor = '#232429';
     static Font = 'Arial';
 
