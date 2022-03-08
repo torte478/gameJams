@@ -120,4 +120,15 @@ export default class Status {
             
         return diff;
     }
+
+    getNextPlayerIndex() {
+        const me = this;
+
+        let result = me.player;
+        do {
+            result = (result + 1) % Config.Start.PlayerCount;
+        } while (Utils.all(me.activePlayers, (p) => p != result));
+
+        return result;
+    }
 }

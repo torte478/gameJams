@@ -59,7 +59,7 @@ export default class Field {
         
         me._pieces = [];
         for (let i = 0; i < Config.Start.PlayerCount; ++i) {
-            me._pieces.push(Enums.PlayerIndex.NOONE)
+            me._pieces.push(Enums.Player.NOONE)
         }
     }
 
@@ -89,7 +89,7 @@ export default class Field {
 
         for (let i = 0; i < me._pieces.length; ++i) {
             if (me._pieces[i] == player)
-                me._pieces[i] = Enums.PlayerIndex.NOONE
+                me._pieces[i] = Enums.Player.NOONE
         }
     }
 
@@ -101,7 +101,7 @@ export default class Field {
 
         for (let position = 0; position < me._pieces.length; ++position) {
 
-            if (me._pieces[position] == Enums.PlayerIndex.NOONE) {
+            if (me._pieces[position] == Enums.Player.NOONE) {
                 me._pieces[position] = player;
                 return position;
             }
@@ -116,7 +116,7 @@ export default class Field {
         const items = me._container.getAll();
 
         items[items.length - 3]
-            .setFrame(player == Enums.PlayerIndex.HUMAN ? 9 : 10)
+            .setFrame(player == Enums.Player.HUMAN ? 9 : 10)
             .setVisible(true);
 
         items[items.length - 2]
@@ -130,7 +130,7 @@ export default class Field {
         const me = this;
 
         const items = me._container.getAll();
-        const text = `${player == Enums.PlayerIndex.HUMAN ? '+' : '-'} ${rent}`;
+        const text = `${player == Enums.Player.HUMAN ? '+' : '-'} ${rent}`;
         items[items.length - 1].setText(text);
     }
 

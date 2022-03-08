@@ -31,7 +31,7 @@ export default class Piece {
         me._container = scene.add.container(x, y, [ me._selection, me._sprite ])
             .setDepth(Consts.Depth.Pieces);
 
-        if (player == Enums.PlayerIndex.HUMAN)
+        if (player == Enums.Player.HUMAN)
             me._tween = scene.tweens.add({
                 targets: me._selection,
                 scale: { from: 1, to: 1.25 },

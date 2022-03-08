@@ -8,43 +8,24 @@ import Hand from './Entities/Hand.js';
 import HUD from './Entities/HUD.js';
 
 import Config from './Config.js';
-import Consts from './/Consts.js';
-import Enums from './/Enums.js';
+import Consts from './Consts.js';
+import Enums from './Enums.js';
 import Status from './Status.js';
 import Utils from './Utils.js';
 import Helper from './Helper.js';
 import Timer from './Entities/Timer.js';
 import Dice from './Entities/Dice.js';
 import Piece from './Entities/Piece.js';
+import AI from './Entities/AI.js';
+import Context from './Entities/Context.js';
 
 export default class Core {
 
     /** @type {Phaser.Scene} */
     _scene;
 
-    /** @type {Fields} */
-    _fields;
-
-    /** @type {Piece[]} */
-    _pieces;
-
-    /** @type {Dice} */
-    _dice1;
-
-    /** @type {Dice} */
-    _dice2;
-
-    /** @type {Hand} */
-    _hand;
-
     /** @type {Hand[]} */
     _hands;
-
-    /** @type {Status} */
-    _status;
-
-    /** @type {Player[]} */
-    _players;
 
     /** @type {HUD} */
     _hud;
@@ -66,6 +47,12 @@ export default class Core {
 
     /** @type {Phaser.GameObjects.Image} */
     _fade;
+
+    /** @type {AI[]} */
+    _ai;
+
+    /** @type {Context} */
+    _context;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -90,12 +77,13 @@ export default class Core {
         // Custom
 
         me._scene = scene;
+        me._context = new Context();
 
         const factory = scene.add;
 
         me._cursor = me._createCursor(scene);
 
-        me._status = new Status(Config.Start.PiecePositions, Config.Start.Player, Config.Start.State);
+        me._context.status = new Status(Config.Start.PiecePositions, Config.Start.Player, Config.Start.State);
 
         const level = [
             [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -115,26 +103,26 @@ export default class Core {
         const tiles = map.addTilesetImage('table');
         const layer = map.createLayer(0, tiles, -2750, -2750);
 
-        me._fields = new Fields(scene, Config.Start.PiecePositions);
+        me._context.fields = new Fields(scene, Config.Start.PiecePositions);
 
-        me._pieces = [];
+        me._context.pieces = [];
         for (let player = 0; player < Config.Start.PlayerCount; ++player) {
-            const position = me._fields.movePiece(player, 0, Config.Start.PiecePositions[player]);
+            const position = me._context.fields.movePiece(player, 0, Config.Start.PiecePositions[player]);
 
             const piece = new Piece(scene, position.x, position.y, player);
 
-            me._pieces.push(piece);
+            me._context.pieces.push(piece);
         }
 
-        me._dice1 = new Dice(scene, 0, 0, 2);
+        me._context.dice1 = new Dice(scene, 0, 0, 2);
 
-        me._dice2 = new Dice(
+        me._context.dice2 = new Dice(
             scene,
             Consts.SecondDiceOffset.X, 
             Consts.SecondDiceOffset.Y,
             6);
 
-        scene.physics.add.collider(me._dice1.toGameObject(), me._dice2.toGameObject());
+        scene.physics.add.collider(me._context.dice1.toGameObject(), me._context.dice2.toGameObject());
 
         me._hands = [];
         for (let i = 0; i < Config.Start.PlayerCount; ++i)
@@ -143,10 +131,10 @@ export default class Core {
         me._groups = new Groups(scene);
         me._cards = new Cards(scene);
 
-        me._players = [];
+        me._context.players = [];
         for (let i = 0; i < Config.Start.PlayerCount; ++ i) {
             const player = new Player(scene, i, Config.Start.Money, me._groups);
-            me._players.push(player);
+            me._context.players.push(player);
 
             for (let j = 0; j < Config.Start.Fields[i].length; ++j)
                 me._buyField(Config.Start.Fields[i][j], i, true);
@@ -157,11 +145,11 @@ export default class Core {
 
         me._hud = new HUD(factory);
 
-        for (let i = 0; i < me._players.length; ++i)
+        for (let i = 0; i < me._context.players.length; ++i)
             me._hud.updateMoney(
                 i, 
-                me._players[i].getBillsMoney(),
-                me._players[i].getFieldsCost());
+                me._context.players[i].getBillsMoney(),
+                me._context.players[i].getFieldsCost());
 
         me._turnTimer = new Timer(Config.Start.Time.TurnSec * 1000);
         me._fade = scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
@@ -169,6 +157,16 @@ export default class Core {
                 .setDepth(Consts.Depth.Fade)
                 .setAlpha(0.75)
                 .setVisible(false);
+
+        me._ai = [ null ];
+        for (let i = 1; i < me._context.players.length; ++i) {
+            const ai = new AI(
+                me._context.players[i],
+                me._hands[i],
+                me._context
+            );
+            me._ai.push(ai);
+        }
 
         me._setState(Config.Start.State);
 
@@ -189,13 +187,13 @@ export default class Core {
 
         const skipTurn = Config.Debug.Global 
                          && Config.Debug.SkipHuman
-                         && !me._status.isBusy 
-                         && me._status.player == Enums.PlayerIndex.HUMAN;
+                         && !me._context.status.isBusy 
+                         && me._context.status.player == Enums.Player.HUMAN;
 
         if (me._turnTimer.check() || skipTurn) {
             Utils.debugLog('Turn timeout!');
             me._cancelTurn();
-            me._moveToJail(me._status.pieceIndicies[me._status.player]);
+            me._moveToJail(me._context.status.pieceIndicies[me._context.status.player]);
             me._turnTimer.pause();
             return;
         }
@@ -220,7 +218,7 @@ export default class Core {
     onPointerMove(pointer) {
         const me = this;
 
-        if (me._status.isPause) 
+        if (me._context.status.isPause) 
             return;
 
         me._cursor.x += pointer.movementX;
@@ -228,7 +226,7 @@ export default class Core {
 
         const point = Utils.toPoint(me._cursor);
 
-        let index = me._fields.getFieldIndex(point);
+        let index = me._context.fields.getFieldIndex(point);
         if (index == null)
             index = me._cards.getFieldIndex(point);
 
@@ -258,7 +256,7 @@ export default class Core {
     onMouseWheel(deltaY) {
         const me = this;
 
-        if (me._status.isPause)
+        if (me._context.status.isPause)
             return;
 
         if (deltaY > 0)
@@ -270,7 +268,7 @@ export default class Core {
     debugDropDices(value) {
         const me = this;
 
-        if (me._status.state == Enums.GameState.BEGIN) {
+        if (me._context.status.state == Enums.GameState.BEGIN) {
             Utils.debugLog(`debug drop: ${value}`);
             me._applyDiceDrop(value, 0);
         }
@@ -292,7 +290,7 @@ export default class Core {
     _processCpuTurn() {
         const me = this;
 
-        const point = me._getCpuPoint();
+        const point = me._ai[me._context.status.player].nextPoint();
 
         if (point != null)
             me._processTurn(point, false);
@@ -301,7 +299,7 @@ export default class Core {
     _isHumanTurn() {
         const me = this;
 
-        return me._status.player == Enums.PlayerIndex.HUMAN;
+        return me._context.status.player == Enums.Player.HUMAN;
     }
 
     /**
@@ -315,7 +313,7 @@ export default class Core {
         const player = currentPlayer.player;
         const hand = currentPlayer.hand;
 
-        if (hand.isBusy() || me._status.isBusy)
+        if (hand.isBusy() || me._context.status.isBusy)
             return;
 
         if (isCancel)
@@ -324,18 +322,18 @@ export default class Core {
         if (me._trySelectOwnField(point))
             return;
 
-        if (Utils.contains(Consts.States.SellField, me._status.state) && me._trySelectOwnField(point)) {
+        if (Utils.contains(Consts.States.SellField, me._context.status.state) && me._trySelectOwnField(point)) {
                 return me._setState(Enums.GameState.OWN_FIELD_SELECTED);
         }
 
-        switch (me._status.state) {
+        switch (me._context.status.state) {
             case Enums.GameState.BEGIN: {
 
                 let canTakeDice = hand.tryMakeAction(
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
-                        image: me._dice1.toGameObject(),
+                        image: me._context.dice1.toGameObject(),
                         type: Enums.HandState.DICES
                     },
                     () => {
@@ -349,7 +347,7 @@ export default class Core {
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
-                        image: me._dice2.toGameObject(),
+                        image: me._context.dice2.toGameObject(),
                         type: Enums.HandState.DICES
                     },
                     () => {
@@ -365,7 +363,7 @@ export default class Core {
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
-                        image: me._dice1.toGameObject(),
+                        image: me._context.dice1.toGameObject(),
                         type: Enums.HandState.DICES
                     },
                     () => {
@@ -379,7 +377,7 @@ export default class Core {
                     point,
                     Enums.HandAction.TAKE_DICE,
                     {
-                        image: me._dice2.toGameObject(),
+                        image: me._context.dice2.toGameObject(),
                         type: Enums.HandState.DICES
                     },
                     () => {
@@ -399,20 +397,20 @@ export default class Core {
                         const first = Utils.getRandom(1, 6, 1);
                         const second = Utils.getRandom(1, 6, 0);
 
-                        me._dice1.roll('first_dice_roll');
-                        me._dice2.roll('second_dice_roll');
+                        me._context.dice1.roll('first_dice_roll');
+                        me._context.dice2.roll('second_dice_roll');
 
-                        me._status.isBusy = true;
+                        me._context.status.isBusy = true;
 
                         me._scene.time.delayedCall(
                             Utils.getRandom(1000, 2000, 1000),
                             () => {
-                                me._dice1.stop(first);
-                                me._dice2.stop(second);
+                                me._context.dice1.stop(first);
+                                me._context.dice2.stop(second);
 
                                 Utils.debugLog(`${first} ${second} (${first + second})`);
 
-                                me._status.isBusy = false;
+                                me._context.status.isBusy = false;
                                 me._applyDiceDrop(first, second);    
                             },
                             null,
@@ -428,7 +426,7 @@ export default class Core {
                     point,
                     Enums.HandAction.TAKE_PIECE,
                     {
-                        image: me._pieces[me._status.player].toGameObject(),
+                        image: me._context.pieces[me._context.status.player].toGameObject(),
                         type: Enums.HandState.PIECE,
                     },
                     () => { me._setState(Enums.GameState.PIECE_TAKED) });
@@ -438,15 +436,15 @@ export default class Core {
 
             case Enums.GameState.PIECE_TAKED: {
                 
-                const field = me._fields.tryMoveToFieldAtPoint(
-                    me._status.player,
-                    me._status.pieceIndicies[me._status.player],
+                const field = me._context.fields.tryMoveToFieldAtPoint(
+                    me._context.status.player,
+                    me._context.status.pieceIndicies[me._context.status.player],
                     point);
 
                 if (!field)
                     return;
 
-                if (field.index != me._status.targetPieceIndex)
+                if (field.index != me._context.status.targetPieceIndex)
                     return;
 
                 hand.tryMakeAction(
@@ -477,18 +475,18 @@ export default class Core {
                     () => {
                         const handMoney = hand.getTotalMoney();
                         hand.dropMoney();
-                        const diff = me._status.updatePayAmount(handMoney);
+                        const diff = me._context.status.updatePayAmount(handMoney);
 
                         if (diff > 0)
                             return;
 
-                        const field = me._status.targetPieceIndex;
+                        const field = me._context.status.targetPieceIndex;
 
                         me._buyField(field, player.index);
                         me._updateRent(player.index);
                         me._addMoney(-diff, point, player);
 
-                        me._status.buyHouseOnCurrentTurn = true;
+                        me._context.status.buyHouseOnCurrentTurn = true;
 
                         me._setState(Enums.GameState.FINAL);
                     }
@@ -502,7 +500,7 @@ export default class Core {
                     return;
                 
                 /** @type {Player} */
-                const enemy = Utils.single(me._players, (p) => p.hasField(me._status.targetPieceIndex));
+                const enemy = Utils.single(me._context.players, (p) => p.hasField(me._context.status.targetPieceIndex));
                 if (!me._hands[enemy.index].isClick(point))
                     return;
 
@@ -514,13 +512,13 @@ export default class Core {
                         const total = hand.getTotalMoney();
                         hand.dropMoney();
 
-                        const change = me._status.updatePayAmount(total);
+                        const change = me._context.status.updatePayAmount(total);
                         if (change > 0)
                             return;
 
                         me._addMoney(-change, point, player);
 
-                        const rent = enemy.getRent(me._status.targetPieceIndex);
+                        const rent = enemy.getRent(me._context.status.targetPieceIndex);
                         me._addMoney(rent, point, enemy);
 
                         me._hands[enemy.index].toWait();
@@ -543,8 +541,8 @@ export default class Core {
                         Enums.HandAction.CLICK_BUTTON,
                         null,
                         () => {
-                            const index = me._status.selectedField;
-                            const cost = player.trySell(index, me._fields.getFieldPosition(index));
+                            const index = me._context.status.selectedField;
+                            const cost = player.trySell(index, me._context.fields.getFieldPosition(index));
                             if (cost == null)
                                 return;
                         
@@ -552,14 +550,14 @@ export default class Core {
 
                             me._updateRent(player.index);
                             if (sellField) {
-                                me._fields.sellField(index);
+                                me._context.fields.sellField(index);
                                 me._cards.sell(index, player.index, player.getCardGrid());
                             }
 
                             me._addMoney(cost, point, player);
 
-                            Utils.debugLog(`SELL: ${Utils.enumToString(Enums.PlayerIndex, player.index)} => ${index}`);
-                            return me._setState(me._status.stateToReturn);
+                            Utils.debugLog(`SELL: ${Utils.enumToString(Enums.Player, player.index)} => ${index}`);
+                            return me._setState(me._context.status.stateToReturn);
                         });
                 }
                 
@@ -574,30 +572,30 @@ export default class Core {
                     Enums.HandAction.CLICK_BUTTON,
                     null,
                     () => {
-                        const field = Config.Fields[me._status.selectedField];
+                        const field = Config.Fields[me._context.status.selectedField];
 
-                        if (me._status.stateToReturn == Enums.GameState.PIECE_ON_FREE_PROPERTY) {
-                            me._status.stateToReturn = Enums.GameState.FINAL;
-                            me._status.payAmount = 0;
+                        if (me._context.status.stateToReturn == Enums.GameState.PIECE_ON_FREE_PROPERTY) {
+                            me._context.status.stateToReturn = Enums.GameState.FINAL;
+                            me._context.status.payAmount = 0;
                         }
 
-                        if (me._status.payAmount == 0) {
-                            me._status.setPayAmount(field.costHouse);
+                        if (me._context.status.payAmount == 0) {
+                            me._context.status.setPayAmount(field.costHouse);
                         }
 
                         const handMoney = hand.getTotalMoney();
                         hand.dropMoney();
-                        const diff = me._status.updatePayAmount(handMoney);
+                        const diff = me._context.status.updatePayAmount(handMoney);
                         if (diff > 0)
                             return;
 
-                        const fieldIndex = me._status.selectedField;
-                        player.addHouse(fieldIndex, me._fields.getFieldPosition(fieldIndex));
+                        const fieldIndex = me._context.status.selectedField;
+                        player.addHouse(fieldIndex, me._context.fields.getFieldPosition(fieldIndex));
                         me._updateRent(player.index);
                         me._addMoney(-diff, point, player);
 
-                        me._status.buyHouseOnCurrentTurn = true;
-                        me._setState(me._status.stateToReturn);
+                        me._context.status.buyHouseOnCurrentTurn = true;
+                        me._setState(me._context.status.stateToReturn);
                 });
 
                 break;
@@ -615,7 +613,7 @@ export default class Core {
             }
 
             default: 
-                throw `can't process state: ${Utils.enumToString(Enums.GameState, me._status.state)}`;
+                throw `can't process state: ${Utils.enumToString(Enums.GameState, me._context.status.state)}`;
         }
     }
 
@@ -679,102 +677,12 @@ export default class Core {
         return false;
     }
 
-    _getCpuPoint() {
-        const me = this;
-
-        if (me._status.isBusy)
-            return null;
-
-        const current = me._getCurrentPlayer();
-
-        switch (me._status.state) {
-            case Enums.GameState.BEGIN:
-                return Utils.toPoint(me._dice1.toGameObject())
-
-            case Enums.GameState.FIRST_DICE_TAKED:
-                return Utils.toPoint(me._dice2.toGameObject());
-
-            case Enums.GameState.SECOND_DICE_TAKED: {
-
-                if (me._status.isBusy)
-                    return null;
-
-                const zone = Consts.DiceZoneRect;
-
-                const playerIndex = me._getNextPlayerIndex() != Enums.PlayerIndex.HUMAN
-                    ? me._status.player
-                    : Enums.PlayerIndex.HUMAN;
-
-                const humanPos = Utils.toPoint(me._pieces[playerIndex].toGameObject());
-
-                const randomPos = Utils.buildPoint(
-                    humanPos.x + Utils.getRandom(-200, 200, 0),
-                    humanPos.y + Utils.getRandom(-200, 200, 0));
-
-                const target = Utils.buildPoint(
-                    Math.max(zone.x, Math.min(zone.x + zone.width, randomPos.x)),
-                    Math.max(zone.y, Math.min(zone.y + zone.height, randomPos.y)));
-
-                return target;
-            }
-
-            case Enums.GameState.DICES_DROPED:
-                return Utils.toPoint(me._pieces[me._status.player].toGameObject());
-
-            case Enums.GameState.PIECE_TAKED:
-                return me._fields.getFieldPosition(me._status.targetPieceIndex);
-
-            case Enums.GameState.PIECE_ON_FREE_PROPERTY: {
-                const cost = Config.Fields[me._status.targetPieceIndex].cost;
-                const handMoney = current.hand.getTotalMoney();
-                const diff = cost - handMoney;
-
-                return diff > 0
-                    ? current.player.getNextOptimalBillPosition(diff)
-                    : current.player.getButtonPosition(Enums.ActionType.BUY_FIELD);
-            }
-
-            case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
-
-                const total = current.player.getBillsMoney() + current.hand.getTotalMoney();
-                if (total < me._status.payAmount) {
-                    const index = current.player.getRichestField();
-                    return me._fields.getFieldPosition(index);
-                }
-                
-                /** @type {Player} */
-                const enemy = Utils.single(me._players, (p) => p.hasField(me._status.targetPieceIndex));
-                const handMoney = current.hand.getTotalMoney();
-                const diff = me._status.payAmount - handMoney;
-
-                return diff > 0
-                    ? current.player.getNextOptimalBillPosition(diff)
-                    : enemy.getButtonPosition(Enums.ActionType.UNKNOWN);
-            }
-
-            case Enums.GameState.OWN_FIELD_SELECTED:  {
-                if (me._status.stateToReturn != Enums.GameState.PIECE_ON_ENEMY_PROPERTY)
-                    throw `ai on OWN_FIELD_SELECTED from ` + 
-                        `${Utils.enumToString(Enums.GameState, me._status.stateToReturn)} not implemented`;
-
-                return current.player.getButtonPosition(Enums.ActionType.SELL_FIELD);
-            }
-                
-            case Enums.GameState.FINAL:
-               return current.player.getButtonPosition(Enums.ActionType.NEXT_TURN);
-
-            default:
-                const stateStr = Utils.enumToString(Enums.GameState, me._status.state);
-                throw `CPU Error! Unknown state ${stateStr}`;
-        }
-    }
-
     _applyDiceDrop(first, second) {
         const me = this;
 
-        const current = me._status.pieceIndicies[me._status.player];
-        me._status.targetPieceIndex = (current + first + second) % Consts.FieldCount;
-        me._status.diceResult = first + second;
+        const current = me._context.status.pieceIndicies[me._context.status.player];
+        me._context.status.targetPieceIndex = (current + first + second) % Consts.FieldCount;
+        me._context.status.diceResult = first + second;
 
         for (let i = 0; i < Config.Start.PlayerCount; ++i)
             me._updateRent(i);
@@ -791,12 +699,12 @@ export default class Core {
 
         current.player.showButtons([]);
 
-        me._status.selectedField = null;
+        me._context.status.selectedField = null;
         const next = me._getNextStateAfterCancel();
 
-        me._status.isBusy = true;
+        me._context.status.isBusy = true;
         current.hand.cancel(() => {
-            me._status.isBusy = false;
+            me._context.status.isBusy = false;
             me._setState(next);
         });
     }
@@ -804,7 +712,7 @@ export default class Core {
     _getNextStateAfterCancel() {
         const me = this;
 
-        switch (me._status.state) {
+        switch (me._context.status.state) {
             case Enums.GameState.FIRST_DICE_TAKED:
             case Enums.GameState.SECOND_DICE_TAKED:
                 return Enums.GameState.BEGIN;
@@ -813,10 +721,10 @@ export default class Core {
                 return Enums.GameState.DICES_DROPED;
 
             case Enums.GameState.OWN_FIELD_SELECTED:
-                return me._status.stateToReturn;
+                return me._context.status.stateToReturn;
             
             default:
-                return me._status.state;
+                return me._context.status.state;
         }
     }
 
@@ -824,51 +732,40 @@ export default class Core {
         const me = this;
 
         me._getCurrentPlayer().hand.toWait();
-        me._status.player = me._getNextPlayerIndex();
-        me._hud.select(me._status.player);
+        me._context.status.player = me._context.status.getNextPlayerIndex();
+        me._hud.select(me._context.status.player);
         
-        for (let i = 0; i < me._players.length; ++i)
-            me._players[i].showButtons(i == me._status.player);
+        for (let i = 0; i < me._context.players.length; ++i)
+            me._context.players[i].showButtons(i == me._context.status.player);
 
-        me._status.reset();
+        me._context.status.reset();
         me._turnTimer.reset();
         me._setState(Enums.GameState.BEGIN);
-    }
-
-    _getNextPlayerIndex() {
-        const me = this;
-
-        let result = me._status.player;
-        do {
-            result = (result + 1) % Config.Start.PlayerCount;
-        } while (Utils.all(me._status.activePlayers, (p) => p != result));
-
-        return result;
     }
 
     _getCurrentPlayer() {
         const me = this;
 
         return {
-           player: me._players[me._status.player],
-           hand: me._hands[me._status.player]
+           player: me._context.players[me._context.status.player],
+           hand: me._hands[me._context.status.player]
         };
     }
 
     _killPlayer() {
         const me = this;
 
-        if (me._status.player == Enums.PlayerIndex.HUMAN) {
+        if (me._context.status.player == Enums.Player.HUMAN) {
             throw 'YOU LOSE!';
         }
 
-        me._status.activePlayers = me._status.activePlayers.filter((p) => p != me._status.player);
+        me._context.status.activePlayers = me._context.status.activePlayers.filter((p) => p != me._context.status.player);
 
-        if (me._status.activePlayers.length == 1) {
+        if (me._context.status.activePlayers.length == 1) {
             throw 'YOU WIN!!!'
         }        
 
-        Utils.debugLog(`Player ${Utils.enumToString(Enums.PlayerIndex, me._status.player)} lose!`);
+        Utils.debugLog(`Player ${Utils.enumToString(Enums.Player, me._context.status.player)} lose!`);
 
         me._finishTurn();
     }
@@ -876,10 +773,10 @@ export default class Core {
     _trySelectOwnField(point) {
         const me = this;
 
-        if (!Utils.contains(Consts.States.SellField, me._status.state))
+        if (!Utils.contains(Consts.States.SellField, me._context.status.state))
             return false;
 
-        let field = me._fields.getFieldIndex(point);
+        let field = me._context.fields.getFieldIndex(point);
         if (field == null)       
             field = me._cards.getFieldIndex(point);
 
@@ -898,8 +795,8 @@ export default class Core {
             Enums.HandAction.CLICK_BUTTON,
             null,
             () => {
-                me._status.selectedField = field;
-                me._status.stateToReturn = me._status.state;
+                me._context.status.selectedField = field;
+                me._context.status.stateToReturn = me._context.status.state;
 
                 const actions = [];
 
@@ -908,9 +805,9 @@ export default class Core {
                     actions.push(action);
                 
                 const canBuyHouse = current.player.canBuyHouse(field)
-                                    && !me._status.buyHouseOnCurrentTurn 
-                                    && (me._status.state == Enums.GameState.FINAL
-                                        || me._status.state == Enums.GameState.PIECE_ON_FREE_PROPERTY);
+                                    && !me._context.status.buyHouseOnCurrentTurn 
+                                    && (me._context.status.state == Enums.GameState.FINAL
+                                        || me._context.status.state == Enums.GameState.PIECE_ON_FREE_PROPERTY);
                 if (canBuyHouse) 
                     actions.push(Enums.ActionType.BUY_HOUSE);
 
@@ -943,7 +840,7 @@ export default class Core {
                 break;    
         }
 
-        me._status.setState(state);
+        me._context.status.setState(state);
         me._restoreSelection();
     }
 
@@ -973,7 +870,7 @@ export default class Core {
         const me = this;
 
         const current = me._getCurrentPlayer(); 
-        me._status.pieceIndicies[me._status.player] = me._status.targetPieceIndex;
+        me._context.status.pieceIndicies[me._context.status.player] = me._context.status.targetPieceIndex;
 
         const fieldConfig = Config.Fields[field.index];
 
@@ -984,16 +881,16 @@ export default class Core {
             return me._setState(Enums.GameState.FINAL);
             
         const enemyIndex = Utils.firstOrDefaultIndex(
-            me._players, 
-            (p) => p.index != me._status.player && p.hasField(field.index));
+            me._context.players, 
+            (p) => p.index != me._context.status.player && p.hasField(field.index));
 
         if (enemyIndex != null) {
-            const rent = me._players[enemyIndex].getRent(field.index, me._status.diceResult);
+            const rent = me._context.players[enemyIndex].getRent(field.index, me._context.status.diceResult);
             
             if (rent > current.player.getTotalMoney())
                 return me._killPlayer();
 
-            me._status.setPayAmount(rent);
+            me._context.status.setPayAmount(rent);
 
             me._hands[enemyIndex].prepareToRent();
             
@@ -1003,7 +900,7 @@ export default class Core {
         const canBuyProperty = fieldConfig.cost <= current.player.getBillsMoney();
 
         if (!current.player.hasField(field.index) && canBuyProperty) {
-            me._status.setPayAmount(fieldConfig.cost);
+            me._context.status.setPayAmount(fieldConfig.cost);
             return me._setState(Enums.GameState.PIECE_ON_FREE_PROPERTY);
         }
 
@@ -1013,27 +910,27 @@ export default class Core {
     _moveToJail(fieldFrom) {
         const me = this;
 
-        const jail = me._fields.movePiece(
-            me._status.player, 
+        const jail = me._context.fields.movePiece(
+            me._context.status.player, 
             fieldFrom, 
             Consts.JailFieldIndex, 
             true);
 
-        me._status.pieceIndicies[me._status.player] = Consts.JailFieldIndex;
+        me._context.status.pieceIndicies[me._context.status.player] = Consts.JailFieldIndex;
 
-        me._status.isBusy = true;
+        me._context.status.isBusy = true;
         return me._scene.tweens.add({
-            targets: me._pieces[me._status.player].toGameObject(),
+            targets: me._context.pieces[me._context.status.player].toGameObject(),
             x: jail.x,
             y: jail.y,
             ease: 'Sine.easeInOut',
             duration: Utils.getTweenDuration(
-                Utils.toPoint(me._pieces[me._status.player].toGameObject()),
+                Utils.toPoint(me._context.pieces[me._context.status.player].toGameObject()),
                 jail,
                 Consts.Speed.HandAction
             ),
             onComplete: () => { 
-                me._status.isBusy = false;
+                me._context.status.isBusy = false;
                 me._finishTurn();
             }
         });
@@ -1042,20 +939,20 @@ export default class Core {
     _updateRent(playerIndex) {
         const me = this;
 
-        const player = me._players[playerIndex];
+        const player = me._context.players[playerIndex];
 
         for (let i = 0; i < Consts.FieldCount; ++i)
             if (player.hasField(i)) {
-                const rent = player.getRent(i, me._status.diceResult);
-                me._fields.updateRent(i, playerIndex, rent)
+                const rent = player.getRent(i, me._context.status.diceResult);
+                me._context.fields.updateRent(i, playerIndex, rent)
             }      
     }
 
     _buyField(field, playerIndex, ignoreTween) {
         const me = this;
 
-        const cardGrid = me._players[playerIndex].addField(field);
-        me._fields.buyField(field, playerIndex);
+        const cardGrid = me._context.players[playerIndex].addField(field);
+        me._context.fields.buyField(field, playerIndex);
         me._cards.buy(field, playerIndex, cardGrid, ignoreTween);
     }
 
@@ -1111,7 +1008,7 @@ export default class Core {
         me._scene.input.mouse.releasePointerLock();
         me._scene.tweens.pauseAll();
         me._turnTimer.pause();
-        me._status.isPause = true;
+        me._context.status.isPause = true;
         me._fade.setVisible(true);
     }
 
@@ -1119,7 +1016,7 @@ export default class Core {
         const me = this;
 
         me._scene.tweens.resumeAll();
-        me._status.isPause = false;
+        me._context.status.isPause = false;
         me._turnTimer.resume();
         me._restoreSelection();
         me._fade.setVisible(false);
@@ -1130,39 +1027,39 @@ export default class Core {
 
         const isHuman = me._isHumanTurn();
         if (!isHuman) {
-            me._dice1.unselect();
-            me._dice2.unselect();
-            me._pieces[Enums.PlayerIndex.HUMAN].unselect();
-            me._fields.unselect();
+            me._context.dice1.unselect();
+            me._context.dice2.unselect();
+            me._context.pieces[Enums.Player.HUMAN].unselect();
+            me._context.fields.unselect();
             return;
         }
 
-        switch (me._status.state) {
+        switch (me._context.status.state) {
             case Enums.GameState.BEGIN:
-                me._dice1.select();
-                me._dice2.select();
+                me._context.dice1.select();
+                me._context.dice2.select();
                 break;
 
             case Enums.GameState.SECOND_DICE_TAKED:
-                me._dice1.unselect();
-                me._dice2.unselect();
+                me._context.dice1.unselect();
+                me._context.dice2.unselect();
 
                 break;
 
             case Enums.GameState.DICES_DROPED:
-                me._pieces[Enums.PlayerIndex.HUMAN].select();
+                me._context.pieces[Enums.Player.HUMAN].select();
 
                 break;
 
             case Enums.GameState.PIECE_TAKED:
-                me._pieces[Enums.PlayerIndex.HUMAN].unselect();
-                me._fields.select(me._status.targetPieceIndex);
+                me._context.pieces[Enums.Player.HUMAN].unselect();
+                me._context.fields.select(me._context.status.targetPieceIndex);
                 break;
 
             case Enums.GameState.PIECE_ON_ENEMY_PROPERTY:
             case Enums.GameState.PIECE_ON_FREE_PROPERTY:
             case Enums.GameState.FINAL:
-                me._fields.unselect();
+                me._context.fields.unselect();
             break;
         }
     }
@@ -1174,11 +1071,11 @@ export default class Core {
             return false;
 
         if (!me._scene.input.mouse.locked) {
-            if (!me._status.isPause)
+            if (!me._context.status.isPause)
                 me._pause();
 
             return true;
-        } else if (me._status.isPause) {
+        } else if (me._context.status.isPause) {
             me._unpause();
             return false;
         }

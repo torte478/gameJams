@@ -39,12 +39,12 @@ export default class Enums {
     };
 
     // TODO: rename
-    static PlayerIndex = {
+    static Player = {
         NOONE: -1,
         HUMAN: 0,
-        CPU1: 1,
-        CPU2: 2,
-        CPU3: 3,
+        AI1: 1,
+        AI2: 2,
+        AI3: 3,
     };
 
     static HandState = {

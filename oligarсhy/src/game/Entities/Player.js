@@ -107,7 +107,7 @@ export default class Player {
             houses: [],
             hotel: null
         });
-        Utils.debugLog(`player ${Utils.enumToString(Enums.PlayerIndex, me.index)} buys property ${field}!`);
+        Utils.debugLog(`player ${Utils.enumToString(Enums.Player, me.index)} buys property ${field}!`);
 
         return me.getCardGrid();
     }
