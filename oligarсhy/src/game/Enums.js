@@ -111,5 +111,6 @@ export default class Enums {
         FINISH_TURN: 1,
         SPLIT_MONEY: 2,
         MERGE_MONEY: 3,
+        BUY_HOUSE: 4,
     }
 }

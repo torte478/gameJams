@@ -72,6 +72,9 @@ export default class Buttons {
         /** @type {Phaser.GameObjects.Image} */
         const button = me._container.getAll()[type];
 
+        if (!button.visible)
+            return null;
+
         const rotated = Helper.rotate(Utils.toPoint(button), me._side);
 
         const world = new Phaser.Geom.Point(

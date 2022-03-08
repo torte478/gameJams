@@ -329,12 +329,12 @@ export default class Player {
         const me = this;
 
         if (Config.Fields[index].type != Enums.FieldType.PROPERTY)
-            return null;
+            return false;
 
         const field = me._getProperty(index);
 
         if (field.hotel != null)
-            return null;
+            return false;
 
         const color = Config.Fields[field.index].color;
         const sameColorFields = me._fields
@@ -342,7 +342,7 @@ export default class Player {
 
         const colorStr = Utils.enumToString(Enums.FieldColorIndex, color);
         if (sameColorFields.length != Consts.PropertyColorCounts[colorStr])
-            return null;
+            return false;
 
         if (field.houses.length == Consts.MaxHouseCount)
             return Utils.all(sameColorFields, (f) => f.houses.length == Consts.MaxHouseCount || f.hotel != null);

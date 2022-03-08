@@ -116,13 +116,20 @@ export default class AI {
             }
 
             case Enums.GameState.OWN_FIELD_SELECTED:  {
-                if (me._context.status.stateToReturn != Enums.GameState.PIECE_ON_ENEMY_PROPERTY)
-                    throw `ai on OWN_FIELD_SELECTED from ` + 
-                        `${Utils.enumToString(Enums.GameState, me._context.status.stateToReturn)} not implemented`;
+                if (me._context.status.stateToReturn == Enums.GameState.PIECE_ON_ENEMY_PROPERTY)
+                    return me._player.getButtonPosition(Enums.ActionType.SELL_FIELD);
 
-                return me._player.getButtonPosition(Enums.ActionType.SELL_FIELD);
+                const handMoney = me._hand.getTotalMoney();
+                const diff = me._context.status.payAmount - handMoney;
+
+                if (diff > 0)
+                    return me._player.getNextOptimalBillPosition(diff);
+                
+                me._state.action = Enums.AiAction.FINISH_TURN;
+                return me._player.getButtonPosition(Enums.ActionType.BUY_HOUSE);
             }
                 
+            // TODO : refactor
             case Enums.GameState.FINAL: {
 
                 if (me._state.action == Enums.AiAction.FINISH_TURN)
@@ -141,6 +148,10 @@ export default class AI {
                     me._state.action = Enums.AiAction.FINISH_TURN;
                     return me._player.getButtonPosition(Enums.ActionType.SPLIT_MONEY);
                 }
+
+                const fieldToSelect = me._tryFindFieldToBuyHouse();
+                if (fieldToSelect != null)
+                    return fieldToSelect;
 
                 const billToMerge = me._tryFindBillToMerge();
                 if (billToMerge != null)
@@ -203,6 +214,31 @@ export default class AI {
                 };
                 return me._state.config.pos;
             }
+
+        return null;
+    }
+
+    _tryFindFieldToBuyHouse() {
+        const me = this;
+
+        if (!me._context.status.isBuyHouseAvailable())
+            return null;
+
+        for (let i = Consts.FieldCount - 1; i >= 0; --i) {
+            if (!me._player.hasField(i))
+                continue;
+
+            if (!me._player.canBuyHouse(i))
+                continue;
+
+            const cost = Config.Fields[i].costHouse;
+            if (me._player.getBillsMoney() < cost)
+                continue;
+
+            me._context.status.setPayAmount(cost);
+            me._state.action = Enums.AiAction.BUY_HOUSE;
+            return me._context.fields.getFieldPosition(i);
+        }
 
         return null;
     }

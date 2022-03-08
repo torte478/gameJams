@@ -131,4 +131,12 @@ export default class Status {
 
         return result;
     }
+
+    isBuyHouseAvailable() {
+        const me = this;
+
+        return !me.buyHouseOnCurrentTurn 
+            && (me.state == Enums.GameState.FINAL
+                || me.state == Enums.GameState.PIECE_ON_FREE_PROPERTY);
+    }
 }

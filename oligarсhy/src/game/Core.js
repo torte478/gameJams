@@ -797,7 +797,7 @@ export default class Core {
         if (!current.player.hasField(field))
             return false;
 
-            current.hand.tryMakeAction(
+        current.hand.tryMakeAction(
             point,
             Enums.HandAction.CLICK_BUTTON,
             null,
@@ -812,9 +812,7 @@ export default class Core {
                     actions.push(action);
                 
                 const canBuyHouse = current.player.canBuyHouse(field)
-                                    && !me._context.status.buyHouseOnCurrentTurn 
-                                    && (me._context.status.state == Enums.GameState.FINAL
-                                        || me._context.status.state == Enums.GameState.PIECE_ON_FREE_PROPERTY);
+                                    && me._context.status.isBuyHouseAvailable();
                 if (canBuyHouse) 
                     actions.push(Enums.ActionType.BUY_HOUSE);
 
@@ -822,8 +820,7 @@ export default class Core {
 
                 Utils.debugLog(`select field ${field}`);
                 me._setState(Enums.GameState.OWN_FIELD_SELECTED);
-            }
-        );
+        });
 
         return true;
     }
