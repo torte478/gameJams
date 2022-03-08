@@ -45,7 +45,7 @@ export default class Dice {
 
         me._tween = scene.tweens.add({
             targets: me._selection,
-            scale: { from: 1, to: 0.9 },
+            scale: { from: 1.25, to: 0.9 },
             duration: Consts.Speed.Selection,
             yoyo: true,
             repeat: -1

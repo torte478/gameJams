@@ -115,7 +115,7 @@ export default class Core {
         const tiles = map.addTilesetImage('table');
         const layer = map.createLayer(0, tiles, -2750, -2750);
 
-        me._fields = new Fields(factory, Config.Start.PiecePositions);
+        me._fields = new Fields(scene, Config.Start.PiecePositions);
 
         me._pieces = [];
         for (let player = 0; player < Config.Start.PlayerCount; ++player) {
@@ -184,14 +184,8 @@ export default class Core {
     update(delta) {
         const me = this;
 
-        if (!me._scene.input.mouse.locked) {
-            if (!me._status.isPause)
-                me._pause();
-
+        if (me._checkPause())
             return;
-        } else if (me._status.isPause) {
-            me._unpause();
-        }
 
         const skipTurn = Config.Debug.Global 
                          && Config.Debug.SkipHuman
@@ -1135,18 +1129,18 @@ export default class Core {
         const me = this;
 
         const isHuman = me._isHumanTurn();
+        if (!isHuman) {
+            me._dice1.unselect();
+            me._dice2.unselect();
+            me._pieces[Enums.PlayerIndex.HUMAN].unselect();
+            me._fields.unselect();
+            return;
+        }
 
         switch (me._status.state) {
             case Enums.GameState.BEGIN:
-
-                if (!isHuman) {
-                    me._dice1.unselect();
-                    me._dice2.unselect();
-                    me._pieces[Enums.PlayerIndex.HUMAN].unselect();
-                } else {
-                    me._dice1.select();
-                    me._dice2.select();
-                }
+                me._dice1.select();
+                me._dice2.select();
                 break;
 
             case Enums.GameState.SECOND_DICE_TAKED:
@@ -1156,15 +1150,37 @@ export default class Core {
                 break;
 
             case Enums.GameState.DICES_DROPED:
-                if (isHuman)
-                    me._pieces[Enums.PlayerIndex.HUMAN].select();
+                me._pieces[Enums.PlayerIndex.HUMAN].select();
 
                 break;
 
             case Enums.GameState.PIECE_TAKED:
-                if (isHuman)
-                    me._pieces[Enums.PlayerIndex.HUMAN].unselect();
+                me._pieces[Enums.PlayerIndex.HUMAN].unselect();
+                me._fields.select(me._status.targetPieceIndex);
                 break;
+
+            case Enums.GameState.PIECE_ON_ENEMY_PROPERTY:
+            case Enums.GameState.PIECE_ON_FREE_PROPERTY:
+            case Enums.GameState.FINAL:
+                me._fields.unselect();
+            break;
+        }
+    }
+
+    _checkPause() {
+        const me = this;
+
+        if (Config.Debug.Global && Config.Debug.Pause)
+            return false;
+
+        if (!me._scene.input.mouse.locked) {
+            if (!me._status.isPause)
+                me._pause();
+
+            return true;
+        } else if (me._status.isPause) {
+            me._unpause();
+            return false;
         }
     }
 }

@@ -12,18 +12,15 @@ export default class Fields {
     /** @type {Field[]} */
     _fields;
 
-    /**
-     * @param {Phaser.GameObjects.GameObjectFactory} factory 
-     */
-    constructor(factory) {
+    constructor(scene) {
         const me = this;
 
         me._fields = [];
 
-        me._createFieldLine(factory, 1, 1, -1, 0, 0, 0);
-        me._createFieldLine(factory, -1, 1, 0, -1, 90, 10);
-        me._createFieldLine(factory, -1, -1, 1, 0, 180, 20);
-        me._createFieldLine(factory, 1, -1, 0, 1, 270, 30);
+        me._createFieldLine(scene, 1, 1, -1, 0, 0, 0);
+        me._createFieldLine(scene, -1, 1, 0, -1, 90, 10);
+        me._createFieldLine(scene, -1, -1, 1, 0, 180, 20);
+        me._createFieldLine(scene, 1, -1, 0, 1, 270, 30);
     }
 
     /**
@@ -121,6 +118,19 @@ export default class Fields {
         me._fields[index].sell();
     }
 
+    select(index) {
+        const me = this;
+
+        me._fields[index].select();
+    }
+
+    unselect() {
+        const me = this;
+
+        for (let i = 0; i < me._fields.length; ++i)
+            me._fields[i].unselect();
+    }
+
     _getNextPointConfig(player, from, to, inJail) {
         const me = this;
 
@@ -159,10 +169,7 @@ export default class Fields {
         }
     }
 
-    /**
-     * @param {Phaser.GameObjects.GameObjectFactory} factory 
-     */
-    _createFieldLine(factory, signX, signY, shiftX, shiftY, angle, index) {
+    _createFieldLine(scene, signX, signY, shiftX, shiftY, angle, index) {
         const me = this;
 
         const sideLength = Consts.FieldCount / 4;
@@ -170,8 +177,8 @@ export default class Fields {
         const size = Consts.Sizes.Field;
         const start = (size.Width * (sideLength - 1) + size.Height) / 2;
 
-        const corner = me._createField(
-            factory, 
+        const corner = new Field(
+            scene, 
             start * signX,
             start * signY,
             'field_corner',
@@ -184,113 +191,16 @@ export default class Fields {
 
         for (let i = 0; i < sideLength - 1; ++i) {
 
-            const field = me._createField(
-                factory,
+            const field = new Field(
+                scene,
                 start * signX + shiftX * (offset + i * size.Width),
                 start * signY + shiftY * (offset + i * size.Width),
                 'field',
                 angle,
                 index + i + 1
-            )
+            );
 
             me._fields.push(field);
-        }
-    }
-
-    /**
-     * @param {Phaser.GameObjects.GameObjectFactory} factory 
-     * @param {Number} x 
-     * @param {Number} y 
-     * @param {String} texture 
-     * @param {Number} index 
-     * @returns {Phaser.GameObjects.Container}
-     */
-    _createField(factory, x, y, texture, angle, index) {
-        const me = this,
-              config = Config.Fields[index],
-              content = me._getFieldContent(factory, config),
-              children = [ factory.image(0, 0, texture) ].concat(content);
-
-        const container = factory.container(x, y, children)
-            .setAngle(angle);
-        return new Field(container, index);
-    }
-
-    /**
-     * @param {Phaser.GameObjects.GameObjectFactory} factory 
-     * @param {Object} config 
-     * @returns {Phaser.GameObjects.GameObject[]}
-     */
-    _getFieldContent(factory, config) {
-        const me = this;
-
-        switch (config.type) {
-            case Enums.FieldType.PROPERTY:
-                return [
-                    factory.image(0, -95, 'field_header', config.color),
-                    factory.image(0, 20, 'icons', config.icon),
-                    factory.text(0, -40, config.name, Consts.TextStyle.FieldSmall).setOrigin(0.5),
-                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
-                    factory.image(0, 144, 'field_header', 9).setVisible(false),
-                    factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
-                    factory.text(20, 144, 'RENT', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
-                ];
-
-            case Enums.FieldType.CHANCE:
-                return [
-                    factory.image(0, 20, 'icons_big', 0),
-                    factory.text(0, -90, 'CHANCE', Consts.TextStyle.FieldBig).setOrigin(0.5)
-                ];
-
-            case Enums.FieldType.TAX:
-                return [
-                    factory.image(0, 0, 'icons_big', 2),
-                    factory.text(0, -90, 'TAX', Consts.TextStyle.FieldBig).setOrigin(0.5),
-                    factory.text(0, 95, `PAY ${config.cost}`, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
-                ];
-
-            case Enums.FieldType.RAILSTATION:
-                return [
-                    factory.image(0, 0, 'icons_big', 4),
-                    factory.text(0, -90, config.name, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
-                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
-                    factory.image(0, 144, 'field_header', 9).setVisible(false),
-                    factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
-                    factory.text(20, 144, 'RENT', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
-                ];
-
-            case Enums.FieldType.UTILITY:
-                return [
-                    factory.image(0, 0, 'icons_big', config.icon),
-                    factory.text(0, -90, config.name, Consts.TextStyle.FieldSmall).setOrigin(0.5),
-                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
-                    factory.image(0, 144, 'field_header', 9).setVisible(false),
-                    factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
-                    factory.text(20, 144, 'RENT', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
-                ];
-
-            case Enums.FieldType.START:
-                return [
-                    factory.image(0, 0, 'icons_corner', 0)
-                ];
-
-            case Enums.FieldType.JAIL:
-                return [
-                    factory.image(0, 0, 'icons_corner', 2)
-                ];
-
-            case Enums.FieldType.FREE:
-                return [
-                    factory.image(0, 0, 'icons_corner', 4)
-                ];
-
-            case Enums.FieldType.GOTOJAIL:
-                return [
-                    factory.image(0, 0, 'icons_corner', 6)
-                ];
-
-            default:
-                throw `Unknown field type ${config.type}`;
         }
     }
 }

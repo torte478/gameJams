@@ -9,15 +9,16 @@ export default class Consts {
 
     static Depth = {
         Board: 0,
-        Money: 50,
-        Houses: 100,
-        Pieces: 200,
-        Cards: 300,
-        Hand: 500,
-        ActiveItem: 750,
-        HUD: 1000,
-        Fade: 2000,
-        Max: 10000
+        SelectedField: 100,
+        Money: 500,
+        Houses: 1000,
+        Pieces: 2000,
+        Cards: 3000,
+        Hand: 5000,
+        ActiveItem: 7500,
+        HUD: 10000,
+        Fade: 20000,
+        Max: 100000
     };
 
     static SecondDiceOffset = {
