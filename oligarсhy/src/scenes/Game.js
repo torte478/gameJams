@@ -62,6 +62,11 @@ export default class Game extends Phaser.Scene {
 
         if (Config.Debug.Global) {
             
+            if (event.key == 'r') {
+                me.input.mouse.releasePointerLock();
+                me.scene.start('game');
+            }
+
             if (isNaN(event.key))
                 return;
 

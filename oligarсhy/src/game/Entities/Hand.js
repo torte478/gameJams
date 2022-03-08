@@ -213,7 +213,9 @@ export default class Hand {
         const me = this;
 
         if (!!me.timeline)
-            me._timeline.stop();
+            me._timeline.pause();
+
+        me._sprite.setFrame(0);
 
         me._timeline = me._scene.tweens.timeline({
             targets: me._container,
@@ -235,6 +237,8 @@ export default class Hand {
         const point = Helper.rotate(
             Utils.buildPoint(80, 550),
             me._side);
+
+        me._sprite.setFrame(4);
 
         me._timeline = me._scene.tweens.timeline({
             targets: me._container,
@@ -260,10 +264,9 @@ export default class Hand {
     isClick(point) {
         const me = this;
 
-        return !me._timeline.isPlaying()
-            &&  Phaser.Geom.Rectangle.ContainsPoint(
-                me._container.getBounds(),
-                point
+        return Phaser.Geom.Rectangle.ContainsPoint(
+            me._container.getBounds(),
+            point
         );
     }
 
