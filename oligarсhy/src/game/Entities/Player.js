@@ -185,23 +185,6 @@ export default class Player {
         return Helper.getTotalMoney(me.enumBills());
     }
 
-    /**
-     * @param {Number} cost 
-     * @returns {Phaser.Geom.Point}
-     */
-    getNextOptimalBillPosition(cost) {
-        const me = this;
-
-        const counts = Helper.getOptimalBills(me.enumBills(), cost);
-        for (let i = counts.length - 1; i >= 0; --i)
-            if (counts[i] > 0) {
-                const bill = me._money[i].image;
-                return new Phaser.Geom.Point(bill.x, bill.y);
-            }
-
-        throw `can't find bill to pay ${cost}`;
-    }
-
     getBillPosition(index) {
         const me = this;
 

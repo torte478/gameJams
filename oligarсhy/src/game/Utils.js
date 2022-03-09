@@ -243,4 +243,17 @@ export default class Utils {
         const time = (dist / speed) * 1000;
         return time;
     }
+
+    /**
+     * @param {Array} source 
+     * @returns {Array}
+     */
+    static copyArray(source) {
+        const result = [];
+
+        for (let i = 0; i < source.length; ++i)
+            result.push(source[i]);
+
+        return result;
+    }
 }

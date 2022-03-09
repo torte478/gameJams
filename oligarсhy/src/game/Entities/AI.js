@@ -222,7 +222,7 @@ export default class AI {
                 continue;
 
             for (let j = i + 1; j < Consts.BillCount; ++j) {
-                if (bills[j] >= 2) {
+                if (bills[j] >= 1) {
                     me._state.action = Enums.AiAction.SPLIT_MONEY;
                     return me._player.getBillPosition(j);
                 }
@@ -281,10 +281,45 @@ export default class AI {
         me._billSeq.bills = [];
         me._billSeq.index = 0;
 
-        const optimalBills = Helper.getOptimalBills(bills, total);
-        for (let i = 0; i < optimalBills.length; ++i)
+        const optimalBills = me._getOptimalBills(bills, total);
+
+        for (let i = optimalBills.length - 1; i >= 0; --i)
             for (let j = 0; j < optimalBills[i]; ++j)
                 me._billSeq.bills.push(i);
+    }
+
+    _getOptimalBills(available, total) {
+        const me = this;
+
+        if (Helper.getTotalMoney(available) < total)
+            throw `can't build optimal bill sequence`;
+
+        const result = me._tryGetOptimalBills(available, total, true);
+
+        return result != null
+            ? result
+            : me._tryGetOptimalBills(available, total, false);
+    }
+
+    _tryGetOptimalBills(available, total, limited) {
+        let amount = total;
+        let bill = Consts.BillCount - 1;
+        const result = Utils.buildArray(Consts.BillCount, 0)
+        while (amount > 0 && bill >= 0) {
+            const canAddBill = result[bill] < available[bill] 
+                && (!limited || Consts.BillValue[bill] <= amount);
+
+            if (canAddBill) {
+                amount -= Consts.BillValue[bill];
+                ++result[bill];
+            } else {
+                --bill;
+            }
+        }
+
+        return amount <= 0
+            ? result
+            : null;
     }
 
     _getNextBillPosition() {

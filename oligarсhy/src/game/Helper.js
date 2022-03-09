@@ -46,35 +46,6 @@ export default class Helper {
     }
 
     /**
-     * @param {Number[]} money 
-     * @param {Number} value 
-     */
-     static getOptimalBills(money, value) {
-
-        if (Helper.getTotalMoney(money) < value)
-            throw `not enough money for pay ${value}`;
-
-        const result = Utils.buildArray(Consts.BillCount, 0);
-
-        const temp = [];
-        for (let i = 0; i < money.length; ++i)
-            temp.push(money[i]);
-
-        let i = result.length - 1;
-        while (value > 0 && i >= 0) {
-
-            while (temp[i] == 0)
-                --i;
-
-            ++result[i];
-            --temp[i];
-            value -= Consts.BillValue[i];
-        }
-
-        return result;
-    }
-
-    /**
      * @param {Number} value 
      * @returns {Number[]}
      */
