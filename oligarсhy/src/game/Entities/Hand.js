@@ -276,6 +276,14 @@ export default class Hand {
         return Utils.toPoint(me._container);
     }
 
+    isMaxBillCount() {
+        const me = this;
+
+        let count = 0;
+        me._money.forEach((b) => count += b);
+        return count >= Consts.MaxHandBillCount;
+    }
+
     _startTimeline(target, callback) {
         const me = this;
 

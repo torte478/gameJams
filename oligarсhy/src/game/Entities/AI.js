@@ -7,6 +7,7 @@ import Context from "./Context.js";
 import Hand from "./Hand.js";
 import Player from "./Player.js";
 import Utils from "../Utils.js";
+import Helper from "../Helper.js";
 
 export default class AI {
 
@@ -28,6 +29,15 @@ export default class AI {
         config: null
     }
 
+    /** @type {Object} */
+    _billSeq = {
+        /** @type {Number[]} */
+        bills: null,
+
+        /** @type {Number} */
+        index: null
+    }
+
     /**
      * @param {Number} index 
      * @param {Context} context 
@@ -44,6 +54,9 @@ export default class AI {
         const me = this;
         me._state.action = null;
         me._state.config = null;
+        
+        me._billSeq.bills = null;
+        me._billSeq.index = null;
     }
 
     nextPoint() {
@@ -90,12 +103,16 @@ export default class AI {
                 return me._context.fields.getFieldPosition(me._context.status.targetPieceIndex);
 
             case Enums.GameState.PIECE_ON_FREE_PROPERTY: {
+
                 const cost = Config.Fields[me._context.status.targetPieceIndex].cost;
                 const handMoney = me._hand.getTotalMoney();
+                if (handMoney == 0)
+                    me._calcBillSequence(me._player.enumBills(), cost);
+
                 const diff = cost - handMoney;
 
-                return diff > 0
-                    ? me._player.getNextOptimalBillPosition(diff)
+                return diff > 0 && !me._hand.isMaxBillCount()
+                    ? me._getNextBillPosition()
                     : me._player.getButtonPosition(Enums.ActionType.BUY_FIELD);
             }
 
@@ -112,10 +129,13 @@ export default class AI {
                     me._context.players, 
                     (p) => p.hasField(me._context.status.targetPieceIndex));
                 const handMoney = me._hand.getTotalMoney();
+                if (handMoney == 0)
+                    me._calcBillSequence(me._player.enumBills(), me._context.status.payAmount);
+
                 const diff = me._context.status.payAmount - handMoney;
 
-                return diff > 0
-                    ? me._player.getNextOptimalBillPosition(diff)
+                return diff > 0 && !me._hand.isMaxBillCount()
+                    ? me._getNextBillPosition()
                     : me._context.hands[enemy.index].toPoint();
             }
 
@@ -128,12 +148,16 @@ export default class AI {
                 }
 
                 const handMoney = me._hand.getTotalMoney();
+                if (handMoney == 0)
+                    me._calcBillSequence(me._player.enumBills(), me._context.status.payAmount);
+
                 const diff = me._context.status.payAmount - handMoney;
 
-                if (diff > 0)
-                    return me._player.getNextOptimalBillPosition(diff);
+                if (diff > 0 && !me._hand.isMaxBillCount())
+                    return me._getNextBillPosition();
                 
-                me._state.action = Enums.AiAction.FINISH_TURN;
+                if (diff <= 0)
+                    me._state.action = Enums.AiAction.FINISH_TURN;
                 return me._player.getButtonPosition(Enums.ActionType.BUY_HOUSE);
             }
                 
@@ -249,5 +273,32 @@ export default class AI {
         }
 
         return null;
+    }
+
+    _calcBillSequence(bills, total) {
+        const me = this;
+
+        me._billSeq.bills = [];
+        me._billSeq.index = 0;
+
+        const optimalBills = Helper.getOptimalBills(bills, total);
+        for (let i = 0; i < optimalBills.length; ++i)
+            for (let j = 0; j < optimalBills[i]; ++j)
+                me._billSeq.bills.push(i);
+    }
+
+    _getNextBillPosition() {
+        const me = this;
+
+        if (me._billSeq == null || me._billSeq.bills == null)
+            throw `bill sequence isn't initiaited`;
+
+        if (me._billSeq.index < 0 || me._billSeq.index >= me._billSeq.bills.length)
+            throw `wrong bill sequence index ${me._billSeq.index}`;
+
+        const bill = me._billSeq.bills[me._billSeq.index];
+        ++me._billSeq.index;
+
+        return me._player.getBillPosition(bill);
     }
 }
