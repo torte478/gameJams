@@ -345,9 +345,14 @@ export default class Hand {
             }
 
             case Enums.HandAction.DROP_PIECE:
-            case Enums.HandAction.TAKE_BILL:
             case Enums.HandAction.CLICK_BUTTON:
                 return true;
+
+            case Enums.HandAction.TAKE_BILL:
+                let count = 0;
+                me._money.forEach((b) => count += b);
+                return count < Consts.MaxHandBillCount;
+            
 
             default: 
                 throw `Unknown hand action ${Utils.enumToString(Enums.HandAction, type)}`;
