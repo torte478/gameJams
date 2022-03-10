@@ -38,6 +38,12 @@ export default class Core {
     /** @type {Timer} */
     _turnTimer;
 
+    /** @type {Timer} */
+    _lightTimer;
+
+    /** @type {Timer} */
+    _darkTimer;
+
     /** @type {Phaser.GameObjects.Image} */
     _fade;
 
@@ -50,39 +56,28 @@ export default class Core {
     update(delta) {
         const me = this;
 
-        if (me._checkPause())
-            return;
-
-        const skipTurn = Config.Debug.Global 
-                         && Config.Debug.SkipHuman
-                         && !me._context.status.isBusy 
-                         && me._context.status.player == Enums.Player.HUMAN;
-
-        if (me._turnTimer.check() || skipTurn) {
-            Utils.debugLog('Turn timeout!');
-            me._cancelTurn();
-            me._moveToJail(me._context.status.pieceIndicies[me._context.status.player]);
-            me._turnTimer.pause();
-            return;
-        }
-
-        if (me._isHumanTurn()) {
-            const target = me._getCursorOffset();
-            me._getCurrentPlayer().hand.moveTo(target, delta);
-            
-        } else {
-            me._processCpuTurn();
-        }
-
         if (Config.Debug.Global && Config.Debug.ShowTextLog) {
             let text = 
             `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
             `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` + 
-            `trn: ${(me._turnTimer._finishTime - new Date().getTime()) / 1000 | 0}\n` +
+            `trn: ${(me._turnTimer.getRemain()) / 1000 | 0}\n` +
+            `lgt: ${(me._lightTimer.getRemain()) / 1000 | 0}\n` +
+            `drk: ${(me._darkTimer.getRemain()) / 1000 | 0}\n` +
             `pse: ${!me._scene.input.mouse.locked}`;
-            for (let i = 0; i < Config.Start.PlayerCount; ++i)
-                text += `\n[${me._context.players[i].enumBills().join(',')}]`;
             me._log.setText(text)
+        }
+
+        if (me._checkPause())
+            return;
+
+        if (me._context.status.state == Enums.GameState.DARK) {
+            if (me._darkTimer.check())
+                return me._stopDark();
+        } else {
+            if (me._lightTimer.check()) 
+                return me._startDark();
+
+            me._updateLightGame(delta);
         }
     }
 
@@ -974,5 +969,45 @@ export default class Core {
             me._unpause();
             return false;
         }
+    }
+
+    _updateLightGame(delta) {
+        const me = this;
+
+        const skipTurn = Config.Debug.Global 
+                && Config.Debug.SkipHuman
+                && !me._context.status.isBusy 
+                && me._context.status.player == Enums.Player.HUMAN;
+
+        if (me._turnTimer.check() || skipTurn) {
+            Utils.debugLog('Turn timeout!');
+
+            me._cancelTurn();
+            me._moveToJail(me._context.status.pieceIndicies[me._context.status.player]);
+            me._turnTimer.pause();
+            return;
+        }
+
+        if (me._isHumanTurn()) {
+            const target = me._getCursorOffset();
+            me._getCurrentPlayer().hand.moveTo(target, delta);
+        } else {
+            me._processCpuTurn();
+        }
+    }
+
+    _startDark() {
+        const me = this;
+
+        me._lightTimer.pause();
+        me._turnTimer.pause();
+        me._darkTimer.reset();
+        me._setState(Enums.GameState.DARK);
+    }
+
+    _stopDark() {
+        const me =this;
+
+        me._setState(Enums.GameState.BEGIN);
     }
 }

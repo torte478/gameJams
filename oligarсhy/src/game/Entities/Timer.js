@@ -14,14 +14,15 @@ export default class Timer {
 
     /**
      * @param {Number} duration 
+     * @param {Boolean} isPause
      */
-    constructor(duration) {
+    constructor(duration, isPause) {
         const me = this;
 
         me._duration = duration;
         me._remain = 0;
-        me._isPause = false;
-        me.reset();
+        me._isPause = isPause;
+        me._finishTime = new Date().getTime() + me._duration;
     }
 
     check() {
@@ -54,5 +55,13 @@ export default class Timer {
         me._isPause = false;
         me._finishTime = new Date().getTime() + me._remain;
         me._remain = 0;
+    }
+
+    getRemain() {
+        const me = this;
+
+        return me._isPause
+            ? me._remain
+            : me._finishTime - new Date().getTime();
     }
 }

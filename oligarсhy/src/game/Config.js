@@ -10,7 +10,7 @@ export default class Config {
         Random: false,
         SkipHuman: false,
         ShowTextLog: true,
-        IgnorePause: false,
+        IgnorePause: true,
         CancelAiBuy: false
     };
 
@@ -48,7 +48,9 @@ export default class Config {
         ],
 
         Time: {
-            TurnSec: 300
+            TurnSec: 300,
+            LightSec: 2,
+            DarkSec: 400,
         }
     }
 }

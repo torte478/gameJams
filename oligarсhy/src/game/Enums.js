@@ -10,7 +10,8 @@ export default class Enums {
         PIECE_ON_FREE_FIELD: 6,
         PIECE_ON_ENEMY_FIELD: 7,
         OWN_FIELD_SELECTED: 8,
-        FINAL: 9
+        FINAL: 9,
+        DARK: 10
     };
 
     static FieldType = {
