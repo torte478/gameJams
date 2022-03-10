@@ -80,11 +80,17 @@ export default class Cards {
             : null;
     }
 
+    sellAll(fields) {
+        const me = this;
+
+        for (let i = 0; i < fields.length; ++i)
+            me._sell(fields[i]);
+    }
+
     _updateGrid(player, grid, field, buy, ignoreTween) {
         const me = this;
 
         const startX = grid.length * 190 / -2;
-        const angle = Helper.getAngle(player);
 
         for (let i = 0; i < grid.length; ++i) 
         for (let j = 0; j < grid[i].length; ++j) {
@@ -120,26 +126,31 @@ export default class Cards {
                     x: position.x,
                     y: position.y,
                     alpha: { from: 0, to: 1 },
-                    duration: Consts.Speed.CardEntranceDuration,
+                    duration: Consts.Speed.CenterEntranceDuration,
                     ease: 'Sine.easeInOut'
                 });
             }
         }
 
-        if (!buy) {
-            const item = Utils.single(me._cards, (c) => c.index == field);
-            const point = Helper.getOuterPos(player);
+        if (!buy) 
+            me._sell(field);
+    }
 
-            me._scene.tweens.add({
-                targets: item.container,
-                x: point.x,
-                y: point.y,
-                alpha: { from: 1, to: 0 },
-                duration: Consts.Speed.CardEntranceDuration,
-                ease: 'Sine.easeInOut',
-                onComplete: () => { item.container.setVisible(false); }
-            });
-        }
+    _sell(field) {
+        const me = this;
+
+        const item = Utils.single(me._cards, (c) => c.index == field);
+        const point = Utils.buildPoint(0, 0);
+
+        me._scene.tweens.add({
+            targets: item.container,
+            x: point.x,
+            y: point.y,
+            alpha: { from: 1, to: 0 },
+            duration: Consts.Speed.CenterEntranceDuration,
+            ease: 'Sine.easeInOut',
+            onComplete: () => { item.container.setVisible(false); }
+        });
     }
 
     _getContent(scene, config) {

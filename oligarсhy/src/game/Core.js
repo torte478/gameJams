@@ -765,18 +765,53 @@ export default class Core {
     _killPlayer() {
         const me = this;
 
-        if (me._context.status.player == Enums.Player.HUMAN) {
+        const current = me._getCurrentPlayer();
+        if (current.player.index == Enums.Player.HUMAN) {
             throw 'YOU LOSE!';
         }
 
-        me._context.status.activePlayers = me._context.status.activePlayers.filter((p) => p != me._context.status.player);
+        me._context.status.activePlayers = me._context.status.activePlayers.filter(
+            (p) => p != current.player.index);
 
         if (me._context.status.activePlayers.length == 1) {
             throw 'YOU WIN!!!'
         }        
 
-        Utils.debugLog(`Player ${Utils.enumToString(Enums.Player, me._context.status.player)} lose!`);
+        me._context.fields.removePiece(
+            me._context.status.pieceIndicies[current.player.index], 
+            current.player.index);
 
+        const piece = me._context.pieces[current.player.index].toGameObject(); 
+        const target = Utils.buildPoint(0, 0);
+        me._scene.tweens.add({
+            targets: piece,
+            x: target.x,
+            y: target.y,
+            alpha: { from: 1, to: 0 },
+            ease: 'Sine.easeIn',
+            duration: Utils.getTweenDuration(
+                Utils.toPoint(piece), 
+                target, 
+                Consts.Speed.CenterEntranceDuration)
+        });
+
+        me._context.hands[current.player.index].hide();
+
+        const playerCards = [];
+        for (let i = 0; i < Consts.FieldCount; ++i) {
+            if (current.player.hasField(i)) {
+                me._context.fields.sellField(i);
+                playerCards.push(i);
+            }
+        }
+
+        me._cards.sellAll(playerCards);
+
+        current.player.kill();
+
+        me._hud.updateMoney(current.player.index, 0, 0);
+
+        Utils.debugLog(`Player ${Utils.enumToString(Enums.Player, me._context.status.player)} lose!`);
         me._finishTurn();
     }
 
@@ -999,7 +1034,7 @@ export default class Core {
                 duration: Utils.getTweenDuration(
                     from, 
                     target, 
-                    Consts.Speed.CardEntranceDuration),
+                    Consts.Speed.CenterEntranceDuration),
                 delay: i * 50,
                 onComplete: () => {
                     me._groups.killBill(bill);

@@ -284,6 +284,16 @@ export default class Hand {
         return count >= Consts.MaxHandBillCount;
     }
 
+    hide() {
+        const me = this;
+
+        me._scene.add.tween({
+            targets: me._sprite,
+            alpha: { from: 1, to: 0 },
+            duration: Consts.Speed.CenterEntranceDuration
+        });
+    }
+
     _startTimeline(target, callback) {
         const me = this;
 

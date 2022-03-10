@@ -131,6 +131,12 @@ export default class Fields {
             me._fields[i].unselect();
     }
 
+    removePiece(field, player) {
+        const me = this;
+
+        me._fields[field].removePiece(player);
+    }
+
     _getNextPointConfig(player, from, to, inJail) {
         const me = this;
 

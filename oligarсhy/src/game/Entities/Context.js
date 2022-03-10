@@ -7,24 +7,24 @@ import Hand from "./Hand.js";
 
 export default class Context {
 
-    /** @type {Status} */
-    status;
-
     /** @type {Dice} */
     dice1;
 
     /** @type {Dice} */
     dice2;
 
-    /** @type {Piece[]} */
-    pieces;
-
     /** @type {Fields} */
     fields;
+
+    /** @type {Hand[]} */
+    hands;
+
+    /** @type {Piece[]} */
+    pieces;
 
     /** @type {Player[]} */
     players;
 
-    /** @type {Hand[]} */
-    hands;
+    /** @type {Status} */
+    status;
 }

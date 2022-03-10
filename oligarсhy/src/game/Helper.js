@@ -114,18 +114,6 @@ export default class Helper {
 
     /**
      * 
-     * @param {Number} side 
-     * @returns {Phaser.Geom.Point}
-     */
-    static getOuterPos(side) {
-
-        return Helper.rotate(
-            Utils.buildPoint(0, -3000),
-            side);
-    }
-
-    /**
-     * 
      * @param {Phaser.Geom.Point} point 
      * @param {Number} side 
      * @returns {Phaser.Geom.Point}

@@ -129,7 +129,7 @@ export default class Consts {
         HandGrabDuration: 200,
 
         CardShiftDuration: 1000,
-        CardEntranceDuration: 1500,
+        CenterEntranceDuration: 1500,
 
         Selection: 500
     };

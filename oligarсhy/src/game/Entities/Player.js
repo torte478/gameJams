@@ -11,7 +11,7 @@ import Utils from '../Utils.js';
 
 export default class Player {
 
-    /** @type {Bills[]} */
+    /** @type {Object[]} */
     _money;
 
     /** @type {Buttons} */
@@ -22,6 +22,9 @@ export default class Player {
 
     /** @type {Groups} */
     _groups;
+
+    /** @type {Boolean} */
+    _alive;
 
     /** @type {Number} */
     index;
@@ -44,6 +47,8 @@ export default class Player {
 
         me._groups = groups;
         me._fields = [];
+
+        me._alive = true;
     }
 
     /**
@@ -150,11 +155,17 @@ export default class Player {
     getTotalMoney() {
         const me = this;
 
+        if (!me._alive)
+            return 0;
+
         return me.getBillsMoney() + me.getFieldsCost();
     }
 
     getFieldsCost() {
         const me = this;
+
+        if (!me._alive)
+            return 0;
 
         let result = 0;
 
@@ -181,6 +192,9 @@ export default class Player {
      */
     getBillsMoney() {
         const me = this;
+
+        if (!me._alive)
+            return 0;
 
         return Helper.getTotalMoney(me.enumBills());
     }
@@ -448,6 +462,24 @@ export default class Player {
                 result.push(grid[i]);
 
         return result;
+    }
+
+    kill() {
+        const me = this;
+
+        me._alive = false;
+        for (let i = 0; i < me._money.length; ++i)
+            me._money[i].image.setVisible(false);
+
+        for (let i = 0; i < me._fields.length; ++i) {
+            const field = me._fields[i];
+            if (!!field.hotel)
+                me._groups.killBuilding(field.hotel);
+            for (let j = 0; j < field.houses.length; ++j)
+                me._groups.killBuilding(field.houses[j]);
+        }
+
+        me._fields = [];
     }
 
     _getCost(index) {
