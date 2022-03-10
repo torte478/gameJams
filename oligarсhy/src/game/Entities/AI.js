@@ -102,7 +102,7 @@ export default class AI {
             case Enums.GameState.PIECE_TAKED:
                 return me._context.fields.getFieldPosition(me._context.status.targetPieceIndex);
 
-            case Enums.GameState.PIECE_ON_FREE_PROPERTY: {
+            case Enums.GameState.PIECE_ON_FREE_FIELD: {
 
                 const cost = Config.Fields[me._context.status.targetPieceIndex].cost;
                 const handMoney = me._hand.getTotalMoney();
@@ -116,7 +116,7 @@ export default class AI {
                     : me._player.getButtonPosition(Enums.ActionType.BUY_FIELD);
             }
 
-            case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
+            case Enums.GameState.PIECE_ON_ENEMY_FIELD: {
 
                 const total = me._player.getBillsMoney() + me._hand.getTotalMoney();
                 if (total < me._context.status.payAmount) {
@@ -140,7 +140,7 @@ export default class AI {
             }
 
             case Enums.GameState.OWN_FIELD_SELECTED:  {
-                if (me._context.status.stateToReturn == Enums.GameState.PIECE_ON_ENEMY_PROPERTY) {
+                if (me._context.status.stateToReturn == Enums.GameState.PIECE_ON_ENEMY_FIELD) {
                     const button = me._player.hasHouse(me._context.status.selectedField)
                         ? Enums.ActionType.SELL_HOUSE
                         : Enums.ActionType.SELL_FIELD;
@@ -161,41 +161,8 @@ export default class AI {
                 return me._player.getButtonPosition(Enums.ActionType.BUY_HOUSE);
             }
                 
-            // TODO : refactor
-            case Enums.GameState.FINAL: {
-
-                if (me._state.action == Enums.AiAction.FINISH_TURN)
-                    return me._player.getButtonPosition(Enums.ActionType.NEXT_TURN);
-
-                if (me._state.action == Enums.AiAction.MERGE_MONEY) {
-                    if (me._hand.getTotalMoney() >= me._state.config.total) {
-                        me._state.action = Enums.AiAction.FINISH_TURN;
-                        return me._player.getButtonPosition(Enums.ActionType.MERGE_MONEY);    
-                    } else {
-                        return me._state.config.pos;
-                    }
-                }
-
-                if (me._state.action == Enums.AiAction.SPLIT_MONEY) {
-                    me._state.action = Enums.AiAction.FINISH_TURN;
-                    return me._player.getButtonPosition(Enums.ActionType.SPLIT_MONEY);
-                }
-
-                const fieldToSelect = me._tryFindFieldToBuyHouse();
-                if (fieldToSelect != null)
-                    return fieldToSelect;
-
-                const billToMerge = me._tryFindBillToMerge();
-                if (billToMerge != null)
-                    return billToMerge;
-
-                const billToSplit = me._tryFindBillToSplit();
-                if (billToSplit != null)
-                    return billToSplit;
-
-                me._state.action = Enums.AiAction.FINISH_TURN;
-                return null;
-            }
+            case Enums.GameState.FINAL: 
+                return me._tryManage();
 
             default:
                 const stateStr = Utils.enumToString(Enums.GameState, me._context.status.state);
@@ -210,6 +177,56 @@ export default class AI {
             return false;
 
         return Config.Fields[index].cost <= me._player.getBillsMoney();
+    }
+
+    _tryManage() {
+        const me = this;
+
+        const point = me._tryProcessInnerState();
+        if (point != null)
+            return point;
+        
+        const fieldToSelect = me._tryFindFieldToBuyHouse();
+        if (fieldToSelect != null)
+            return fieldToSelect;
+
+        const billToMerge = me._tryFindBillToMerge();
+        if (billToMerge != null)
+            return billToMerge;
+
+        const billToSplit = me._tryFindBillToSplit();
+        if (billToSplit != null)
+            return billToSplit;
+
+        me._state.action = Enums.AiAction.FINISH_TURN;
+        return null;
+    }
+
+    _tryProcessInnerState() {
+        const me = this;
+
+        if (me._state == null)
+            return null;
+
+        switch (me._state.action) {
+            case Enums.AiAction.FINISH_TURN:
+                return me._player.getButtonPosition(Enums.ActionType.NEXT_TURN);    
+
+            case Enums.AiAction.MERGE_MONEY:
+                if (me._hand.getTotalMoney() <  me._state.config.total)
+                    return me._state.config.pos;
+
+                me._state.action = Enums.AiAction.FINISH_TURN;
+                return me._player.getButtonPosition(Enums.ActionType.MERGE_MONEY);        
+
+            case Enums.AiAction.SPLIT_MONEY:
+                me._state.action = Enums.AiAction.FINISH_TURN;
+                return me._player.getButtonPosition(Enums.ActionType.SPLIT_MONEY);
+
+            default:
+                return null;
+                
+        }
     }
 
     _tryFindBillToSplit() {

@@ -463,7 +463,7 @@ export default class Core {
                 break;
             }
 
-            case Enums.GameState.PIECE_ON_FREE_PROPERTY: {
+            case Enums.GameState.PIECE_ON_FREE_FIELD: {
 
                 if (me._tryManageMoney(point))
                     return;
@@ -500,7 +500,7 @@ export default class Core {
                 break;
             }
 
-            case Enums.GameState.PIECE_ON_ENEMY_PROPERTY: {
+            case Enums.GameState.PIECE_ON_ENEMY_FIELD: {
 
                 if (me._tryManageMoney(point))
                     return;
@@ -580,7 +580,7 @@ export default class Core {
                     () => {
                         const field = Config.Fields[me._context.status.selectedField];
 
-                        if (me._context.status.stateToReturn == Enums.GameState.PIECE_ON_FREE_PROPERTY) {
+                        if (me._context.status.stateToReturn == Enums.GameState.PIECE_ON_FREE_FIELD) {
                             me._context.status.stateToReturn = Enums.GameState.FINAL;
                             me._context.status.payAmount = 0;
                         }
@@ -877,7 +877,7 @@ export default class Core {
                 player.showButtons([ Enums.ActionType.NEXT_TURN ]);
                 break;
 
-            case Enums.GameState.PIECE_ON_FREE_PROPERTY:
+            case Enums.GameState.PIECE_ON_FREE_FIELD:
                 player.showButtons([Enums.ActionType.BUY_FIELD, Enums.ActionType.NEXT_TURN]);
                 break;    
         }
@@ -936,14 +936,14 @@ export default class Core {
 
             me._context.hands[enemyIndex].prepareToRent();
             
-            return me._setState(Enums.GameState.PIECE_ON_ENEMY_PROPERTY);
+            return me._setState(Enums.GameState.PIECE_ON_ENEMY_FIELD);
         }
 
         const canBuyField = me._isHumanTurn() || current.ai.canBuyField(field.index);
 
         if (!current.player.hasField(field.index) && canBuyField) {
             me._context.status.setPayAmount(fieldConfig.cost);
-            return me._setState(Enums.GameState.PIECE_ON_FREE_PROPERTY);
+            return me._setState(Enums.GameState.PIECE_ON_FREE_FIELD);
         }
 
         return me._setState(Enums.GameState.FINAL)
@@ -1097,8 +1097,8 @@ export default class Core {
                 me._context.fields.select(me._context.status.targetPieceIndex);
                 break;
 
-            case Enums.GameState.PIECE_ON_ENEMY_PROPERTY:
-            case Enums.GameState.PIECE_ON_FREE_PROPERTY:
+            case Enums.GameState.PIECE_ON_ENEMY_FIELD:
+            case Enums.GameState.PIECE_ON_FREE_FIELD:
             case Enums.GameState.FINAL:
                 me._context.fields.unselect();
             break;

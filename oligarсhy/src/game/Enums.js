@@ -7,11 +7,8 @@ export default class Enums {
         SECOND_DICE_TAKED: 3,
         DICES_DROPED: 4,
         PIECE_TAKED: 5,
-
-        // TODO : rename Property => Field
-        PIECE_ON_FREE_PROPERTY: 6,
-        PIECE_ON_ENEMY_PROPERTY: 7,
-
+        PIECE_ON_FREE_FIELD: 6,
+        PIECE_ON_ENEMY_FIELD: 7,
         OWN_FIELD_SELECTED: 8,
         FINAL: 9
     };
@@ -41,7 +38,6 @@ export default class Enums {
         BROWN: 8,
     };
 
-    // TODO: rename
     static Player = {
         NOONE: -1,
         HUMAN: 0,

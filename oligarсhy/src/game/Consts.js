@@ -110,13 +110,13 @@ export default class Consts {
 
     static States = {
         SellField: [
-            Enums.GameState.PIECE_ON_FREE_PROPERTY,
-            Enums.GameState.PIECE_ON_ENEMY_PROPERTY,
+            Enums.GameState.PIECE_ON_FREE_FIELD,
+            Enums.GameState.PIECE_ON_ENEMY_FIELD,
             Enums.GameState.FINAL
         ],
 
         Final: [
-            Enums.GameState.PIECE_ON_FREE_PROPERTY,
+            Enums.GameState.PIECE_ON_FREE_FIELD,
             Enums.GameState.FINAL
         ],
     };

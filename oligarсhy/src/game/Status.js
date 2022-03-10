@@ -137,6 +137,6 @@ export default class Status {
 
         return !me.buyHouseOnCurrentTurn 
             && (me.state == Enums.GameState.FINAL
-                || me.state == Enums.GameState.PIECE_ON_FREE_PROPERTY);
+                || me.state == Enums.GameState.PIECE_ON_FREE_FIELD);
     }
 }

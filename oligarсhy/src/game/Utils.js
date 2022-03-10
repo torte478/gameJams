@@ -225,7 +225,6 @@ export default class Utils {
         return arr[index];
     }
 
-    // TODO : replace all occurences
     /**
      * @param {Phaser.Geom.Point} from 
      * @param {Phaser.Geom.Point} to 
