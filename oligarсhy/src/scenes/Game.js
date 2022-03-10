@@ -3,6 +3,7 @@ import Phaser from '../lib/phaser.js';
 import Config from '../game/Config.js';
 import Consts from '../game/Consts.js';
 import Core from '../game/Core.js';
+import Start from '../game/Start.js';
 import Utils from '../game/Utils.js';
 
 export default class Game extends Phaser.Scene {
@@ -43,7 +44,7 @@ export default class Game extends Phaser.Scene {
 
         me._createAnimation();
 
-        me._core = new Core(me);
+        me._core = Start.Init(me);
 
         me.input.on('pointerdown', me._onPointerDown, me);
         me.input.on('pointermove', me._onPointerMove, me);

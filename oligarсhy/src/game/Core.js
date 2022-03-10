@@ -1,21 +1,16 @@
 import Phaser from '../lib/phaser.js';
 
 import Player from './Entities/Player.js';
-import Fields from './Entities/Fields.js';
 import Cards from './Entities/Cards.js';
 import Groups from './Entities/Groups.js'; 
-import Hand from './Entities/Hand.js';
 import HUD from './Entities/HUD.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
-import Status from './Status.js';
 import Utils from './Utils.js';
 import Helper from './Helper.js';
 import Timer from './Entities/Timer.js';
-import Dice from './Entities/Dice.js';
-import Piece from './Entities/Piece.js';
 import AI from './Entities/AI.js';
 import Context from './Entities/Context.js';
 
@@ -50,137 +45,6 @@ export default class Core {
 
     /** @type {Context} */
     _context;
-
-    /**
-     * @param {Phaser.Scene} scene 
-     */
-    constructor(scene) {
-        const me = this;
-
-        // Phaser
-
-        scene.physics.world.setBounds(-2500, -2500, 5000, 5000);
-
-        scene.cameras.main
-            .setScroll(
-                Config.Start.CameraPosition.x - Consts.Viewport.Width / 2,
-                Config.Start.CameraPosition.y - Consts.Viewport.Height / 2)
-            .setBounds(
-                scene.physics.world.bounds.x,
-                scene.physics.world.bounds.y,
-                scene.physics.world.bounds.width,
-                scene.physics.world.bounds.height);
-
-        // Custom
-
-        me._scene = scene;
-        me._context = new Context();
-
-        const factory = scene.add;
-
-        me._cursor = me._createCursor(scene);
-
-        me._context.status = new Status(Config.Start.PiecePositions, Config.Start.Player, Config.Start.State);
-
-        const level = [
-            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-            [ 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 ],
-            [ 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 ],
-            [ 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 ],
-            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-        ];
-
-        const map = scene.make.tilemap({ data: level, tileWidth: 500, tileHeight: 500 });
-        const tiles = map.addTilesetImage('table');
-        const layer = map.createLayer(0, tiles, -2750, -2750);
-
-        me._context.fields = new Fields(scene, Config.Start.PiecePositions);
-
-        me._context.pieces = [];
-        for (let player = 0; player < Config.Start.PlayerCount; ++player) {
-            const position = me._context.fields.movePiece(player, 0, Config.Start.PiecePositions[player]);
-
-            const piece = new Piece(scene, position.x, position.y, player);
-
-            me._context.pieces.push(piece);
-        }
-
-        me._context.dice1 = new Dice(scene, 0, 0, 2);
-
-        me._context.dice2 = new Dice(
-            scene,
-            Consts.SecondDiceOffset.X, 
-            Consts.SecondDiceOffset.Y,
-            6);
-
-        scene.physics.add.collider(me._context.dice1.toGameObject(), me._context.dice2.toGameObject());
-
-        me._context.hands = [];
-        for (let i = 0; i < Config.Start.PlayerCount; ++i)
-            me._context.hands.push(new Hand(scene, i));
-
-        me._groups = new Groups(scene);
-        me._cards = new Cards(scene);
-
-        me._context.players = [];
-        for (let i = 0; i < Config.Start.PlayerCount; ++ i) {
-            const player = new Player(scene, i, Config.Start.Money, me._groups);
-            me._context.players.push(player);
-
-            for (let j = 0; j < Config.Start.Fields[i].length; ++j) {
-                const field = Config.Start.Fields[i][j];
-                if (isNaN(field)) {
-                    me._buyField(field.index, i, true);
-                    for (let k = 0; k < field.houses; ++k)
-                        player.addHouse(
-                            field.index, 
-                            me._context.fields.getFieldPosition(field.index));
-                } else {
-                    me._buyField(field, i, true);
-                }
-            }
-
-            if (Config.Start.Fields[i].length > 0)
-                me._updateRent(i);
-        }
-
-        me._hud = new HUD(factory);
-
-        for (let i = 0; i < me._context.players.length; ++i)
-            me._hud.updateMoney(
-                i, 
-                me._context.players[i].getBillsMoney(),
-                me._context.players[i].getFieldsCost());
-
-        me._turnTimer = new Timer(Config.Start.Time.TurnSec * 1000);
-        me._fade = scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
-                .setScrollFactor(0)
-                .setDepth(Consts.Depth.Fade)
-                .setAlpha(0.75)
-                .setVisible(false);
-
-        me._ai = [ null ];
-        for (let i = 1; i < me._context.players.length; ++i) {
-            const ai = new AI(i, me._context);
-            me._ai.push(ai);
-        }
-
-        me._setState(Config.Start.State);
-
-        // Debug
-
-        if (Config.Debug.Global && Config.Debug.ShowTextLog) {
-            me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
-                .setScrollFactor(0)
-                .setDepth(Consts.Depth.Max);
-        }
-    }
 
     update(delta) {
         const me = this;
@@ -328,9 +192,12 @@ export default class Core {
         if (me._trySelectOwnField(point))
             return;
 
-        if (Utils.contains(Consts.States.SellField, me._context.status.state) && me._trySelectOwnField(point)) {
-                return me._setState(Enums.GameState.OWN_FIELD_SELECTED);
-        }
+        const fieldSelected = 
+            Utils.contains(Consts.States.SellField, me._context.status.state) 
+            && me._trySelectOwnField(point)
+
+        if (fieldSelected) 
+            return me._setState(Enums.GameState.OWN_FIELD_SELECTED);
 
         switch (me._context.status.state) {
             case Enums.GameState.BEGIN: {
@@ -884,20 +751,6 @@ export default class Core {
 
         me._context.status.setState(state);
         me._restoreSelection();
-    }
-
-    _createCursor(scene) {
-        const me = this;
-
-        const cursor = scene.physics.add.image(
-            Config.Start.CameraPosition.x, 
-            Config.Start.CameraPosition.y, 
-            'cursor')
-            .setDepth(Consts.Depth.Max)
-            .setVisible(false)
-            .setCollideWorldBounds(true);
-
-        return cursor;
     }
 
     _getCursorOffset() {
