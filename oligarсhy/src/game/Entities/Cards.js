@@ -5,6 +5,7 @@ import Consts from "../Consts.js";
 import Enums from "../Enums.js";
 import Helper from "../Helper.js";
 import Utils from "../Utils.js";
+import FieldInfo from '../FieldInfo.js';
 
 export default class Cards {
 
@@ -24,7 +25,7 @@ export default class Cards {
 
         me._cards = [];
         for (let i = 0; i < Consts.FieldCount; ++i) {
-            const config = Config.Fields[i];
+            const config = FieldInfo.Config[i];
 
             if (!Utils.contains(Consts.BuyableFieldTypes, config.type))
                 continue;

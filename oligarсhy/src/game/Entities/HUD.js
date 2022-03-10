@@ -5,6 +5,7 @@ import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Helper from '../Helper.js';
 import Utils from '../Utils.js';
+import FieldInfo from '../FieldInfo.js';
 
 export default class HUD {
 
@@ -127,7 +128,7 @@ export default class HUD {
     showField(index) {
         const me = this;
 
-        const config = Config.Fields[index];
+        const config = FieldInfo.Config[index];
         
         me._setFieldInfoVisible(true);
 

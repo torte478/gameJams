@@ -1,13 +1,13 @@
 import Phaser from '../../lib/phaser.js';
 
 import Buttons from './Buttons.js';
-
 import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Groups from './Groups.js';
 import Helper from '../Helper.js';
 import Utils from '../Utils.js';
+import FieldInfo from '../FieldInfo.js';
 
 export default class Player {
 
@@ -78,15 +78,6 @@ export default class Player {
         --me._money[index].count;
         me._money[index].image.setVisible(
             me._money[index].count > 0);
-    }
-
-    addBills(bills) {
-        const me = this;
-
-        for (let i = 0; i < bills.length; ++i) {
-            me._money[i].count += bills[i];
-            me._money[i].image.setVisible(me._money[i].count > 0);
-        }
     }
 
     /**
@@ -171,7 +162,7 @@ export default class Player {
 
         for (let i = 0; i < me._fields.length; ++i) {
             const field = me._fields[i];
-            const config = Config.Fields[field.index];
+            const config = FieldInfo.Config[field.index];
             
             result += config.cost / 2;
 
@@ -223,13 +214,13 @@ export default class Player {
     getRent(field, dices) {
         const me = this;
 
-        const config = Config.Fields[field];
+        const config = FieldInfo.Config[field];
         if (!Utils.contains(Consts.BuyableFieldTypes, config.type))
             throw `Field hasn't rent`;
 
         if (config.type == Enums.FieldType.UTILITY) {
             const total = me._fields
-                .filter((f) => Config.Fields[f.index].type == Enums.FieldType.UTILITY)
+                .filter((f) => FieldInfo.Config[f.index].type == Enums.FieldType.UTILITY)
                 .length;
 
             return config.rent[total - 1] * dices;
@@ -248,7 +239,7 @@ export default class Player {
         const color = config.color;
         const sameColorFieldsCount = me._fields
             .map((f) => f.index)
-            .filter((i) => Config.Fields[i].color == color)
+            .filter((i) => FieldInfo.Config[i].color == color)
             .length;
 
         const colorStr = Utils.enumToString(Enums.FieldColorIndex, color);
@@ -266,10 +257,10 @@ export default class Player {
         const me = this;
 
         const field = Utils.single(me._fields, (f) => f.index == index);
-        const config = Config.Fields[index];
+        const config = FieldInfo.Config[index];
         
         const sameColorFields = me._fields
-            .filter((f) => Config.Fields[f.index].color == config.color);
+            .filter((f) => FieldInfo.Config[f.index].color == config.color);
 
         if (!!field.hotel) {
             me._groups.killBuilding(field.hotel);
@@ -309,10 +300,10 @@ export default class Player {
         const me = this;
 
         const field = Utils.single(me._fields, (f) => f.index == index);
-        const config = Config.Fields[index];
+        const config = FieldInfo.Config[index];
 
         const sameColorFields = me._fields
-            .filter((f) => Config.Fields[f.index].color == config.color);
+            .filter((f) => FieldInfo.Config[f.index].color == config.color);
 
         if (!!field.hotel) 
             return Enums.ActionType.SELL_HOUSE;
@@ -337,7 +328,7 @@ export default class Player {
     canBuyHouse(index) {
         const me = this;
 
-        if (Config.Fields[index].type != Enums.FieldType.PROPERTY)
+        if (FieldInfo.Config[index].type != Enums.FieldType.PROPERTY)
             return false;
 
         const field = me._getProperty(index);
@@ -345,9 +336,9 @@ export default class Player {
         if (field.hotel != null)
             return false;
 
-        const color = Config.Fields[field.index].color;
+        const color = FieldInfo.Config[field.index].color;
         const sameColorFields = me._fields
-            .filter((f) => Config.Fields[f.index].color == color);
+            .filter((f) => FieldInfo.Config[f.index].color == color);
 
         const colorStr = Utils.enumToString(Enums.FieldColorIndex, color);
         if (sameColorFields.length != Consts.PropertyColorCounts[colorStr])
@@ -442,7 +433,7 @@ export default class Player {
         const grid = Utils.buildArray(10, -1);
         for (let i = 0; i < me._fields.length; ++i) {
             let column = -1;
-            const config = Config.Fields[me._fields[i].index];
+            const config = FieldInfo.Config[me._fields[i].index];
             if (config.type == Enums.FieldType.PROPERTY)
                 column = config.color - 1;
             else if (config.type == Enums.FieldType.RAILSTATION)
@@ -482,10 +473,19 @@ export default class Player {
         me._fields = [];
     }
 
+    /**
+     * @returns {Number[]}
+     */
+    enumBills() {
+        const me = this;
+
+        return me._money.map((x) => x.count);
+    }
+
     _getCost(index) {
         const me = this;
 
-        const config = Config.Fields[index];
+        const config = FieldInfo.Config[index];
         if (config.type == Enums.FieldType.PROPERTY) {
             const field = Utils.single(me._fields, (f) => f.index == index);
 
@@ -554,19 +554,10 @@ export default class Player {
         if (!field)
             return null;
 
-        if (Config.Fields[field.index].type != Enums.FieldType.PROPERTY)
+        if (FieldInfo.Config[field.index].type != Enums.FieldType.PROPERTY)
             return null;
 
         return field;
-    }
-
-    /**
-     * @returns {Number[]}
-     */
-    enumBills() {
-        const me = this;
-
-        return me._money.map((x) => x.count);
     }
 
     _createStartBills(factory, money, index) {

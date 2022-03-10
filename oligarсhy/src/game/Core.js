@@ -8,6 +8,7 @@ import HUD from './Entities/HUD.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
+import FieldInfo from './FieldInfo.js';
 import Utils from './Utils.js';
 import Helper from './Helper.js';
 import Timer from './Entities/Timer.js';
@@ -445,7 +446,7 @@ export default class Core {
                     Enums.HandAction.CLICK_BUTTON,
                     null,
                     () => {
-                        const field = Config.Fields[me._context.status.selectedField];
+                        const field = FieldInfo.Config[me._context.status.selectedField];
 
                         if (me._context.status.stateToReturn == Enums.GameState.PIECE_ON_FREE_FIELD) {
                             me._context.status.stateToReturn = Enums.GameState.FINAL;
@@ -695,7 +696,7 @@ export default class Core {
         if (field == null)
             return false;
 
-        if (!Utils.contains(Consts.BuyableFieldTypes, Config.Fields[field].type))
+        if (!Utils.contains(Consts.BuyableFieldTypes, FieldInfo.Config[field].type))
             return false;
 
         const current = me._getCurrentPlayer();
@@ -767,7 +768,7 @@ export default class Core {
         const current = me._getCurrentPlayer(); 
         me._context.status.pieceIndicies[me._context.status.player] = me._context.status.targetPieceIndex;
 
-        const fieldConfig = Config.Fields[field.index];
+        const fieldConfig = FieldInfo.Config[field.index];
 
         if (fieldConfig.type == Enums.FieldType.GOTOJAIL)
             return me._moveToJail(field.index);

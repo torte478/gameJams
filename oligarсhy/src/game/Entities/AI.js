@@ -1,5 +1,3 @@
-import Phaser from "../../lib/phaser.js";
-
 import Config from "../Config.js";
 import Consts from "../Consts.js";
 import Enums from "../Enums.js";
@@ -8,6 +6,7 @@ import Hand from "./Hand.js";
 import Player from "./Player.js";
 import Utils from "../Utils.js";
 import Helper from "../Helper.js";
+import FieldInfo from '../FieldInfo.js';
 
 export default class AI {
 
@@ -104,7 +103,7 @@ export default class AI {
 
             case Enums.GameState.PIECE_ON_FREE_FIELD: {
 
-                const cost = Config.Fields[me._context.status.targetPieceIndex].cost;
+                const cost = FieldInfo.Config[me._context.status.targetPieceIndex].cost;
                 const handMoney = me._hand.getTotalMoney();
                 if (handMoney == 0)
                     me._calcBillSequence(me._player.enumBills(), cost);
@@ -176,7 +175,7 @@ export default class AI {
         if (Config.Debug.Global && Config.Debug.CancelAiBuy)
             return false;
 
-        return Config.Fields[index].cost <= me._player.getBillsMoney();
+        return FieldInfo.Config[index].cost <= me._player.getBillsMoney();
     }
 
     _tryManage() {
@@ -280,7 +279,7 @@ export default class AI {
             if (!me._player.canBuyHouse(i))
                 continue;
 
-            const cost = Config.Fields[i].costHouse;
+            const cost = FieldInfo.Config[i].costHouse;
             if (me._player.getBillsMoney() < cost)
                 continue;
 

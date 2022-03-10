@@ -4,6 +4,7 @@ import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Field from './Field.js';
+import FieldInfo from '../FieldInfo.js';
 import Helper from '../Helper.js';
 import Utils from '../Utils.js';
 
@@ -66,7 +67,7 @@ export default class Fields {
             fieldPosition.x + target.offset.x,
             fieldPosition.y + target.offset.y);
 
-        if (Config.Fields[to].type == Enums.FieldType.JAIL)
+        if (FieldInfo.Config[to].type == Enums.FieldType.JAIL)
             return origin;
 
         return Phaser.Math.RotateAround(
@@ -158,7 +159,7 @@ export default class Fields {
     _getPiecePosOffset(field, inJail) {
         const me = this;
 
-        switch (Config.Fields[field].type) {
+        switch (FieldInfo.Config[field].type) {
 
             case Enums.FieldType.START:
             case Enums.FieldType.FREE:

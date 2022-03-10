@@ -4,6 +4,7 @@ import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
+import FieldInfo from '../FieldInfo.js';
 
 export default class Field {
 
@@ -33,7 +34,7 @@ export default class Field {
     constructor(scene, x, y, backgroundTexture, angle, index) {
         const me = this;
 
-        const config = Config.Fields[index],
+        const config = FieldInfo.Config[index],
               content = me._getFieldContent(scene.add, config);
 
         me._selection = scene.add.image(0, 0, backgroundTexture, 2).setVisible(false);
@@ -147,7 +148,7 @@ export default class Field {
         const me = this;
 
         const items = me._container.getAll();
-        const buyed = Utils.contains(Consts.BuyableFieldTypes, Config.Fields[me._index].type)
+        const buyed = Utils.contains(Consts.BuyableFieldTypes, FieldInfo.Config[me._index].type)
                       &&  items[items.length - 3].visible;
 
         me._selection
