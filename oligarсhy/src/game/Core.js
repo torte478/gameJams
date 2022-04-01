@@ -70,14 +70,14 @@ export default class Core {
         if (me._checkPause())
             return;
 
-        if (me._context.status.state == Enums.GameState.DARK) {
-            if (me._darkTimer.check())
-                return me._stopDark();
-        } else {
+        if (me._context.status.state != Enums.GameState.DARK) {
             if (me._lightTimer.check()) 
                 return me._startDark();
 
             me._updateLightGame(delta);
+        } else {
+            if (me._darkTimer.check())
+                return me._stopDark();
         }
     }
 
