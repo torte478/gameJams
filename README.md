@@ -11,4 +11,11 @@ Game: https://torte478.itch.io/the-last-flake-of-snow
 
 Submission for https://itch.io/jam/mini-jame-gam-6
 
-10-12-21 - 13-12-21
+10.12.21 - 13.12.21
+
+## Parallel Worlds
+Game: not finished
+
+Submission for https://itch.io/jam/brackeys-7
+
+20.02.22 - 27.02.22

@@ -1,0 +1,451 @@
+import Phaser from '../../lib/phaser.js';
+
+import Consts from '../Consts.js';
+import Enums from '../Enums.js';
+import Helper from '../Helper.js';
+import Utils from '../Utils.js';
+
+export default class Hand {
+
+    /** @type {Phaser.Scene} */
+    _scene;
+    
+    /** @type {Phaser.GameObjects.Image[]} */
+    _content;
+
+    /** @type {Number} */
+    _state;
+
+    /** @type {Number[]} */
+    _money;
+
+    /** @type {Phaser.GameObjects.Container} */
+    _container;
+
+    /** @type {Phaser.Tweens.Timeline} */
+    _timeline;
+
+    /** @type {Phaser.Geom.Point} */
+    _waitPosition;
+
+    /** @type {Number} */
+    _side;
+
+    /** @type {Phaser.GameObjects.Image} */
+    _sprite;
+
+    /**
+     * @param {Phaser.Scene} scene
+     */
+    constructor(scene, index) {
+        const me = this;
+
+        me._scene = scene;
+        me._side = index;
+
+        me._content = [];
+        me._state = Enums.HandState.EMPTY;
+        
+        me._money = [];
+        for (let x in Enums.Money) {
+            me._money.push(0);
+        }
+
+        me._sprite = scene.add.image(0, 0, 'hand', 0);
+
+        const angle = Helper.getAngle(index);
+        me._waitPosition =  Helper.rotate(
+            Utils.toPoint(Consts.HandWaitPosition),
+            index);
+
+        me._container = scene.add.container(me._waitPosition.x, me._waitPosition.y, [ me._sprite ])
+            .setDepth(Consts.Depth.Hand)
+            .setAngle(angle);
+    }
+
+    tryMakeAction(point, type, config, callback) {
+        const me = this;
+
+        if (!me._validateAction(point, type, config))
+            return false;
+
+        me._startTimeline(
+            point,
+            () => {
+                me._innerTimelineCallback(point, type, config);
+
+                if (!!callback)
+                    callback();
+            }
+        );
+
+        return true;
+    }
+
+    cancel(callback) {
+        const me = this;
+
+        for (let i = 0; i < me._money.length; ++i)
+            me._money[i] = 0;
+
+        me._sprite.setFrame(0);
+        if (!!me._timeline)
+            me._timeline.stop();
+
+        me._state = Enums.HandState.EMPTY;
+
+        let index = 0;
+        const last = me._content.length - 1
+
+        if (last == -1 && !!callback)
+            return callback();
+
+        while (me._content.length > 0) {
+            const item = me._content.pop();
+            const target = Utils.toPoint(item);
+            item.setPosition(me._container.x, me._container.y);
+
+            item.setVisible(true);
+
+            const runCallback = index == last && !!callback;
+
+            me._scene.tweens.add({
+                targets: item,
+                x: target.x,
+                y: target.y,
+                delay: index * 200,
+                duration: Utils.getTweenDuration(
+                    Utils.toPoint(me._container),
+                    target,
+                    Consts.Speed.HandAction),
+                ease: 'Sine.easeOut',
+                onComplete:() => {
+                    if (runCallback)
+                        callback();
+                }
+            })
+
+            ++index;
+        }
+    }
+    
+    dropMoney() {
+        const me = this;
+
+        if (me._state != Enums.HandState.MONEY)
+            return [];
+
+        let result = [];
+        for (let i = 0; i < me._money.length; ++i) {
+            result.push(me._money[i]);
+            me._money[i] = 0;
+        }
+
+        me._state = Enums.HandState.EMPTY;
+
+        return result;
+    }
+
+    getTotalMoney() {
+        const me = this;
+
+        return Helper.getTotalMoney(me._money);
+    }
+
+    getMoneyAction() {
+        const me = this;
+
+        let billCount = 0;
+        for (let i = 0; i < me._money.length; ++i)
+            billCount += me._money[i];
+
+        const total = me.getTotalMoney();
+
+        if (billCount == 1 && total >= Consts.BillValue[1])
+            return Enums.ActionType.SPLIT_MONEY;
+
+        if (billCount > 1 && total >= Consts.BillValue[1])
+            return Enums.ActionType.MERGE_MONEY;
+        
+        return null;
+    }
+
+    /**
+     * @param {Phaser.Geom.Point} pos 
+     */
+    moveTo(pos, delta) {
+        const me = this;
+
+        if (me.isBusy())
+            return;
+
+        const dist = Phaser.Math.Distance.Between(
+            pos.x,
+            pos.y,
+            me._container.x,
+            me._container.y);
+
+        if (dist < 10)
+            return;
+
+        const distance = {
+            x: pos.x - me._container.x,
+            y: pos.y - me._container.y
+        };
+
+        const shift = {
+            x: Math.min(Math.abs(distance.x), Consts.Speed.HandFollow),
+            y: Math.min(Math.abs(distance.y), Consts.Speed.HandFollow)
+        };
+
+        const movement = {
+            x: shift.x * Math.sign(distance.x) * (delta / 1000),
+            y: shift.y * Math.sign(distance.y) * (delta / 1000)
+        };
+
+        me._container.setPosition(
+            me._container.x + movement.x,
+            me._container.y + movement.y,
+        );
+    }
+
+    toWait() {
+        const me = this;
+
+        if (!!me.timeline)
+            me._timeline.pause();
+
+        me._sprite.setFrame(0);
+
+        me._timeline = me._scene.tweens.timeline({
+            targets: me._container,
+            tweens: [{
+                x: me._waitPosition.x,
+                y: me._waitPosition.y,
+                duration: Utils.getTweenDuration(
+                    Utils.toPoint(me._container),
+                    me._waitPosition,
+                    Consts.Speed.HandAction),
+                ease: 'Sine.easeInOut'
+            }]            
+        });
+    }
+
+    prepareToRent() {
+        const me = this;
+
+        const point = Helper.rotate(
+            Utils.buildPoint(80, 550),
+            me._side);
+
+        me._sprite.setFrame(4);
+
+        me._timeline = me._scene.tweens.timeline({
+            targets: me._container,
+            tweens: [{
+                x: point.x,
+                y: point.y,
+                duration: Utils.getTweenDuration(
+                    Utils.toPoint(me._container),
+                    point,
+                    Consts.Speed.HandAction),
+                ease: 'Sine.easeInOut'
+            }]            
+        });
+    }
+
+    isBusy() {
+        const me = this;
+
+        return me._timeline != null 
+               && me._timeline.isPlaying();
+    }
+
+    isClick(point) {
+        const me = this;
+
+        return Phaser.Geom.Rectangle.ContainsPoint(
+            me._container.getBounds(),
+            point
+        );
+    }
+
+    toPoint() {
+        const me = this;
+
+        return Utils.toPoint(me._container);
+    }
+
+    isMaxBillCount() {
+        const me = this;
+
+        let count = 0;
+        me._money.forEach((b) => count += b);
+        return count >= Consts.MaxHandBillCount;
+    }
+
+    hide() {
+        const me = this;
+
+        me._scene.add.tween({
+            targets: me._sprite,
+            alpha: { from: 1, to: 0 },
+            duration: Consts.Speed.CenterEntranceDuration
+        });
+    }
+
+    _startTimeline(target, callback) {
+        const me = this;
+
+        me._timeline = me._scene.tweens.timeline({
+            targets: me._container,
+
+            tweens: [
+            {
+                x: target.x,
+                y: target.y,
+                ease: 'Sine.easeInOut',
+                duration: Utils.getTweenDuration(
+                    Utils.toPoint(me._container),
+                    target,
+                    Consts.Speed.HandAction),
+            },
+            {
+                scale: { from: 1, to: 0.75 },
+                duration: Consts.Speed.HandGrabDuration / 2,
+                onComplete: () => {
+                    if (!!callback)
+                        callback();    
+                }
+            },
+            {
+                scale: { from: 0.75, to: 1 },
+                duration: Consts.Speed.HandGrabDuration / 2
+            }]
+        });
+    }
+
+    _validateAction(point, type, config) {
+        const me = this;
+
+        if (me.isBusy())
+            return false;
+
+        switch (type) {
+            case Enums.HandAction.TAKE_DICE:
+            case Enums.HandAction.TAKE_PIECE: {
+                if (!config.image.visible)
+                    return false;
+
+                const canTake = Phaser.Geom.Rectangle.ContainsPoint(
+                    config.image.getBounds(), 
+                    point);
+
+                if (!canTake)
+                    return false;
+                
+                break;
+            }
+
+            case Enums.HandAction.DROP_DICES: {
+                if (me._content.length != 2)
+                    throw `Wrong hand content length: ${me._content.length}`;
+
+                const zone = Consts.DiceZoneRect;
+                const inside = Phaser.Geom.Rectangle.ContainsPoint(
+                    new Phaser.Geom.Rectangle(zone.x, zone.y, zone.width, zone.height),
+                    point);
+
+                if (!inside)
+                    return false;
+
+                break;
+            }
+
+            case Enums.HandAction.DROP_PIECE:
+            case Enums.HandAction.CLICK_BUTTON:
+                return true;
+
+            case Enums.HandAction.TAKE_BILL:
+                let count = 0;
+                me._money.forEach((b) => count += b);
+                return count < Consts.MaxHandBillCount;
+            
+
+            default: 
+                throw `Unknown hand action ${Utils.enumToString(Enums.HandAction, type)}`;
+        }
+
+        return true;
+    }
+
+    _innerTimelineCallback(point, type, config) {
+        const me = this;
+
+        switch (type) {
+            case Enums.HandAction.TAKE_DICE:
+            case Enums.HandAction.TAKE_PIECE: {
+                config.image.setVisible(false);
+                me._content.push(config.image);
+                me._state = config.type;
+                me._sprite.setFrame(2);
+                break;
+            }
+
+            case Enums.HandAction.DROP_DICES: {
+                if (me._state == Enums.HandState.EMPTY)
+                    return;
+
+                const first = me._content.pop();
+                const second = me._content.pop();
+
+                first
+                    .setPosition(point.x, point.y)
+                    .setVisible(true);
+        
+                second
+                    .setPosition(
+                        point.x + Consts.SecondDiceOffset.X, 
+                        point.y + Consts.SecondDiceOffset.Y)
+                    .setVisible(true);
+
+                me._state = Enums.HandState.EMPTY;
+                me._sprite.setFrame(0);
+                break;
+            }
+
+            case Enums.HandAction.DROP_PIECE: {
+                if (me._state == Enums.HandState.EMPTY)
+                    return;
+
+                while (me._content.length > 0) {
+                    const item = me._content.pop();
+
+                    item
+                        .setPosition(point.x, point.y)
+                        .setVisible(true);
+                }   
+
+                me._state = Enums.HandState.EMPTY;
+                me._sprite.setFrame(0);
+                break;
+            }
+
+            case Enums.HandAction.TAKE_BILL: {
+                ++me._money[config.index];
+                me._state = Enums.HandState.MONEY;
+        
+                Utils.debugLog(`money: ${me._money.join(';')} (${Helper.getTotalMoney(me._money)})`);
+
+                break;
+            }
+
+            case Enums.HandAction.CLICK_BUTTON: {            
+                break;
+            }
+
+            default: 
+                throw `Unknown hand action callback ${Utils.enumToString(Enums.HandAction, type)}`;
+        }
+    }
+}
