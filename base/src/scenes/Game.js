@@ -18,9 +18,7 @@ export default class Game extends Phaser.Scene {
     create() {
         const me = this;
 
-        me._core = new Core(me.add);
-
-        console.log('Hello, world!');
+        me._core = new Core(me);
     }
 
     update() {
