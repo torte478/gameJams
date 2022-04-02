@@ -7,6 +7,7 @@ import Consts from './Consts.js';
 import Controls from './Controls.js';
 import Door from './Door.js';
 import Enums from './Enums.js';
+import Flame from './Flame.js';
 import Helper from './Helper.js';
 import Player from './Player.js';
 import She from './She.js';
@@ -52,6 +53,9 @@ export default class Core {
 
     /** @type {Phaser.GameObjects.Group} */
     _waves;
+
+    /** @type {Flame[]} */
+    _flames;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -119,6 +123,18 @@ export default class Core {
             .setVisible(false);
 
         me._waves = scene.add.group();
+
+        me._flames = [];
+        const particles = scene.add.particles('fire');
+        for (let i = 0; i < config.flame.length; ++i) {
+            const flame = new Flame(
+                scene, 
+                config.flame[i].x, 
+                config.flame[i].y, 
+                config.flame[i].angle, 
+                particles);
+            me._flames.push(flame);
+        }
 
         // phaser
 
@@ -192,6 +208,13 @@ export default class Core {
                 me._bigBottle.setVisible(true);
         }
 
+        for (let i = 0; i < me._flames.length; ++i) {
+            if (me._flames[i].checkDamage(player)) {
+                console.log('TODO: dead!');
+                return;
+            }
+        }
+
         // debug
 
         if (Config.Debug.Global && Config.Debug.Text) {
@@ -230,6 +253,9 @@ export default class Core {
                     duration: 1000,
                     onComplete: () => { me._waves.killAndHide(wave)}
                 });
+
+                for (let j = 0; j < me._flames.length; ++j)
+                    me._flames[j].checkDestroy(player);
             }
                 
         });

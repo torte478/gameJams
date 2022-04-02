@@ -27,6 +27,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'wings', 150);
         Utils.loadSpriteSheet(me, 'items', Consts.Unit.Medium);
         Utils.loadSpriteSheet(me, 'wave', Consts.Unit.Big);
+        Utils.loadSpriteSheet(me, 'fire', Consts.Unit.Medium);
     }
 
     create() {
@@ -173,6 +174,19 @@ export default class Game extends Phaser.Scene {
             frames: me.anims.generateFrameNumbers('wave', { frames: [ 7, 6, 5, 4, 3, 2, 1, 0, 1, 0, 1, 0 ] }),
             frameRate: 30,
             repeat: 0
+        });
+
+        me.anims.create({
+            key: 'flame_turret',
+            frames: me.anims.generateFrameNumbers('items', { frames: [ 10, 11, 12 ] }),
+            frameRate: 9,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'fire',
+            frameRate: 9,
+            repeat: -1
         });
     }
 }

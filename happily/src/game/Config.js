@@ -15,8 +15,12 @@ export default class Config {
                 // { x: 565, y: 670 }
             ],
             bottles: [
-                { x: 325, y: 725 },
-                { x: 425, y: 725 },
+                { x: 200, y: 725 },
+                // { x: 425, y: 725 },
+            ],
+            flame: [
+                { x: 375, y: 775, angle: 270 },
+                { x: 725, y: 550, angle: 180 },
             ]
         }
     ]
