@@ -15,7 +15,8 @@ export default class Config {
                 // { x: 565, y: 670 }
             ],
             bottles: [
-                { x: 325, y: 725 }
+                { x: 325, y: 725 },
+                { x: 425, y: 725 },
             ]
         }
     ]

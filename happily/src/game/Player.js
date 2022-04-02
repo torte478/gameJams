@@ -159,6 +159,14 @@ export default class Player {
         me._container.body.setAllowGravity(false);
         me._container.body.setVelocity(0);
     }
+    
+    startDrink() {
+        const me = this;
+
+        me.isBusy = true;
+        me._sprite.play('player_drink', true);
+        me._container.body.setVelocity(0);
+    }
 
     _getVelocity(fly) {
         const me = this;

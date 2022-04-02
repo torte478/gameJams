@@ -26,6 +26,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'she', Consts.Unit.Big);
         Utils.loadSpriteSheet(me, 'wings', 150);
         Utils.loadSpriteSheet(me, 'items', Consts.Unit.Medium);
+        Utils.loadSpriteSheet(me, 'wave', Consts.Unit.Big);
     }
 
     create() {
@@ -72,6 +73,13 @@ export default class Game extends Phaser.Scene {
             key: 'player_walk',
             frames: me.anims.generateFrameNumbers('player', { frames: [ 5, 6, 7, 6]}),
             frameRate: 6,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'player_drink',
+            frames: me.anims.generateFrameNumbers('player', { frames: [ 8, 9 ]}),
+            frameRate: 4,
             repeat: -1
         });
 
@@ -158,6 +166,13 @@ export default class Game extends Phaser.Scene {
             frames: me.anims.generateFrameNumbers('items', { frames: [ 7, 8 ] }),
             frameRate: 5,
             repeat: -1
+        });
+
+        me.anims.create({
+            key: 'wave',
+            frames: me.anims.generateFrameNumbers('wave', { frames: [ 7, 6, 5, 4, 3, 2, 1, 0, 1, 0, 1, 0 ] }),
+            frameRate: 30,
+            repeat: 0
         });
     }
 }

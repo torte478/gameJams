@@ -33,7 +33,7 @@ export default class Bottle {
         if (me._taked)
             return false;
 
-        const needTake = Phaser.Math.Distance.BetweenPoints(pos, Utils.toPoint(me._sprite)) < 50;
+        const needTake = Phaser.Math.Distance.BetweenPoints(pos, Utils.toPoint(me._sprite)) < 25;
         if (needTake) {
             me._sprite.stop();
             me._sprite.setFrame(9);

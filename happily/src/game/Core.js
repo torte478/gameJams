@@ -50,6 +50,9 @@ export default class Core {
     /** @type {Phaser.GameObjects.Image} */
     _bigBottle;
 
+    /** @type {Phaser.GameObjects.Group} */
+    _waves;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -115,6 +118,8 @@ export default class Core {
             .setScale(0.75)
             .setVisible(false);
 
+        me._waves = scene.add.group();
+
         // phaser
 
         scene.cameras.main
@@ -159,6 +164,10 @@ export default class Core {
 
         if (me._she.state == Enums.SheState.FLY)
             me._processFly()
+        else if (status == Enums.PlayerStatus.GROUNDED 
+                && me._bigBottle.visible 
+                && me._controls.isDownOnce(Enums.Keyboard.ACTION))
+            me._processBeer();
         else
             me._movePlayer();
 
@@ -192,6 +201,38 @@ export default class Core {
                 `lst: ${me._player.lastGround.pos.x | 0} ${me._player.lastGround.pos.y | 0}`;
             me._debugText.setText(text);
         }
+    }
+
+    _processBeer() {
+        const me = this;
+
+        me._bigBottle.setVisible(false);
+        me._player.startDrink();
+
+        me._she.hitDrink(() => {
+            for (let i = 0; i < me._bottles.length; ++i)
+                me._bottles[i].reset();    
+            me._player.awake();
+
+            const player = Utils.toPoint(me._player.toGameObject());
+
+            for (let i = 0; i < 2; ++i) {
+                const wave = me._waves.create(player.x, player.y, 'wave')
+                    .setDepth(Consts.Depth.Foreground)
+                    .play('wave')
+                    .setFlipX(i == 0);
+
+                me._scene.add.tween({
+                    targets: wave,
+                    x: player.x + 200 * (i == 0 ? -1 : 1),
+                    alpha: { from: 1, to: 0 },
+                    ease: 'ease.SineOut',
+                    duration: 1000,
+                    onComplete: () => { me._waves.killAndHide(wave)}
+                });
+            }
+                
+        });
     }
 
     _processFall() {

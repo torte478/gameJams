@@ -205,4 +205,43 @@ export default class She {
             me._wings.setFlipX(flip);
         }
     }
+
+    hitDrink(callback) {
+        const me = this;
+
+        if (!!me._tween)
+            me._tween.stop();
+
+        const player = Utils.toPoint(me._player.toGameObject());
+        me._sprite.play('she_fly_quick', true);
+        me._wings.play('wings_fly_quick', true);
+
+        me._scene.tweens.timeline({
+            targets: me._container,
+            tweens: [
+                {
+                    x: player.x,
+                    y: player.y - 500,
+                    duration: 1500,
+                    ease: 'Sine.easeInOut',
+                },
+                {
+                    x: player.x,
+                    y: player.y,
+                    ease: 'Sine.easeIn',
+                    duration: 250
+                }
+            ],
+            onComplete: () => {
+                me._container.setPosition(player.x, player.y);
+                
+                me.state = Enums.SheState.IDLE; 
+                me._sprite.play('she_idle', true);
+                me._wings.play('wings_close');
+
+                if (!!callback)
+                    callback();
+            }
+        });       
+    }
 }
