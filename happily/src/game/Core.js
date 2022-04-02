@@ -2,6 +2,7 @@ import Phaser from '../lib/phaser.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
+import Controls from './Controls.js';
 import Enums from './Enums.js';
 import Helper from './Helper.js';
 import Player from './Player.js';
@@ -14,6 +15,9 @@ export default class Core {
 
     /** @type {Player} */
     _player;
+
+    /** @type {Controls} */
+    _controls;
 
     /** @type {Phaser.GameObjects.Text} */
     _debugText;
@@ -48,11 +52,17 @@ export default class Core {
         const tiles = level.createLayer(0, tileset)
             .setDepth(Consts.Depth.Background);
 
-        me._player = new Player(scene, 100, 650);
+        me._player = new Player(scene, 360, 100);
+        me._controls = new Controls(scene.input);
 
         // physics
 
         level.setCollision(8);
+        scene.physics.world.enable(me._player.toCollider());
+
+        scene.physics.add.collider(
+            me._player.toCollider(),
+            tiles);
 
         // debug
 
@@ -65,6 +75,23 @@ export default class Core {
 
     update() {
         const me = this;
+
+        me._player.update();
+        me._controls.update();
+
+        // movement
+        if (me._controls.isDownOnce(Enums.Keyboard.JUMP))
+            me._player.tryJump();
+
+        let signX = 0;
+        if (me._controls.isDown(Enums.Keyboard.LEFT))
+            signX = -1;
+        else if (me._controls.isDown(Enums.Keyboard.RIGHT))
+            signX = 1;
+
+        me._player.setVelocityX(signX);
+
+        // debug
 
         if (Config.Debug.Global && Config.Debug.Text) {
             const text =
