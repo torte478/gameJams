@@ -80,12 +80,7 @@ export default class Player {
             return Enums.PlayerStatus.GROUNDED
         }
         
-        const dist = me._container.y - me.lastGround.startY;
-        if (dist < Consts.Offset.Fall && me._container.y < me._levelHeight)
-            return Enums.PlayerStatus.JUMP;
-
-        me.isBusy = true;
-        return Enums.PlayerStatus.FALL;
+        return Enums.PlayerStatus.JUMP;
     }
 
     disablePhysics() {
@@ -122,6 +117,15 @@ export default class Player {
 
         const velocity = me._getVelocity(fly);
         me._container.body.setVelocityX(sign * velocity);
+
+        if (fly)
+            me._sprite.play('player_fly', true)
+        else if (!me.isGrounded())
+            me._sprite.play('player_jump', true)
+        else if (sign != 0)
+            me._sprite.play('player_walk', true)
+        else
+            me._sprite.play('player_idle', true);
     }
 
     setVelocityY(velocity) {

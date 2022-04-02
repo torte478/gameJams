@@ -70,7 +70,7 @@ export default class Core {
         // phaser
 
         scene.cameras.main
-            .startFollow(me._player.toGameObject(), true)
+            .startFollow(me._player.toGameObject(), true, 0.9)
             .setBounds(0, 0, me._level.widthInPixels, me._level.heightInPixels);
 
         // physics
@@ -103,9 +103,9 @@ export default class Core {
         const status = me._player.update();
         me._controls.update();
 
-        if (status == Enums.PlayerStatus.FALL)
-            me._processFall();
-        else if (me._she.state == Enums.SheState.FLY)
+        me._she.updateFlipX();
+
+        if (me._she.state == Enums.SheState.FLY)
             me._processFly()
         else
             me._movePlayer();
@@ -213,7 +213,7 @@ export default class Core {
         me._movePlayerX(true);
 
         const playerPos = Utils.toPoint(me._player.toGameObject());
-        me._she.toGameObject().setPosition(playerPos.x, playerPos.y);
+        me._she.toGameObject().setPosition(playerPos.x, playerPos.y - 55);
     }
 
     _movePlayer() {

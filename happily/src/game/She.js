@@ -14,6 +14,9 @@ export default class She {
     /** @type {Phaser.GameObjects.Sprite} */
     _sprite;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    _wings;
+
     /** @type {Phaser.GameObjects.Container} */
     _container;
 
@@ -39,15 +42,18 @@ export default class She {
 
         me._scene = scene;
 
-        me._sprite = scene.add.sprite(0, 0, 'player', 1);
+        me._wings = scene.add.sprite(-5, -35, 'wings', 7);
+        me._sprite = scene.add.sprite(0, 0, 'she', 0);
 
-        me._container = scene.add.container(x, y, [ me._sprite ])
+        me._container = scene.add.container(x, y, [ me._wings, me._sprite ])
             .setDepth(Consts.Depth.She);
 
         me._player = player;
 
         me.state = Enums.SheState.IDLE;
         me._prevPosition = Utils.toPoint(me._container);
+
+        me._sprite.play('she_idle', true);
     }
 
     toGameObject() {
@@ -114,6 +120,9 @@ export default class She {
 
         const playerObj = me._player.toGameObject();
 
+        me._sprite.play('she_fly_quick', true);
+        me._wings.play('wings_fly', true);
+
         me._scene.add.tween({
             targets: me._container,
             x: playerObj.x,
@@ -121,6 +130,8 @@ export default class She {
             duration: 100,
             onComplete: () => {
                 me.state = Enums.SheState.FLY;
+                me._sprite.play('she_fly_player', true);
+
                 if (!!callback)
                     callback();
                 }
@@ -138,6 +149,9 @@ export default class She {
         if (delta <= Consts.Physics.FlyNormalTime)
             return Consts.Physics.FlyUpSpeed;
 
+        me._sprite.play('she_fly_player_slow', true);
+        me._wings.play('wings_fly_quick', true);
+
         if (delta > Consts.Physics.FlySlowTime + Consts.Physics.FlyNormalTime)
             return Consts.Physics.FlyDownSpeed;
 
@@ -149,6 +163,9 @@ export default class She {
     stopFly() {
         const me = this;
 
+        me._sprite.play('she_fly', true);
+        me._wings.play('wings_fly', true);
+
         me.state = Enums.SheState.MOVEMENT;
         me._scene.add.tween({
             targets: me._container,
@@ -159,7 +176,27 @@ export default class She {
                 Utils.toPoint(me._container),
                 me._prevPosition,
                 200),
-            onComplete: () => { me.state = Enums.SheState.IDLE; }
+            onComplete: () => { 
+                me.state = Enums.SheState.IDLE; 
+                me._sprite.play('she_idle', true);
+                me._wings.play('wings_close');
+            }
         });
+    }
+
+    updateFlipX() {
+        const me = this;
+
+        if (me.state == Enums.SheState.FLY) {
+            const flip = me._player._sprite.flipX;
+            me._sprite.setFlipX(flip);
+            me._wings.setFlipX(flip);
+        }
+            
+        else if (me.state == Enums.SheState.IDLE) {
+            const flip = me._player.toGameObject.x < me._container.x;
+            me._sprite.setFlipX(flip);
+            me._wings.setFlipX(flip);
+        }
     }
 }
