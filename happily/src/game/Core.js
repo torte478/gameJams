@@ -64,9 +64,14 @@ export default class Core {
 
         me._controls = new Controls(scene.input);
 
-        me._she = new She(scene, 100, 438);
+        me._player = new Player(scene, 200, 690, me._level.heightInPixels);
+        me._she = new She(scene, 100, 438, me._player);
 
-        me._player = new Player(scene, 200, 690);
+        // phaser
+
+        scene.cameras.main
+            .startFollow(me._player.toGameObject(), true)
+            .setBounds(0, 0, me._level.widthInPixels, me._level.heightInPixels);
 
         // physics
 
@@ -98,23 +103,12 @@ export default class Core {
         const status = me._player.update();
         me._controls.update();
 
-        if (status == Enums.PlayerStatus.FALL) {
-            
-            if (me._she.state != Enums.SheState.CATCH) {
-                const target = me._getCatchPlayerTarget(
-                    me._player.lastGround.pos, 
-                    me._player.lastGround.flip);
-    
-                me._she.catchPlayer(
-                    me._player,
-                    target,
-                    () => { me._player.disablePhysics() },
-                    () => { me._player.awake(); }
-                );
-            }
-        } else {
+        if (status == Enums.PlayerStatus.FALL)
+            me._processFall();
+        else if (me._she.state == Enums.SheState.FLY)
+            me._processFly()
+        else
             me._movePlayer();
-        }
 
         // debug
 
@@ -127,7 +121,22 @@ export default class Core {
         }
     }
 
-    _getCatchPlayerTarget(pos, flip) {
+    _processFall() {
+        const me = this;
+
+        if (me._she.state == Enums.SheState.CATCH)
+            return;
+
+        const target = me._getCatchPlayerTarget(me._player.lastGround.pos);
+
+        me._she.catchPlayer(
+            target,
+            () => { me._player.disablePhysics() },
+            () => { me._player.awake(); }
+        );
+    }
+
+    _getCatchPlayerTarget(pos) {
         const me = this;
 
         const left = me._level.getTileAtWorldXY(
@@ -189,14 +198,45 @@ export default class Core {
         return !solid;
     }
 
+    _processFly() {
+        const me = this;
+
+        if (!me._controls.isDown(Enums.Keyboard.JUMP)) {
+            me._she.stopFly();
+            me._player.awake();
+            return;
+        }
+
+        const flyVelocity = me._she.getFlyVelocity();
+
+        me._player.setVelocityY(flyVelocity);
+        me._movePlayerX(true);
+
+        const playerPos = Utils.toPoint(me._player.toGameObject());
+        me._she.toGameObject().setPosition(playerPos.x, playerPos.y);
+    }
+
     _movePlayer() {
         const me = this;
 
         if (me._player.isBusy)
             return;
 
-        if (me._controls.isDownOnce(Enums.Keyboard.JUMP))
-            me._player.tryJump();
+        if (me._controls.isDownOnce(Enums.Keyboard.JUMP)) {
+            if (me._player.isGrounded())
+                me._player.tryJump();
+            else
+                me._she.startFly(() => me._player.startFly());
+        }
+
+        me._movePlayerX(false);
+    }
+
+    _movePlayerX(fly) {
+        const me = this;
+
+        if (me._player.isBusy)
+            return;
 
         let signX = 0;
         if (me._controls.isDown(Enums.Keyboard.LEFT))
@@ -204,6 +244,6 @@ export default class Core {
         else if (me._controls.isDown(Enums.Keyboard.RIGHT))
             signX = 1;
 
-        me._player.setVelocityX(signX);
+        me._player.setVelocityX(signX, fly);
     }
 }

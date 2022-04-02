@@ -47,6 +47,9 @@ export default class Controls {
             case Enums.Keyboard.RIGHT: 
                 return me._keys.right.key.isDown;
 
+            case Enums.Keyboard.JUMP:
+                return me._keys.jump.key.isDown;
+
             default:
                 return false;
         }

@@ -17,6 +17,8 @@ export default class Enums {
     static SheState = {
         UNKNOWN: 0,
         IDLE: 1,
-        CATCH: 2
+        CATCH: 2,
+        FLY: 3,
+        MOVEMENT: 4,
     }
 }

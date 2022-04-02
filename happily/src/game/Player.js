@@ -18,6 +18,9 @@ export default class Player {
 
     /** @type {Number} */
     _groundTime;
+    
+    /** @type {Number} */
+    _levelHeight;
 
     /** @type {Boolean} */
     isBusy;
@@ -32,7 +35,10 @@ export default class Player {
         flip: false,
 
         /** @type {Phaser.Geom.Point} */
-        pos: null
+        pos: null,
+
+        /** @type {Number} */
+        startY: null
     };
 
     /**
@@ -40,21 +46,25 @@ export default class Player {
      * @param {Number} x 
      * @param {Number} y 
      */
-    constructor(scene, x, y) {
+    constructor(scene, x, y, levelHeight) {
         const me = this
 
         me._scene = scene;
 
         me._sprite = scene.add.sprite(0, 0, 'player', 0);
 
-        me._container = scene.add.container(x, y, [ me._sprite ]);
+        me._container = scene.add.container(x, y, [ me._sprite ])
+            .setDepth(Consts.Depth.Player);
         me._container.setSize(Consts.Unit.PlayerWidth, Consts.Unit.PlayerHeight);
+
+        me._levelHeight = levelHeight;
 
         me.isBusy = false;
 
         me.lastGround.time = new Date().getTime();
         me.lastGround.flip = false;
         me.lastGround.pos = Utils.buildPoint(x, y);
+        me.lastGround.startY = y;
     }
 
     update() {
@@ -66,11 +76,12 @@ export default class Player {
             me.lastGround.time = new Date().getTime();
             me.lastGround.flip = me._sprite.flipX;
             me.lastGround.pos = Utils.toPoint(me._container);
+            me.lastGround.startY = me._container.y;
             return Enums.PlayerStatus.GROUNDED
         }
         
-        const dist = me._container.y - me.lastGround.pos.y;
-        if (dist < Consts.Offset.Fall)
+        const dist = me._container.y - me.lastGround.startY;
+        if (dist < Consts.Offset.Fall && me._container.y < me._levelHeight)
             return Enums.PlayerStatus.JUMP;
 
         me.isBusy = true;
@@ -89,6 +100,9 @@ export default class Player {
 
         me.isBusy = false;
         me._scene.physics.world.enable(me._container);
+        me._container.body.setVelocity(0, 10);
+        me._container.body.setAllowGravity(true);
+        me.lastGround.startY = me._container.y;
     }
 
     toGameObject() {
@@ -97,7 +111,7 @@ export default class Player {
         return me._container;
     }
 
-    setVelocityX(sign) {
+    setVelocityX(sign, fly) {
         const me = this;
 
         if (me.isBusy)
@@ -106,8 +120,14 @@ export default class Player {
         if (sign != 0)
             me._sprite.setFlipX(sign < 0);
 
-        const velocity = me._getVelocity();
+        const velocity = me._getVelocity(fly);
         me._container.body.setVelocityX(sign * velocity);
+    }
+
+    setVelocityY(velocity) {
+        const me = this;
+
+        me._container.body.setVelocityY(velocity);
     }
 
     tryJump() {
@@ -123,14 +143,27 @@ export default class Player {
         return true;
     }
 
-    _getVelocity() {
+    isGrounded() {
+        const me = this;
+
+        return !me.isBusy && me._container.body.blocked.down;
+    }
+
+    startFly() {
+        const me = this;
+
+        me._container.body.setAllowGravity(false);
+        me._container.body.setVelocity(0);
+    }
+
+    _getVelocity(fly) {
         const me = this;
 
         if (me._container.body.blocked.down)
             return Consts.Physics.VelocityGround;
 
         const delta = new Date().getTime() - me.lastGround.time;
-        if (delta > Consts.Physics.FrictionTime)
+        if (fly || delta > Consts.Physics.FrictionTime)
             return Consts.Physics.VelocityJump;
 
         const velocity = Consts.Physics.VelocityGround - 

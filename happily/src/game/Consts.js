@@ -13,6 +13,8 @@ export default class Consts {
 
     static Depth = {
         Background: -1000,
+        She: 50,
+        Player: 100,
         Foreground: 1000,
         Max: 100000
     };
@@ -22,7 +24,11 @@ export default class Consts {
         VelocityGround: 320,
         VelocityJump: 100,
         Jump: -550,
-        FrictionTime: 1000
+        FrictionTime: 1000,
+        FlyNormalTime: 2000,
+        FlySlowTime: 3000,
+        FlyUpSpeed: -100,
+        FlyDownSpeed: 100
     };
 
     static Offset = {
