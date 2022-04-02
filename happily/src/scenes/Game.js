@@ -19,6 +19,7 @@ export default class Game extends Phaser.Scene {
         me.load.tilemapCSV('level0', 'assets/level0.csv');
 
         Utils.loadImage(me, 'background');
+        Utils.loadImage(me, 'big_bottle');
 
         Utils.loadSpriteSheet(me, 'tiles', Consts.Unit.Small);
         Utils.loadSpriteSheet(me, 'player', Consts.Unit.Big);
@@ -150,6 +151,13 @@ export default class Game extends Phaser.Scene {
             frames: me.anims.generateFrameNumbers('items', { frames: [ 6, 5, 4, 3, 2 ] }),
             frameRate: 10,
             repeat: 0
+        });
+
+        me.anims.create({
+            key: 'bottle',
+            frames: me.anims.generateFrameNumbers('items', { frames: [ 7, 8 ] }),
+            frameRate: 5,
+            repeat: -1
         });
     }
 }

@@ -1,4 +1,5 @@
 import Phaser from '../lib/phaser.js';
+import Bottle from './Bottle.js';
 import Button from './Button.js';
 
 import Config from './Config.js';
@@ -40,8 +41,14 @@ export default class Core {
     /** @type {Door[]} */
     _doors;
 
+    /** @type {Bottle[]} */
+    _bottles;
+
     /** @type {Number} */
     _levelIndex;
+
+    /** @type {Phaser.GameObjects.Image} */
+    _bigBottle;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -94,6 +101,19 @@ export default class Core {
             const door = new Door(doorGroup, config.doors[i].x, config.doors[i].y);
             me._doors.push(door);
         }
+
+        me._bottles = [];
+        for (let i = 0; i < config.bottles.length; ++i) {
+            const bottle = new Bottle(scene, config.bottles[i].x, config.bottles[i].y);
+            me._bottles.push(bottle);
+        }
+
+        me._bigBottle = scene.add.image(75, 725, 'big_bottle')
+            .setAngle(-15)
+            .setDepth(Consts.Depth.Foreground)
+            .setScrollFactor(0)
+            .setScale(0.75)
+            .setVisible(false);
 
         // phaser
 
@@ -155,6 +175,12 @@ export default class Core {
                         : door.close();
                 }
             }
+        }
+
+        if (!me._bigBottle.visible) {
+            const bottle = Utils.firstOrNull(me._bottles, (b) => b.check(player));
+            if (!!bottle)
+                me._bigBottle.setVisible(true);
         }
 
         // debug
