@@ -13,7 +13,8 @@ export default class Consts {
 
     static Depth = {
         Background: -1000,
-        Foreground: 1000
+        Foreground: 1000,
+        Max: 100000
     };
 
     static Physics = {
@@ -27,4 +28,6 @@ export default class Consts {
     static Offset = {
         Fall: Consts.Unit.PlayerHeight * 3
     }
+
+    static CollideTiles = [ 8 ];
 }

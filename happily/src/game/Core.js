@@ -29,6 +29,9 @@ export default class Core {
     /** @type {Phaser.Tilemaps.Tilemap} */
     _level;
 
+    /** @type {Set} */
+    _collideTiles;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -67,7 +70,13 @@ export default class Core {
 
         // physics
 
-        me._level.setCollision(8);
+        me._collideTiles = new Set();
+        for (let i = 0; i < Consts.CollideTiles.length; ++i) {
+            const tile = Consts.CollideTiles[i];
+            me._collideTiles.add(tile);
+            me._level.setCollision(tile);
+        }
+
         scene.physics.world.enable(me._player.toGameObject());
 
         scene.physics.add.collider(
@@ -121,31 +130,63 @@ export default class Core {
     _getCatchPlayerTarget(pos, flip) {
         const me = this;
 
-        const rectangle = new Phaser.Geom.Rectangle(
-            pos.x, 
-            pos.y, 
-            Consts.Unit.PlayerWidth, 
-            Consts.Unit.PlayerHeight);
+        const left = me._level.getTileAtWorldXY(
+            pos.x - Consts.Unit.PlayerWidth / 2,
+            pos.y + 5 + Consts.Unit.PlayerHeight / 2);
 
-        return Utils.buildPoint(pos.x, pos.y);
+        const right = me._level.getTileAtWorldXY(
+            pos.x + Consts.Unit.PlayerWidth / 2,
+            pos.y + 5 + Consts.Unit.PlayerHeight / 2);
+
+        if (left && right)
+            Utils.debugLog('left + right');
+        else if (!!left)
+            Utils.debugLog('left')
+        else if (!!right)
+            Utils.debugLog('right');
+
+        if (!!left === !!right)
+            return pos;
+
+        if (left &&
+            !me._isEmptyTile(left.x - 1, left.y) && 
+            me._isEmptyTile(left.x - 1, left.y - 1) &&
+            me._isEmptyTile(left.x - 1, left.y - 2) &&
+            me._isEmptyTile(left.x, left.y - 1) &&
+            me._isEmptyTile(left.x, left.y - 2)) {
+
+                Utils.debugLog('shift left');
+                return Utils.buildPoint(
+                    me._level.tileToWorldX(left.x),
+                    pos.y);
+            }
+
+        if (right &&
+            !me._isEmptyTile(right.x + 1, right.y) && 
+            me._isEmptyTile(right.x + 1, right.y - 1) &&
+            me._isEmptyTile(right.x + 1, right.y - 2) &&
+            me._isEmptyTile(right.x, right.y - 1) &&
+            me._isEmptyTile(right.x, right.y - 2)) {
+
+                Utils.debugLog('shift right');
+                return Utils.buildPoint(
+                    me._level.tileToWorldX(right.x + 1),
+                    pos.y);
+            }
+
+        return pos;
     }
 
-    _isTileFree(rect) {
+    _isEmptyTile(x, y) {
         const me = this;
 
-        const x = Math.floor(rect.x / Consts.Unit.Small);
-        const y = Math.floor(rect.y / Consts.Unit.Small);
+        const tile = me._level.getTileAt(x, y);
 
-        const widthMod = rect.x % Consts.Unit.Small > 4 ? 1 : 0;
-        const heghtMod = rect.y % Consts.Unit.Small > 4 ? 1 : 0;
+        if (!tile)
+            return true;
 
-        const width = Math.floor(rect.width / Consts.Unit.Small) + widthMod;
-        const height = Math.floor(rect.height / Consts.Unit.Small) + heghtMod;
-
-        const tiles = me._level.findTile(() => true, this, x, y, width, height, { 
-            isColliding: true });
-
-        return !tiles;
+        const solid = me._collideTiles.has(tile.index);
+        return !solid;
     }
 
     _movePlayer() {
