@@ -15,4 +15,16 @@ export default class Consts {
         Background: -1000,
         Foreground: 1000
     };
+
+    static Physics = {
+        Gravity: 900,
+        VelocityGround: 320,
+        VelocityJump: 100,
+        Jump: -550,
+        FrictionTime: 1000
+    };
+
+    static Offset = {
+        Fall: Consts.Unit.PlayerHeight * 3
+    }
 }

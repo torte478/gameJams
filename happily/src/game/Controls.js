@@ -14,7 +14,7 @@ export default class Controls {
             key: null,
             once: false
         },
-        up: {
+        jump: {
             key: null,
             once: false
         },
@@ -33,9 +33,8 @@ export default class Controls {
 
         me._keys.left.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         me._keys.right.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-        me._keys.up.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-
-        me._keys.action.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+        me._keys.jump.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+        me._keys.action.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
     }
 
     isDown(key) {
@@ -61,7 +60,7 @@ export default class Controls {
                 return me._keys.action.once;
 
             case Enums.Keyboard.JUMP: 
-                return me._keys.up.once;
+                return me._keys.jump.once;
 
                 default:
                 return false;
