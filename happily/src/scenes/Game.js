@@ -21,7 +21,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadImage(me, 'background');
 
         Utils.loadSpriteSheet(me, 'tiles', Consts.Unit.Small);
-        Utils.loadSpriteSheet(me, 'player', Consts.Unit.PlayerWidth, Consts.Unit.PlayerHeight);
+        Utils.loadSpriteSheet(me, 'player', Consts.Unit.Big);
     }
 
     create() {

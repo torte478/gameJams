@@ -7,6 +7,7 @@ export default class Consts {
 
     static Unit = {
         Small: 25,
+        Big: 75,
         PlayerWidth: 50,
         PlayerHeight: 75
     };
