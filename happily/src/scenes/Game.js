@@ -24,6 +24,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'player', Consts.Unit.Big);
         Utils.loadSpriteSheet(me, 'she', Consts.Unit.Big);
         Utils.loadSpriteSheet(me, 'wings', 150);
+        Utils.loadSpriteSheet(me, 'items', Consts.Unit.Medium);
     }
 
     create() {

@@ -1,4 +1,5 @@
 import Phaser from '../lib/phaser.js';
+import Button from './Button.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
@@ -31,6 +32,9 @@ export default class Core {
 
     /** @type {Set} */
     _collideTiles;
+
+    /** @type {Button[]} */
+    _buttons;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -66,6 +70,8 @@ export default class Core {
 
         me._player = new Player(scene, 200, 690, me._level.heightInPixels);
         me._she = new She(scene, 100, 438, me._player);
+
+        me._buttons = [ new Button(scene, 375, 739) ];
 
         // phaser
 
@@ -109,6 +115,12 @@ export default class Core {
             me._processFly()
         else
             me._movePlayer();
+
+        const player = Utils.toPoint(me._player.toGameObject());
+        const she = Utils.toPoint(me._she.toGameObject());
+        for (let i = 0; i < me._buttons.length; ++i) {
+            const changed = me._buttons[i].check(player, she);
+        }
 
         // debug
 
