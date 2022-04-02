@@ -32,7 +32,7 @@ export default class Game extends Phaser.Scene {
 
         me._createAnimation();
 
-        me._core = new Core(me);
+        me._core = new Core(me, 0);
     }
 
     update() {
@@ -43,6 +43,8 @@ export default class Game extends Phaser.Scene {
 
     _createAnimation() {
         const me = this;
+
+        // player
 
         me.anims.create({
             key: 'player_idle',
@@ -71,6 +73,8 @@ export default class Game extends Phaser.Scene {
             frameRate: 6,
             repeat: -1
         });
+
+        // she
 
         me.anims.create({
             key: 'she_idle',
@@ -109,6 +113,8 @@ export default class Game extends Phaser.Scene {
             repeat: -1
         });
 
+        // wings
+
         me.anims.create({
             key: 'wings_close',
             frames: me.anims.generateFrameNumbers('wings', { frames: [ 0, 1, 2, 3, 7] }),
@@ -128,6 +134,22 @@ export default class Game extends Phaser.Scene {
             frames: me.anims.generateFrameNumbers('wings', { frames: [ 4, 5, 6, 5 ] }),
             frameRate: 16,
             repeat: -1
+        });
+
+        //other
+
+        me.anims.create({
+            key: 'door_open',
+            frames: me.anims.generateFrameNumbers('items', { frames: [ 2, 3, 4, 5, 6 ] }),
+            frameRate: 10,
+            repeat: 0
+        });
+
+        me.anims.create({
+            key: 'door_close',
+            frames: me.anims.generateFrameNumbers('items', { frames: [ 6, 5, 4, 3, 2 ] }),
+            frameRate: 10,
+            repeat: 0
         });
     }
 }

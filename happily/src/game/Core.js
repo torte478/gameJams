@@ -4,6 +4,7 @@ import Button from './Button.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Controls from './Controls.js';
+import Door from './Door.js';
 import Enums from './Enums.js';
 import Helper from './Helper.js';
 import Player from './Player.js';
@@ -36,13 +37,21 @@ export default class Core {
     /** @type {Button[]} */
     _buttons;
 
+    /** @type {Door[]} */
+    _doors;
+
+    /** @type {Number} */
+    _levelIndex;
+
     /**
      * @param {Phaser.Scene} scene 
      */
-    constructor(scene) {
+    constructor(scene, levelIndex) {
         const me = this;
 
         me._scene = scene;
+
+        me._levelIndex = levelIndex;
 
         // phaser
 
@@ -71,7 +80,20 @@ export default class Core {
         me._player = new Player(scene, 200, 690, me._level.heightInPixels);
         me._she = new She(scene, 100, 438, me._player);
 
-        me._buttons = [ new Button(scene, 375, 739) ];
+        const config = Config.Levels[levelIndex];
+
+        me._buttons = [];
+        for (let i = 0; i < config.buttons.length; ++i) {
+            const button = new Button(scene, config.buttons[i].x, config.buttons[i].y);
+            me._buttons.push(button);
+        };
+
+        const doorGroup = scene.physics.add.staticGroup();
+        me._doors = [];
+        for (let i = 0; i < config.doors.length; ++i) {
+            const door = new Door(doorGroup, config.doors[i].x, config.doors[i].y);
+            me._doors.push(door);
+        }
 
         // phaser
 
@@ -93,6 +115,10 @@ export default class Core {
         scene.physics.add.collider(
             me._player.toGameObject(),
             tiles);
+
+        scene.physics.add.collider(
+            me._player.toGameObject(),
+            doorGroup);
 
         // debug
 
@@ -120,6 +146,15 @@ export default class Core {
         const she = Utils.toPoint(me._she.toGameObject());
         for (let i = 0; i < me._buttons.length; ++i) {
             const changed = me._buttons[i].check(player, she);
+            if (changed) {
+                const doors = Config.Levels[me._levelIndex].buttons[i].doors;
+                for (let j = 0; j < doors.length; ++j) {
+                    const door = me._doors[doors[j]];
+                    me._buttons[i].isPressed
+                        ? door.open()
+                        : door.close();
+                }
+            }
         }
 
         // debug
