@@ -29,6 +29,9 @@ export default class She {
     /** @type {Phaser.Geom.Point} */
     _prevPosition;
 
+    /** @type {Phaser.Tweens.Tween} */
+    _tween;
+
     /** @type {Number} */
     state;
 
@@ -123,7 +126,10 @@ export default class She {
         me._sprite.play('she_fly_quick', true);
         me._wings.play('wings_fly', true);
 
-        me._scene.add.tween({
+        if (!!me._tween)
+            me._tween.stop();
+
+        me._tween = me._scene.add.tween({
             targets: me._container,
             x: playerObj.x,
             y: playerObj.y,
@@ -160,21 +166,21 @@ export default class She {
             * (Consts.Physics.FlyDownSpeed - Consts.Physics.FlyUpSpeed);
     }
 
-    stopFly() {
+    stopFly(target) {
         const me = this;
 
         me._sprite.play('she_fly', true);
         me._wings.play('wings_fly', true);
 
         me.state = Enums.SheState.MOVEMENT;
-        me._scene.add.tween({
+        me._tween = me._scene.add.tween({
             targets: me._container,
-            x: me._prevPosition.x,
-            y: me._prevPosition.y,
+            x: target.x,
+            y: target.y,
             ease: 'ease.SineInOut',
             duration: Utils.getTweenDuration(
                 Utils.toPoint(me._container),
-                me._prevPosition,
+                target,
                 200),
             onComplete: () => { 
                 me.state = Enums.SheState.IDLE; 

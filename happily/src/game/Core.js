@@ -127,7 +127,7 @@ export default class Core {
         if (me._she.state == Enums.SheState.CATCH)
             return;
 
-        const target = me._getCatchPlayerTarget(me._player.lastGround.pos);
+        const target = me._getSagePlayerTarget(me._player.lastGround.pos);
 
         me._she.catchPlayer(
             target,
@@ -136,7 +136,7 @@ export default class Core {
         );
     }
 
-    _getCatchPlayerTarget(pos) {
+    _getSagePlayerTarget(pos) {
         const me = this;
 
         const left = me._level.getTileAtWorldXY(
@@ -202,7 +202,8 @@ export default class Core {
         const me = this;
 
         if (!me._controls.isDown(Enums.Keyboard.JUMP)) {
-            me._she.stopFly();
+            const target = me._getSagePlayerTarget(me._player.lastGround.pos)
+            me._she.stopFly(target);
             me._player.awake();
             return;
         }
