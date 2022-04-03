@@ -3,20 +3,36 @@ import Phaser from '../lib/phaser.js';
 import Core from '../game/Core.js';
 import Utils from '../game/Utils.js';
 import Consts from '../game/Consts.js';
+import Config from '../game/Config.js';
 
 export default class Game extends Phaser.Scene {
 
 	/** @type {Core} */
 	_core;
 
+    _levelIndex;
+
     constructor() {
         super('game');
+    }
+
+    init(data) {
+        const me = this;
+
+        me._levelIndex = data.level != undefined
+            ? data.level
+            : 0;
+
+        if (Config.Debug.Global && Config.Debug.LevelIndex)
+            me._levelIndex = Config.LevelIndex;
     }
 
     preload() {
         const me = this;
 
-        me.load.tilemapCSV('level0', 'assets/level0.csv');
+        const csvName = Config.Levels[me._levelIndex].tiles;
+
+        me.load.tilemapCSV(csvName, `assets/${csvName}.csv`);
 
         Utils.loadImage(me, 'background');
         Utils.loadImage(me, 'big_bottle');
@@ -53,7 +69,7 @@ export default class Game extends Phaser.Scene {
 
         me._createAnimation();
 
-        me._core = new Core(me, 0);
+        me._core = new Core(me, me._levelIndex);
     }
 
     update() {

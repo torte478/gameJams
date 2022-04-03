@@ -41,6 +41,8 @@ export default class Player {
         startY: null
     };
 
+    useFly;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} x 
@@ -65,6 +67,8 @@ export default class Player {
         me.lastGround.flip = false;
         me.lastGround.pos = Utils.buildPoint(x, y);
         me.lastGround.startY = y;
+
+        me.useFly = false;
     }
 
     update() {
@@ -77,6 +81,7 @@ export default class Player {
             me.lastGround.flip = me._sprite.flipX;
             me.lastGround.pos = Utils.toPoint(me._container);
             me.lastGround.startY = me._container.y;
+            me.useFly = false;
             return Enums.PlayerStatus.GROUNDED
         }
         
@@ -158,6 +163,7 @@ export default class Player {
 
         me._container.body.setAllowGravity(false);
         me._container.body.setVelocity(0);
+        me.useFly = true;
     }
     
     startDrink() {

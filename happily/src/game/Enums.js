@@ -29,4 +29,11 @@ export default class Enums {
         KETTLE: 1,
         SINK: 2
     }
+
+    static GameResult = {
+        UNKNOWN: 0,
+        RESTART: 1,
+        WIN: 2,
+        LOSE: 3
+    }
 }

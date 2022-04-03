@@ -37,5 +37,5 @@ export default class Consts {
         Fall: Consts.Unit.PlayerHeight * 3
     }
 
-    static CollideTiles = [ 8 ];
+    static CollideTiles = [ 0 ];
 }

@@ -97,8 +97,10 @@ export default class Core {
             .setDepth(Consts.Depth.Background)
             .setScrollFactor(0);
 
+        const config = Config.Levels[levelIndex];
+
         me._level = scene.make.tilemap({
-            key: 'level0',
+            key: config.tiles,
             tileWidth: Consts.Unit.Small,
             tileHeight: Consts.Unit.Small
         });
@@ -110,10 +112,8 @@ export default class Core {
 
         me._controls = new Controls(scene.input);
 
-        me._player = new Player(scene, 200, 690, me._level.heightInPixels);
-        me._she = new She(scene, 100, 438, me._player);
-
-        const config = Config.Levels[levelIndex];
+        me._player = new Player(scene, config.playerX, config.playerY, me._level.heightInPixels);
+        me._she = new She(scene, config.sheX, config.sheY, me._player);
 
         me._buttons = [];
         for (let i = 0; i < config.buttons.length; ++i) {
@@ -182,7 +182,7 @@ export default class Core {
             .setInteractive()
             .setScrollFactor(0)
             .setDepth(Consts.Depth.Foreground)
-            .on('pointerdown', () => { me._startRestart(); })
+            .on('pointerdown', () => { me._startRestart(Enums.GameResult.RESTART); })
             .on('pointermove', () => { me._restartButton.setFrame(1) })
             .on('pointerout', () => { me._restartButton.setFrame(0) });
 
@@ -264,7 +264,7 @@ export default class Core {
         me._controls.update();
 
         if (me._controls.isDown(Enums.Keyboard.RESTART)) {
-            me._startRestart();
+            me._startRestart(Enums.GameResult.RESTART);
             return;
         }
 
@@ -364,7 +364,7 @@ export default class Core {
                 });
             });
             me._scene.time.delayedCall(1500, () => {
-                me._startRestart();
+                me._startRestart(Enums.GameResult.WIN);
             });
         });
     }
@@ -389,7 +389,7 @@ export default class Core {
 
             me._scene.time.delayedCall(
                 1000,
-                () => { me._startRestart() });
+                () => { me._startRestart(Enums.GameResult.LOSE) });
 
             return true;
         }
@@ -397,7 +397,7 @@ export default class Core {
         return false;
     }
 
-    _startRestart() {
+    _startRestart(result) {
         const me = this;
 
         if (me._isRestarting)
@@ -406,7 +406,9 @@ export default class Core {
         me._isRestarting = true;
 
         me._scene.sound.stopAll();
-        me._scene.sound.play('restart', { volume: 0.5 });
+        if (result == Enums.GameResult.RESTART)
+            me._scene.sound.play('restart', { volume: 0.5 });
+
         me._player.disablePhysics();
 
         me._fade.setVisible(true).setAlpha(0);
@@ -416,7 +418,9 @@ export default class Core {
             ease: 'Sine.easeInOut',
             duration: 1000,
             onComplete: () => {
-                me._scene.scene.restart(me._levelIndex);
+                me._scene.scene.start(
+                    'game', 
+                    { level: result == Enums.GameResult.WIN ? me._levelIndex + 1 : me._levelIndex });
             }
         })
     }
@@ -568,7 +572,7 @@ export default class Core {
                 if (jump)
                     me._scene.sound.play('jump', { volume: 0.5 });
             }
-            else {
+            else if (!me._player.useFly) {
                 me._she.startFly(() => me._player.startFly());
                 me._scene.sound.play('start_fly', { volume: 0.5 });
             }
