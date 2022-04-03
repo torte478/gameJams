@@ -6,11 +6,13 @@ export default class Config {
         Global: true,
         Text: true,
         Log: true,
-        Music: true,
+        Music: false,
         LevelIndex: true
     };
 
-    static LevelIndex = 3;
+    static LevelIndex = 5;
+
+    static FinalLevelIndex = 5;
 
     static Levels = [
         {
@@ -136,6 +138,34 @@ export default class Config {
             targets: [
                 { x: 660, y: 162, type: Enums.TargetType.SINK },
                 //{ x: 250, y: 712, type: Enums.TargetType.KETTLE },
+                // { x: 1430, y: 1412, type: Enums.TargetType.SINK },
+                // { x: 927, y: 437, type: Enums.TargetType.IRON },
+                // { x: 927, y: 187, type: Enums.TargetType.KETTLE },
+            ]
+        },
+        {
+            tiles: 'level5',
+            playerX: 100, //100,
+            playerY: 100, //100,
+            sheX: 2475,
+            sheY: 1037,
+            buttons: [
+                //{ x: 375, y: 739, doors: [ 0 ] }
+            ],
+            doors: [
+                //{ x: 565, y: 670 }
+            ],
+            bottles: [
+                // { x: 850, y: 1387 },
+                // { x: 825, y: 875 },
+                // { x: 975, y: 165 },
+            ],
+            flame: [
+                //{ x: 2525, y: 1525, angle: 270 },
+            ],
+            targets: [
+                { x: 750, y: 212, type: Enums.TargetType.KETTLE },
+                // { x: 250, y: 712, type: Enums.TargetType.KETTLE },
                 // { x: 1430, y: 1412, type: Enums.TargetType.SINK },
                 // { x: 927, y: 437, type: Enums.TargetType.IRON },
                 // { x: 927, y: 187, type: Enums.TargetType.KETTLE },

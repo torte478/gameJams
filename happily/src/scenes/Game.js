@@ -62,6 +62,8 @@ export default class Game extends Phaser.Scene {
         me.load.audio('idle', 'assets/sfx/idle.mp3');
         me.load.audio('win', 'assets/sfx/win.mp3');
         me.load.audio('death', 'assets/sfx/death.wav');
+        me.load.audio('medley', 'assets/sfx/medley.mp3');
+        me.load.audio('final', 'assets/sfx/final.mp3');
     }
 
     create() {

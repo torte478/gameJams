@@ -76,6 +76,9 @@ export default class Core {
     /** @type {Boolean} */
     _isDeath;
 
+    /** @type {Boolean} */
+    _finalTriggerActivated;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -145,14 +148,26 @@ export default class Core {
 
         me._flames = [];
         const particles = scene.add.particles('fire');
-        for (let i = 0; i < config.flame.length; ++i) {
-            const flame = new Flame(
-                scene, 
-                config.flame[i].x, 
-                config.flame[i].y, 
-                config.flame[i].angle, 
-                particles);
-            me._flames.push(flame);
+        if (levelIndex != Config.FinalLevelIndex) {
+            for (let i = 0; i < config.flame.length; ++i) {
+                const flame = new Flame(
+                    scene, 
+                    config.flame[i].x, 
+                    config.flame[i].y, 
+                    config.flame[i].angle, 
+                    particles);
+                me._flames.push(flame);
+            }
+        } else {
+            for (let i = 0; i < 24; ++i) {
+                const flame = new Flame(
+                    scene, 
+                    2525 + i * 50, 
+                    1525, 
+                    270, 
+                    particles);
+                me._flames.push(flame);
+            }
         }
 
         me._targets = [];
@@ -176,7 +191,8 @@ export default class Core {
             .setStroke('#684976', 16)
             .setShadow(2, 2, '#333333', 2)
             .setScrollFactor(0)
-            .setDepth(Consts.Depth.Foreground);
+            .setDepth(Consts.Depth.Foreground)
+            .setVisible(levelIndex != Config.FinalLevelIndex);
 
         me._restartButton = scene.add.sprite(55, 55, 'buttons', 0)
             .setInteractive()
@@ -214,8 +230,14 @@ export default class Core {
         });
 
         const ignoreMusic = Config.Debug.Global && Config.Debug.Music;
-        if (!ignoreMusic)
-            me._scene.sound.play('idle', { volume: 0.25, loop: true });
+        if (!ignoreMusic) {
+            const music = levelIndex == Config.FinalLevelIndex
+                ? 'medley'
+                : 'idle';
+            me._scene.sound.play(music, { volume: 0.25, loop: true });
+        }
+
+        me._finalTriggerActivated = false;
 
         me._isDeath = false;
 
@@ -590,9 +612,15 @@ export default class Core {
                 if (jump)
                     me._scene.sound.play('jump', { volume: 0.5 });
             }
-            else if (!me._player.useFly) {
-                me._she.startFly(() => me._player.startFly());
-                me._scene.sound.play('start_fly', { volume: 0.5 });
+            else {
+                const canFly = me._levelIndex != Config.FinalLevelIndex
+                    ? !me._player.useFly
+                    : !me._player.useFly && me._player.toGameObject().x >= 2000;
+
+                if (canFly) {
+                    me._she.startFly(() => me._player.startFly());
+                    me._scene.sound.play('start_fly', { volume: 0.5 });
+                }
             }
         }
 
