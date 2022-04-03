@@ -375,10 +375,10 @@ export default class Core {
 
                     if (me._buttons[i].isPressed) {
                         door.open();
-                        me._scene.sound.play('button_on', { volume: 0.5 });
+                        me._scene.sound.play('button_on', { volume: 0.25 });
                     } else {
                         door.close();
-                        me._scene.sound.play('button_off', { volume: 0.25 });
+                        me._scene.sound.play('button_off', { volume: 0.20 });
                     }
                 }
             }

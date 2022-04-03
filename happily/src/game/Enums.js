@@ -34,6 +34,7 @@ export default class Enums {
         UNKNOWN: 0,
         RESTART: 1,
         WIN: 2,
-        LOSE: 3
+        LOSE: 3,
+        EXIT: 4
     }
 }

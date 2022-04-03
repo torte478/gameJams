@@ -6,13 +6,13 @@ export default class Config {
         Global: true,
         Text: true,
         Log: true,
-        Music: false,
-        LevelIndex: false
+        Music: true,
+        LevelIndex: true
     };
 
     static LevelIndex = 5;
 
-    static FinalLevelIndex = 5;
+    static FinalLevelIndex = 99999999999;
 
     static Levels = [
         {
@@ -101,6 +101,61 @@ export default class Config {
             targets: [
                 { x: 430, y: 137, type: Enums.TargetType.IRON },
                 { x: 250, y: 712, type: Enums.TargetType.KETTLE },
+            ]
+        },
+        {
+            tiles: 'level6',
+            playerX: 100, 
+            playerY: 300, 
+            sheX: 100,
+            sheY: 687,
+            buttons: [
+                { x: 160, y: 450, doors: [ 0, 1, 2 ] },
+                { x: 710, y: 700, doors: [ 3, 4, 5, 6 ] },
+            ],
+            doors: [
+                { x: 400, y: 350 },
+                { x: 400, y: 400 },
+                { x: 400, y: 450 },
+                { x: 500, y: 550 },
+                { x: 500, y: 600 },
+                { x: 500, y: 650 },
+                { x: 500, y: 700 }
+            ],
+            bottles: [
+                { x: 335, y: 450 },
+                { x: 1201, y: 694 },
+            ],
+            flame: [
+            ],
+            targets: [
+                { x: 1196, y: 237, type: Enums.TargetType.KETTLE },
+                { x: 280, y: 687, type: Enums.TargetType.IRON }
+            ]
+        },
+        {
+            tiles: 'level7',
+            playerX: 100, 
+            playerY: 100, 
+            sheX: 550,
+            sheY: 462,
+            buttons: [
+                { x: 745, y: 700, doors: [ 0, 1, 2, 3 ] }
+            ],
+            doors: [
+                { x: 425, y: 225 },
+                { x: 475, y: 225 },
+                { x: 525, y: 225 },
+                { x: 575, y: 225 },
+            ],
+            bottles: [
+                { x: 1201, y: 694 },
+            ],
+            flame: [
+                { x: 825, y: 375, angle: 270 },
+            ],
+            targets: [
+                { x: 222, y: 462, type: Enums.TargetType.KETTLE },
             ]
         },
         {
