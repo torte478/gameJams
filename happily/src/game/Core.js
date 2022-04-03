@@ -73,6 +73,9 @@ export default class Core {
     /** @type {Phaser.GameObjects.Sprite} */
     _restartButton;
 
+    /** @type {Boolean} */
+    _isDeath;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -210,6 +213,12 @@ export default class Core {
             ]
         });
 
+        const ignoreMusic = Config.Debug.Global && Config.Debug.Music;
+        if (!ignoreMusic)
+            me._scene.sound.play('idle', { volume: 0.25, loop: true });
+
+        me._isDeath = false;
+
         // phaser
 
         scene.cameras.main
@@ -248,7 +257,7 @@ export default class Core {
     update() {
         const me = this;
 
-        if (me._isRestarting)
+        if (me._isRestarting || me._isDeath)
             return;
 
         const status = me._player.update();
@@ -335,6 +344,9 @@ export default class Core {
         if (completed != me._targets.length)
             return;
 
+        me._scene.sound.stopByKey('idle');
+        me._scene.sound.play('win', { volume: 0.5 });
+
         const target = Config.Levels[me._levelIndex].targets[changed];
         const position = Utils.buildPoint(target.x, target.y);
 
@@ -360,11 +372,16 @@ export default class Core {
     _checkDeath(player) {
         const me = this;
 
+        if (me._isDeath)
+            return false;
+
         for (let i = 0; i < me._flames.length; ++i) {
             if (!me._flames[i].checkDamage(player))
                 continue; 
                 
-            me._isRestarting = true;
+            me._scene.sound.stopByKey('idle');
+            me._scene.sound.play('death', { volume: 0.5 });
+            me._isDeath = true;
 
             me._player.makeDeath();
             if (me._she.state == Enums.SheState.FLY)
