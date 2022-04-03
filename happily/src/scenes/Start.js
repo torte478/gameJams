@@ -39,10 +39,10 @@ export default class Start extends Phaser.Scene {
             color: '#430064', 
         };
 
-        for (let i = 0; i < 6; ++i) {
+        for (let i = 0; i < 10; ++i) {
 
-            const x = 100 + i * 150;
-            const y = 500 + 0;// i * 150;
+            const x = 200 + (i % 5) * 150;
+            const y = 530 + Math.floor(i / 5) * 125;
 
             const button = me.add.sprite(x, y, 'buttons', 2).setInteractive();
 

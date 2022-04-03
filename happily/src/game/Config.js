@@ -3,16 +3,16 @@ import Enums from "./Enums.js";
 export default class Config {
 
     static Debug = {
-        Global: true,
+        Global: false,
         Text: true,
         Log: true,
-        Music: true,
-        LevelIndex: true
+        Music: false,
+        LevelIndex: false
     };
 
-    static LevelIndex = 5;
+    static LevelIndex = 6;
 
-    static FinalLevelIndex = 99999999999;
+    static FinalLevelIndex = 9;
 
     static Levels = [
         {
@@ -78,6 +78,35 @@ export default class Config {
             ]
         },
         {
+            tiles: 'level8',
+            playerX: 100, //330,//125,
+            playerY: 400, //150,//700,
+            sheX: 2370,
+            sheY: 462,
+            medley: true,
+            buttons: [
+            ],
+            doors: [
+            ],
+            bottles: [
+            ],
+            flame: [
+            ],
+            targets: [
+                { x: 225, y: 462, type: Enums.TargetType.IRON },
+                { x: 425, y: 462, type: Enums.TargetType.KETTLE },
+                { x: 625, y: 462, type: Enums.TargetType.SINK },
+                { x: 825, y: 462, type: Enums.TargetType.IRON },
+                { x: 1025, y: 462, type: Enums.TargetType.KETTLE },
+                { x: 1225, y: 462, type: Enums.TargetType.SINK },
+                { x: 1425, y: 462, type: Enums.TargetType.IRON },
+                { x: 1625, y: 462, type: Enums.TargetType.KETTLE },
+                { x: 1825, y: 462, type: Enums.TargetType.SINK },
+                { x: 2025, y: 462, type: Enums.TargetType.IRON },
+                { x: 2225, y: 462, type: Enums.TargetType.KETTLE },
+            ]
+        },
+        {
             tiles: 'level3',
             playerX: 350,
             playerY: 460,
@@ -131,6 +160,42 @@ export default class Config {
             targets: [
                 { x: 1196, y: 237, type: Enums.TargetType.KETTLE },
                 { x: 280, y: 687, type: Enums.TargetType.IRON }
+            ]
+        },
+        {
+            tiles: 'level9',
+            playerX: 200, //330,//125,
+            playerY: 400, //150,//700,
+            sheX: 100,
+            sheY: 462,
+            medley: true,
+            buttons: [
+            ],
+            doors: [
+            ],
+            bottles: [
+                { x: 350, y: 475 },
+                { x: 550, y: 475 },
+                { x: 750, y: 475 },
+                { x: 950, y: 475 },
+                { x: 1000, y: 475 },
+                { x: 1200, y: 475 },
+                { x: 1300, y: 475 },
+                { x: 1500, y: 475 },
+                { x: 1600, y: 475 },
+                { x: 1700, y: 475 },
+                { x: 1800, y: 475 },
+            ],
+            flame: [
+                { x: 450, y: 525, angle: 270 },
+                { x: 650, y: 525, angle: 270 },
+                { x: 850, y: 525, angle: 270 },
+                { x: 1100, y: 525, angle: 270 },
+                { x: 1400, y: 525, angle: 270 },
+                { x: 1900, y: 525, angle: 270 },
+            ],
+            targets: [
+                { x: 2225, y: 462, type: Enums.TargetType.KETTLE },
             ]
         },
         {

@@ -262,7 +262,7 @@ export default class Core {
 
         const ignoreMusic = Config.Debug.Global && Config.Debug.Music;
         if (!ignoreMusic) {
-            const music = levelIndex == Config.FinalLevelIndex
+            const music = levelIndex == Config.FinalLevelIndex || !!config.medley
                 ? 'medley'
                 : 'idle';
             me._scene.sound.play(music, { volume: 0.25, loop: true });
@@ -430,6 +430,7 @@ export default class Core {
             return;
 
         me._scene.sound.stopByKey('idle');
+        me._scene.sound.stopByKey('medley');
         me._scene.sound.play('win', { volume: 0.5 });
 
         const target = Config.Levels[me._levelIndex].targets[changed];
