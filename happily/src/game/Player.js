@@ -168,6 +168,14 @@ export default class Player {
         me._container.body.setVelocity(0);
     }
 
+    makeDeath() {
+        const me = this;
+
+        me.disablePhysics();
+        me.isBusy = true;
+        me._sprite.play('player_death', true);
+    }
+
     _getVelocity(fly) {
         const me = this;
 

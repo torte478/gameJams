@@ -20,6 +20,7 @@ export default class Game extends Phaser.Scene {
 
         Utils.loadImage(me, 'background');
         Utils.loadImage(me, 'big_bottle');
+        Utils.loadImage(me, 'fade');
 
         Utils.loadSpriteSheet(me, 'tiles', Consts.Unit.Small);
         Utils.loadSpriteSheet(me, 'player', Consts.Unit.Big);
@@ -84,6 +85,13 @@ export default class Game extends Phaser.Scene {
             repeat: -1
         });
 
+        me.anims.create({
+            key: 'player_death',
+            frames: me.anims.generateFrameNumbers('player', { frames: [ 10, 11 ]}),
+            frameRate: 8,
+            repeat: -1
+        });
+
         // she
 
         me.anims.create({
@@ -119,6 +127,13 @@ export default class Game extends Phaser.Scene {
         me.anims.create({
             key: 'she_fly_player_slow',
             frames: me.anims.generateFrameNumbers('she', { frames: [ 9, 10 ] }),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'she_death',
+            frames: me.anims.generateFrameNumbers('she', { frames: [ 12, 13 ] }),
             frameRate: 8,
             repeat: -1
         });

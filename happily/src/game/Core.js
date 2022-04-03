@@ -57,6 +57,12 @@ export default class Core {
     /** @type {Flame[]} */
     _flames;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _fade;
+
+    /** @type {Boolean} */
+    _isRestarting;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -136,6 +142,13 @@ export default class Core {
             me._flames.push(flame);
         }
 
+        me._fade = scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
+            .setScrollFactor(0)
+            .setDepth(Consts.Depth.Max)
+            .setVisible(false);
+
+        me._isRestarting = false;
+
         // phaser
 
         scene.cameras.main
@@ -172,6 +185,9 @@ export default class Core {
 
     update() {
         const me = this;
+
+        if (me._isRestarting)
+            return;
 
         const status = me._player.update();
         me._controls.update();
@@ -210,7 +226,28 @@ export default class Core {
 
         for (let i = 0; i < me._flames.length; ++i) {
             if (me._flames[i].checkDamage(player)) {
-                console.log('TODO: dead!');
+                
+                me._isRestarting = true;
+
+                me._player.makeDeath();
+                if (me._she.state == Enums.SheState.FLY)
+                    me._she.makeDeath();
+
+                me._scene.time.delayedCall(
+                    1000,
+                    () => {
+                        me._fade.setVisible(true).setAlpha(0);
+                        me._scene.add.tween({
+                            targets: me._fade,
+                            alpha: { from: 0, to: 1 },
+                            ease: 'ease.SineInOut',
+                            duration: 3000,
+                            onComplete: () => {
+                                me._scene.scene.restart(me._levelIndex);
+                            }
+                        })
+                    })
+
                 return;
             }
         }

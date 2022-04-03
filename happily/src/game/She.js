@@ -244,4 +244,14 @@ export default class She {
             }
         });       
     }
+
+    makeDeath() {
+        const me = this;
+
+        if (!!me._tween)
+            me._tween.stop();
+
+        me._wings.setVisible(false);
+        me._sprite.play('she_death');
+    }
 }
