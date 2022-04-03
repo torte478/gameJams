@@ -197,17 +197,14 @@ export default class Core {
             tweens: [
                 {
                     x: 200,
-                    ease: 'ease.SineOut',
                     duration: 500
                 },
                 {
                     x: 500,
-                    ease: 'ease.SineInOut',
                     duration: 1000
                 },
                 {
                     x: 1500,
-                    ease: 'ease.SineIn',
                     duration: 500
                 }
             ]
@@ -312,19 +309,43 @@ export default class Core {
     _checkTargets(player) {
         const me = this;
 
-        let changed = false;
+        let changed = -1;
         for (let i = 0; i < me._targets.length; ++i) {
             const success = me._targets[i].checkComplete(player);
 
             if (success)
-                changed = true;
+                changed = i;
         }
 
-        if (!changed)
+        if (changed == -1)
             return;
 
         const completed = me._targets.filter((t) => t.isCompleted).length;
         me._hud.setText(`${completed}/${me._targets.length}`);
+
+        if (completed != me._targets.length)
+            return;
+
+        const target = Config.Levels[me._levelIndex].targets[changed];
+        const position = Utils.buildPoint(target.x, target.y);
+
+        me._player.startWin(position);
+        me._she.startWin(position, () => {
+            me._scene.time.delayedCall(800, () => {
+                const heart = me._scene.add.image(position.x - 25, position.y - 25, 'items', 14);
+                me._scene.add.tween({
+                    targets: heart,
+                    y: position.y - 100,
+                    duration: 2000,
+                    ease: 'ease.SinIn',
+                    alpha: { from: 1, to: 0 },
+                    scale: { from: 0.75, to: 1.25 }
+                });
+            });
+            me._scene.time.delayedCall(1500, () => {
+                me._startRestart();
+            });
+        });
     }
 
     _checkDeath(player) {
@@ -362,7 +383,7 @@ export default class Core {
         me._scene.add.tween({
             targets: me._fade,
             alpha: { from: 0, to: 1 },
-            ease: 'ease.SineInOut',
+            ease: 'Sine.easeInOut',
             duration: 1000,
             onComplete: () => {
                 me._scene.scene.restart(me._levelIndex);
@@ -393,7 +414,7 @@ export default class Core {
                     targets: wave,
                     x: player.x + 200 * (i == 0 ? -1 : 1),
                     alpha: { from: 1, to: 0 },
-                    ease: 'ease.SineOut',
+                    ease: 'Sine.easeOut',
                     duration: 1000,
                     onComplete: () => { me._waves.killAndHide(wave)}
                 });

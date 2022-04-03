@@ -140,6 +140,13 @@ export default class Game extends Phaser.Scene {
             repeat: -1
         });
 
+        me.anims.create({
+            key: 'she_kiss',
+            frames: me.anims.generateFrameNumbers('she', { frames: [ 0, 14, 15, 16, 15, 0 ] }),
+            frameRate: 6,
+            repeat: 0
+        });
+
         // wings
 
         me.anims.create({

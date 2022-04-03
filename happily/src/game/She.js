@@ -177,7 +177,7 @@ export default class She {
             targets: me._container,
             x: target.x,
             y: target.y,
-            ease: 'ease.SineInOut',
+            ease: 'Sine.easeInOut',
             duration: Utils.getTweenDuration(
                 Utils.toPoint(me._container),
                 target,
@@ -253,5 +253,44 @@ export default class She {
 
         me._wings.setVisible(false);
         me._sprite.play('she_death');
+    }
+
+    startWin(position, callback) {
+        const me = this;
+
+        if (!!me._tween)
+            me._tween.stop();
+
+        me._wings.play('wings_fly').setFlipX(true);
+        me._sprite.play('she_fly').setFlipX(true);
+        me._container.setDepth(Consts.Depth.Foreground);
+        me.state = Enums.SheState.WIN;
+
+        me._scene.tweens.timeline({
+            targets: me._container,
+            onComplete: () => {
+                if (!!callback)
+                    callback();
+            },
+            tweens: [
+                {
+                    x: position.x - 15,
+                    y: position.y - 300,
+                    ease: 'Sine.easeInOut',
+                    duration: 2000,
+                    onComplete: () => {
+                        me._wings.play('wings_close');
+                    }
+                },
+                {
+                    y: position.y,
+                    ease: 'Sine.easeInOut',
+                    duration: 1000,
+                    onComplete: () => {
+                        me._sprite.play('she_kiss');
+                    }
+                }
+            ]
+        })
     }
 }

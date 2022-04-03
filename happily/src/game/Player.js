@@ -176,6 +176,15 @@ export default class Player {
         me._sprite.play('player_death', true);
     }
 
+    startWin(pos) {
+        const me = this;
+
+        me.disablePhysics();
+        me._sprite.play('player_idle', true).setFlipX(false);
+        me._container.setPosition(pos.x - 50, pos.y);
+        me.isBusy = true;
+    }
+
     _getVelocity(fly) {
         const me = this;
 
