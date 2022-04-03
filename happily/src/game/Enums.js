@@ -4,7 +4,8 @@ export default class Enums {
         LEFT: 1,
         RIGHT: 2,
         JUMP: 3,
-        ACTION: 4
+        ACTION: 4,
+        RESTART: 5
     };
 
     static PlayerStatus = {

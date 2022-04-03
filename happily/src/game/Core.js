@@ -70,6 +70,9 @@ export default class Core {
     /** @type {Phaser.GameObjects.Text} */
     _hud;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    _restartButton;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -172,6 +175,14 @@ export default class Core {
             .setScrollFactor(0)
             .setDepth(Consts.Depth.Foreground);
 
+        me._restartButton = scene.add.sprite(55, 55, 'buttons', 0)
+            .setInteractive()
+            .setScrollFactor(0)
+            .setDepth(Consts.Depth.Foreground)
+            .on('pointerdown', () => { me._startRestart(); })
+            .on('pointermove', () => { me._restartButton.setFrame(1) })
+            .on('pointerout', () => { me._restartButton.setFrame(0) });
+
         // phaser
 
         scene.cameras.main
@@ -200,7 +211,8 @@ export default class Core {
         // debug
 
         if (Config.Debug.Global && Config.Debug.Text) {
-            me._debugText = scene.add.text(10, 10, 'DEBUG', { fontSize: 14, backgroundColor: '#000' })
+            me._debugText = scene.add.text(990, 10, 'DEBUG', { fontSize: 14, backgroundColor: '#000' })
+                .setOrigin(1, 0)
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
         }
@@ -214,6 +226,11 @@ export default class Core {
 
         const status = me._player.update();
         me._controls.update();
+
+        if (me._controls.isDown(Enums.Keyboard.RESTART)) {
+            me._startRestart();
+            return;
+        }
 
         me._she.updateFlipX();
 
@@ -295,23 +312,32 @@ export default class Core {
 
             me._scene.time.delayedCall(
                 1000,
-                () => {
-                    me._fade.setVisible(true).setAlpha(0);
-                    me._scene.add.tween({
-                        targets: me._fade,
-                        alpha: { from: 0, to: 1 },
-                        ease: 'ease.SineInOut',
-                        duration: 3000,
-                        onComplete: () => {
-                            me._scene.scene.restart(me._levelIndex);
-                        }
-                    })
-                })
+                () => { me._startRestart() });
 
             return true;
         }
 
         return false;
+    }
+
+    _startRestart() {
+        const me = this;
+
+        if (me._isRestarting)
+            return;
+
+        me._isRestarting = true;
+
+        me._fade.setVisible(true).setAlpha(0);
+        me._scene.add.tween({
+            targets: me._fade,
+            alpha: { from: 0, to: 1 },
+            ease: 'ease.SineInOut',
+            duration: 1000,
+            onComplete: () => {
+                me._scene.scene.restart(me._levelIndex);
+            }
+        })
     }
 
     _processBeer() {

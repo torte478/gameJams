@@ -30,6 +30,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'wave', Consts.Unit.Big);
         Utils.loadSpriteSheet(me, 'fire', Consts.Unit.Medium);
         Utils.loadSpriteSheet(me, 'targets', 150, 100);
+        Utils.loadSpriteSheet(me, 'buttons', 100);
     }
 
     create() {

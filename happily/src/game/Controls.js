@@ -22,6 +22,10 @@ export default class Controls {
             key: null,
             once: false,
             isDown: false,
+        },
+        restart: {
+            key: null,
+            isDown: false
         }
     };
 
@@ -35,6 +39,7 @@ export default class Controls {
         me._keys.right.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         me._keys.jump.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
         me._keys.action.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
+        me._keys.restart.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
     }
 
     isDown(key) {
@@ -49,6 +54,9 @@ export default class Controls {
 
             case Enums.Keyboard.JUMP:
                 return me._keys.jump.key.isDown;
+
+            case Enums.Keyboard.RESTART:
+                return me._keys.restart.key.isDown;
 
             default:
                 return false;
