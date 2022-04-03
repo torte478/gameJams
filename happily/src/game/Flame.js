@@ -23,7 +23,7 @@ export default class Button {
      * @param {Number} angle
      * @param {Phaser.GameObjects.Particles.ParticleEmitterManager} particles
      */
-    constructor(scene, x, y, angle, particles) {
+    constructor(scene, x, y, angle, particles, deactivated) {
         const me = this;
 
         me._sprite = scene.add.sprite(x, y, 'items', 10)
@@ -54,6 +54,11 @@ export default class Button {
             y: y
         });
 
+        if (!!deactivated) {
+            me._active = false;
+            me._emmiter.pause();
+        }
+
         const shift = 175;
         if (accY != 0)
             me._rect = new Phaser.Geom.Rectangle(x - 35, y + shift * accY, 70, 150);
@@ -63,6 +68,13 @@ export default class Button {
         }
 
         //scene.add.graphics().fillStyle(0xffff00, 1).fillRect(me._rect.x, me._rect.y, me._rect.width, me._rect.height);
+    }
+
+    activate() {
+        const me = this;
+
+        me._emmiter.resume();
+        me._active = true;
     }
 
     checkDamage(pos) {

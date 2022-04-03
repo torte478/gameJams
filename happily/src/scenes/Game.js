@@ -37,6 +37,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadImage(me, 'background');
         Utils.loadImage(me, 'big_bottle');
         Utils.loadImage(me, 'fade');
+        Utils.loadImage(me, 'fade_white');
 
         Utils.loadSpriteSheet(me, 'tiles', Consts.Unit.Small);
         Utils.loadSpriteSheet(me, 'player', Consts.Unit.Big);
@@ -193,6 +194,13 @@ export default class Game extends Phaser.Scene {
             key: 'wings_fly',
             frames: me.anims.generateFrameNumbers('wings', { frames: [ 4, 5, 6, 5 ] }),
             frameRate: 6,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'wings_fly_slow',
+            frames: me.anims.generateFrameNumbers('wings', { frames: [ 4, 5, 6, 5 ] }),
+            frameRate: 1,
             repeat: -1
         });
 

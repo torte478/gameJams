@@ -79,6 +79,8 @@ export default class Core {
     /** @type {Boolean} */
     _finalTriggerActivated;
 
+    _isFinale;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -168,7 +170,20 @@ export default class Core {
                     particles);
                 me._flames.push(flame);
             }
+
+            for (let i = 0; i < 17; ++i) {
+                const flame = new Flame(
+                    scene, 
+                    1675 + i * 50, 
+                    1100, 
+                    270, 
+                    particles,
+                    true);
+                me._flames.push(flame);
+            }
         }
+
+        me._isFinale = false;
 
         me._targets = [];
         for (let i = 0; i < config.targets.length; ++i) {
@@ -177,6 +192,11 @@ export default class Core {
         }
 
         me._fade = scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
+            .setScrollFactor(0)
+            .setDepth(Consts.Depth.Max)
+            .setVisible(false);
+
+        me._fadeWhite = scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade_white')
             .setScrollFactor(0)
             .setDepth(Consts.Depth.Max)
             .setVisible(false);
@@ -262,7 +282,7 @@ export default class Core {
         // phaser
 
         scene.cameras.main
-            .startFollow(me._player.toGameObject(), true, 0.9)
+            .startFollow(me._player.toGameObject(), true, 0.9, 0.9)
             .setBounds(0, 0, me._level.widthInPixels, me._level.heightInPixels);
 
         // physics
@@ -297,7 +317,7 @@ export default class Core {
     update() {
         const me = this;
 
-        if (me._isRestarting || me._isDeath)
+        if (me._isRestarting || me._isDeath || me._isFinale)
             return;
 
         const status = me._player.update();
@@ -306,6 +326,20 @@ export default class Core {
         if (me._controls.isDown(Enums.Keyboard.RESTART)) {
             me._startRestart(Enums.GameResult.RESTART);
             return;
+        }
+
+        if (me._levelIndex == Config.FinalLevelIndex && !me._finalTriggerActivated && me._player._container.x >= 1820) {
+            me._finalTriggerActivated = true;
+
+            for (let i = 0; i < 17; ++i)
+                me._scene.time.delayedCall(
+                    i * 500,
+                    () =>  { 
+                        if (!me._isFinale)
+                            me._scene.sound.play('button_off', { volume: 0.25 });
+                        me._flames[24 + i].activate(); 
+                    }
+                );
         }
 
         me._she.updateFlipX();
@@ -585,10 +619,14 @@ export default class Core {
         const me = this;
 
         if (!me._controls.isDown(Enums.Keyboard.JUMP)) {
-            const target = me._getSagePlayerTarget(me._player.lastGround.pos)
-            me._she.stopFly(target);
-            me._player.awake();
-            return;
+            if (me._levelIndex != Config.FinalLevelIndex) {
+                const target = me._getSagePlayerTarget(me._player.lastGround.pos)
+                me._she.stopFly(target);
+                me._player.awake();
+                return;
+            } else if (me._player._container.x > 2500) {
+                return me._processFinale();
+            }
         }
 
         const flyVelocity = me._she.getFlyVelocity();
@@ -640,5 +678,73 @@ export default class Core {
             signX = 1;
 
         me._player.setVelocityX(signX, fly);
+    }
+
+    _processFinale() {
+        const me = this;
+
+        me._isFinale = true;
+
+        me._scene.sound.stopAll();
+        me._scene.sound.play('final', { volume: 0.75 });
+
+        me._fadeWhite.setVisible(true);
+        me._scene.add.tween({
+            targets: me._fadeWhite,
+            alpha: { from: 1, to: 0 },
+            ease: 'Sine.easeInOut',
+            duration: 1000
+        });
+
+        me._player.disablePhysics();
+        me._player._sprite.stop().setFrame(3).setFlipX(false);
+
+        const playerTrgt = 1500;
+        me._scene.add.tween({
+            targets: me._player.toGameObject(),
+            y: playerTrgt,
+            angle: { from: 0, to: -90 },
+            duration: Utils.getTweenDuration(
+                Utils.toPoint(me._player._container),
+                Utils.buildPoint(me._player._container.x, playerTrgt),
+                20
+            )
+        });
+
+        me._she._stopTween();
+        me._she._sprite.stop().setFrame(17);
+        me._she._wings.play('wings_fly_slow');
+        me._scene.cameras.main.startFollow(me._she.toGameObject(), true, 0.8, 0.8);
+
+        const sheTrgt = 0;
+        me._scene.add.tween({
+            targets: me._she.toGameObject(),
+            y: sheTrgt,
+            duration: Utils.getTweenDuration(
+                Utils.toPoint(me._she._container),
+                Utils.buildPoint(me._she._container.x, sheTrgt),
+                10
+            )
+        });
+
+        me._scene.time.delayedCall(16000, () => {
+            me._scene.tweens.add({
+                targets: me._fadeWhite,
+                alpha: { from: 0, to: 1 },
+                ease: 'Sine.easeInOut',
+                duration: 9000,
+                onComplete: () => {
+                    me._scene.add.text(500, 400, 'THE END', { 
+                        fontFamily: 'Arial Black',
+                        fontSize: 74,
+                        color: '#FFE8FF'})
+                        .setOrigin(0.5)
+                        .setStroke('#684976', 16)
+                        .setShadow(2, 2, '#333333', 2)
+                        .setScrollFactor(0)
+                        .setDepth(Consts.Depth.Max);
+                }
+            });
+        });
     }
 }
