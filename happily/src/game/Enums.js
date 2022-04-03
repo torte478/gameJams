@@ -21,4 +21,10 @@ export default class Enums {
         FLY: 3,
         MOVEMENT: 4,
     }
+
+    static TargetType = {
+        IRON: 0,
+        KETTLE: 1,
+        SINK: 2
+    }
 }

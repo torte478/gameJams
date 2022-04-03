@@ -29,6 +29,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'items', Consts.Unit.Medium);
         Utils.loadSpriteSheet(me, 'wave', Consts.Unit.Big);
         Utils.loadSpriteSheet(me, 'fire', Consts.Unit.Medium);
+        Utils.loadSpriteSheet(me, 'targets', 150, 100);
     }
 
     create() {
@@ -201,6 +202,27 @@ export default class Game extends Phaser.Scene {
         me.anims.create({
             key: 'fire',
             frameRate: 9,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'targets_iron',
+            frames: me.anims.generateFrameNumbers('targets', { frames: [ 0, 1, 2, 3 ] }),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'targets_kettle',
+            frames: me.anims.generateFrameNumbers('targets', { frames: [ 5, 6, 7, 8 ] }),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        me.anims.create({
+            key: 'targets_sink',
+            frames: me.anims.generateFrameNumbers('targets', { frames: [ 10, 11, 12, 13 ] }),
+            frameRate: 8,
             repeat: -1
         });
     }

@@ -8,6 +8,7 @@ import Controls from './Controls.js';
 import Door from './Door.js';
 import Enums from './Enums.js';
 import Flame from './Flame.js';
+import Target from './Target.js';
 import Helper from './Helper.js';
 import Player from './Player.js';
 import She from './She.js';
@@ -56,6 +57,9 @@ export default class Core {
 
     /** @type {Flame[]} */
     _flames;
+
+    /** @type {Target[]} */
+    _targets;
 
     /** @type {Phaser.GameObjects.Image} */
     _fade;
@@ -142,6 +146,12 @@ export default class Core {
             me._flames.push(flame);
         }
 
+        me._targets = [];
+        for (let i = 0; i < config.targets.length; ++i) {
+            const target = new Target(scene, config.targets[i].x, config.targets[i].y, config.targets[i].type);
+            me._targets.push(target);
+        }
+
         me._fade = scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
             .setScrollFactor(0)
             .setDepth(Consts.Depth.Max)
@@ -224,33 +234,9 @@ export default class Core {
                 me._bigBottle.setVisible(true);
         }
 
-        for (let i = 0; i < me._flames.length; ++i) {
-            if (me._flames[i].checkDamage(player)) {
-                
-                me._isRestarting = true;
-
-                me._player.makeDeath();
-                if (me._she.state == Enums.SheState.FLY)
-                    me._she.makeDeath();
-
-                me._scene.time.delayedCall(
-                    1000,
-                    () => {
-                        me._fade.setVisible(true).setAlpha(0);
-                        me._scene.add.tween({
-                            targets: me._fade,
-                            alpha: { from: 0, to: 1 },
-                            ease: 'ease.SineInOut',
-                            duration: 3000,
-                            onComplete: () => {
-                                me._scene.scene.restart(me._levelIndex);
-                            }
-                        })
-                    })
-
-                return;
-            }
-        }
+        me._checkDeath(player);
+        me._checkTargets(player);
+        
 
         // debug
 
@@ -261,6 +247,48 @@ export default class Core {
                 `lst: ${me._player.lastGround.pos.x | 0} ${me._player.lastGround.pos.y | 0}`;
             me._debugText.setText(text);
         }
+    }
+
+    _checkTargets(player) {
+        const me = this;
+
+        for (let i = 0; i < me._targets.length; ++i) {
+            me._targets[i].checkComplete(player);
+        }
+    }
+
+    _checkDeath(player) {
+        const me = this;
+
+        for (let i = 0; i < me._flames.length; ++i) {
+            if (!me._flames[i].checkDamage(player))
+                continue; 
+                
+            me._isRestarting = true;
+
+            me._player.makeDeath();
+            if (me._she.state == Enums.SheState.FLY)
+                me._she.makeDeath();
+
+            me._scene.time.delayedCall(
+                1000,
+                () => {
+                    me._fade.setVisible(true).setAlpha(0);
+                    me._scene.add.tween({
+                        targets: me._fade,
+                        alpha: { from: 0, to: 1 },
+                        ease: 'ease.SineInOut',
+                        duration: 3000,
+                        onComplete: () => {
+                            me._scene.scene.restart(me._levelIndex);
+                        }
+                    })
+                })
+
+            return true;
+        }
+
+        return false;
     }
 
     _processBeer() {
