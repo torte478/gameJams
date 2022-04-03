@@ -35,6 +35,15 @@ export default class She {
     /** @type {Number} */
     state;
 
+    /** @type {Boolean} */
+    _quickFly;
+
+    /** @type {Phaser.Sound.BaseSound} */
+    _wingsFlySound;
+
+    /** @type {Phaser.Sound.BaseSound} */
+    _wingsFlyQuickSound;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} x 
@@ -57,6 +66,15 @@ export default class She {
         me._prevPosition = Utils.toPoint(me._container);
 
         me._sprite.play('she_idle', true);
+
+        me._quickFly = false;
+        me._wingsFlySound = me._scene.sound.add('wings', { loop: true, volume: 0.1 });
+        me._wingsFlySound.play();
+        me._wingsFlySound.pause();
+
+        me._wingsFlyQuickSound = me._scene.sound.add('wings_quick', { loop: true, volume: 0.1 });
+        me._wingsFlyQuickSound.play();
+        me._wingsFlyQuickSound.pause();
     }
 
     toGameObject() {
@@ -123,11 +141,11 @@ export default class She {
 
         const playerObj = me._player.toGameObject();
 
+        me._stopTween();
+
         me._sprite.play('she_fly_quick', true);
         me._wings.play('wings_fly', true);
-
-        if (!!me._tween)
-            me._tween.stop();
+        me._wingsFlySound.resume();
 
         me._tween = me._scene.add.tween({
             targets: me._container,
@@ -144,6 +162,16 @@ export default class She {
             });
     }
 
+    _stopTween() {
+        const me = this;
+
+        if (!!me._tween) {
+            me._tween.stop();
+            me._wingsFlySound.pause();
+            me._wingsFlyQuickSound.pause();
+        }
+    }
+
     getFlyVelocity() {
         const me = this;
 
@@ -152,11 +180,20 @@ export default class She {
 
         const delta = new Date().getTime() - me._startFlyTime;
         
-        if (delta <= Consts.Physics.FlyNormalTime)
+        if (delta <= Consts.Physics.FlyNormalTime) {
+            me._quickFly = false;
             return Consts.Physics.FlyUpSpeed;
+        }
 
         me._sprite.play('she_fly_player_slow', true);
         me._wings.play('wings_fly_quick', true);
+
+        if (!me._quickFly) {
+            me._wingsFlySound.pause();
+            me._wingsFlyQuickSound.play();
+        }
+
+        me._quickFly = true;
 
         if (delta > Consts.Physics.FlySlowTime + Consts.Physics.FlyNormalTime)
             return Consts.Physics.FlyDownSpeed;
@@ -170,7 +207,10 @@ export default class She {
         const me = this;
 
         me._sprite.play('she_fly', true);
+
+        me._wingsFlyQuickSound.pause();
         me._wings.play('wings_fly', true);
+        me._wingsFlySound.resume();
 
         me.state = Enums.SheState.MOVEMENT;
         me._tween = me._scene.add.tween({
@@ -186,6 +226,8 @@ export default class She {
                 me.state = Enums.SheState.IDLE; 
                 me._sprite.play('she_idle', true);
                 me._wings.play('wings_close');
+
+                me._wingsFlySound.pause();
             }
         });
     }
@@ -209,12 +251,13 @@ export default class She {
     hitDrink(callback) {
         const me = this;
 
-        if (!!me._tween)
-            me._tween.stop();
+        me._stopTween();
 
         const player = Utils.toPoint(me._player.toGameObject());
         me._sprite.play('she_fly_quick', true);
         me._wings.play('wings_fly_quick', true);
+
+        me._wingsFlyQuickSound.play();
 
         me._scene.tweens.timeline({
             targets: me._container,
@@ -238,6 +281,9 @@ export default class She {
                 me.state = Enums.SheState.IDLE; 
                 me._sprite.play('she_idle', true);
                 me._wings.play('wings_close');
+                
+                me._wingsFlySound.pause();
+                me._wingsFlyQuickSound.pause();
 
                 if (!!callback)
                     callback();
@@ -248,8 +294,7 @@ export default class She {
     makeDeath() {
         const me = this;
 
-        if (!!me._tween)
-            me._tween.stop();
+        me._stopTween();
 
         me._wings.setVisible(false);
         me._sprite.play('she_death');
@@ -258,10 +303,11 @@ export default class She {
     startWin(position, callback) {
         const me = this;
 
-        if (!!me._tween)
-            me._tween.stop();
+        me._stopTween();
 
         me._wings.play('wings_fly').setFlipX(true);
+        me._wingsFlySound.resume();
+
         me._sprite.play('she_fly').setFlipX(true);
         me._container.setDepth(Consts.Depth.Foreground);
         me.state = Enums.SheState.WIN;
@@ -280,6 +326,7 @@ export default class She {
                     duration: 2000,
                     onComplete: () => {
                         me._wings.play('wings_close');
+                        me._wingsFlySound.pause();
                     }
                 },
                 {

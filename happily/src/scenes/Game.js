@@ -31,6 +31,18 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'fire', Consts.Unit.Medium);
         Utils.loadSpriteSheet(me, 'targets', 150, 100);
         Utils.loadSpriteSheet(me, 'buttons', 100);
+
+        me.load.audio('drink', 'assets/sfx/drink.mp3');
+        me.load.audio('wings', 'assets/sfx/wings.mp3');
+        me.load.audio('wings_quick', 'assets/sfx/wings_quick.mp3');
+        me.load.audio('bottle', 'assets/sfx/bottle.wav');
+        me.load.audio('button_off', 'assets/sfx/button_off.wav');
+        me.load.audio('button_on', 'assets/sfx/button_on.wav');
+        me.load.audio('hit', 'assets/sfx/hit.wav');
+        me.load.audio('jump', 'assets/sfx/jump.wav');
+        me.load.audio('restart', 'assets/sfx/restart.wav');
+        me.load.audio('start_fly', 'assets/sfx/start_fly.wav');
+        me.load.audio('target', 'assets/sfx/target.wav');
     }
 
     create() {

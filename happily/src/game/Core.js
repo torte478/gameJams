@@ -278,17 +278,24 @@ export default class Core {
                 const doors = Config.Levels[me._levelIndex].buttons[i].doors;
                 for (let j = 0; j < doors.length; ++j) {
                     const door = me._doors[doors[j]];
-                    me._buttons[i].isPressed
-                        ? door.open()
-                        : door.close();
+
+                    if (me._buttons[i].isPressed) {
+                        door.open();
+                        me._scene.sound.play('button_on', { volume: 0.5 });
+                    } else {
+                        door.close();
+                        me._scene.sound.play('button_off', { volume: 0.25 });
+                    }
                 }
             }
         }
 
         if (!me._bigBottle.visible) {
             const bottle = Utils.firstOrNull(me._bottles, (b) => b.check(player));
-            if (!!bottle)
+            if (!!bottle) {
                 me._bigBottle.setVisible(true);
+                me._scene.sound.play('bottle', { volume: 0.5 });
+            }
         }
 
         me._checkDeath(player);
@@ -319,6 +326,8 @@ export default class Core {
 
         if (changed == -1)
             return;
+
+        me._scene.sound.play('target', { volume: 0.5 });
 
         const completed = me._targets.filter((t) => t.isCompleted).length;
         me._hud.setText(`${completed}/${me._targets.length}`);
@@ -379,6 +388,10 @@ export default class Core {
 
         me._isRestarting = true;
 
+        me._scene.sound.stopAll();
+        me._scene.sound.play('restart', { volume: 0.5 });
+        me._player.disablePhysics();
+
         me._fade.setVisible(true).setAlpha(0);
         me._scene.add.tween({
             targets: me._fade,
@@ -396,6 +409,8 @@ export default class Core {
 
         me._bigBottle.setVisible(false);
         me._player.startDrink();
+
+        me._scene.sound.play('drink', { volume: 0.15 });
 
         me._she.hitDrink(() => {
             for (let i = 0; i < me._bottles.length; ++i)
@@ -421,6 +436,8 @@ export default class Core {
 
                 for (let j = 0; j < me._flames.length; ++j)
                     me._flames[j].checkDestroy(player);
+
+                me._scene.sound.play('hit', { volume: 0.25 });
             }
                 
         });
@@ -529,10 +546,15 @@ export default class Core {
             return;
 
         if (me._controls.isDownOnce(Enums.Keyboard.JUMP)) {
-            if (me._player.isGrounded())
-                me._player.tryJump();
-            else
+            if (me._player.isGrounded()) {
+                const jump = me._player.tryJump();
+                if (jump)
+                    me._scene.sound.play('jump', { volume: 0.5 });
+            }
+            else {
                 me._she.startFly(() => me._player.startFly());
+                me._scene.sound.play('start_fly', { volume: 0.5 });
+            }
         }
 
         me._movePlayerX(false);
