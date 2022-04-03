@@ -186,7 +186,7 @@ export default class Core {
             .on('pointermove', () => { me._restartButton.setFrame(1) })
             .on('pointerout', () => { me._restartButton.setFrame(0) });
 
-        const startText = scene.add.text(-500, 300, `Level ${levelIndex + 1}/8`, { 
+        const startText = scene.add.text(-500, 300, `Level ${levelIndex + 1}/${Config.Levels.length}`, { 
             fontFamily: 'Arial Black',
             fontSize: 84,
             color: '#FFE8FF'})
@@ -204,7 +204,7 @@ export default class Core {
                 },
                 {
                     x: 500,
-                    duration: 1000
+                    duration: 1500
                 },
                 {
                     x: 1500,
@@ -218,6 +218,24 @@ export default class Core {
             me._scene.sound.play('idle', { volume: 0.25, loop: true });
 
         me._isDeath = false;
+
+        const textStyle = { 
+            fontSize: 28, 
+            color: '#000000', 
+            align: 'center'
+        };
+
+        if (config.tiles == 'level0') {
+            const text = 'Press Left/Right to move\n' +
+                         'Press Z to jump';
+            scene.add.text(150, 500, text, textStyle ).setDepth(Consts.Depth.Background);
+            scene.add.text(650, 360, 'Press and hold Z after jump', textStyle ).setDepth(Consts.Depth.Background);
+            scene.add.text(1260, 200, 'Use R or menu buttons\nto restart and exit', textStyle ).setDepth(Consts.Depth.Background);
+        }
+
+        if (config.tiles == 'level3') {
+            scene.add.text(310, 480, 'Press X to drink', textStyle ).setDepth(Consts.Depth.Background);
+        }
 
         // phaser
 

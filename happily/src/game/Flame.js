@@ -37,7 +37,7 @@ export default class Button {
             : 0;
 
         const accX = angle == 0 || angle == 180
-            ? (angle == 1800 ? 1 : -1)
+            ? (angle == 0 ? 1 : -1)
             : 0;
 
         me._emmiter = particles.createEmitter({
@@ -49,7 +49,6 @@ export default class Button {
             angle: { min: -85, max: -95 },
             rotate: { min: -45, max: 45 },
             lifespan: { min: 1000, max: 1000 },
-            //blendMode: 'ADD',
             frequency: 110,
             x: x,
             y: y
@@ -58,8 +57,10 @@ export default class Button {
         const shift = 175;
         if (accY != 0)
             me._rect = new Phaser.Geom.Rectangle(x - 35, y + shift * accY, 70, 150);
-        else
-            me._rect = new Phaser.Geom.Rectangle(x + shift * accX, y - 35, 150, 70);
+        else {
+            const temp = accX < 0 ? shift * accX : 25;
+            me._rect = new Phaser.Geom.Rectangle(x + temp, y - 35, 150, 70);
+        }
 
         //scene.add.graphics().fillStyle(0xffff00, 1).fillRect(me._rect.x, me._rect.y, me._rect.width, me._rect.height);
     }
