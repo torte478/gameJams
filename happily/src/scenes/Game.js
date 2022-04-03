@@ -181,6 +181,20 @@ export default class Game extends Phaser.Scene {
             repeat: 0
         });
 
+        me.anims.create({
+            key: 'she_not_kiss',
+            frames: me.anims.generateFrameNumbers('she', { frames: [ 0 ] }),
+            frameRate: 3,
+            repeat: 0
+        });
+
+        me.anims.create({
+            key: 'she_cry',
+            frames: me.anims.generateFrameNumbers('she', { frames: [ 0, 18, 19, 20, 21, 22 ] }),
+            frameRate: 5,
+            repeat: 0
+        });
+
         // wings
 
         me.anims.create({
@@ -243,7 +257,7 @@ export default class Game extends Phaser.Scene {
 
         me.anims.create({
             key: 'flame_turret',
-            frames: me.anims.generateFrameNumbers('items', { frames: [ 10, 11, 12 ] }),
+            frames: me.anims.generateFrameNumbers('items', { frames: [ 10, 11, 12, 11 ] }),
             frameRate: 9,
             repeat: -1
         });

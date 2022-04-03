@@ -37,6 +37,7 @@ export default class Bottle {
         if (needTake) {
             me._sprite.stop();
             me._sprite.setFrame(9);
+            me._taked = true;
         }
 
         return needTake;

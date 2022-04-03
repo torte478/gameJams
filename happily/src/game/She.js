@@ -300,7 +300,7 @@ export default class She {
         me._sprite.play('she_death');
     }
 
-    startWin(position, callback) {
+    startWin(position, levelIndex, callback) {
         const me = this;
 
         me._stopTween();
@@ -334,7 +334,10 @@ export default class She {
                     ease: 'Sine.easeInOut',
                     duration: 1000,
                     onComplete: () => {
-                        me._sprite.play('she_kiss');
+                        const anim = levelIndex <= 2
+                            ? 'she_kiss'
+                            : (levelIndex < 7 ? 'she_not_kiss' : 'she_cry');
+                        me._sprite.play(anim);
                     }
                 }
             ]

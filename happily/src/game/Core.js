@@ -279,7 +279,7 @@ export default class Core {
         };
 
         if (config.tiles == 'level0') {
-            const text = 'Press Left/Right to move\n' +
+            const text = 'Use Left/Right to move\n' +
                          'Press Z to jump';
             scene.add.text(150, 500, text, textStyle ).setDepth(Consts.Depth.Background);
             scene.add.text(650, 360, 'Press and hold Z after jump', textStyle ).setDepth(Consts.Depth.Background);
@@ -384,13 +384,13 @@ export default class Core {
             }
         }
 
-        if (!me._bigBottle.visible) {
+        //if (!me._bigBottle.visible) {
             const bottle = Utils.firstOrNull(me._bottles, (b) => b.check(player));
             if (!!bottle) {
                 me._bigBottle.setVisible(true);
                 me._scene.sound.play('bottle', { volume: 0.5 });
             }
-        }
+        //}
 
         me._checkDeath(player);
         me._checkTargets(player);
@@ -437,18 +437,20 @@ export default class Core {
         const position = Utils.buildPoint(target.x, target.y);
 
         me._player.startWin(position);
-        me._she.startWin(position, () => {
-            me._scene.time.delayedCall(800, () => {
-                const heart = me._scene.add.image(position.x - 25, position.y - 25, 'items', 14);
-                me._scene.add.tween({
-                    targets: heart,
-                    y: position.y - 100,
-                    duration: 2000,
-                    ease: 'ease.SinIn',
-                    alpha: { from: 1, to: 0 },
-                    scale: { from: 0.75, to: 1.25 }
+        me._she.startWin(position, me._levelIndex, () => {
+            if (me._levelIndex <= 2) {
+                me._scene.time.delayedCall(800, () => {
+                    const heart = me._scene.add.image(position.x - 25, position.y - 25, 'items', 14);
+                    me._scene.add.tween({
+                        targets: heart,
+                        y: position.y - 100,
+                        duration: 2000,
+                        ease: 'ease.SinIn',
+                        alpha: { from: 1, to: 0 },
+                        scale: { from: 0.75, to: 1.25 }
+                    });
                 });
-            });
+            }
             me._scene.time.delayedCall(1500, () => {
                 me._startRestart(Enums.GameResult.WIN);
             });
@@ -668,7 +670,7 @@ export default class Core {
             else {
                 const canFly = me._levelIndex != Config.FinalLevelIndex
                     ? !me._player.useFly
-                    : !me._player.useFly && me._player.toGameObject().x >= 2000;
+                    : !me._player.useFly && me._player.toGameObject().x >= 2500;
 
                 if (canFly) {
                     me._she.startFly(() => me._player.startFly());
@@ -713,6 +715,9 @@ export default class Core {
 
         me._player.disablePhysics();
         me._player._sprite.stop().setFrame(3).setFlipX(false);
+
+        me._player.toGameObject().setPosition(2900, 1200);
+        me._she.toGameObject().setPosition(2900, 1100);
 
         const playerTrgt = 1500;
         me._scene.add.tween({
