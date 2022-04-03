@@ -67,6 +67,9 @@ export default class Core {
     /** @type {Boolean} */
     _isRestarting;
 
+    /** @type {Phaser.GameObjects.Text} */
+    _hud;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -158,6 +161,16 @@ export default class Core {
             .setVisible(false);
 
         me._isRestarting = false;
+
+        me._hud = scene.add.text(985, 755, `0/${config.targets.length}`, { 
+            fontFamily: 'Arial Black',
+            fontSize: 74,
+            color: '#FFE8FF'})
+            .setOrigin(1, 0.5)
+            .setStroke('#684976', 16)
+            .setShadow(2, 2, '#333333', 2)
+            .setScrollFactor(0)
+            .setDepth(Consts.Depth.Foreground);
 
         // phaser
 
@@ -252,9 +265,19 @@ export default class Core {
     _checkTargets(player) {
         const me = this;
 
+        let changed = false;
         for (let i = 0; i < me._targets.length; ++i) {
-            me._targets[i].checkComplete(player);
+            const success = me._targets[i].checkComplete(player);
+
+            if (success)
+                changed = true;
         }
+
+        if (!changed)
+            return;
+
+        const completed = me._targets.filter((t) => t.isCompleted).length;
+        me._hud.setText(`${completed}/${me._targets.length}`);
     }
 
     _checkDeath(player) {
