@@ -73,6 +73,9 @@ export default class Core {
     /** @type {Phaser.GameObjects.Sprite} */
     _restartButton;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    _exitButton;
+
     /** @type {Boolean} */
     _isDeath;
 
@@ -221,6 +224,14 @@ export default class Core {
             .on('pointerdown', () => { me._startRestart(Enums.GameResult.RESTART); })
             .on('pointermove', () => { me._restartButton.setFrame(1) })
             .on('pointerout', () => { me._restartButton.setFrame(0) });
+
+        me._exitButton = scene.add.sprite(155, 55, 'buttons', 4)
+            .setInteractive()
+            .setScrollFactor(0)
+            .setDepth(Consts.Depth.Foreground)
+            .on('pointerdown', () => { me._startRestart(Enums.GameResult.EXIT); })
+            .on('pointermove', () => { me._exitButton.setFrame(5) })
+            .on('pointerout', () => { me._exitButton.setFrame(4) });
 
         const startText = scene.add.text(-500, 300, `Level ${levelIndex + 1}/${Config.Levels.length}`, { 
             fontFamily: 'Arial Black',
@@ -480,7 +491,7 @@ export default class Core {
         me._isRestarting = true;
 
         me._scene.sound.stopAll();
-        if (result == Enums.GameResult.RESTART)
+        if (result == Enums.GameResult.RESTART || result == Enums.GameResult.EXIT)
             me._scene.sound.play('restart', { volume: 0.5 });
 
         me._player.disablePhysics();
@@ -492,9 +503,12 @@ export default class Core {
             ease: 'Sine.easeInOut',
             duration: 1000,
             onComplete: () => {
-                me._scene.scene.start(
-                    'game', 
-                    { level: result == Enums.GameResult.WIN ? me._levelIndex + 1 : me._levelIndex });
+                if (result != Enums.GameResult.EXIT)
+                    me._scene.scene.start(
+                        'game', 
+                        { level: result == Enums.GameResult.WIN ? me._levelIndex + 1 : me._levelIndex });
+                else
+                    me._scene.scene.start('start');
             }
         })
     }

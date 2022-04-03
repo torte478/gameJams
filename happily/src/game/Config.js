@@ -7,7 +7,7 @@ export default class Config {
         Text: true,
         Log: true,
         Music: false,
-        LevelIndex: true
+        LevelIndex: false
     };
 
     static LevelIndex = 5;
