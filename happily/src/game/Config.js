@@ -25,7 +25,7 @@ export default class Config {
                 // { x: 725, y: 550, angle: 180 },
             ],
             targets: [
-                { x: 375, y: 713, type: Enums.TargetType.SINK }
+                { x: 375, y: 713, type: Enums.TargetType.IRON }
             ]
         }
     ]

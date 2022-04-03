@@ -183,6 +183,36 @@ export default class Core {
             .on('pointermove', () => { me._restartButton.setFrame(1) })
             .on('pointerout', () => { me._restartButton.setFrame(0) });
 
+        const startText = scene.add.text(-500, 300, `Level ${levelIndex + 1}/8`, { 
+            fontFamily: 'Arial Black',
+            fontSize: 84,
+            color: '#FFE8FF'})
+            .setStroke('#684976', 16)
+            .setShadow(2, 2, '#333333', 2)
+            .setScrollFactor(0)
+            .setDepth(Consts.Depth.Foreground);
+        scene.tweens.timeline({
+            targets: startText,
+            onComplete: () => { startText.setVisible(false)},
+            tweens: [
+                {
+                    x: 200,
+                    ease: 'ease.SineOut',
+                    duration: 500
+                },
+                {
+                    x: 500,
+                    ease: 'ease.SineInOut',
+                    duration: 1000
+                },
+                {
+                    x: 1500,
+                    ease: 'ease.SineIn',
+                    duration: 500
+                }
+            ]
+        });
+
         // phaser
 
         scene.cameras.main
