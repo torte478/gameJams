@@ -1,7 +1,6 @@
 import Phaser from '../../lib/phaser.js';
 
 import Buttons from './Buttons.js';
-import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Groups from './Groups.js';
@@ -78,6 +77,15 @@ export default class Player {
         --me._money[index].count;
         me._money[index].image.setVisible(
             me._money[index].count > 0);
+    }
+
+    addBills(bills) {
+        const me = this;
+
+        for (let i = 0; i < bills.length; ++i) {
+            me._money[i].count += bills[i];
+            me._money[i].image.setVisible(me._money[i].count > 0);
+        }
     }
 
     /**
