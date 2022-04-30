@@ -19,3 +19,10 @@ Game: not finished
 Submission for https://itch.io/jam/brackeys-7
 
 20.02.22 - 27.02.22
+
+## Love, wings & flamethrowers
+Game: not finished
+
+Submission for https://ldjam.com/events/ludum-dare/50
+
+02.04.22 - 04.04.22
