@@ -1,5 +1,7 @@
 export default class Config {
 
-    static Debug = true;
-    static DebugLog = true;
+    static Debug = {
+        Global: true,
+        Log: true
+    };
 }
