@@ -57,7 +57,7 @@ export default class HUD {
         me._playerItems = [];
         const start = -360;
         const offset = 100;
-        for (let i = 0; i < Config.Start.PlayerCount; ++i) {
+        for (let i = 0; i < Config.PlayerCount; ++i) {
             content.push(factory.image(-60, start + i * offset + 10, 'pieces', i*2).setScale(0.75));
             me._playerItems.push({
                 hand: factory.text(85, start + i * offset - 25, '12', Consts.TextStyle.HudMoney).setOrigin(1, 0),
@@ -84,7 +84,7 @@ export default class HUD {
             .setDepth(Consts.Depth.HUD);
 
         me._state = Enums.HudState.HIDDEN;
-        me.select(Config.Start.Player);
+        me.select(Config.StartPlayer);
     }
 
     show() {

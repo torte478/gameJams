@@ -1,9 +1,9 @@
 import Phaser from '../lib/phaser.js';
 
-import Config from '../game/Config.js';
+import Animation from '../game/Animation.js';
 import Consts from '../game/Consts.js';
 import Core from '../game/Core.js';
-import Start from '../game/Start.js';
+import Startup from '../game/Startup.js';
 import Utils from '../game/Utils.js';
 
 export default class Game extends Phaser.Scene {
@@ -42,9 +42,9 @@ export default class Game extends Phaser.Scene {
     create() {
         const me = this;
 
-        me._createAnimation();
+        Animation.init(me);
 
-        me._core = Start.Init(me);
+        me._core = Startup.init(me);
 
         me.input.on('pointerdown', me._onPointerDown, me);
         me.input.on('pointermove', me._onPointerMove, me);
@@ -61,23 +61,9 @@ export default class Game extends Phaser.Scene {
     _onKeyDown(event) {
         const me = this;
 
-        if (Config.Debug.Global) {
-            
-            if (event.key == 'r') {
-                me.input.mouse.releasePointerLock();
-                me.scene.start('game');
-            }
-
-            if (isNaN(event.key))
-                return;
-
-            me._core.debugDropDices(+event.key);
-        }
+        me._core.onKeyDown(event);
     }
 
-    /**
-     * @param {Phaser.Input.Pointer} pointer 
-     */
     _onPointerDown(pointer) {
         const me = this;
 
@@ -94,23 +80,5 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         me._core.onPointerMove(pointer);
-    }
-
-    _createAnimation() {
-        const me = this;
-
-        me.anims.create({
-            key: 'first_dice_roll',
-            frames: me.anims.generateFrameNames('dice', { frames: [ 7, 8, 9, 10, 11, 12, 13, 14 ]}),
-            frameRate: 24,
-            repeat: -1
-        });
-
-        me.anims.create({
-            key: 'second_dice_roll',
-            frames: me.anims.generateFrameNames('dice', { frames: [ 10, 11, 12, 13, 14, 7, 8, 9 ]}),
-            frameRate: 25,
-            repeat: -1
-        });
     }
 }

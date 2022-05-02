@@ -50,12 +50,12 @@ export default class Status {
 
         me.pieceIndicies = pieceIndicies;
 
-        if (startPlayer >= Config.Start.PlayerCount)
-            throw `Player index ${startPlayer} >= total player count ${Config.Start.PlayerCount}`;
+        if (startPlayer >= Config.PlayerCount)
+            throw `Player index ${startPlayer} >= total player count ${Config.PlayerCount}`;
         me.player = startPlayer;
 
         me.activePlayers = [];
-        for (let i = 0; i < Config.Start.PlayerCount; ++i)
+        for (let i = 0; i < Config.PlayerCount; ++i)
             me.activePlayers.push(i);
         
         me.targetPieceIndex = me.pieceIndicies[me.player];
@@ -126,7 +126,7 @@ export default class Status {
 
         let result = me.player;
         do {
-            result = (result + 1) % Config.Start.PlayerCount;
+            result = (result + 1) % Config.PlayerCount;
         } while (Utils.all(me.activePlayers, (p) => p != result));
 
         return result;

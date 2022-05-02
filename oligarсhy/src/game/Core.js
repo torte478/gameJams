@@ -70,15 +70,17 @@ export default class Core {
         if (me._checkPause())
             return;
 
-        if (me._context.status.state != Enums.GameState.DARK) {
-            if (me._lightTimer.check()) 
-                return me._startDark();
+        me._updateLightGame(delta);
 
-            me._updateLightGame(delta);
-        } else {
-            if (me._darkTimer.check())
-                return me._stopDark();
-        }
+        // if (me._context.status.state != Enums.GameState.DARK) {
+        //     if (me._lightTimer.check()) 
+        //         return me._startDark();
+
+        //     me._updateLightGame(delta);
+        // } else {
+        //     if (me._darkTimer.check())
+        //         return me._stopDark();
+        // }
     }
 
     onPointerMove(pointer) {
@@ -131,7 +133,24 @@ export default class Core {
             me._hud.hide();
     }
 
-    debugDropDices(value) {
+    onKeyDown(event) {
+        const me = this;
+
+        if (!Config.Debug.Global)
+            return;
+            
+        if (event.key == 'r') {
+            scene.input.mouse.releasePointerLock();
+            scene.start('game');
+        }
+
+        if (isNaN(event.key))
+            return;
+
+        me._debugDropDices(+event.key);
+    }
+
+    _debugDropDices(value) {
         const me = this;
 
         if (me._context.status.state == Enums.GameState.BEGIN) {
@@ -553,7 +572,7 @@ export default class Core {
         me._context.status.targetPieceIndex = (current + first + second) % Consts.FieldCount;
         me._context.status.diceResult = first + second;
 
-        for (let i = 0; i < Config.Start.PlayerCount; ++i)
+        for (let i = 0; i < Config.PlayerCount; ++i)
             me._updateRent(i);
 
         me._setState(Enums.GameState.DICES_DROPED);

@@ -21,7 +21,12 @@ import Context from './Entities/Context.js';
 import Core from './Core.js';
 
 export default class Start {
-    static Init(scene) {
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @returns 
+     */
+    static init(scene) {
 
         const core = new Core(scene);
 
@@ -31,8 +36,8 @@ export default class Start {
 
         scene.cameras.main
             .setScroll(
-                Config.Start.CameraPosition.x - Consts.Viewport.Width / 2,
-                Config.Start.CameraPosition.y - Consts.Viewport.Height / 2)
+                Config.CameraPosition.x - Consts.Viewport.Width / 2,
+                Config.CameraPosition.y - Consts.Viewport.Height / 2)
             .setBounds(
                 scene.physics.world.bounds.x,
                 scene.physics.world.bounds.y,
@@ -47,21 +52,21 @@ export default class Start {
         core._groups = new Groups(scene);
         core._cards = new Cards(scene);
         core._hud = new HUD(scene.add);
-        core._turnTimer = new Timer(Config.Start.Time.TurnSec * 1000, false);
-        core._lightTimer = new Timer(Config.Start.Time.LightSec * 1000, false);
-        core._darkTimer = new Timer(Config.Start.Time.DarkSec * 1000, true);
+        core._turnTimer = new Timer(Config.Time.TurnSec * 1000, false);
+        core._lightTimer = new Timer(Config.Time.LightSec * 1000, false);
+        core._darkTimer = new Timer(Config.Time.DarkSec * 1000, true);
         core._fade = Start._createFade(scene);
 
         // context
 
         const context = new Context();
 
-        context.status = new Status(Config.Start.PiecePositions, Config.Start.Player, Config.Start.State);
-        context.fields = new Fields(scene, Config.Start.PiecePositions);
+        context.status = new Status(Config.StartPiecePositions, Config.StartPlayer, Config.StartState);
+        context.fields = new Fields(scene, Config.StartPiecePositions);
 
         context.pieces = [];
-        for (let player = 0; player < Config.Start.PlayerCount; ++player) {
-            const position = context.fields.movePiece(player, 0, Config.Start.PiecePositions[player]);
+        for (let player = 0; player < Config.PlayerCount; ++player) {
+            const position = context.fields.movePiece(player, 0, Config.StartPiecePositions[player]);
             const piece = new Piece(scene, position.x, position.y, player);
             context.pieces.push(piece);
         }
@@ -75,12 +80,12 @@ export default class Start {
             6);
 
         context.hands = [];
-        for (let i = 0; i < Config.Start.PlayerCount; ++i)
+        for (let i = 0; i < Config.PlayerCount; ++i)
             context.hands.push(new Hand(scene, i));
 
         context.players = [];
-        for (let i = 0; i < Config.Start.PlayerCount; ++ i) {
-            const player = new Player(scene, i, Config.Start.Money, core._groups);
+        for (let i = 0; i < Config.PlayerCount; ++ i) {
+            const player = new Player(scene, i, Config.Money, core._groups);
             context.players.push(player);
         }
 
@@ -89,10 +94,10 @@ export default class Start {
 
         // init
 
-        for (let i = 0; i < Config.Start.PlayerCount; ++i)
+        for (let i = 0; i < Config.PlayerCount; ++i)
             Start._initPlayer(i, core, context);
 
-        core._setState(Config.Start.State);
+        core._setState(Config.StartState);
 
         // colliders
 
@@ -113,8 +118,8 @@ export default class Start {
 
     static _createCursor(scene) {
         return scene.physics.add.image(
-            Config.Start.CameraPosition.x, 
-            Config.Start.CameraPosition.y, 
+            Config.CameraPosition.x, 
+            Config.CameraPosition.y, 
             'cursor')
             .setDepth(Consts.Depth.Max)
             .setVisible(false)
@@ -161,8 +166,8 @@ export default class Start {
 
     static _initPlayer(player, core, context) {
         // start fields
-        for (let i = 0; i < Config.Start.Fields[player].length; ++i) {
-            const field = Config.Start.Fields[player][i];
+        for (let i = 0; i < Config.Fields[player].length; ++i) {
+            const field = Config.Fields[player][i];
             const index = isNaN(field) ? field.index : index;
             core._buyField(index, player, true);
 
@@ -176,7 +181,7 @@ export default class Start {
         }
 
         //start rent
-        if (Config.Start.Fields[player].length > 0)
+        if (Config.Fields[player].length > 0)
             core._updateRent(player);
 
         // hud

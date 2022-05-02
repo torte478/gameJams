@@ -49,7 +49,6 @@ export default class Consts {
     };
 
     static FieldCount = 40;
-    static  BillCount = 7;
 
     static PiecePosition = {
         Usual: [
@@ -80,6 +79,8 @@ export default class Consts {
             { x: 65, y: 15}
         ]
     };
+
+    static BillCount = 7;
 
     static BillValue = [
         1,
