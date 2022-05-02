@@ -110,4 +110,11 @@ export default class Enums {
         MERGE_MONEY: 3,
         BUY_HOUSE: 4,
     }
+
+    static TimerIndex = {
+        UNKNOWN: -1,
+        TURN: 0,
+        LIGHT: 1,
+        DARK: 2
+    }
 }

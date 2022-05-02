@@ -52,9 +52,13 @@ export default class Start {
         core._groups = new Groups(scene);
         core._cards = new Cards(scene);
         core._hud = new HUD(scene.add);
-        core._turnTimer = new Timer(Config.Time.TurnSec * 1000, false);
-        core._lightTimer = new Timer(Config.Time.LightSec * 1000, false);
-        core._darkTimer = new Timer(Config.Time.DarkSec * 1000, true);
+
+        core._timers = [
+            new Timer(Config.Time.TurnSec * 1000, false),
+            new Timer(Config.Time.LightSec * 1000, false),
+            new Timer(Config.Time.DarkSec * 1000, true)
+        ];
+
         core._fade = Start._createFade(scene);
 
         // context

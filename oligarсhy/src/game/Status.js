@@ -11,7 +11,7 @@ export default class Status {
     state;
 
     /** @type {Number} */
-    targetPieceIndex;
+    targetFieldIndex;
 
     /**@type {Number} */
     player;
@@ -58,7 +58,7 @@ export default class Status {
         for (let i = 0; i < Config.PlayerCount; ++i)
             me.activePlayers.push(i);
         
-        me.targetPieceIndex = me.pieceIndicies[me.player];
+        me.targetFieldIndex = me.pieceIndicies[me.player];
 
         me.reset();
 
@@ -87,7 +87,7 @@ export default class Status {
     reset() {
         const me = this;
 
-        me.targetPieceIndex = null;
+        me.targetFieldIndex = null;
         me.selectedField = null;
         me.stateToReturn = null;
         me.buyHouseOnCurrentTurn = false;

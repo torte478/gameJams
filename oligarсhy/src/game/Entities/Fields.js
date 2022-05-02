@@ -25,6 +25,7 @@ export default class Fields {
     }
 
     /**
+     * TODO : wtf ?
      * @param {Number} player
      * @param {Number} from
      * @param {Phaser.Geom.Point} point 

@@ -129,7 +129,7 @@ export default class Hand {
         }
     }
     
-    dropMoney() {
+    dropBills() {
         const me = this;
 
         if (me._state != Enums.HandState.MONEY)
@@ -144,6 +144,13 @@ export default class Hand {
         me._state = Enums.HandState.EMPTY;
 
         return result;
+    }
+
+    dropMoney() {
+        const me = this;
+
+        const bills = me.dropBills();
+        return Helper.getTotalMoney(bills);
     }
 
     getTotalMoney() {
