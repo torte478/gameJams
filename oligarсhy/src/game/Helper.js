@@ -1,4 +1,5 @@
 import Consts from "./Consts.js";
+import Enums from "./Enums.js";
 import Utils from "./Utils.js";
 
 export default class Helper {
@@ -69,7 +70,7 @@ export default class Helper {
      * @param {Number[]} money 
      * @returns {Number[]}
      */
-    static splitBillToBills(money) {
+    static splitBillToMany(money) {
         let totalCount = 0;
         money.forEach((x) => totalCount += x);
         if (totalCount != 1)
@@ -151,5 +152,19 @@ export default class Helper {
         }
 
         return result;
+    }
+
+    /**
+     * @param {Number[]} bills 
+     * @param {Number} action 
+     * @returns {Number[]}
+     */
+    static manageBills(bills, action) {
+        if (action == Enums.ActionType.MERGE_MONEY)
+            return Helper.mergeBills(bills);
+        else if (action == Enums.ActionType.SPLIT_MONEY)
+            return Helper.splitBillToMany(bills);
+        else 
+            throw `Unknown money management type ${Utils.enumToString(Enums.ActionType, action)}`;
     }
 }

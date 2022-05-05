@@ -159,7 +159,7 @@ export default class Hand {
         return Helper.getTotalMoney(me._money);
     }
 
-    getMoneyAction() {
+    getAvailableMoneyAction() {
         const me = this;
 
         let billCount = 0;

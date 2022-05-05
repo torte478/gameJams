@@ -152,11 +152,34 @@ export default class Utils {
     }
 
     /**
+     * @param {Boolean} flag 
+     * @param {Function} func 
+     * @returns {Boolean}
+     */
+    static ifDebug(flag, func) {
+        if (Utils.isDebug(flag))
+            return func();
+
+        return false;
+    }
+
+    // TODO: refactir is/if Debug everywhere
+
+    /**
+     * @param {Boolean} flag 
+     * @returns {Boolean}
+     */
+    static isDebug(flag) {
+        return Config.Debug.Global && flag;
+    }
+
+    /**
      * @param {String} msg 
      */
     static debugLog(msg) {
-        if (Config.Debug.Global && Config.Debug.Log)
+        Utils.ifDebug(Config.Debug.Log, () => {
             console.log(msg);
+        })  
     }
 
     /**
@@ -166,7 +189,7 @@ export default class Utils {
      * @returns {Number}
      */
     static getRandom(from, to, debug) {
-        return debug !== undefined && Config.Debug.Global && Config.Debug.Random
+        return debug !== undefined && Utils.isDebug(Config.Debug.Random)
             ? debug
             : Phaser.Math.Between(from, to);
     }
@@ -244,6 +267,32 @@ export default class Utils {
     }
 
     /**
+     * TODO: add everywhere
+     * @param {Phaser.Scene} scene 
+     * @param {Phaser.GameObjects.GameObject} obj
+     * @param {Phaser.Geom.Point} target
+     * @param {Number} speed
+     * @param {Function} callback
+     * @returns {Phaser.Tweens.Tween}
+     */
+    static startMovementTween(scene, obj, target, speed, callback) {
+        return scene.tweens.add({
+            targets: obj,
+            x: target.x,
+            y: target.y,
+            ease: 'Sine.easeInOut',
+            duration: Utils.getTweenDuration(
+                Utils.toPoint(obj),
+                target,
+                speed),
+            onComplete: () => {
+                if (!!callback)
+                    callback();
+            }
+        });
+    }
+
+    /**
      * @param {Array} source 
      * @returns {Array}
      */
@@ -254,5 +303,13 @@ export default class Utils {
             result.push(source[i]);
 
         return result;
+    }
+
+    /**
+     * @param {String} s 
+     * @returns {Boolean}
+     */
+    static stringIsDigit(s) {
+        return !(isNaN(s));
     }
 }

@@ -87,42 +87,15 @@ export default class HUD {
         me.select(Config.StartPlayer);
     }
 
-    show() {
+    /**
+     * @param {Boolean} show 
+     */
+    updateVisibility(show) {
         const me = this;
 
-        if (me._state != Enums.HudState.HIDDEN)
-            return;
-
-        me._state = Enums.HudState.MOVING;
-
-        me._factory.tween({
-            targets: me._container,
-            x: Consts.Sizes.HUD.Width / 2,
-            duration: 500,
-            ease: 'Sine.easeOut',
-            onComplete: () => {
-                me._state = Enums.HudState.VISIBLE;
-            }
-        });
-    }
-
-    hide() {
-        const me = this;
-
-        if (me._state != Enums.HudState.VISIBLE)
-            return;
-
-        me._state = Enums.HudState.MOVING;
-
-        me._factory.tween({
-            targets: me._container,
-            x: Consts.Sizes.HUD.Width / -2 ,
-            duration: 500,
-            ease: 'Sine.easeIn',
-            onComplete: () => {
-                me._state = Enums.HudState.HIDDEN;
-            }
-        });
+        show
+            ? me._show()
+            : me._hide();
     }
 
     showField(index) {
@@ -220,6 +193,44 @@ export default class HUD {
                 Utils.toPoint(me._selection),
                 target,
                 Consts.Speed.HandFollow)
+        });
+    }
+
+    _show() {
+        const me = this;
+
+        if (me._state != Enums.HudState.HIDDEN)
+            return;
+
+        me._state = Enums.HudState.MOVING;
+
+        me._factory.tween({
+            targets: me._container,
+            x: Consts.Sizes.HUD.Width / 2,
+            duration: 500,
+            ease: 'Sine.easeOut',
+            onComplete: () => {
+                me._state = Enums.HudState.VISIBLE;
+            }
+        });
+    }
+
+    _hide() {
+        const me = this;
+
+        if (me._state != Enums.HudState.VISIBLE)
+            return;
+
+        me._state = Enums.HudState.MOVING;
+
+        me._factory.tween({
+            targets: me._container,
+            x: Consts.Sizes.HUD.Width / -2 ,
+            duration: 500,
+            ease: 'Sine.easeIn',
+            onComplete: () => {
+                me._state = Enums.HudState.HIDDEN;
+            }
         });
     }
 

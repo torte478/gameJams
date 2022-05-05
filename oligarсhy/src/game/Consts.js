@@ -110,7 +110,7 @@ export default class Consts {
     ];
 
     static States = {
-        SellField: [
+        Sell: [
             Enums.GameState.PIECE_ON_FREE_FIELD,
             Enums.GameState.PIECE_ON_ENEMY_FIELD,
             Enums.GameState.FINAL

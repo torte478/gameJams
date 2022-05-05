@@ -121,15 +121,19 @@ export default class Status {
         return diff;
     }
 
-    getNextPlayerIndex() {
+    /**
+     * @returns {Number}
+     */
+    setNextPlayerIndex() {
         const me = this;
 
-        let result = me.player;
+        let next = me.player;
         do {
-            result = (result + 1) % Config.PlayerCount;
-        } while (Utils.all(me.activePlayers, (p) => p != result));
+            next = (next + 1) % Config.PlayerCount;
+        } while (Utils.all(me.activePlayers, (p) => p != next));
 
-        return result;
+        me.player = next;
+        return next;
     }
 
     isBuyHouseAvailable() {
@@ -138,5 +142,22 @@ export default class Status {
         return !me.buyHouseOnCurrentTurn 
             && (me.state == Enums.GameState.FINAL
                 || me.state == Enums.GameState.PIECE_ON_FREE_FIELD);
+    }
+
+    /**
+     * @returns {Number}
+     */
+    killCurrentPlayer() {
+        const me = this;
+
+        if (me.player == Enums.Player.HUMAN)
+            return Enums.PlayerDeathResult.LOSS;
+
+        me.activePlayers = me.activePlayers.filter(
+            (p) => p != me.player);
+
+        return me.activePlayers.length === 1
+            ? Enums.PlayerDeathResult.WIN
+            : Enums.PlayerDeathResult.CONTINUE;
     }
 }
