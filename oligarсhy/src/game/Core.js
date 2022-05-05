@@ -5,7 +5,6 @@ import Context from './Entities/Context.js';
 import Cards from './Entities/Cards.js';
 import Groups from './Entities/Groups.js'; 
 import HUD from './Entities/HUD.js';
-import Player from './Entities/Player.js';
 import Timer from './Entities/Timer.js';
 
 import State from './StateMachine/State.js';
@@ -653,6 +652,7 @@ export default class Core {
     _updateGame(delta) {
         const me = this;
 
+        // TODO : split to Dark and Light state (pattern)
         if (me._context.status.state === Enums.GameState.DARK) {
             if (me._timers[Enums.TimerIndex.DARK].check())
                 return me._stopDark();

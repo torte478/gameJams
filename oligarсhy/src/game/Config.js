@@ -30,8 +30,6 @@ export default class Config {
 
     static StartPlayer = Enums.Player.HUMAN;
 
-    static StartState = Enums.GameState.BEGIN;
-
     static Money = [5, 1, 2, 1, 1, 4, 2 ];
 
     // static Money = [ 0, 0, 0, 0, 0, 0, 0 ];

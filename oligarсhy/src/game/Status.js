@@ -43,9 +43,8 @@ export default class Status {
     /**
      * @param {Number[]} pieceIndicies 
      * @param {Number} player
-     * @param {Number} startState
      */
-    constructor(pieceIndicies, startPlayer, startState) {
+    constructor(pieceIndicies, startPlayer) {
         const me = this;
 
         me.pieceIndicies = pieceIndicies;
@@ -75,7 +74,7 @@ export default class Status {
     setState(value) {
         const me = this;
 
-        if (Config.Debug.Global && Config.Debug.StateLog)
+        if (Utils.isDebug(Config.Debug.StateLog))
             Utils.debugLog(
                 `(${me.player + 1}): `
                 + `${Utils.enumToString(Enums.GameState, me.state)} => `

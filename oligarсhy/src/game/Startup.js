@@ -1,30 +1,28 @@
 import Phaser from '../lib/phaser.js';
 
-import Player from './Entities/Player.js';
-import Fields from './Entities/Fields.js';
+import AI from './Entities/AI.js';
 import Cards from './Entities/Cards.js';
-import Groups from './Entities/Groups.js'; 
+import Context from './Entities/Context.js';
+import Dice from './Entities/Dice.js';
+import Fields from './Entities/Fields.js';
+import Groups from './Entities/Groups.js';
 import Hand from './Entities/Hand.js';
 import HUD from './Entities/HUD.js';
+import Piece from './Entities/Piece.js';
+import Player from './Entities/Player.js';
+import Timer from './Entities/Timer.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
-import Enums from './Enums.js';
+import Core from './Core.js';
 import Status from './Status.js';
 import Utils from './Utils.js';
-import Helper from './Helper.js';
-import Timer from './Entities/Timer.js';
-import Dice from './Entities/Dice.js';
-import Piece from './Entities/Piece.js';
-import AI from './Entities/AI.js';
-import Context from './Entities/Context.js';
-import Core from './Core.js';
 
 export default class Start {
 
     /**
      * @param {Phaser.Scene} scene 
-     * @returns 
+     * @returns {Core}
      */
     static init(scene) {
 
@@ -44,10 +42,10 @@ export default class Start {
                 scene.physics.world.bounds.width,
                 scene.physics.world.bounds.height);
 
-        // core
+        Start._createTiles(scene);
 
+        // core
         core._scene = scene;
-        Start._createLevel(scene);
         core._cursor = Start._createCursor(scene);
         core._groups = new Groups(scene);
         core._cards = new Cards(scene);
@@ -65,7 +63,7 @@ export default class Start {
 
         const context = new Context();
 
-        context.status = new Status(Config.StartPiecePositions, Config.StartPlayer, Config.StartState);
+        context.status = new Status(Config.StartPiecePositions, Config.StartPlayer);
         context.fields = new Fields(scene, Config.StartPiecePositions);
 
         context.pieces = [];
@@ -105,11 +103,13 @@ export default class Start {
 
         // colliders
 
-        scene.physics.add.collider(core._context.dice1.toGameObject(), core._context.dice2.toGameObject());
+        scene.physics.add.collider(
+            core._context.dice1.toGameObject(), 
+            core._context.dice2.toGameObject());
 
         // Debug
 
-        if (Config.Debug.Global && Config.Debug.ShowTextLog) {
+        if (Utils.isDebug(Config.Debug.ShowTextLog)) {
             core._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
@@ -130,7 +130,7 @@ export default class Start {
             .setCollideWorldBounds(true);
     }
 
-    static _createLevel(scene) {
+    static _createTiles(scene) {
         const level = [
             [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
             [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -147,7 +147,7 @@ export default class Start {
 
         const map = scene.make.tilemap({ data: level, tileWidth: 500, tileHeight: 500 });
         const tiles = map.addTilesetImage('table');
-        const layer = map.createLayer(0, tiles, -2750, -2750);
+        map.createLayer(0, tiles, -2750, -2750);
     }
 
     static _createFade(scene) {
