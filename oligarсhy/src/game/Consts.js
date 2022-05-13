@@ -158,6 +158,8 @@ export default class Consts {
 
     static MaxHandBillCount = 10;
 
+    static ButtonSelectionColor = 0xd4d6e1;
+
     static FieldTextColor = '#232429';
     static Font = 'Arial';
 

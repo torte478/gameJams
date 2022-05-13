@@ -715,7 +715,7 @@ export default class Core {
 
         let fieldIndex = me._context.fields.getFieldIndex(point);
         if (fieldIndex == null)
-            fieldIndex = me._cards.getFieldIndex(point);
+            fieldIndex = me._cards.findFieldIndex(point);
 
         return fieldIndex;
     }

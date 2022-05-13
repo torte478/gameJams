@@ -15,10 +15,13 @@ export default class Dice {
     _container;
 
     /** @type {Phaser.Tweens.Tween} */
-    _tween;
+    _selectTween;
 
     /**
      * @param {Phaser.Scene} scene 
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {Number} frame 
      */
     constructor(scene, x, y, frame) {
         const me = this;
@@ -28,46 +31,47 @@ export default class Dice {
 
         me._sprite = scene.add.sprite(0, 0, 'dice', frame);
 
-        me._container = scene.add.container(x, y, 
-            [
-                me._selection,
-                me._sprite
-            ])
-            .setDepth(Consts.Depth.Pieces);
+        me._container = me._buildContainer(scene, x, y, [ me._sprite, me._selection ]);
 
-        scene.physics.world.enable(me._container);
-
-        me._container
-            .body
-            .setBounce(1, 1)
-            .setCollideWorldBounds(true)
-            .setBoundsRectangle(new Phaser.Geom.Rectangle(-700, -700, 1400, 1400));
-
-        me._tween = scene.tweens.add({
+        me._selectTween = scene.tweens.add({
             targets: me._selection,
             scale: { from: 1.25, to: 0.9 },
             duration: Consts.Speed.Selection,
             yoyo: true,
             repeat: -1
-        });
-        me._tween.pause();
+        }).pause();
     }
 
+    /**
+     * @returns {Phaser.GameObjects.Container}
+     */
     toGameObject() {
         const me = this;
 
         return me._container;
     }
 
-    play(anim) {
+    /**
+     * @param {String} anim 
+     */
+    startRoll(anim) {
         const me = this;
 
         me._sprite.play(anim);
-
-        return me;
+                            
+        me._container.body
+            .setVelocity(
+                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0),
+                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0))
+            .setAngularVelocity(
+                Utils.getRandom(-Consts.DicePhysics.Angle, -Consts.DicePhysics.Angle, 10))
     }
 
-    stop(frame) {
+    /**
+     * @param {Number} frame 
+     * @returns {Dice}
+     */
+    stopRoll(frame) {
         const me = this;
 
         me._sprite
@@ -81,30 +85,36 @@ export default class Dice {
         return me;
     }
 
-    roll(anim) {
-        const me = this;
-
-        me._sprite.play(anim);
-                            
-        me._container.body
-            .setVelocity(
-                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0),
-                Utils.getRandom(-Consts.DicePhysics.Speed, Consts.DicePhysics.Speed, 0))
-            .setAngularVelocity(
-                Utils.getRandom(-Consts.DicePhysics.Angle, -Consts.DicePhysics.Angle, 10))
-    }
-
+    /**
+     */
     select() {
         const me = this;
 
         me._selection.setVisible(true);
-        me._tween.resume();
+        me._selectTween.resume();
     }
 
+    /**
+     */
     unselect() {
         const me = this;
 
         me._selection.setVisible(false);
-        me._tween.pause();
+        me._selectTween.pause();
+    }
+
+    _buildContainer(scene, x, y, content) {
+        const container = scene.add.container(x, y, content)
+            .setDepth(Consts.Depth.Pieces);
+
+        scene.physics.world.enable(container);
+
+        container
+            .body
+            .setBounce(1, 1)
+            .setCollideWorldBounds(true)
+            .setBoundsRectangle(new Phaser.Geom.Rectangle(-700, -700, 1400, 1400));
+        
+        return container;
     }
 }

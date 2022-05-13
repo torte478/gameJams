@@ -1,6 +1,5 @@
 import Phaser from "../../lib/phaser.js";
 
-import Config from "../Config.js";
 import Consts from "../Consts.js";
 import Enums from "../Enums.js";
 import Helper from "../Helper.js";
@@ -10,7 +9,7 @@ import FieldInfo from '../FieldInfo.js';
 export default class Cards {
 
     /** @type {Phaser.Scene} */
-    _scene;
+    _scene; // TODO: remove there and everywhere
 
     /** @type {Object[]} */
     _cards;
@@ -22,24 +21,15 @@ export default class Cards {
         const me = this;
 
         me._scene = scene;
-
-        me._cards = [];
-        for (let i = 0; i < Consts.FieldCount; ++i) {
-            const config = FieldInfo.Config[i];
-
-            if (!Utils.contains(Consts.BuyableFieldTypes, config.type))
-                continue;
-
-            const card = {
-                index: i,
-                container: scene.add.container(0, 300, me._getContent(scene, config))
-                    .setVisible(false)
-                    .setDepth(Consts.Depth.Cards)
-            };
-            me._cards.push(card);
-        }
+        me._cards = me._initCards(scene);
     }
 
+    /**
+     * @param {Number} field 
+     * @param {Number} player 
+     * @param {Number[][]} grid 
+     * @param {Boolean} ignoreTween 
+     */
     buy(field, player, grid, ignoreTween) {
         const me = this;
 
@@ -52,9 +42,14 @@ export default class Cards {
             .setVisible(true)
             .setAngle(Helper.getAngle(player));
 
-        me._updateGrid(player, grid, field, true, ignoreTween);
+        me._updateGridForCard(player, grid, field, true, ignoreTween);
     }
 
+    /**
+     * @param {Number} field 
+     * @param {Number} player 
+     * @param {Number[][]} grid 
+     */
     sell(field, player, grid) {
         const me = this;
 
@@ -63,10 +58,14 @@ export default class Cards {
         if (!card.container.visible)
             throw `card ${field} already hidden`;
 
-        me._updateGrid(player, grid, field, false);
+        me._updateGridForCard(player, grid, field, false);
     }
 
-    getFieldIndex(point) {
+    /**
+     * @param {Phaser.Geom.Point} point 
+     * @returns {Number}
+     */
+    findFieldIndex(point) {
         const me = this;
 
         const card =  Utils.firstOrDefault(
@@ -74,89 +73,96 @@ export default class Cards {
             (c) => c.container.visible
                    && Phaser.Geom.Rectangle.ContainsPoint(
                         c.container.getBounds(),
-                        point))
+                        point));
 
         return card != null
             ? card.index
             : null;
     }
 
+    /**
+     * @param {Number[]} fields 
+     */
     sellAll(fields) {
         const me = this;
 
         for (let i = 0; i < fields.length; ++i)
-            me._sell(fields[i]);
+            me._sellCard(fields[i]);
     }
 
-    _updateGrid(player, grid, field, buy, ignoreTween) {
+    _updateGridForCard(player, grid, updated, buy, ignoreTween) {
         const me = this;
 
-        const startX = grid.length * 190 / -2;
+        var startX = grid.length * 190 / -2;
 
         for (let i = 0; i < grid.length; ++i) 
         for (let j = 0; j < grid[i].length; ++j) {
-            const item = Utils.single(me._cards, (c) => c.index == grid[i][j]);
+            const card = Utils.single(me._cards, (c) => c.index == grid[i][j]);
 
             const position = Helper.rotate(
                 Utils.buildPoint(
-                    startX + i * 190,    
-                    1600 + j * 220
+                    startX + column * 190,    
+                    1600 + row * 220
                 ),
                 player);
 
-            if (!!ignoreTween) {
-                item.container.setPosition(position.x, position.y);
-                continue;
-            }
+            if (ignoreTween)
+                return card.container.setPosition(position.x, position.y);
 
-            if (item.index != field) {
-                me._scene.tweens.add({
-                    targets: item.container,
-                    x: position.x,
-                    y: position.y,
-                    duration: Consts.Speed.CardShiftDuration,
-                    ease: 'Sine.easeInOut'
-                });
-            } else if (buy) {
-                item.container
-                    .setPosition(0, 0)
-                    .setAlpha(0);
+            if (card.index != updated)
+                return me._moveCard(card, position);
 
-                me._scene.tweens.add({
-                    targets: item.container,
-                    x: position.x,
-                    y: position.y,
-                    alpha: { from: 0, to: 1 },
-                    duration: Consts.Speed.CenterEntranceDuration,
-                    ease: 'Sine.easeInOut'
-                });
-            }
+            if (buy)
+                return me._buyCard(card, position);
+            else
+                return me._sellCard(card);
         }
-
-        if (!buy) 
-            me._sell(field);
     }
 
-    _sell(field) {
+    _buyCard(card, position) {
         const me = this;
 
-        const item = Utils.single(me._cards, (c) => c.index == field);
-        const point = Utils.buildPoint(0, 0);
+        card.container
+            .setPosition(0, 0)
+            .setAlpha(0);
 
         me._scene.tweens.add({
-            targets: item.container,
-            x: point.x,
-            y: point.y,
+            targets: card.container,
+            x: position.x,
+            y: position.y,
+            alpha: { from: 0, to: 1 },
+            duration: Consts.Speed.CenterEntranceDuration,
+            ease: 'Sine.easeInOut'
+        });
+    }
+
+    _moveCard(card, position) {
+        const me = this;
+
+        me._scene.tweens.add({
+            targets: card.container,
+            x: position.x,
+            y: position.y,
+            duration: Consts.Speed.CardShiftDuration,
+            ease: 'Sine.easeInOut'
+        });
+    }
+
+    _sellCard(card) {
+        const me = this;
+
+        me._scene.tweens.add({
+            targets: card.container,
+            x: 0,
+            y: 0,
             alpha: { from: 1, to: 0 },
             duration: Consts.Speed.CenterEntranceDuration,
             ease: 'Sine.easeInOut',
-            onComplete: () => { item.container.setVisible(false); }
+            onComplete: () => { card.container.setVisible(false); }
         });
     }
 
     _getContent(scene, config) {
-        const me = this;
-
         switch (config.type) {
             case Enums.FieldType.PROPERTY:
                 return [
@@ -183,5 +189,26 @@ export default class Cards {
             default: 
                 throw `wrong field type ${config.type}`;
         }
+    }
+
+    _initCards(scene) {
+        const cards = [];
+
+        for (let i = 0; i < Consts.FieldCount; ++i) {
+            const config = FieldInfo.Config[i];
+
+            if (!Utils.contains(Consts.BuyableFieldTypes, config.type))
+                continue;
+
+            const card = {
+                index: i,
+                container: scene.add.container(0, 300, me._getContent(scene, config))
+                    .setVisible(false)
+                    .setDepth(Consts.Depth.Cards)
+            };
+            cards.push(card);
+        }
+
+        return cards;
     }
 }

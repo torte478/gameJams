@@ -21,7 +21,7 @@ export default class Field {
     _selection;
 
     /** @type {Phaser.Tweens.Tween} */
-    _tween;
+    _selectionTween;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -39,7 +39,7 @@ export default class Field {
 
         me._selection = scene.add.image(0, 0, backgroundTexture, 2).setVisible(false);
 
-        me._tween = scene.tweens.add({
+        me._selectionTween = scene.tweens.add({
             targets: me._selection,
             scaleX: { from: 1.1, to: 1.25 },
             scaleY: { from: 1.2, to: 1.4 },
@@ -155,7 +155,7 @@ export default class Field {
             .setVisible(true)
             .setPosition(0, buyed ? 25 : 0);
 
-        me._tween.resume();
+        me._selectionTween.resume();
         me._container.setDepth(Consts.Depth.SelectedField);
     }
 
@@ -164,7 +164,7 @@ export default class Field {
 
         me._selection.setVisible(false);
         me._container.setDepth(Consts.Depth.Board);
-        me._tween.pause();
+        me._selectionTween.pause();
     }
 
      /**

@@ -51,6 +51,7 @@ export default class AI {
 
     resetState() {
         const me = this;
+    
         me._state.action = null;
         me._state.config = null;
         
@@ -61,7 +62,7 @@ export default class AI {
     canBuyField(index) {
         const me = this;
 
-        if (Config.Debug.Global && Config.Debug.CancelAiBuy)
+        if (Utils.isDebug(Config.Debug.CancelAiBuy))
             return false;
 
         return FieldInfo.Config[index].cost <= me._player.getBillsMoney();

@@ -95,7 +95,7 @@ export default class Player {
     canClickButton(point, type) {
         const me = this;
 
-        const result = me._buttons.checkClick(point);
+        const result = me._buttons.findVisibleIndex(point);
         if (result == null)
             return false;
 

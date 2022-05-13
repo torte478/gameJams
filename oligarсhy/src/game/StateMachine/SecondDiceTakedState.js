@@ -13,7 +13,7 @@ export default class SecondDiceTakedState extends State {
     /** 
      * @returns {Number}
      */
-     getName() {
+    getName() {
         return Enums.GameState.SECOND_DICE_TAKED;
     }
 
@@ -86,8 +86,8 @@ export default class SecondDiceTakedState extends State {
     _startDiceDrop() {
         const me = this;
 
-        me.core._context.dice1.roll('first_dice_roll');
-        me.core._context.dice2.roll('second_dice_roll');
+        me.core._context.dice1.startRoll('first_dice_roll');
+        me.core._context.dice2.startRoll('second_dice_roll');
 
         me.core._context.status.isBusy = true;
 
@@ -104,8 +104,8 @@ export default class SecondDiceTakedState extends State {
         const first = Utils.getRandom(1, 6, 1);
         const second = Utils.getRandom(1, 6, 0);
 
-        me.core._context.dice1.stop(first);
-        me.core._context.dice2.stop(second);
+        me.core._context.dice1.stopRoll(first);
+        me.core._context.dice2.stopRoll(second);
 
         Utils.debugLog(`${first} ${second} (${first + second})`);
 
