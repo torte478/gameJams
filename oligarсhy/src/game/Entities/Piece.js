@@ -5,12 +5,16 @@ import Enums from "../Enums.js";
 
 export default class Piece {
     
+    /** @type {Phaser.GameObjects.Image} */
     _sprite;
 
+    /** @type {Phaser.GameObjects.Image} */
     _selection;
 
+    /** @type {Phaser.Tweens.Tween} */
     _tween;
 
+    /** @type {Phaser.GameObjects.Container} */
     _container;
 
     /**
@@ -18,7 +22,7 @@ export default class Piece {
      * @param {Phaser.Scene} scene 
      * @param {Number} x 
      * @param {Number} y 
-     * @param {Number} frame 
+     * @param {Number} player 
      */
     constructor(scene, x, y, player) {
         const me = this;
@@ -41,12 +45,17 @@ export default class Piece {
             });
     }
 
+    /**
+     * @returns {Phaser.GameObjects.GameObject}
+     */
     toGameObject() {
         const me = this;
 
         return me._container;
     }
 
+    /**
+     */
     select() {
         const me = this;
 
@@ -54,6 +63,7 @@ export default class Piece {
         me._tween.resume();
     }
 
+    /** */
     unselect() {
         const me = this;
 

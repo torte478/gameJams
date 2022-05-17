@@ -1,9 +1,10 @@
 import Phaser from '../lib/phaser.js';
 
 import AI from './Entities/AI.js';
+import BillPool from './Entities/BillPool';
 import Context from './Entities/Context.js';
 import Cards from './Entities/Cards.js';
-import Groups from './Entities/Groups.js'; 
+import Groups from "./Entities/BillPool";
 import HUD from './Entities/HUD.js';
 import Timer from './Entities/Timer.js';
 
@@ -33,8 +34,8 @@ export default class Core {
     /** @type {Phaser.GameObjects.Text} */
     _log;
 
-    /** @type {Groups} */
-    _groups;
+    /** @type {BillPool} */
+    _billPool;
 
     /** @type {Timer[]} */
     _timers;
@@ -280,7 +281,7 @@ export default class Core {
     _finishTurn() {
         const me = this;
 
-        me._getCurrent().hand.toWait();
+        me._getCurrent().hand.toWaitPosition();
         const nextPlayer = me._context.status.setNextPlayerIndex();
         me._hud.select(nextPlayer);
 
@@ -339,7 +340,7 @@ export default class Core {
         const playerCards = [];
         for (let i = 0; i < Consts.FieldCount; ++i) {
             if (player.hasField(i)) {
-                me._context.fields.sellField(i);
+                me._context.fields.at(i).sell();
                 playerCards.push(i);
             }
         }
@@ -350,9 +351,8 @@ export default class Core {
     _removePiece(playerIndex) {
         const me = this;
 
-        me._context.fields.removePiece(
-            me._context.status.pieceIndicies[playerIndex], 
-            playerIndex);
+        const fieldIndex = me._context.status.pieceIndicies[playerIndex];
+        me._context.fields.at(fieldIndex).removePiece(playerIndex);
 
         const piece = me._context.pieces[playerIndex].toGameObject(); 
         const target = Utils.buildPoint(0, 0);
@@ -469,7 +469,7 @@ export default class Core {
         for (let i = 0; i < Consts.FieldCount; ++i)
             if (player.hasField(i)) {
                 const rent = player.getRent(i, me._context.status.diceResult);
-                me._context.fields.updateRent(i, playerIndex, rent)
+                me._context.fields.at(i).updateRent(playerIndex, rent);
             }      
     }
 
@@ -477,7 +477,7 @@ export default class Core {
         const me = this;
 
         const cardGrid = me._context.players[playerIndex].addField(field);
-        me._context.fields.buyField(field, playerIndex);
+        me._context.fields.at(field).buy(playerIndex);
         me._cards.buy(field, playerIndex, cardGrid, ignoreTween);
     }
 
@@ -502,7 +502,7 @@ export default class Core {
         const billIndicies = Helper.enumBills(bills);
 
         for (let i = 0; i < billIndicies.length; ++i) {
-            const bill = me._groups.createBill(
+            const bill = me._billPool.create(
                 from.x,
                 from.y,
                 player.index,
@@ -521,7 +521,7 @@ export default class Core {
                     Consts.Speed.CenterEntranceDuration),
                 delay: i * 50,
                 onComplete: () => {
-                    me._groups.killBill(bill);
+                    me._billPool.remove(bill);
                 }
             });
         }
@@ -568,7 +568,7 @@ export default class Core {
         me._context.dice1.unselect();
         me._context.dice2.unselect();
         me._context.pieces[Enums.Player.HUMAN].unselect();
-        me._context.fields.unselect();
+        me._context.fields.unselectAll();
     }
 
     _checkPause() {

@@ -152,6 +152,8 @@ export default class Consts {
         height: 1300
     };
 
+    static HandMovementOffset = 10;
+
     static JailFieldIndex = 10;
 
     static SplitBillLimit = [ 15, 6, 6, 9, 6, 6 ];

@@ -5,7 +5,7 @@ import Cards from './Entities/Cards.js';
 import Context from './Entities/Context.js';
 import Dice from './Entities/Dice.js';
 import Fields from './Entities/Fields.js';
-import Groups from './Entities/Groups.js';
+import Groups from "./Entities/BillPool";
 import Hand from './Entities/Hand.js';
 import HUD from './Entities/HUD.js';
 import Piece from './Entities/Piece.js';
@@ -17,7 +17,10 @@ import Consts from './Consts.js';
 import Core from './Core.js';
 import Status from './Status.js';
 import Utils from './Utils.js';
+import BillPool from './Entities/BillPool';
+import HousePool from './Entities/HousePool.js';
 
+// TODO : rename
 export default class Start {
 
     /**
@@ -47,7 +50,7 @@ export default class Start {
         // core
         core._scene = scene;
         core._cursor = Start._createCursor(scene);
-        core._groups = new Groups(scene);
+        core._billPool = new BillPool(scene);
         core._cards = new Cards(scene);
         core._hud = new HUD(scene.add);
 
@@ -85,9 +88,10 @@ export default class Start {
         for (let i = 0; i < Config.PlayerCount; ++i)
             context.hands.push(new Hand(scene, i));
 
+        const housePool = new HousePool(scene);
         context.players = [];
         for (let i = 0; i < Config.PlayerCount; ++ i) {
-            const player = new Player(scene, i, Config.Money, core._groups);
+            const player = new Player(scene, i, Config.Money, housePool);
             context.players.push(player);
         }
 

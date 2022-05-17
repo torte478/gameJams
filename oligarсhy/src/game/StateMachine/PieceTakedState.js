@@ -55,7 +55,7 @@ export default class PieceTakedState extends State {
               context = me.core.context;
 
         context.pieces[Enums.Player.HUMAN].unselect();
-        context.fields.select(context.status.targetFieldIndex);
+        context.fields.at(context.status.targetFieldIndex).select();
     }
 
     /**

@@ -175,7 +175,8 @@ export default class AI {
 
             me._context.status.setPayAmount(cost);
             me._state.action = Enums.AiAction.BUY_HOUSE;
-            return me._context.fields.getFieldPosition(i);
+            const field = me._context.fields.at(i).toGameObject();
+            return Utils.toPoint(field);
         }
 
         return null;

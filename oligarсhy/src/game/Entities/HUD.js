@@ -3,7 +3,6 @@ import Phaser from '../../lib/phaser.js';
 import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
-import Helper from '../Helper.js';
 import Utils from '../Utils.js';
 import FieldInfo from '../FieldInfo.js';
 
@@ -58,12 +57,13 @@ export default class HUD {
         const start = -360;
         const offset = 100;
         for (let i = 0; i < Config.PlayerCount; ++i) {
-            content.push(factory.image(-60, start + i * offset + 10, 'pieces', i*2).setScale(0.75));
             me._playerItems.push({
                 hand: factory.text(85, start + i * offset - 25, '12', Consts.TextStyle.HudMoney).setOrigin(1, 0),
                 cards: factory.text(85, start + i * offset, '34', Consts.TextStyle.HudMoney).setOrigin(1, 0),
                 total: factory.text(85, start + i * offset + 25 , '56', Consts.TextStyle.HudMoney).setOrigin(1, 0),
-            })
+            });
+
+            content.push(factory.image(-60, start + i * offset + 10, 'pieces', i*2).setScale(0.75));
             content.push(factory.text(-20, start + i * offset - 25, 'money:', Consts.TextStyle.HudMoney));
             content.push(me._playerItems[i].hand);
             content.push(factory.text(-20, start + i * offset, 'cards:', Consts.TextStyle.HudMoney));
@@ -98,6 +98,9 @@ export default class HUD {
             : me._hide();
     }
 
+    /**
+     * @param {Number} index 
+     */
     showField(index) {
         const me = this;
 
@@ -106,72 +109,33 @@ export default class HUD {
         me._setFieldInfoVisible(true);
 
         switch (config.type) {
-            case Enums.FieldType.PROPERTY: {
-                me._infoItems.icon
-                    .setTexture('icons', config.icon);
+            case Enums.FieldType.PROPERTY: 
+                return me._showPropertyInfo(config);
 
-                me._infoItems.caption
-                    .setText(config.name);
+            case Enums.FieldType.UTILITY: 
+                return me._showUtilityInfo(config);
 
-                const details = 
-                    'BUY\n' +
-                    `house: ${config.costHouse}\n\n` +
-                    'RENT\n' + 
-                    `base: ${config.rent[Enums.PropertyRentIndex.BASE]}\n` + 
-                    `full color: ${config.rent[Enums.PropertyRentIndex.COLOR]}\n` + 
-                    `1 house: ${config.rent[Enums.PropertyRentIndex.ONE]}\n` + 
-                    `2 houses: ${config.rent[Enums.PropertyRentIndex.TWO]}\n` + 
-                    `3 houses: ${config.rent[Enums.PropertyRentIndex.THREE]}\n` + 
-                    `4 houses: ${config.rent[Enums.PropertyRentIndex.FOUR]}\n` + 
-                    `hotel: ${config.rent[Enums.PropertyRentIndex.HOTEL]}\n\n` +
-                    'SELL\n' + 
-                    `house: ${config.costHouse / 2}\n` + 
-                    `property: ${config.cost / 2}`;
-                me._infoItems.details.setText(details)
-
-                break;
-            }
-
-            case Enums.FieldType.UTILITY: {
-
-                me._infoItems.caption
-                    .setText(config.name);
-
-                me._infoItems.icon
-                    .setTexture('icons_big', config.icon);
-
-                    const details = 
-                    'RENT\n' + 
-                    `1 utility:\n`+
-                    `   ${config.rent[0]} X dices\n\n` + 
-                    `2 utilities:\n` + 
-                    `   ${config.rent[1]} x dices\n\n` + 
-                    `SELL: ${config.cost / 2}`;
-                me._infoItems.details.setText(details)
-
-                break;
-            }
-
-            case Enums.FieldType.RAILSTATION: {
-                me._infoItems.caption
-                    .setText(config.name);
-
-                me._infoItems.details.setVisible(false);
-
-                break;
-            }
+            case Enums.FieldType.RAILSTATION: 
+                return me._showRailStationInfo(config);
 
             default:
-                me._setFieldInfoVisible(false);
+                return me._setFieldInfoVisible(false);
         }
     }
 
+    /**
+     */
     hideField() {
         const me = this;
         
         me._setFieldInfoVisible(false);
     }
 
+    /**
+     * @param {Number} player 
+     * @param {Number} hand 
+     * @param {Number} cards 
+     */
     updateMoney(player, hand, cards) {
         const me = this;
         
@@ -180,6 +144,9 @@ export default class HUD {
         me._playerItems[player].total.setText(hand + cards);
     }
     
+    /**
+     * @param {Number} player 
+     */
     select(player) {
         const me = this;
 
@@ -240,5 +207,61 @@ export default class HUD {
         me._infoItems.caption.setVisible(visible);
         me._infoItems.icon.setVisible(visible);
         me._infoItems.details.setVisible(visible);
+    }
+
+    _showPropertyInfo(config) {
+        const me = this;
+
+        me._infoItems.icon
+            .setTexture('icons', config.icon);
+
+        me._infoItems.caption
+            .setText(config.name);
+
+        const details = 
+            'BUY\n' +
+            `house: ${config.costHouse}\n\n` +
+            'RENT\n' + 
+            `base: ${config.rent[Enums.PropertyRentIndex.BASE]}\n` + 
+            `full color: ${config.rent[Enums.PropertyRentIndex.COLOR]}\n` + 
+            `1 house: ${config.rent[Enums.PropertyRentIndex.ONE]}\n` + 
+            `2 houses: ${config.rent[Enums.PropertyRentIndex.TWO]}\n` + 
+            `3 houses: ${config.rent[Enums.PropertyRentIndex.THREE]}\n` + 
+            `4 houses: ${config.rent[Enums.PropertyRentIndex.FOUR]}\n` + 
+            `hotel: ${config.rent[Enums.PropertyRentIndex.HOTEL]}\n\n` +
+            'SELL\n' + 
+            `house: ${config.costHouse / 2}\n` + 
+            `property: ${config.cost / 2}`;
+
+        me._infoItems.details.setText(details)
+    }
+
+    _showUtilityInfo(config) {
+        const me = this;
+
+        me._infoItems.caption
+            .setText(config.name);
+
+        me._infoItems.icon
+            .setTexture('icons_big', config.icon);
+
+        const details = 
+            'RENT\n' + 
+            `1 utility:\n`+
+            `   ${config.rent[0]} X dices\n\n` + 
+            `2 utilities:\n` + 
+            `   ${config.rent[1]} x dices\n\n` + 
+            `SELL: ${config.cost / 2}`;
+
+        me._infoItems.details.setText(details);
+    }
+
+    _showRailStationInfo(config) {
+        const me = this;
+
+        me._infoItems.caption
+            .setText(config.name);
+
+        me._infoItems.details.setVisible(false);
     }
 }

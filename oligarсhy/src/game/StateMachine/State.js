@@ -3,7 +3,7 @@ import Phaser from '../lib/phaser.js';
 import AI from '../Entities/AI.js';
 import Context from '../Entities/Context.js';
 import Cards from '../Entities/Cards.js';
-import Groups from '../Entities/Groups.js'; 
+import Groups from "../Entities/BillPool";
 import HUD from '../Entities/HUD.js';
 import Player from '../Entities/Player.js';
 import Timer from '../Entities/Timer.js';

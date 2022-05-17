@@ -3,10 +3,10 @@ import Phaser from '../../lib/phaser.js';
 import Buttons from './Buttons.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
-import Groups from './Groups.js';
 import Helper from '../Helper.js';
 import Utils from '../Utils.js';
 import FieldInfo from '../FieldInfo.js';
+import HousePool from './HousePool.js';
 
 export default class Player {
 
@@ -19,8 +19,8 @@ export default class Player {
     /** @type {Object[]} */
     _fields;
 
-    /** @type {Groups} */
-    _groups;
+    /** @type {HousePool} */
+    _housePool;
 
     /** @type {Boolean} */
     _alive;
@@ -32,9 +32,9 @@ export default class Player {
      * @param {Phaser.Scene} scene 
      * @param {Number} index
      * @param {Number[]} money
-     * @param {Groups} groups
+     * @param {HousePool} housePool
      */
-    constructor(scene, index, money, groups) {
+    constructor(scene, index, money, housePool) {
         const me = this;
 
         const factory = scene.add;
@@ -44,7 +44,7 @@ export default class Player {
         me._money = me._createStartBills(factory, money, index);
         me._buttons = new Buttons(scene, index);
 
-        me._groups = groups;
+        me._housePool = housePool;
         me._fields = [];
 
         me._alive = true;
@@ -271,7 +271,7 @@ export default class Player {
             .filter((f) => FieldInfo.Config[f.index].color == config.color);
 
         if (!!field.hotel) {
-            me._groups.killBuilding(field.hotel);
+            me._housePool.remove(field.hotel);
             field.hotel = null;
             for (let i = 0; i < Consts.MaxHouseCount; ++i)
                 me.addHouse(index, fieldPos);
@@ -284,7 +284,7 @@ export default class Player {
                 throw "can't sell - to many houses";
 
             for (let i = 0; i < field.houses.length; ++i)
-                me._groups.killBuilding(field.houses[i]);
+            me._housePool.remove(field.houses[i]);
 
             field.houses = [];
             for (let i = 0; i < count - 1; ++i)
@@ -376,16 +376,16 @@ export default class Player {
 
         if (field.houses.length >= Consts.MaxHouseCount) {
             for (let i = 0; i < field.houses.length; ++i)
-                me._groups.killBuilding(field.houses[i]);
+            me._housePool.remove(field.houses[i]);
 
             field.houses = [];
 
-            field.hotel = me._groups.createHotel()
+            field.hotel = me._housePool.createHotel()
                 .setAngle(angle)
                 .setPosition(positions[0].x, positions[0].y);
         }
         else {
-            const house = me._groups.createHouse()
+            const house = me._housePool.createHouse()
                 .setAngle(angle);
             field.houses.push(house);
             for (let i = 0; i < positions.length; ++i)
@@ -473,9 +473,9 @@ export default class Player {
         for (let i = 0; i < me._fields.length; ++i) {
             const field = me._fields[i];
             if (!!field.hotel)
-                me._groups.killBuilding(field.hotel);
+                me._housePool.remove(field.hotel);
             for (let j = 0; j < field.houses.length; ++j)
-                me._groups.killBuilding(field.houses[j]);
+                me._housePool.remove(field.houses[j]);
         }
 
         me._fields = [];
