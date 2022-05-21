@@ -101,21 +101,25 @@ export default class Cards {
 
             const position = Helper.rotate(
                 Utils.buildPoint(
-                    startX + column * 190,    
-                    1600 + row * 220
+                    startX + i * 190,    
+                    1600 + j * 220
                 ),
                 player);
 
-            if (ignoreTween)
-                return card.container.setPosition(position.x, position.y);
-
-            if (card.index != updated)
-                return me._moveCard(card, position);
+            if (ignoreTween) {
+                card.container.setPosition(position.x, position.y);
+                continue;
+            }
+                
+            if (card.index != updated) {
+                me._moveCard(card, position);
+                continue;
+            }
 
             if (buy)
-                return me._buyCard(card, position);
+                me._buyCard(card, position);
             else
-                return me._sellCard(card);
+                me._sellCard(card);
         }
     }
 
@@ -192,6 +196,7 @@ export default class Cards {
     }
 
     _initCards(scene) {
+        const me = this;
         const cards = [];
 
         for (let i = 0; i < Consts.FieldCount; ++i) {

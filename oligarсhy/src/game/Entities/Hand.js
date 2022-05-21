@@ -347,10 +347,10 @@ export default class Hand {
         switch (type) {
             case Enums.HandAction.TAKE_DICE:
             case Enums.HandAction.TAKE_PIECE: 
-                return me._canTake(config.image);
+                return me._canTake(config.image, point);
 
             case Enums.HandAction.DROP_DICES:
-                return me._canDropDices();
+                return me._canDropDices(point);
 
             case Enums.HandAction.DROP_PIECE:
             case Enums.HandAction.CLICK_BUTTON:
@@ -373,7 +373,7 @@ export default class Hand {
             point);
     }
 
-    _canDropDices() {
+    _canDropDices(point) {
         const me = this;
 
         if (me._content.length != 2)

@@ -8,9 +8,9 @@ export default class Config {
         StateLog: true,
         Log: true,
         Random: false,
-        SkipHuman: false,
+        SkipHuman: true,
         ShowTextLog: true,
-        IgnorePause: false,
+        IgnorePause: true,
         CancelAiBuy: false
     };
 
@@ -45,7 +45,7 @@ export default class Config {
 
     static Time = {
         TurnSec: 300,
-        LightSec: 2,
+        LightSec: 2000,
         DarkSec: 400,
     };
 }

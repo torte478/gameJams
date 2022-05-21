@@ -1,8 +1,11 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
 import AI from '../Entities/AI.js';
 
+import Consts from '../Consts.js';
 import Enums from '../Enums.js';
+import FieldInfo from '../FieldInfo.js';
+import Utils from '../Utils.js';
 
 import State from './State.js';
 
@@ -21,7 +24,8 @@ export default class PieceTakedState extends State {
     processTurn(point) {
         const me = this,
               context = me.core._context,
-              status = context.status;
+              status = context.status,
+              hand = me.core.getCurrent().hand;
 
         const nextField = context.fields.tryMoveToFieldAtPoint(
             status.player,
@@ -52,7 +56,7 @@ export default class PieceTakedState extends State {
      */
     restoreSelection() {
         const me = this,
-              context = me.core.context;
+              context = me.core._context;
 
         context.pieces[Enums.Player.HUMAN].unselect();
         context.fields.at(context.status.targetFieldIndex).select();
@@ -64,14 +68,14 @@ export default class PieceTakedState extends State {
      */
     getAiNextPoint(ai) {
         const me = this,
-              context = me.core.context;
+              context = me.core._context;
 
         return context.fields.getFieldPosition(context.status.targetFieldIndex);
     }
 
     _onPieceDrop(field) {
         const me = this,
-              current = me.core._getCurrent(),
+              current = me.core.getCurrent(),
               context = me.core._context,
               status = context.status;
 
@@ -90,11 +94,12 @@ export default class PieceTakedState extends State {
             (p) => p.index != status.player && p.hasField(field.index));
 
         if (enemyIndex != null) 
-            return me._onMoveToEnemyField();
+            return me._onMoveToEnemyField(enemyIndex, field);
 
         const canBuyField = !current.player.hasField(field.index)
                             && (me.core._isHumanTurn() 
-                                || current.ai.canBuyField(field.index));
+                                || current.ai.canBuyField(field.index))
+                            && fieldConfig.type != Enums.FieldType.RAILSTATION;
 
         if (canBuyField) {
             context.status.setPayAmount(fieldConfig.cost);
@@ -104,9 +109,9 @@ export default class PieceTakedState extends State {
         return me.core._setState(Enums.GameState.FINAL)
     }
 
-    _onMoveToEnemyField() {
+    _onMoveToEnemyField(enemyIndex, field) {
         const me = this,
-              current = me.core._getCurrent(),
+              current = me.core.getCurrent(),
               context = me.core._context,
               status = context.status;
 

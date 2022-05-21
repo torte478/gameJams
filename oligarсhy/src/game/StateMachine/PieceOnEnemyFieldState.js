@@ -1,4 +1,5 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
+import Core from '../Core.js';
 
 import AI from '../Entities/AI.js';
 
@@ -36,7 +37,7 @@ export default class PieceOnEnemyFieldState extends State {
             point,
             Enums.HandAction.CLICK_BUTTON,
             null,
-            () => { me._payRent(enemy) });
+            () => { me._payRent(enemy, point) });
     }
 
     /**
@@ -44,7 +45,7 @@ export default class PieceOnEnemyFieldState extends State {
     restoreSelection() {
         const me = this;
 
-        me.core._context.fields.unselect();
+        me.core._context.fields.unselectAll();
     }
 
     /**
@@ -86,8 +87,10 @@ export default class PieceOnEnemyFieldState extends State {
 
     _findFieldToSellPos() {
         const me = this,
-              context = me.core._context,
-              current = me.core.getCurrent(),
+              /** @type {Core} */
+              core = me.core,
+              context = core._context,
+              current = core.getCurrent(),
               hand = current.hand,
               player = current.player;
 
@@ -95,14 +98,16 @@ export default class PieceOnEnemyFieldState extends State {
         if (money >= context.status.payAmount)
             return null;
 
-        const field = player.getRichestField();
+        const field = player.getRichestFieldIndex();
         return context.fields.getFieldPosition(field);
     }
 
-    _payRent(enemy) {
+    _payRent(enemy, point) {
         const me = this,
-              context = me.core._context,
-              current = me.core.getCurrent(),
+              /** @type {Core} */
+              core = me.core,
+              context = core._context,
+              current = core.getCurrent(),
               hand = current.hand,
               player = current.player;
 
@@ -112,18 +117,18 @@ export default class PieceOnEnemyFieldState extends State {
         if (remain > 0)
             return;
 
-        me.core._addMoney(-remain, point, player);
+        core._addMoney(-remain, point, player);
 
         const rent = enemy.getRent(context.status.targetFieldIndex);
-        me.core._addMoney(rent, point, enemy);
-        context.hands[enemy.index].toWait();
+        core._addMoney(rent, point, enemy);
+        context.hands[enemy.index].toWaitPosition();
 
-        me.core._setState(Enums.GameState.FINAL);
+        core._setState(Enums.GameState.FINAL);
     }
 
     _findEnemyByHandClick(point) {
         const me = this,
-              context = me.core.context,
+              context = me.core._context,
               enemy = me._getEnemy();
 
         const isEnemyHandClick = context.hands[enemy.index].isClick(point);

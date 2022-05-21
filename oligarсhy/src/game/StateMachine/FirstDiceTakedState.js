@@ -1,6 +1,6 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
-import AI from "../Entities/AI";
+import AI from "../Entities/AI.js";
 
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
@@ -47,7 +47,7 @@ export default class FirstDiceTakedState extends State {
     _tryTakeDice(point, dice) {
         const me = this;
 
-        const hand = me.core._getCurrent().hand;
+        const hand = me.core.getCurrent().hand;
 
         return hand.tryMakeAction(
             point,

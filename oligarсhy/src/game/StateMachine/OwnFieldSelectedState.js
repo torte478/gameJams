@@ -1,4 +1,4 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
 import AI from '../Entities/AI.js';
 
@@ -34,7 +34,7 @@ export default class OwnFieldSelectedState extends State {
                 point,
                 Enums.HandAction.CLICK_BUTTON,
                 null,
-                () => { me._trySell(isFieldSell) });
+                () => { me._trySell(point, isFieldSell) });
         
         if (me.core._tryManageMoney(point))
             return;
@@ -65,7 +65,8 @@ export default class OwnFieldSelectedState extends State {
               context = me.core._context,
               status = context.status,
               current = me.core.getCurrent(),
-              player = current.player;
+              player = current.player,
+              hand = current.hand;
 
         if (status.stateToReturn == Enums.GameState.PIECE_ON_ENEMY_FIELD) {
             const button = player.hasHouse(status.selectedField)
@@ -129,7 +130,7 @@ export default class OwnFieldSelectedState extends State {
         return context.status.updatePayAmount(handMoney);
     }
 
-    _trySell(isFieldSell) {
+    _trySell(point, isFieldSell) {
         const me = this,
               context = me.core._context,
               player = me.core.getCurrent().player;
@@ -143,7 +144,7 @@ export default class OwnFieldSelectedState extends State {
 
         me.core._updateRent(player.index);
         if (isFieldSell) {
-            context.fields.sellField(fieldIndex);
+            // context.fields.sellField(fieldIndex);
             me.core._cards.sell(fieldIndex, player.index, player.getCardGrid());
         }
 

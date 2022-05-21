@@ -1,23 +1,26 @@
 import Phaser from '../lib/phaser.js';
 
 import AI from './Entities/AI.js';
+import BillPool from './Entities/BillPool.js';
 import Cards from './Entities/Cards.js';
 import Context from './Entities/Context.js';
 import Dice from './Entities/Dice.js';
 import Fields from './Entities/Fields.js';
 import Hand from './Entities/Hand.js';
+import HousePool from './Entities/HousePool.js';
 import HUD from './Entities/HUD.js';
 import Piece from './Entities/Piece.js';
 import Player from './Entities/Player.js';
 import Timer from './Entities/Timer.js';
+
+import BeginState from './StateMachine/BeginState.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Core from './Core.js';
 import Status from './Status.js';
 import Utils from './Utils.js';
-import BillPool from './Entities/BillPool';
-import HousePool from './Entities/HousePool.js';
+import Enums from './Enums.js';
 
 export default class CompositionRoot {
 
@@ -27,7 +30,7 @@ export default class CompositionRoot {
      */
     static init(scene) {
 
-        const core = new Core(scene);
+        const core = new Core(scene, (x) => new BeginState(x));
 
         // phaser
 
@@ -101,7 +104,7 @@ export default class CompositionRoot {
         for (let i = 0; i < Config.PlayerCount; ++i)
             CompositionRoot._initPlayer(i, core, context);
 
-        core._setState(Config.StartState);
+        core._setState(Enums.GameState.BEGIN);
 
         // colliders
 
@@ -181,7 +184,7 @@ export default class CompositionRoot {
                 continue;
 
             for (let j = 0; j < field.houses; ++j)
-                context.players[player].addHouse(
+                context.players[player].addBuilding(
                     index, 
                     context.fields.getFieldPosition(index));
         }

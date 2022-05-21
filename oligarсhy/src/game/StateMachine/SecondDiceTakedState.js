@@ -1,4 +1,4 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
 import AI from '../Entities/AI.js';
 
@@ -23,13 +23,13 @@ export default class SecondDiceTakedState extends State {
     processTurn(point) {
         const me = this;
 
-        const hand = me.core._getCurrent().hand;
+        const hand = me.core.getCurrent().hand;
 
         hand.tryMakeAction(
             point,
             Enums.HandAction.DROP_DICES,
             null,
-            me._startDiceDrop);
+            () => me._startDiceDrop());
     }
 
     /**

@@ -1,4 +1,4 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
 import AI from '../Entities/AI.js';
 
@@ -20,7 +20,8 @@ export default class DiceDropedState extends State {
      * @param {Phaser.Geom.Point} point
      */
     processTurn(point) {
-        const me = this;
+        const me = this,
+              hand = me.core.getCurrent().hand;
 
         hand.tryMakeAction(
             point,

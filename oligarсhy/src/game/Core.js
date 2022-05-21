@@ -1,14 +1,14 @@
 import Phaser from '../lib/phaser.js';
 
 import AI from './Entities/AI.js';
-import BillPool from './Entities/BillPool';
+import BillPool from './Entities/BillPool.js';
 import Context from './Entities/Context.js';
 import Cards from './Entities/Cards.js';
-import Groups from "./Entities/BillPool";
 import HUD from './Entities/HUD.js';
 import Timer from './Entities/Timer.js';
 
 import State from './StateMachine/State.js';
+import States from './StateMachine/States.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
@@ -51,6 +51,17 @@ export default class Core {
 
     /** @type {State} */
     _gameState;
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {Function} createStartState
+     */
+    constructor(scene, createStartState) {
+        const me = this;
+
+        me._scene = scene;
+        me._gameState = createStartState(me);
+    }
 
     /**
      * @param {Number} delta 
@@ -156,6 +167,9 @@ export default class Core {
     _processCpuTurn() {
         const me = this;
 
+        if (me.getCurrent().hand.isBusy() || me._context.status.isBusy)
+            return;
+
         const playerIndex = me._context.status.player;
         const ai = me._ai[playerIndex];
         const point = me._gameState.getAiNextPoint(ai);
@@ -173,7 +187,7 @@ export default class Core {
      _processTurn(point, isCancel) {
         const me = this;
 
-        if (me._getCurrent().hand.isBusy() || me._context.status.isBusy)
+        if (me.getCurrent().hand.isBusy() || me._context.status.isBusy)
             return;
 
         if (isCancel)
@@ -188,7 +202,7 @@ export default class Core {
     _tryManageMoney(point) {
         const me = this;
 
-        const current = me._getCurrent();
+        const current = me.getCurrent();
         const billIndex = current.player.findBillIndexOnPoint(point);
 
         const canTakeMoney = billIndex >= 0;
@@ -220,7 +234,7 @@ export default class Core {
 
     _manageMoney(point, action) {
         const me = this,
-              current = me._getCurrent();
+              current = me.getCurrent();
 
         const bills = current.hand.dropBills();
         const newBills = Helper.manageBills(bills, action);
@@ -232,7 +246,7 @@ export default class Core {
 
     _takeBill(billIndex) {
         const me = this,
-              current = me._getCurrent();
+              current = me.getCurrent();
 
         current.player.removeBill(billIndex);
 
@@ -261,7 +275,7 @@ export default class Core {
 
     _cancelTurn() {
         const me = this,
-              current = me._getCurrent();
+              current = me.getCurrent();
 
         const money = current.hand.dropBills();
         me._addBills(money, current.hand.toPoint(), current.player);
@@ -281,7 +295,7 @@ export default class Core {
     _finishTurn() {
         const me = this;
 
-        me._getCurrent().hand.toWaitPosition();
+        me.getCurrent().hand.toWaitPosition();
         const nextPlayer = me._context.status.setNextPlayerIndex();
         me._hud.select(nextPlayer);
 
@@ -296,7 +310,7 @@ export default class Core {
         me._setState(Enums.GameState.BEGIN);
     }
 
-    _getCurrent() {
+    getCurrent() {
         const me = this;
 
         const current = me._context.status.player;
@@ -316,7 +330,7 @@ export default class Core {
 
     _killPlayer() {
         const me = this,
-              current = me._getCurrent(),
+              current = me.getCurrent(),
               playerIndex = current.player.index;
 
         const result = me._context.status.killCurrentPlayer();
@@ -371,7 +385,7 @@ export default class Core {
 
     _trySelectOwnField(point) {
         const me = this,
-              current = me._getCurrent(),
+              current = me.getCurrent(),
               player = current.player;
 
         if (!Utils.contains(Consts.States.Sell, me._context.status.state))
@@ -428,9 +442,9 @@ export default class Core {
     _setState(state) {
         const me = this;
 
-        me._gameState.showButtons();
         me._context.status.setState(state);
-        me._gameState = State.next(state, me);
+        me._gameState = States.next(state, me);
+        me._gameState.showButtons();
         me._restoreSelection();
     }
 
@@ -626,7 +640,7 @@ export default class Core {
             me._cursor.x + 100,
             me._cursor.y + 200);
 
-        me._getCurrent().hand.moveTo(offset, delta);
+        me.getCurrent().hand.moveTo(offset, delta);
     }
 
     _startDark() {
@@ -697,7 +711,7 @@ export default class Core {
         const me = this;
 
         if (me._isHumanTurn())
-            me._getCurrent().player.updateButtonSelection(point);
+            me.getCurrent().player.updateButtonSelection(point);
     }
 
     _updateFieldHud(point) {

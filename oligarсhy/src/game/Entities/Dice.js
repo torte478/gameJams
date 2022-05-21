@@ -31,7 +31,7 @@ export default class Dice {
 
         me._sprite = scene.add.sprite(0, 0, 'dice', frame);
 
-        me._container = me._buildContainer(scene, x, y, [ me._sprite, me._selection ]);
+        me._container = me._buildContainer(scene, x, y, [ me._selection, me._sprite,  ]);
 
         me._selectTween = scene.tweens.add({
             targets: me._selection,

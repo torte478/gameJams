@@ -78,7 +78,7 @@ export default class Buttons {
         const me = this;
 
         me._updateVisibility(types, concat);
-        me._updateVisibleButtonPositions();
+        me._updateVisibleButtonPositions(types);
     }
 
     /**
@@ -134,7 +134,7 @@ export default class Buttons {
             .setAngle(angle);
     }
 
-    _updateVisibleButtonPositions() {
+    _updateVisibleButtonPositions(types) {
         const me = this;
         
         const buttons = me._container.getAll();

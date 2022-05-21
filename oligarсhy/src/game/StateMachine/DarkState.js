@@ -1,4 +1,4 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
 import Enums from '../Enums.js';
 

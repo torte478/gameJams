@@ -1,6 +1,7 @@
 import Phaser from '../../lib/phaser.js';
 
 import Consts from '../Consts.js';
+import Helper from '../Helper.js';
 
 export default class BillPool {
 

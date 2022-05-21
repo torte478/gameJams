@@ -125,13 +125,21 @@ export default class Status {
      */
     setNextPlayerIndex() {
         const me = this;
+        me.player = me.getNextPlayerIndex();
+        return me.player;
+    }
+
+    /**
+     * @returns {Number}
+     */
+    getNextPlayerIndex() {
+        const me = this;
 
         let next = me.player;
         do {
             next = (next + 1) % Config.PlayerCount;
         } while (Utils.all(me.activePlayers, (p) => p != next));
 
-        me.player = next;
         return next;
     }
 

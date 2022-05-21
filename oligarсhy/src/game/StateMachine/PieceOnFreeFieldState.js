@@ -1,10 +1,11 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
+import Core from '../Core.js';
 
 import AI from '../Entities/AI.js';
 
 import Enums from '../Enums.js';
 import FieldInfo from '../FieldInfo.js';
-import Helper from '../Helper.js';
+import Utils from '../Utils.js';
 
 import State from './State.js';
 
@@ -22,7 +23,9 @@ export default class PieceOnFreeFieldState extends State {
      */
     processTurn(point) {
         const me = this,
-              player = me.core.getCurrent().player;
+              current = me.core.getCurrent(),
+              player = current.player,
+              hand = current.hand;
 
         if (me.core._tryManageMoney(point))
             return;
@@ -37,15 +40,17 @@ export default class PieceOnFreeFieldState extends State {
             point,
             Enums.HandAction.CLICK_BUTTON,
             null,
-            me._tryBuyField);
+            () => me._tryBuyField(point));
     }
 
     /**
      */
     restoreSelection() {
-        const me = this;
+        const me = this,
+              /** @type {Core} */
+              core = me.core;
 
-        me.core._context.fields.unselect();
+        core._context.fields.unselectAll();
     }
 
     /**
@@ -67,7 +72,10 @@ export default class PieceOnFreeFieldState extends State {
               hand = current.hand,
               player = current.player;
 
-        return !hand.isMaxBillCount() && me._isNeedMoreBills(ai)
+
+        const needMoreBills = me._isNeedMoreBills(ai);
+        const canTakeMoreBills = !hand.isMaxBillCount();
+        return needMoreBills && canTakeMoreBills
             ? ai._getNextBillPosition()
             : player.getButtonPosition(Enums.ActionType.BUY_FIELD);
     }
@@ -78,27 +86,29 @@ export default class PieceOnFreeFieldState extends State {
               hand = current.hand,
               player = current.player;
 
-        const fieldIndex = me.core.context.status.targetFieldIndex; 
+        const fieldIndex = me.core._context.status.targetFieldIndex; 
         const cost = FieldInfo.Config[fieldIndex].cost;
         const handMoney = hand.getTotalMoney();
 
         // TODO: to getNextBillPosition
-        if (handMoney == 0)
+        if (handMoney == 0) {
+            Utils.debugLog('ai build bill sequence');
             ai._calcBillSequence(player.enumBills(), cost);
+        }
 
         return (cost - handMoney) > 0
     }
 
-    _tryBuyField() {
+    _tryBuyField(point) {
         const me = this;
 
         var remain = me._spendHandMoney();
 
         if (remain <= 0)
-            me._buyField(remain);
+            me._buyField(point, remain);
     }
 
-    _spendHandMoney(hand) {
+    _spendHandMoney() {
         const me = this,
               status = me.core._context.status,
               hand = me.core.getCurrent().hand;
@@ -107,7 +117,7 @@ export default class PieceOnFreeFieldState extends State {
         return status.updatePayAmount(handMoney);
     }
 
-    _buyField(remain) {
+    _buyField(point, remain) {
         const me = this,
               status = me.core._context.status,
               current = me.core.getCurrent(),

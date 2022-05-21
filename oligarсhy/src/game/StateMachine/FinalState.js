@@ -1,4 +1,5 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
+import Core from '../Core.js';
 
 import AI from '../Entities/AI.js';
 
@@ -40,9 +41,11 @@ export default class FinalState extends State {
     /**
      */
     restoreSelection() {
-        const me = this;
+        const me = this,
+              /** @type {Core} */
+              core = me.core;
 
-        me.core._context.fields.unselect();
+        core._context.fields.unselectAll();
     }
 
     /**

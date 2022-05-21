@@ -37,7 +37,7 @@ export default class Fields {
             return null;
 
         return {
-            index: i,
+            index: to,
             position: me.movePiece(player, from, to)
         };
     }
@@ -96,6 +96,16 @@ export default class Fields {
             throw `wrong field index ${index}`;
 
         return me._fields[index];
+    }
+
+    /**
+     * @param {Number} index 
+     * @returns {Phaser.Geom.Point}
+     */
+    getFieldPosition(index) {
+        const me = this;
+
+        return Utils.toPoint(me.at(index).toGameObject());
     }
 
     /**

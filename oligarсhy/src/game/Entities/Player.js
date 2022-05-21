@@ -267,7 +267,7 @@ export default class Player {
         if (field.houses.length > 0)
             return me._sellHouse(field, config, sameColorFields);
 
-        return me._sellField(index, config);
+        return me._sellField(index, config, sameColorFields);
     }
 
     /**
@@ -609,7 +609,7 @@ export default class Player {
         return config.rent[utilities - 1] * dices;
     }
 
-    _sellField(index, config) {
+    _sellField(index, config, sameColorFields) {
         const me = this;
 
         if (Utils.any(sameColorFields, (f) => f.houses.length > 0))
@@ -638,8 +638,6 @@ export default class Player {
 
     _sellHotel(field, config, fieldPos) {
         const me = this;
-
-        const config = FieldInfo.Config[field.index];
 
         me._housePool.remove(field.hotel);
         field.hotel = null;

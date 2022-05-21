@@ -22,6 +22,6 @@ export default class Animation {
     }
 
     static getFrames(scene, texture, frames) {
-        return scene.anims.generateFrameNames(texture, frames);
+        return scene.anims.generateFrameNames(texture, { frames: frames });
     }
 }

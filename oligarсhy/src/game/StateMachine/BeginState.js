@@ -1,7 +1,6 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
-import AI from "../Entities/AI";
-import Player from '../Entities/Player.js';
+import AI from "../Entities/AI.js";
 
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
@@ -13,7 +12,7 @@ export default class BeginState extends State {
     /** 
      * @returns {Number}
      */
-     getName() {
+    getName() {
         return Enums.GameState.BEGIN;
     }
 
@@ -60,7 +59,7 @@ export default class BeginState extends State {
     _tryTakeDice(point, dice) {
         const me = this;
 
-        const hand = me.core._getCurrent().hand;
+        const hand = me.core.getCurrent().hand;
 
         return hand.tryMakeAction(
             point,
