@@ -79,7 +79,6 @@ export default class PieceTakedState extends State {
 
         const fieldConfig = FieldInfo.Config[field.index];
 
-        // TODO : to chain pattern (and other places)
         if (fieldConfig.type == Enums.FieldType.GOTOJAIL)
             return me.core._moveToJail(field.index);
 

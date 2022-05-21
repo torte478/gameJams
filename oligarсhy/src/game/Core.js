@@ -189,7 +189,7 @@ export default class Core {
         const me = this;
 
         const current = me._getCurrent();
-        const billIndex = current.player.findBillOnPoint(point);
+        const billIndex = current.player.findBillIndexOnPoint(point);
 
         const canTakeMoney = billIndex >= 0;
         if (canTakeMoney) 
@@ -234,7 +234,7 @@ export default class Core {
         const me = this,
               current = me._getCurrent();
 
-        current.player.takeBill(billIndex);
+        current.player.removeBill(billIndex);
 
         const availableAction = current.hand.getAvailableMoneyAction();
         if (availableAction == null)

@@ -11,7 +11,7 @@ import HousePool from './HousePool.js';
 export default class Player {
 
     /** @type {Object[]} */
-    _money;
+    _bills;
 
     /** @type {Buttons} */
     _buttons;
@@ -31,17 +31,17 @@ export default class Player {
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} index
-     * @param {Number[]} money
+     * @param {Number[]} bills
      * @param {HousePool} housePool
      */
-    constructor(scene, index, money, housePool) {
+    constructor(scene, index, bills, housePool) {
         const me = this;
 
         const factory = scene.add;
 
         me.index = index;
 
-        me._money = me._createStartBills(factory, money, index);
+        me._bills = me._createStartBills(factory, bills, index);
         me._buttons = new Buttons(scene, index);
 
         me._housePool = housePool;
@@ -54,37 +54,43 @@ export default class Player {
      * @param {Phaser.Geom.Point} point 
      * @returns {Number}
      */
-    findBillOnPoint(point) {
+    findBillIndexOnPoint(point) {
         const me = this;
 
-        for (let i = 0; i < me._money.length; ++i) {
+        for (let i = 0; i < me._bills.length; ++i) {
 
             const contains = Phaser.Geom.Rectangle.ContainsPoint(
-                me._money[i].image.getBounds(),
+                me._bills[i].image.getBounds(),
                 point
             )
 
-            if (contains && me._money[i].count > 0) 
+            if (contains && me._bills[i].count > 0) 
                 return i;
         }
 
         return -1;
     }
 
-    takeBill(index) {
+    /**
+     * @param {Number} index 
+     */
+    removeBill(index) {
         const me = this;
 
-        --me._money[index].count;
-        me._money[index].image.setVisible(
-            me._money[index].count > 0);
+        --me._bills[index].count;
+        me._bills[index].image.setVisible(
+            me._bills[index].count > 0);
     }
 
+    /**
+     * @param {Number[]} bills 
+     */
     addBills(bills) {
         const me = this;
 
         for (let i = 0; i < bills.length; ++i) {
-            me._money[i].count += bills[i];
-            me._money[i].image.setVisible(me._money[i].count > 0);
+            me._bills[i].count += bills[i];
+            me._bills[i].image.setVisible(me._bills[i].count > 0);
         }
     }
 
@@ -113,6 +119,7 @@ export default class Player {
             houses: [],
             hotel: null
         });
+
         Utils.debugLog(`player ${Utils.enumToString(Enums.Player, me.index)} buys property ${field}!`);
 
         return me.getCardGrid();
@@ -128,6 +135,10 @@ export default class Player {
         return Utils.any(me._fields, (f) => f.index == field);
     }
 
+    /**
+     * @param {Number} field 
+     * @returns {Boolean}
+     */
     hasHouse(field) {
         const me = this;
 
@@ -160,6 +171,9 @@ export default class Player {
         return me.getBillsMoney() + me.getFieldsCost();
     }
 
+    /**
+     * @returns {Number}
+     */
     getFieldsCost() {
         const me = this;
 
@@ -167,21 +181,8 @@ export default class Player {
             return 0;
 
         let result = 0;
-
-        for (let i = 0; i < me._fields.length; ++i) {
-            const field = me._fields[i];
-            const config = FieldInfo.Config[field.index];
-            
-            result += config.cost / 2;
-
-            if (config.type == Enums.FieldType.PROPERTY) {
-                if (!!field.hotel)
-                    result += 5 * (config.costHouse / 2);
-                else 
-                    result += field.houses.length * (config.costHouse / 2);
-            }
-                        
-        }
+        for (let i = 0; i < me._fields.length; ++i)
+            result += me._getFieldCost(i);            
 
         return result;
     }
@@ -198,10 +199,14 @@ export default class Player {
         return Helper.getTotalMoney(me.enumBills());
     }
 
+    /**
+     * @param {Number} index 
+     * @returns {Phaser.Geom.Point}
+     */
     getBillPosition(index) {
         const me = this;
 
-        return Utils.toPoint(me._money[index].image);
+        return Utils.toPoint(me._bills[index].image);
     }
 
     /**
@@ -226,13 +231,8 @@ export default class Player {
         if (!Utils.contains(Consts.BuyableFieldTypes, config.type))
             throw `Field hasn't rent`;
 
-        if (config.type == Enums.FieldType.UTILITY) {
-            const total = me._fields
-                .filter((f) => FieldInfo.Config[f.index].type == Enums.FieldType.UTILITY)
-                .length;
-
-            return config.rent[total - 1] * dices;
-        } 
+        if (config.type == Enums.FieldType.UTILITY)
+            return me._getUtilityRent(config, dices);
 
         const property = Utils.firstOrDefault(me._fields, (f) => f.index == field);
         if (!property)
@@ -244,21 +244,12 @@ export default class Player {
         if (property.houses.length > 0)
             return config.rent[Enums.PropertyRentIndex.COLOR + property.houses.length];
 
-        const color = config.color;
-        const sameColorFieldsCount = me._fields
-            .map((f) => f.index)
-            .filter((i) => FieldInfo.Config[i].color == color)
-            .length;
-
-        const colorStr = Utils.enumToString(Enums.FieldColorIndex, color);
-        if (sameColorFieldsCount == Consts.PropertyColorCounts[colorStr])
-            return config.rent[Enums.PropertyRentIndex.COLOR];
-        
-        return config.rent[Enums.PropertyRentIndex.BASE];
+        return me._getPropertyColorRent(config);
     }
 
     /**
      * @param {Number} index 
+     * @param {Phaser.Geom.Point} fieldPos
      * @returns {Number}
      */
     trySell(index, fieldPos) {
@@ -266,38 +257,17 @@ export default class Player {
 
         const field = Utils.single(me._fields, (f) => f.index == index);
         const config = FieldInfo.Config[index];
-        
+    
+        if (!!field.hotel) 
+            return this._sellHotel(field, config, fieldPos);
+
         const sameColorFields = me._fields
             .filter((f) => FieldInfo.Config[f.index].color == config.color);
 
-        if (!!field.hotel) {
-            me._housePool.remove(field.hotel);
-            field.hotel = null;
-            for (let i = 0; i < Consts.MaxHouseCount; ++i)
-                me.addHouse(index, fieldPos);
+        if (field.houses.length > 0)
+            return me._sellHouse(field, config, sameColorFields);
 
-            return config.costHouse / 2;
-        }
-        else if (field.houses.length > 0) {
-            const count = field.houses.length;
-            if (Utils.any(sameColorFields, (f) => f.houses.length > count || !!f.hotel))
-                throw "can't sell - to many houses";
-
-            for (let i = 0; i < field.houses.length; ++i)
-            me._housePool.remove(field.houses[i]);
-
-            field.houses = [];
-            for (let i = 0; i < count - 1; ++i)
-                me.addHouse(index, fieldPos);
-
-            return config.costHouse / 2;
-        } else {
-            if (Utils.any(sameColorFields, (f) => f.houses.length > 0))
-                throw "can't sell - to many houses";
-
-            me._fields = me._fields.filter((f) => f.index != index);
-            return config.cost / 2    
-        }
+        return me._sellField(index, config);
     }
 
     /**
@@ -362,7 +332,7 @@ export default class Player {
      * @param {Number} index
      * @param {Phaser.Geom.Point[]} positions
      */
-    addHouse(index, pos) {
+    addBuilding(index, pos) {
         const me = this;
 
         const count = me._getHouseCount(index);
@@ -374,23 +344,10 @@ export default class Player {
 
         const angle = Helper.getFieldAngle(index);
 
-        if (field.houses.length >= Consts.MaxHouseCount) {
-            for (let i = 0; i < field.houses.length; ++i)
-            me._housePool.remove(field.houses[i]);
-
-            field.houses = [];
-
-            field.hotel = me._housePool.createHotel()
-                .setAngle(angle)
-                .setPosition(positions[0].x, positions[0].y);
-        }
-        else {
-            const house = me._housePool.createHouse()
-                .setAngle(angle);
-            field.houses.push(house);
-            for (let i = 0; i < positions.length; ++i)
-                field.houses[i].setPosition(positions[i].x, positions[i].y);
-        }
+        if (field.houses.length >= Consts.MaxHouseCount) 
+            me._addHotel(field, positions);
+        else 
+            me._addHouse(field, positions);
     }
 
     /**
@@ -405,7 +362,7 @@ export default class Player {
     /**
      * @returns {Number}
      */
-    getRichestField() {
+    getRichestFieldIndex() {
         const me = this;
 
         let result = [ me._fields[0].index ];
@@ -416,7 +373,7 @@ export default class Player {
             const cost = me._getCost(index);
 
             if (cost > max) {
-                result = [ index];
+                result = [ index ];
                 max = cost;
             }
             else if (cost == max)
@@ -429,12 +386,19 @@ export default class Player {
         return Utils.getRandomEl(result);
     }
 
+    /**
+     * 
+     * @param {Phaser.Geom.Point} point 
+     */
     updateButtonSelection(point) {
         const me = this;
 
         me._buttons.updateButtonSelection(point);
     }
 
+    /**
+     * @returns {Number[][]}
+     */
     getCardGrid() {
         const me = this;
 
@@ -442,6 +406,7 @@ export default class Player {
         for (let i = 0; i < me._fields.length; ++i) {
             let column = -1;
             const config = FieldInfo.Config[me._fields[i].index];
+
             if (config.type == Enums.FieldType.PROPERTY)
                 column = config.color - 1;
             else if (config.type == Enums.FieldType.RAILSTATION)
@@ -463,17 +428,21 @@ export default class Player {
         return result;
     }
 
+    /**
+     */
     kill() {
         const me = this;
 
         me._alive = false;
-        for (let i = 0; i < me._money.length; ++i)
-            me._money[i].image.setVisible(false);
+        for (let i = 0; i < me._bills.length; ++i)
+            me._bills[i].image.setVisible(false);
 
         for (let i = 0; i < me._fields.length; ++i) {
             const field = me._fields[i];
+
             if (!!field.hotel)
                 me._housePool.remove(field.hotel);
+                
             for (let j = 0; j < field.houses.length; ++j)
                 me._housePool.remove(field.houses[j]);
         }
@@ -487,7 +456,7 @@ export default class Player {
     enumBills() {
         const me = this;
 
-        return me._money.map((x) => x.count);
+        return me._bills.map((x) => x.count);
     }
 
     _getCost(index) {
@@ -593,5 +562,116 @@ export default class Player {
         }
 
         return result;
+    }
+
+    _getFieldCost(index) {
+        const me = this;
+
+        const field = me._fields[index];
+        const config = FieldInfo.Config[field.index];
+        
+        let cost = config.cost / 2;
+
+        if (config.type != Enums.FieldType.PROPERTY) 
+            return cost;
+
+        if (!!field.hotel)
+            cost += 5 * (config.costHouse / 2);
+        else 
+            cost += field.houses.length * (config.costHouse / 2);
+
+        return cost;
+    }
+
+    _getPropertyColorRent(config) {
+        const me = this;
+
+        const color = config.color;
+        const sameColorFieldsCount = me._fields
+            .map((f) => f.index)
+            .filter((i) => FieldInfo.Config[i].color == color)
+            .length;
+
+        const colorStr = Utils.enumToString(Enums.FieldColorIndex, color);
+        if (sameColorFieldsCount == Consts.PropertyColorCounts[colorStr])
+            return config.rent[Enums.PropertyRentIndex.COLOR];
+        
+        return config.rent[Enums.PropertyRentIndex.BASE];
+    }
+
+    _getUtilityRent(config, dices) {
+        const me = this;
+
+        const utilities = me._fields
+            .filter((f) => FieldInfo.Config[f.index].type == Enums.FieldType.UTILITY)
+            .length;
+
+        return config.rent[utilities - 1] * dices;
+    }
+
+    _sellField(index, config) {
+        const me = this;
+
+        if (Utils.any(sameColorFields, (f) => f.houses.length > 0))
+            throw "can't sell - to many houses";
+
+        me._fields = me._fields.filter((f) => f.index != index);
+        return config.cost / 2    
+    }
+
+    _sellHouse(field, config, sameColorFields) {
+        const me = this;
+
+        const count = field.houses.length;
+        if (Utils.any(sameColorFields, (f) => f.houses.length > count || !!f.hotel))
+            throw "can't sell - to many houses";
+
+        for (let i = 0; i < field.houses.length; ++i)
+            me._housePool.remove(field.houses[i]);
+
+        field.houses = [];
+        for (let i = 0; i < count - 1; ++i)
+            me.addBuilding(field.index, fieldPos);
+
+        return config.costHouse / 2;
+    }
+
+    _sellHotel(field, config, fieldPos) {
+        const me = this;
+
+        const config = FieldInfo.Config[field.index];
+
+        me._housePool.remove(field.hotel);
+        field.hotel = null;
+
+        for (let i = 0; i < Consts.MaxHouseCount; ++i)
+            me.addBuilding(field.index, fieldPos);
+
+        return config.costHouse / 2;
+    }
+
+    _addHouse(field, positions) {
+        const me = this;
+
+        const house = me._housePool.createHouse()
+            .setAngle(angle);
+
+        field.houses.push(house);
+
+        for (let i = 0; i < positions.length; ++i)
+            field.houses[i].setPosition(positions[i].x, positions[i].y);
+    }
+
+    _addHotel(field, positions) {
+        const me = this;
+
+        for (let i = 0; i < field.houses.length; ++i)
+            me._housePool.remove(field.houses[i]);
+
+        field.houses = [];
+
+        field.hotel = me._housePool.createHotel()
+            .setAngle(angle)
+            .setPosition(positions[0].x, positions[0].y);
     }
 }

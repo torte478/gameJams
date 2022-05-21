@@ -25,6 +25,10 @@ export default class Timer {
         me._finishTime = new Date().getTime() + me._duration;
     }
 
+
+    /**
+     * @returns {Boolean}
+     */
     check() {
         const me = this;
 
@@ -35,6 +39,8 @@ export default class Timer {
         return time >= me._finishTime;
     }
 
+    /**
+     */
     reset() {
         const me = this;
 
@@ -42,6 +48,8 @@ export default class Timer {
         me._finishTime = new Date().getTime() + me._duration;
     }
 
+    /**
+     */
     pause() {
         const me = this;
 
@@ -49,6 +57,8 @@ export default class Timer {
         me._remain = me._finishTime - new Date().getTime();
     }
 
+    /**
+     */
     resume() {
         const me = this;
 
@@ -57,6 +67,9 @@ export default class Timer {
         me._remain = 0;
     }
 
+    /**
+     * @returns {Number}
+     */
     getRemain() {
         const me = this;
 
