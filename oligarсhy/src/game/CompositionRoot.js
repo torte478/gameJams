@@ -5,7 +5,6 @@ import Cards from './Entities/Cards.js';
 import Context from './Entities/Context.js';
 import Dice from './Entities/Dice.js';
 import Fields from './Entities/Fields.js';
-import Groups from "./Entities/BillPool";
 import Hand from './Entities/Hand.js';
 import HUD from './Entities/HUD.js';
 import Piece from './Entities/Piece.js';
@@ -20,8 +19,7 @@ import Utils from './Utils.js';
 import BillPool from './Entities/BillPool';
 import HousePool from './Entities/HousePool.js';
 
-// TODO : rename
-export default class Start {
+export default class CompositionRoot {
 
     /**
      * @param {Phaser.Scene} scene 
@@ -45,11 +43,11 @@ export default class Start {
                 scene.physics.world.bounds.width,
                 scene.physics.world.bounds.height);
 
-        Start._createTiles(scene);
+        CompositionRoot._createTiles(scene);
 
         // core
         core._scene = scene;
-        core._cursor = Start._createCursor(scene);
+        core._cursor = CompositionRoot._createCursor(scene);
         core._billPool = new BillPool(scene);
         core._cards = new Cards(scene);
         core._hud = new HUD(scene.add);
@@ -60,7 +58,7 @@ export default class Start {
             new Timer(Config.Time.DarkSec * 1000, true)
         ];
 
-        core._fade = Start._createFade(scene);
+        core._fade = CompositionRoot._createFade(scene);
 
         // context
 
@@ -95,13 +93,13 @@ export default class Start {
             context.players.push(player);
         }
 
-        core._ai = Start._createAI(context);
+        core._ai = CompositionRoot._createAI(context);
         core._context = context;
 
         // init
 
         for (let i = 0; i < Config.PlayerCount; ++i)
-            Start._initPlayer(i, core, context);
+            CompositionRoot._initPlayer(i, core, context);
 
         core._setState(Config.StartState);
 
