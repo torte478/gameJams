@@ -32,7 +32,7 @@ export default class PieceTakedState extends State {
             status.pieceIndicies[status.player],
             point);
 
-        if (nextField.index != status.targetFieldIndex)
+        if (!nextField || nextField.index != status.targetFieldIndex)
             return;
 
         hand.tryMakeAction(

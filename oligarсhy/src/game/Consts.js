@@ -17,7 +17,8 @@ export default class Consts {
         Hand: 5000,
         ActiveItem: 7500,
         HUD: 10000,
-        Fade: 20000,
+        Fade: 15000,
+        PauseFade: 20000,
         Max: 100000
     };
 
@@ -132,7 +133,9 @@ export default class Consts {
         CardShiftDuration: 1000,
         CenterEntranceDuration: 1500,
 
-        Selection: 500
+        Selection: 500,
+        PhaseChangeDuration: 10000,
+        PhaseChangeDelay: 1000
     };
 
     static HandWaitPosition = {

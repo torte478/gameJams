@@ -163,7 +163,7 @@ export default class Utils {
         return false;
     }
 
-    // TODO: refactir is/if Debug everywhere
+    // TODO: refactor is/if Debug everywhere
 
     /**
      * @param {Boolean} flag 

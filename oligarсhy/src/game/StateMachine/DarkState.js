@@ -39,6 +39,20 @@ export default class DarkState extends State {
         core._timers[Enums.TimerIndex.DARK].resume();    
     }
 
+    /**
+     */
+    showButtons() {
+        const me = this,
+            /** @type {Core} */
+            core = me.core,
+            players = core._context.status.activePlayers;
+
+        for (let i = 0; i < players.length; ++i) {
+            const index = players[i];
+            core._context.players[index].showButtons([]);
+        }
+    }
+
     _stopDark() {
         const me = this,
               /** @type {Core} */

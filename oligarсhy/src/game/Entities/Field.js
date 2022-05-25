@@ -275,7 +275,7 @@ export default class Field {
                 Helper.toLight(items[3]);
                 items[4].setStyle(Consts.TextStyle.FieldSmallLight);
                 items[5].setStyle(Consts.TextStyle.FieldMiddleLight);
-                items[6].setFrame(player == Enums.Player.HUMAN ? 9 : 1);
+                items[6].setFrame(me._player == Enums.Player.HUMAN ? 9 : 1);
                 Helper.toLight(items[7]);
                 items[8].setStyle(Consts.TextStyle.FieldMiddleLight);
                 break;
@@ -295,7 +295,7 @@ export default class Field {
                 Helper.toLight(items[2]);
                 items[3].setStyle(Consts.TextStyle.FieldMiddleLight);
                 items[4].setStyle(Consts.TextStyle.FieldMiddleLight);
-                items[5].setFrame(player == Enums.Player.HUMAN ? 9 : 1);
+                items[5].setFrame(me._player == Enums.Player.HUMAN ? 9 : 1);
                 Helper.toLight(items[6]);
                 items[7].setStyle(Consts.TextStyle.FieldMiddleLight);
                 break;
@@ -304,7 +304,7 @@ export default class Field {
                 Helper.toLight(items[2]);
                 items[3].setStyle(Consts.TextStyle.FieldSmallLight);
                 items[4].setStyle(Consts.TextStyle.FieldMiddleLight);
-                items[5].setFrame(player == Enums.Player.HUMAN ? 9 : 1);
+                items[5].setFrame(me._player == Enums.Player.HUMAN ? 9 : 1);
                 Helper.toLight(items[6]);
                 items[7].setStyle(Consts.TextStyle.FieldMiddleLight);
                 break;

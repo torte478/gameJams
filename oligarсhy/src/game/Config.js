@@ -8,10 +8,11 @@ export default class Config {
         StateLog: true,
         Log: true,
         Random: false,
-        SkipHuman: true,
+        SkipHuman: false,
         ShowTextLog: true,
         IgnorePause: true,
-        CancelAiBuy: false
+        CancelAiBuy: false,
+        IgnorePhaseFade: false,
     };
 
     static PlayerCount = 4;
@@ -45,7 +46,7 @@ export default class Config {
 
     static Time = {
         TurnSec: 300,
-        LightSec: 2000,
+        LightSec: 5,
         DarkSec: 400,
     };
 }

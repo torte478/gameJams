@@ -4,6 +4,7 @@ import AI from './Entities/AI.js';
 import BillPool from './Entities/BillPool.js';
 import Context from './Entities/Context.js';
 import Cards from './Entities/Cards.js';
+import Graphics from './Entities/Graphics.js';
 import HUD from './Entities/HUD.js';
 import Timer from './Entities/Timer.js';
 
@@ -54,6 +55,9 @@ export default class Core {
 
     /** @type {State} */
     _gameState;
+
+    /** @type {Graphics} */
+    _graphics;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -276,7 +280,7 @@ export default class Core {
         me._setState(Enums.GameState.DICES_DROPED);
     }
 
-    _cancelTurn() {
+    _cancelTurn(ignoreTween) {
         const me = this,
               current = me.getCurrent();
 
@@ -289,10 +293,19 @@ export default class Core {
         const nextState = me._gameState.getNextStateAfterCancel();
 
         me._context.status.isBusy = true;
-        current.hand.cancel(() => {
-            me._context.status.isBusy = false;
-            me._setState(nextState);
-        });
+        if (!!ignoreTween) {
+            current.hand.cancel();
+            me._cancelTurnCallback(nextState);
+        } else {
+            current.hand.cancel(() => me._cancelTurnCallback(nextState));
+        }
+    }
+
+    _cancelTurnCallback(nextState) {
+        const me = this;
+
+        me._context.status.isBusy = false;
+        me._setState(nextState);
     }
 
     _finishTurn() {
@@ -651,7 +664,8 @@ export default class Core {
             `trn: ${(me._timers[Enums.TimerIndex.TURN].getRemain()) / 1000 | 0}\n` +
             `lgt: ${(me._timers[Enums.TimerIndex.LIGHT].getRemain()) / 1000 | 0}\n` +
             `drk: ${(me._timers[Enums.TimerIndex.DARK].getRemain()) / 1000 | 0}\n` +
-            `pse: ${!me._scene.input.mouse.locked}`;
+            `pse: ${!me._scene.input.mouse.locked}\n` +
+            `ste: ${Utils.enumToString(Enums.GameState, me._gameState.getName())}`;
         me._log.setText(text);
     }
 

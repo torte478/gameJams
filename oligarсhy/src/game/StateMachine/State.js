@@ -33,7 +33,7 @@ export default class State {
     processTurn(point) {
         const me = this;
 
-        const stateStr = Utils.enumToString(Enums.GameState, me.core_context.status.state);
+        const stateStr = Utils.enumToString(Enums.GameState, me.core._context.status.state);
         throw `can't process state: ${stateStr}`;
     }
 
@@ -91,6 +91,10 @@ export default class State {
 
     _startDark() {
         const me = this;
+
+        me.core._graphics.showDarkFade();
+
+        me.core._cancelTurn(true);
 
         me.core._timers[Enums.TimerIndex.LIGHT].pause();
         me.core._timers[Enums.TimerIndex.TURN].pause();

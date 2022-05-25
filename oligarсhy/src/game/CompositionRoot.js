@@ -6,6 +6,7 @@ import Cards from './Entities/Cards.js';
 import Context from './Entities/Context.js';
 import Dice from './Entities/Dice.js';
 import Fields from './Entities/Fields.js';
+import Graphics from './Entities/Graphics.js';
 import Hand from './Entities/Hand.js';
 import HousePool from './Entities/HousePool.js';
 import HUD from './Entities/HUD.js';
@@ -61,6 +62,7 @@ export default class CompositionRoot {
         ];
 
         core._fade = CompositionRoot._createFade(scene);
+        core._graphics = new Graphics(scene);
 
         // context
 
@@ -159,9 +161,9 @@ export default class CompositionRoot {
     }
 
     static _createFade(scene) {
-        return scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
+        return scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade_black')
             .setScrollFactor(0)
-            .setDepth(Consts.Depth.Fade)
+            .setDepth(Consts.Depth.PauseFade)
             .setAlpha(0.75)
             .setVisible(false);
     }
