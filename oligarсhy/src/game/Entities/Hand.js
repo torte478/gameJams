@@ -307,6 +307,22 @@ export default class Hand {
         });
     }
 
+    /**
+     */
+    startDark() {
+        const me = this;
+
+        Helper.toDark(me._sprite);
+    }
+
+    /**
+     */
+    stopDark() {
+        const me = this;
+
+        Helper.toLight(me._sprite);
+    }
+
     _startGrabTimeline(target, callback) {
         const me = this;
 

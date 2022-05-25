@@ -90,6 +90,90 @@ export default class Cards {
             me._sellCard(fields[i]);
     }
 
+    /**
+     */
+    startDark() {
+        const me = this;
+
+        for (let i = 0; i < me._cards.length; ++i) {
+            const card = me._cards[i];
+            
+            if (!card.container.visible)
+                continue;
+
+            me._startCardDark(card);
+        }
+    }
+
+    /**
+     */
+    stopDark() {
+        const me = this;
+
+        for (let i = 0; i < me._cards.length; ++i) {
+            const card = me._cards[i];
+            
+            if (!card.container.visible)
+                continue;
+
+            me._stopCardDark(card);
+        }
+    }
+
+    _startCardDark(card) {
+        const config = FieldInfo.Config[card.index];
+
+        /** @type {Phaser.GameObjects.Container} */
+        const container = card.container;
+        const items = container.getAll();
+
+        switch (config.type) {
+            case Enums.FieldType.PROPERTY:
+                Helper.toDark(items[0]);
+                items[1].setFrame(0);
+                items[2].setStyle(Consts.TextStyle.FieldSmallDark);
+                Helper.toDark(items[3]);
+                break;
+
+            case Enums.FieldType.RAILSTATION:
+            case Enums.FieldType.UTILITY:
+                Helper.toDark(items[0]);
+                items[1].setStyle(Consts.TextStyle.FieldMiddleDark);
+                Helper.toDark(items[2]);
+                break;
+
+            default: 
+                throw `wrong field type ${config.type}`;
+        }
+    }
+
+    _stopCardDark(card) {
+        const config = FieldInfo.Config[card.index];
+
+        /** @type {Phaser.GameObjects.Container} */
+        const container = card.container;
+        const items = container.getAll();
+
+        switch (config.type) {
+            case Enums.FieldType.PROPERTY:
+                Helper.toLight(items[0]);
+                items[1].setFrame(config.color);
+                items[2].setStyle(Consts.TextStyle.FieldSmallLight);
+                Helper.toLight(items[3]);
+                break;
+
+            case Enums.FieldType.RAILSTATION:
+            case Enums.FieldType.UTILITY:
+                Helper.toLight(items[0]);
+                items[1].setStyle(Consts.TextStyle.FieldMiddleLight);
+                Helper.toLight(items[2]);
+                break;
+
+            default: 
+                throw `wrong field type ${config.type}`;
+        }
+    }   
+
     _updateGridForCard(player, grid, updated, buy, ignoreTween) {
         const me = this;
 
@@ -166,27 +250,32 @@ export default class Cards {
         });
     }
 
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {Object} config 
+     * @returns {Phaser.GameObjects.GameObject[]}
+     */
     _getContent(scene, config) {
         switch (config.type) {
             case Enums.FieldType.PROPERTY:
                 return [
                     scene.add.image(0, 0, 'cards', 0),
                     scene.add.image(0, -75, 'field_header', config.color),
-                    scene.add.text(0, -30, config.name, Consts.TextStyle.FieldSmall).setOrigin(0.5),
+                    scene.add.text(0, -30, config.name, Consts.TextStyle.FieldSmallLight).setOrigin(0.5),
                     scene.add.image(0, 30, 'icons', config.icon)
                 ];
 
             case Enums.FieldType.RAILSTATION:
                 return [
                     scene.add.image(0, 0, 'cards', 0),
-                    scene.add.text(0, -65, config.name, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
+                    scene.add.text(0, -65, config.name, Consts.TextStyle.FieldMiddleLight).setOrigin(0.5),
                     scene.add.image(0, 20, 'icons_big', 4).setScale(0.75)
                 ];
 
             case Enums.FieldType.UTILITY:
                 return [
                     scene.add.image(0, 0, 'cards', 0),
-                    scene.add.text(0, -65, config.name, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
+                    scene.add.text(0, -65, config.name, Consts.TextStyle.FieldMiddleLight).setOrigin(0.5),
                     scene.add.image(0, 20, 'icons_big', config.icon).setScale(0.75)
                 ];
 

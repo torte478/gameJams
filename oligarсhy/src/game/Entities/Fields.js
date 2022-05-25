@@ -117,6 +117,25 @@ export default class Fields {
             me._fields[i].unselect();
     }
 
+
+    /**
+     */
+    startDark() {
+        const me = this;
+
+        for (let i = 0; i < me._fields.length; ++i)
+            me._fields[i].startDark();
+    }
+
+    /**
+     */
+    stopDark() {
+        const me = this;
+
+        for (let i = 0; i < me._fields.length; ++i)
+            me._fields[i].stopDark();
+    }
+
     _movePiece(player, from, to, inJail) {
         const me = this;
 

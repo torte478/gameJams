@@ -46,10 +46,9 @@ export default class CompositionRoot {
                 scene.physics.world.bounds.width,
                 scene.physics.world.bounds.height);
 
-        CompositionRoot._createTiles(scene);
-
         // core
         core._scene = scene;
+        core._desk = CompositionRoot._createTiles(scene);
         core._cursor = CompositionRoot._createCursor(scene);
         core._billPool = new BillPool(scene);
         core._cards = new Cards(scene);
@@ -135,6 +134,10 @@ export default class CompositionRoot {
             .setCollideWorldBounds(true);
     }
 
+    /**
+     * @param {Phaser.Scene} scene 
+     * @returns {Phaser.Tilemaps.TilemapLayer}
+     */
     static _createTiles(scene) {
         const level = [
             [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -152,7 +155,7 @@ export default class CompositionRoot {
 
         const map = scene.make.tilemap({ data: level, tileWidth: 500, tileHeight: 500 });
         const tiles = map.addTilesetImage('table');
-        map.createLayer(0, tiles, -2750, -2750);
+        return map.createLayer(0, tiles, -2750, -2750);
     }
 
     static _createFade(scene) {
@@ -177,7 +180,7 @@ export default class CompositionRoot {
         // start fields
         for (let i = 0; i < Config.Fields[player].length; ++i) {
             const field = Config.Fields[player][i];
-            const index = isNaN(field) ? field.index : index;
+            const index = isNaN(field) ? field.index : field;
             core._buyField(index, player, true);
 
             if (!isNaN(field))

@@ -162,26 +162,49 @@ export default class Consts {
 
     static ButtonSelectionColor = 0xd4d6e1;
 
-    static FieldTextColor = '#232429';
+    static FieldTextColorLight = '#232429';
+    static FieldTextColorDark = '#d4d6e1';
+
     static Font = 'Arial';
 
     static TextStyle = {
-        FieldSmall: {
-            color: Consts.FieldTextColor,
+        FieldSmallLight: {
+            color: Consts.FieldTextColorLight,
             fontFamily: Consts.Font,
             align: 'center',
             fontSize: 18
         },
 
-        FieldMiddle: {
-            color: Consts.FieldTextColor,
+        FieldSmallDark: {
+            color: Consts.FieldTextColorDark,
+            fontFamily: Consts.Font,
+            align: 'center',
+            fontSize: 18
+        },
+
+        FieldMiddleLight: {
+            color: Consts.FieldTextColorLight,
             fontFamily: Consts.Font,
             align: 'center',
             fontSize: 22
         },
 
-        FieldBig: {
-            color: Consts.FieldTextColor,
+        FieldMiddleDark: {
+            color: Consts.FieldTextColorDark,
+            fontFamily: Consts.Font,
+            align: 'center',
+            fontSize: 22
+        },
+
+        FieldBigLight: {
+            color: Consts.FieldTextColorLight,
+            fontFamily: Consts.Font,
+            align: 'center',
+            fontSize: 28
+        },
+
+        FieldBigDark: {
+            color: Consts.FieldTextColorDark,
             fontFamily: Consts.Font,
             align: 'center',
             fontSize: 28

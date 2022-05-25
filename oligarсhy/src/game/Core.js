@@ -49,6 +49,9 @@ export default class Core {
     /** @type {Context} */
     _context;
 
+    /** @type {Phaser.Tilemaps.TilemapLayer} */
+    _desk;
+
     /** @type {State} */
     _gameState;
 
@@ -483,7 +486,7 @@ export default class Core {
         for (let i = 0; i < Consts.FieldCount; ++i)
             if (player.hasField(i)) {
                 const rent = player.getRent(i, me._context.status.diceResult);
-                me._context.fields.at(i).updateRent(playerIndex, rent);
+                me._context.fields.at(i).updateRent(rent);
             }      
     }
 
@@ -634,30 +637,6 @@ export default class Core {
             me._cursor.y + 200);
 
         me.getCurrent().hand.moveTo(offset, delta);
-    }
-
-    _startDark() {
-        const me = this;
-
-        me._timers[Enums.TimerIndex.LIGHT].pause();
-        me._timers[Enums.TimerIndex.TURN].pause();
-        me._timers[Enums.TimerIndex.DARK].reset();
-
-        me._setState(Enums.GameState.DARK);
-    }
-
-    _stopDark() {
-        const me =this;
-
-        me._timers[Enums.TimerIndex.LIGHT].reset();
-        me._timers[Enums.TimerIndex.TURN].reset();
-        me._timers[Enums.TimerIndex.DARK].pause();
-
-        me._setState(Enums.GameState.BEGIN);
-    }
-
-    _updateDarkGame(delta) {
-        const me = this;
     }
 
     _updateDebugLog() {

@@ -75,7 +75,7 @@ export default class State {
         const me = this;
 
         if (me.core._timers[Enums.TimerIndex.LIGHT].check()) 
-            return me.core._startDark();
+            return me._startDark();
 
         me.core._updateLightGame(delta);
     }
@@ -87,5 +87,19 @@ export default class State {
 
         me.core._timers[Enums.TimerIndex.TURN].resume();
         me.core._timers[Enums.TimerIndex.LIGHT].resume();
+    }
+
+    _startDark() {
+        const me = this;
+
+        me.core._timers[Enums.TimerIndex.LIGHT].pause();
+        me.core._timers[Enums.TimerIndex.TURN].pause();
+        me.core._timers[Enums.TimerIndex.DARK].reset();
+
+        me.core._desk.setVisible(false);
+        me.core._cards.startDark();
+        me.core._context.startDark();
+
+        me.core._setState(Enums.GameState.DARK);
     }
 }

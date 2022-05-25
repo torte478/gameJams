@@ -2,6 +2,7 @@ import Phaser from "../../lib/phaser.js";
 
 import Consts from "../Consts.js";
 import Enums from "../Enums.js";
+import Helper from "../Helper.js";
 
 export default class Piece {
     
@@ -69,5 +70,21 @@ export default class Piece {
 
         me._selection.setVisible(false);
         me._tween.pause();
+    }
+
+    /**
+     */
+    startDark() {
+        const me = this;
+
+        Helper.toDark(me._sprite);
+    }
+
+    /**
+    */
+    stopDark() {
+        const me = this;
+
+        Helper.toLight(me._sprite);
     }
 }

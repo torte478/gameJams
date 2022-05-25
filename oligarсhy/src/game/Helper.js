@@ -167,4 +167,18 @@ export default class Helper {
 
         return result;
     }
+
+    /**
+     * @param {Phaser.GameObjects.Image} image 
+     */
+    static toDark(image) {
+        image.setFrame(image.frame.name + 1);
+    }
+
+    /**
+     * @param {Phaser.GameObjects.Image} image 
+     */
+    static toLight(image) {
+        image.setFrame(image.frame.name - 1);
+    }
 }

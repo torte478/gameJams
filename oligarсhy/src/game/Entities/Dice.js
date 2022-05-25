@@ -103,6 +103,22 @@ export default class Dice {
         me._selectTween.pause();
     }
 
+    /**
+     */
+    hide() {
+        const me = this;
+
+        me._container.setVisible(false);
+    }
+
+    /**
+     */
+    show() {
+        const me = this;
+
+        me._container.setVisible(true);
+    }
+
     _buildContainer(scene, x, y, content) {
         const container = scene.add.container(x, y, content)
             .setDepth(Consts.Depth.Pieces);

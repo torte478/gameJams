@@ -345,9 +345,9 @@ export default class Player {
         const angle = Helper.getFieldAngle(index);
 
         if (field.houses.length >= Consts.MaxHouseCount) 
-            me._addHotel(field, positions);
+            me._addHotel(field, positions, angle);
         else 
-            me._addHouse(field, positions);
+            me._addHouse(field, positions, angle);
     }
 
     /**
@@ -457,6 +457,24 @@ export default class Player {
         const me = this;
 
         return me._bills.map((x) => x.count);
+    }
+
+    /**
+     */
+    startDark() {
+        const me = this;
+
+        for (let i = 0; i < me._bills.length; ++i)
+            Helper.toDark(me._bills[i].image);
+    }
+
+    /**
+     */
+    stopDark() {
+        const me = this;
+
+        for (let i = 0; i < me._bills.length; ++i)
+            Helper.toLight(me._bills[i].image);
     }
 
     _getCost(index) {
@@ -648,7 +666,7 @@ export default class Player {
         return config.costHouse / 2;
     }
 
-    _addHouse(field, positions) {
+    _addHouse(field, positions, angle) {
         const me = this;
 
         const house = me._housePool.createHouse()
@@ -660,7 +678,7 @@ export default class Player {
             field.houses[i].setPosition(positions[i].x, positions[i].y);
     }
 
-    _addHotel(field, positions) {
+    _addHotel(field, positions, angle) {
         const me = this;
 
         for (let i = 0; i < field.houses.length; ++i)
