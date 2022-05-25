@@ -2,6 +2,7 @@ import Phaser from '../../lib/phaser.js';
 
 import AI from '../Entities/AI.js';
 
+import Core from '../Core.js';
 import Enums from '../Enums.js';
 import FieldInfo from '../FieldInfo.js';
 import Utils from '../Utils.js';
@@ -92,9 +93,11 @@ export default class OwnFieldSelectedState extends State {
 
     _tryBuyHouse(point) {
         const me = this,
-              context = me.core._context,
+              /** @type {Core} */
+              core = me.core,
+              context = core._context,
               status = context.status,
-              current = me.core.getCurrent(),
+              current = core.getCurrent(),
               player = current.player;
 
         const remain = me._updatePayAmount();
@@ -102,12 +105,12 @@ export default class OwnFieldSelectedState extends State {
             return;
 
         const fieldIndex = status.selectedField;
-        player.addHouse(fieldIndex, context.fields.getFieldPosition(fieldIndex));
-        me.core._updateRent(player.index);
-        me.core._addMoney(-remain, point, player);
+        player.addBuilding(fieldIndex, context.fields.getFieldPosition(fieldIndex));
+        core._updateRent(player.index);
+        core._addMoney(-remain, point, player);
 
         status.buyHouseOnCurrentTurn = true;
-        me.core._setState(status.stateToReturn);
+        core._setState(status.stateToReturn);
     }
 
     _updatePayAmount() {

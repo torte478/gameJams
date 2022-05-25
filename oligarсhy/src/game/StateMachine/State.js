@@ -3,6 +3,7 @@ import Phaser from '../../lib/phaser.js';
 import AI from '../Entities/AI.js';
 
 import Enums from '../Enums.js';
+import Core from '../Core.js';
 import Utils from '../Utils.js';
 
 export default class State {
@@ -64,5 +65,27 @@ export default class State {
 
         const stateStr = Utils.enumToString(Enums.GameState, ai._context.status.state);
         throw `CPU Error! Unknown state ${stateStr}`;
+    }
+
+    /**
+     * @param {Number} delta 
+     * @returns 
+     */
+    updateGame(delta) {
+        const me = this;
+
+        if (me.core._timers[Enums.TimerIndex.LIGHT].check()) 
+            return me.core._startDark();
+
+        me.core._updateLightGame(delta);
+    }
+
+    /**
+     */
+    unpause() {
+        const me = this;
+
+        me.core._timers[Enums.TimerIndex.TURN].resume();
+        me.core._timers[Enums.TimerIndex.LIGHT].resume();
     }
 }

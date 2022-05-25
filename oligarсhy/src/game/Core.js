@@ -74,7 +74,7 @@ export default class Core {
         if (me._checkPause())
             return;
 
-        me._updateGame(delta);
+        me._gameState.updateGame(delta);
     }
 
     /**
@@ -544,7 +544,7 @@ export default class Core {
     _pause() {
         const me = this;
 
-        if (!me._context.status.isPause)
+        if (me._context.status.isPause)
             return;
 
         me._scene.input.mouse.releasePointerLock();
@@ -563,14 +563,7 @@ export default class Core {
         me._context.status.isPause = false;
         me._restoreSelection();
         me._fade.setVisible(false);
-
-        // TODO : extract dark logic code (+everywhere)
-        if (me._context.status.state === Enums.GameState.DARK) {
-            me._timers[Enums.TimerIndex.DARK].resume();    
-        } else {
-            me._timers[Enums.TimerIndex.TURN].resume();
-            me._timers[Enums.TimerIndex.LIGHT].resume();
-        }
+        me._gameState.unpause();
     }
 
     _restoreSelection() {
@@ -661,23 +654,6 @@ export default class Core {
         me._timers[Enums.TimerIndex.DARK].pause();
 
         me._setState(Enums.GameState.BEGIN);
-    }
-
-    _updateGame(delta) {
-        const me = this;
-
-        // TODO : split to Dark and Light state (pattern)
-        if (me._context.status.state === Enums.GameState.DARK) {
-            if (me._timers[Enums.TimerIndex.DARK].check())
-                return me._stopDark();
-
-            me._updateDarkGame(delta);
-        } else {
-            if (me._timers[Enums.TimerIndex.LIGHT].check()) 
-                return me._startDark();
-
-            me._updateLightGame(delta);
-        }
     }
 
     _updateDarkGame(delta) {
