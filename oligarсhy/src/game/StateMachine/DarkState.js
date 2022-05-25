@@ -55,9 +55,11 @@ export default class DarkState extends State {
         core._setState(Enums.GameState.BEGIN);
     }
 
-    _updateDarkGame() {
+    _updateDarkGame(delta) {
         const me = this,
               /** @type {Core} */
               core = me.core;
+
+        core._moveHumanHand(delta);
     }
 }

@@ -145,6 +145,9 @@ export default class Hand {
         return Helper.getTotalMoney(me._money);
     }
 
+    /**
+     * @returns {Number}
+     */
     getAvailableMoneyAction() {
         const me = this;
 

@@ -636,7 +636,7 @@ export default class Core {
             me._cursor.x + 100,
             me._cursor.y + 200);
 
-        me.getCurrent().hand.moveTo(offset, delta);
+        me._context.hands[Enums.Player.HUMAN].moveTo(offset, delta);
     }
 
     _updateDebugLog() {
