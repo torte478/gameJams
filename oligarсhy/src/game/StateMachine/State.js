@@ -89,12 +89,19 @@ export default class State {
         me.core._timers[Enums.TimerIndex.LIGHT].resume();
     }
 
+    /**
+     */
+    interupt() {
+    }
+
     _startDark() {
         const me = this;
 
         me.core._graphics.showDarkFade();
 
         me.core._cancelTurn(true);
+        me.interupt();
+
         me.core._context.status.stateToReturn = me.core._gameState.getName();
 
         me.core._timers[Enums.TimerIndex.LIGHT].pause();
