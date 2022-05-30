@@ -95,6 +95,7 @@ export default class State {
         me.core._graphics.showDarkFade();
 
         me.core._cancelTurn(true);
+        me.core._context.status.stateToReturn = me.core._gameState.getName();
 
         me.core._timers[Enums.TimerIndex.LIGHT].pause();
         me.core._timers[Enums.TimerIndex.TURN].pause();

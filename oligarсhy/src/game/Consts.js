@@ -134,8 +134,8 @@ export default class Consts {
         CenterEntranceDuration: 1500,
 
         Selection: 500,
-        PhaseChangeDuration: 10000,
-        PhaseChangeDelay: 1000
+        PhaseChangeDuration: 1000, //10000,
+        PhaseChangeDelay: 0, // 1000
     };
 
     static HandWaitPosition = {

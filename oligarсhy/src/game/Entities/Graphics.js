@@ -12,6 +12,9 @@ export default class Graphics {
     /** @type {Phaser.GameObjects.Image} */
     _darkFade;
 
+    /** @type {Phaser.Tweens.Tween} */
+    _fadeTween;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -34,16 +37,19 @@ export default class Graphics {
         if (Utils.isDebug(Config.Debug.IgnorePhaseFade))
             return;
 
+        if (!!me._fadeTween)
+            me._fadeTween.pause().remove();
+
         me._darkFade
             .setVisible(true)
             .setAlpha(1);
 
-        me._scene.tweens.add({
+        me._fadeTween = me._scene.tweens.add({
             targets: me._darkFade,
             alpha: { from: 1, to: 0 },
             delay: Consts.Speed.PhaseChangeDelay,
             ease: 'Sine.easeInOut',
-            duration: Consts.Speed.PhaseChangeDuration
+            duration: Consts.Speed.PhaseChangeDuration,
         });
     }
 }

@@ -66,7 +66,7 @@ export default class DarkState extends State {
         core._cards.stopDark();
         core._context.stopDark();
 
-        core._setState(Enums.GameState.BEGIN);
+        core._setState(core._context.status.stateToReturn);
     }
 
     _updateDarkGame(delta) {

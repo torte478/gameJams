@@ -46,7 +46,7 @@ export default class Config {
 
     static Time = {
         TurnSec: 300,
-        LightSec: 5,
-        DarkSec: 400,
+        LightSec: 500,
+        DarkSec: 500,
     };
 }

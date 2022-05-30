@@ -141,6 +141,9 @@ export default class Core {
 
         if (!Config.Debug.Global)
             return;
+
+        if (!!event.repeat)
+            return;
             
         if (event.key == 'r') {
             scene.input.mouse.releasePointerLock();
@@ -148,10 +151,23 @@ export default class Core {
             return;
         }
 
+        if (event.key == 'q')
+            return me._debugChangeMode();
+
         if (Utils.stringIsDigit(event.key)) {
             const value = +event.key;
             me._debugDropDices(value);
         }
+    }
+
+    _debugChangeMode() {
+        const me = this;
+
+        if (me._gameState.getName() === Enums.GameState.DARK)
+            me._gameState._stopDark();
+        else
+            me._gameState._startDark();
+
     }
 
     _debugDropDices(value) {

@@ -74,11 +74,14 @@ export default class Status {
     setState(value) {
         const me = this;
 
-        if (Utils.isDebug(Config.Debug.StateLog))
-            Utils.debugLog(
+        me._validateStateChange(value);
+
+        Utils.ifDebug(
+            Config.Debug.StateLog, 
+            () => Utils.debugLog(
                 `(${me.player + 1}): `
                 + `${Utils.enumToString(Enums.GameState, me.state)} => `
-                + `${Utils.enumToString(Enums.GameState, value)}`);
+                + `${Utils.enumToString(Enums.GameState, value)}`));
 
         me.state = value;
     }
@@ -166,5 +169,21 @@ export default class Status {
         return me.activePlayers.length === 1
             ? Enums.PlayerDeathResult.WIN
             : Enums.PlayerDeathResult.CONTINUE;
+    }
+
+    _validateStateChange(value) {
+        const me = this;
+
+        if (me.state !== Enums.GameState.DARK)
+            return;
+
+        if (me.stateToReturn == null)
+            throw 'unexpected dark state end. '
+                + 'State to return is null';
+
+        if (value !== me.stateToReturn)
+            throw 'unexpected dark state end. '
+                + `Expected ${Utils.enumToString(Enums.GameState, me.stateToReturn)} `
+                + `, but actually ${Utils.enumToString(Enums.GameState, value)}`;
     }
 }
