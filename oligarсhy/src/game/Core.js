@@ -167,7 +167,28 @@ export default class Core {
             me._gameState._stopDark();
         else
             me._gameState._startDark();
+    }
 
+    _runDark() {
+        const me = this;
+
+        me._context.status.needRunDark = false;
+
+        me._graphics.showDarkFade();
+
+        me._cancelTurn(true);
+
+        me._context.status.stateToReturn = me._gameState.getName();
+
+        me._timers[Enums.TimerIndex.LIGHT].pause();
+        me._timers[Enums.TimerIndex.TURN].pause();
+        me._timers[Enums.TimerIndex.DARK].reset();
+
+        me._desk.setVisible(false);
+        me._cards.startDark();
+        me._context.startDark();
+
+        me._setState(Enums.GameState.DARK);
     }
 
     _debugDropDices(value) {
@@ -473,6 +494,9 @@ export default class Core {
 
     _setState(state) {
         const me = this;
+
+        if (!!me._context.status.needRunDark)
+            return me._runDark();
 
         me._context.status.setState(state);
         me._gameState = States.next(state, me);

@@ -10,8 +10,7 @@ import State from './State.js';
 
 export default class SecondDiceTakedState extends State {
 
-    /** @type {Object} */
-    _beforeDropConfig = null;
+    _isActionRunning = false;
 
     /** 
      * @returns {Number}
@@ -77,44 +76,18 @@ export default class SecondDiceTakedState extends State {
             Math.max(zone.y, Math.min(zone.y + zone.height, diceDropPos.y)));
     }
 
-    /**
-     */
-    interupt() {
-        const me = this;
-
-        if (!me._beforeDropConfig)
-            return;
-
-        /** @type {Phaser.Time.TimerEvent} */
-        const timeEvent = me._beforeDropConfig.delayed;
-        timeEvent.paused = true;
-        timeEvent.remove(false);
-
-        me.core._context.dice1
-            .stopRoll(me._beforeDropConfig.dice1.value)
-            .setPosition(me._beforeDropConfig.dice1.pos);
-
-        me.core._context.dice2
-            .stopRoll(me._beforeDropConfig.dice2.value)
-            .setPosition(me._beforeDropConfig.dice2.pos);
-
-        me._beforeDropConfig = null;
-    }
-
     _startDiceDrop() {
         const me = this,
               context = me.core._context;
 
-        me._beforeDropConfig = {};
-        me._beforeDropConfig.dice1 = context.dice1.getConfig();
-        me._beforeDropConfig.dice2 = context.dice2.getConfig();
+        me._isActionRunning = true;
 
-        me.core._context.dice1.startRoll('first_dice_roll');
-        me.core._context.dice2.startRoll('second_dice_roll');
+        context.dice1.startRoll('first_dice_roll');
+        context.dice2.startRoll('second_dice_roll');
 
-        me.core._context.status.isBusy = true;
+        context.status.isBusy = true;
 
-        me._beforeDropConfig.delayed = me.core._scene.time.delayedCall(
+        me.core._scene.time.delayedCall(
             Utils.getRandom(1000, 2000, 1000),
             me._stopDiceDrop,
             null,
@@ -124,7 +97,7 @@ export default class SecondDiceTakedState extends State {
     _stopDiceDrop() {
         const me = this;
 
-        me._beforeDropConfig = null;
+        me._isActionRunning = false;
 
         const first = Utils.getRandom(1, 6, 1);
         const second = Utils.getRandom(1, 6, 0);
@@ -145,5 +118,14 @@ export default class SecondDiceTakedState extends State {
 
         const piece = ai._context.pieces[playerIndex];
         return Utils.toPoint(piece.toGameObject());
+    }
+
+    _startDark() {
+        const me = this;
+
+        if (me._isActionRunning)
+            me.core._context.status.needRunDark = true;
+        else
+            super._startDark();
     }
 }

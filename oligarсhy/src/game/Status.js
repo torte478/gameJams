@@ -40,6 +40,9 @@ export default class Status {
     /** @type {Boolean} */
     isPause;
 
+    /** @type {Boolean} */
+    needRunDark;
+
     /**
      * @param {Number[]} pieceIndicies 
      * @param {Number} player
@@ -96,6 +99,7 @@ export default class Status {
         me.payAmount = 0;
         me.diceResult = 0;
         me.isPause = false;
+        me.needRunDark = false;
     }
 
     setPayAmount(value) {

@@ -119,28 +119,6 @@ export default class Dice {
         me._container.setVisible(true);
     }
 
-    /**
-     * 
-     * @returns {Object}
-     */
-    getConfig() {
-        const me = this;
-
-        return {
-            pos: Utils.toPoint(me._container),
-            value: me._sprite.frame.name
-        };
-    }
-
-    /**
-     * @param {Phaser.Geom.Point} pos 
-     */
-    setPosition(pos) {
-        const me = this;
-
-        me._container.setPosition(pos.x, pos.y);
-    }
-
     _buildContainer(scene, x, y, content) {
         const container = scene.add.container(x, y, content)
             .setDepth(Consts.Depth.Pieces);

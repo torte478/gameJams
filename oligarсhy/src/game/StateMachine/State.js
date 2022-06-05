@@ -89,29 +89,9 @@ export default class State {
         me.core._timers[Enums.TimerIndex.LIGHT].resume();
     }
 
-    /**
-     */
-    interupt() {
-    }
-
     _startDark() {
         const me = this;
 
-        me.core._graphics.showDarkFade();
-
-        me.core._cancelTurn(true);
-        me.interupt();
-
-        me.core._context.status.stateToReturn = me.core._gameState.getName();
-
-        me.core._timers[Enums.TimerIndex.LIGHT].pause();
-        me.core._timers[Enums.TimerIndex.TURN].pause();
-        me.core._timers[Enums.TimerIndex.DARK].reset();
-
-        me.core._desk.setVisible(false);
-        me.core._cards.startDark();
-        me.core._context.startDark();
-
-        me.core._setState(Enums.GameState.DARK);
+        me.core._runDark();
     }
 }
