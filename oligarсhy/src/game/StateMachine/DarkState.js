@@ -58,6 +58,8 @@ export default class DarkState extends State {
               /** @type {Core} */
               core = me.core;
 
+        core._graphics.showLightFade();
+
         core._timers[Enums.TimerIndex.LIGHT].reset();
         core._timers[Enums.TimerIndex.TURN].reset();
         core._timers[Enums.TimerIndex.DARK].pause();

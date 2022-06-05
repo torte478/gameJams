@@ -21,6 +21,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadImage(me, 'hud');
         Utils.loadImage(me, 'cursor');
         Utils.loadImage(me, 'fade_black');
+        Utils.loadImage(me, 'fade_white');
         Utils.loadImage(me, 'hud_select');
 
         Utils.loadSpriteSheet(me, 'dice', 75);

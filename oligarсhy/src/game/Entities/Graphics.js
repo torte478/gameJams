@@ -12,6 +12,9 @@ export default class Graphics {
     /** @type {Phaser.GameObjects.Image} */
     _darkFade;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _lightFade;
+
     /** @type {Phaser.Tweens.Tween} */
     _fadeTween;
 
@@ -27,6 +30,11 @@ export default class Graphics {
             .setScrollFactor(0)
             .setDepth(Consts.Depth.Fade)
             .setVisible(false);
+
+        me._lightFade = scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade_white')
+            .setScrollFactor(0)
+            .setDepth(Consts.Depth.Fade)
+            .setVisible(false);
     }
 
     /**
@@ -34,18 +42,35 @@ export default class Graphics {
     showDarkFade() {
         const me = this;
 
+        me._showFade(me._darkFade);
+    }
+
+    /**
+     */
+    showLightFade() {
+        const me = this;
+
+        me._showFade(me._lightFade);
+    }
+
+    _showFade(fade) {
+        const me = this;
+
         if (Utils.isDebug(Config.Debug.IgnorePhaseFade))
             return;
+
+        me._darkFade.setVisible(false);
+        me._lightFade.setVisible(false);
 
         if (!!me._fadeTween)
             me._fadeTween.pause().remove();
 
-        me._darkFade
+        fade
             .setVisible(true)
             .setAlpha(1);
 
         me._fadeTween = me._scene.tweens.add({
-            targets: me._darkFade,
+            targets: fade,
             alpha: { from: 1, to: 0 },
             delay: Consts.Speed.PhaseChangeDelay,
             ease: 'Sine.easeInOut',
