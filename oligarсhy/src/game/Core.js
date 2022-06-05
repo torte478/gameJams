@@ -225,7 +225,8 @@ export default class Core {
     _isHumanTurn() {
         const me = this;
 
-        return me._context.status.player == Enums.Player.HUMAN;
+        return me._context.status.player == Enums.Player.HUMAN
+            || me._gameState.getName() === Enums.GameState.DARK;
     }
 
      _processTurn(point, isCancel) {
