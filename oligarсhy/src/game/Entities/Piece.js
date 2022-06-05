@@ -69,7 +69,9 @@ export default class Piece {
         const me = this;
 
         me._selection.setVisible(false);
-        me._tween.pause();
+
+        if (!!me._tween)
+            me._tween.pause();
     }
 
     /**
@@ -77,6 +79,7 @@ export default class Piece {
     startDark() {
         const me = this;
 
+        me.unselect();
         Helper.toDark(me._sprite);
     }
 

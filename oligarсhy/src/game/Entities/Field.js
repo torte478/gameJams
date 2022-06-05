@@ -204,6 +204,7 @@ export default class Field {
 
         const config = FieldInfo.Config[me._index];
         const items = me._container.getAll();
+        me.unselect();
 
         items[1].setFrame(1);
 
