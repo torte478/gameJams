@@ -1,6 +1,5 @@
 import Phaser from '../../lib/phaser.js';
 
-import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Field from './Field.js';
@@ -28,25 +27,19 @@ export default class Fields {
      * @param {Number} player
      * @param {Number} from
      * @param {Phaser.Geom.Point} point 
-     * @returns {Phaser.Geom.Point}
+     * @returns {Object}
      */
     tryMoveToFieldAtPoint(player, from, point) {
         const me = this;
 
-        for (let i = 0; i < me._fields.length; ++i) {
-            const contains = Phaser.Geom.Rectangle.ContainsPoint(
-                me._fields[i].getBounds(),
-                point);
+        var to = me.getFieldIndex(point);
+        if (to == null)
+            return null;
 
-            if (contains) {
-                return {
-                    index: i,
-                    position: me.movePiece(player, from, i)
-                };
-            }
-        }
-
-        return null;
+        return {
+            index: to,
+            position: me.movePiece(player, from, to)
+        };
     }
 
     /**
@@ -59,9 +52,9 @@ export default class Fields {
     movePiece(player, from, to, inJail) {
         const me = this;
 
-        const target = me._getNextPointConfig(player, from, to, inJail);
+        const target = me._movePiece(player, from, to, inJail);
 
-        const fieldPosition = me._fields[to].toPoint();
+        const fieldPosition = Utils.toPoint(me._fields[to].toGameObject());
 
         const origin = new Phaser.Geom.Point(
             fieldPosition.x + target.offset.x,
@@ -78,16 +71,6 @@ export default class Fields {
     }
 
     /**
-     * @param {Number} index 
-     * @returns {Phaser.Geom.Point}
-     */
-    getFieldPosition(index) {
-        const me = this;
-
-        return me._fields[index].toPoint();
-    }
-
-    /**
      * @param {Phaser.Geom.Point} point 
      * @returns {Number}
      */
@@ -101,44 +84,59 @@ export default class Fields {
                 point));
     }
 
-    buyField(index, player) {
+
+    /**
+     * @param {Number} index 
+     * @returns {Field}
+     */
+    at(index) {
         const me = this;
 
-        me._fields[index].buy(player);
+        if (index < 0 || index >= me._fields.length)
+            throw `wrong field index ${index}`;
+
+        return me._fields[index];
     }
 
-    updateRent(index, player, rent) {
+    /**
+     * @param {Number} index 
+     * @returns {Phaser.Geom.Point}
+     */
+    getFieldPosition(index) {
         const me = this;
 
-        me._fields[index].updateRent(player, rent);
+        return Utils.toPoint(me.at(index).toGameObject());
     }
 
-    sellField(index) {
-        const me = this;
-
-        me._fields[index].sell();
-    }
-
-    select(index) {
-        const me = this;
-
-        me._fields[index].select();
-    }
-
-    unselect() {
+    /**
+     */
+    unselectAll() {
         const me = this;
 
         for (let i = 0; i < me._fields.length; ++i)
             me._fields[i].unselect();
     }
 
-    removePiece(field, player) {
+
+    /**
+     */
+    startDark() {
         const me = this;
 
-        me._fields[field].removePiece(player);
+        for (let i = 0; i < me._fields.length; ++i)
+            me._fields[i].startDark();
     }
 
-    _getNextPointConfig(player, from, to, inJail) {
+    /**
+     */
+    stopDark() {
+        const me = this;
+
+        for (let i = 0; i < me._fields.length; ++i)
+            me._fields[i].stopDark();
+    }
+
+    _movePiece(player, from, to, inJail) {
         const me = this;
 
         if (from >= 0)
@@ -157,8 +155,6 @@ export default class Fields {
      * @param {Boolean} inJail
      */
     _getPiecePosOffset(field, inJail) {
-        const me = this;
-
         switch (FieldInfo.Config[field].type) {
 
             case Enums.FieldType.START:

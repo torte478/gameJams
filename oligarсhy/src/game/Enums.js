@@ -63,7 +63,7 @@ export default class Enums {
         M50: 4,
         M100: 5,
         M500: 6
-    }
+    };
 
     static PropertyRentIndex = {
         BASE: 0,
@@ -73,7 +73,7 @@ export default class Enums {
         THREE: 4,
         FOUR: 5,
         HOTEL: 6
-    }
+    };
 
     static ActionType = {
         UNKNOWN: 0,
@@ -91,7 +91,7 @@ export default class Enums {
         HIDDEN: 1,
         MOVING: 2,
         VISIBLE: 3
-    }
+    };
 
     static HandAction = {
         UNKNOWN: 0,
@@ -101,7 +101,7 @@ export default class Enums {
         DROP_PIECE: 4,
         TAKE_BILL: 5,
         CLICK_BUTTON: 6
-    }
+    };
 
     static AiAction = {
         UNKNOWN: 0,
@@ -109,5 +109,19 @@ export default class Enums {
         SPLIT_MONEY: 2,
         MERGE_MONEY: 3,
         BUY_HOUSE: 4,
-    }
+    };
+
+    static TimerIndex = {
+        UNKNOWN: -1,
+        TURN: 0,
+        LIGHT: 1,
+        DARK: 2
+    };
+
+    static PlayerDeathResult = {
+        UNKNOWN: 0,
+        CONTINUE: 1,
+        LOSS: 2,
+        WIN: 3
+    };
 }

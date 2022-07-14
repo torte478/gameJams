@@ -1,29 +1,37 @@
 import Phaser from '../lib/phaser.js';
 
-import Player from './Entities/Player.js';
-import Fields from './Entities/Fields.js';
+import AI from './Entities/AI.js';
+import BillPool from './Entities/BillPool.js';
 import Cards from './Entities/Cards.js';
-import Groups from './Entities/Groups.js'; 
+import Context from './Entities/Context.js';
+import Dice from './Entities/Dice.js';
+import Fields from './Entities/Fields.js';
+import Graphics from './Entities/Graphics.js';
 import Hand from './Entities/Hand.js';
+import HousePool from './Entities/HousePool.js';
 import HUD from './Entities/HUD.js';
+import Piece from './Entities/Piece.js';
+import Player from './Entities/Player.js';
+import Timer from './Entities/Timer.js';
+
+import BeginState from './StateMachine/BeginState.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
-import Enums from './Enums.js';
+import Core from './Core.js';
 import Status from './Status.js';
 import Utils from './Utils.js';
-import Helper from './Helper.js';
-import Timer from './Entities/Timer.js';
-import Dice from './Entities/Dice.js';
-import Piece from './Entities/Piece.js';
-import AI from './Entities/AI.js';
-import Context from './Entities/Context.js';
-import Core from './Core.js';
+import Enums from './Enums.js';
 
-export default class Start {
-    static Init(scene) {
+export default class CompositionRoot {
 
-        const core = new Core(scene);
+    /**
+     * @param {Phaser.Scene} scene 
+     * @returns {Core}
+     */
+    static init(scene) {
+
+        const core = new Core(scene, (x) => new BeginState(x));
 
         // phaser
 
@@ -31,8 +39,8 @@ export default class Start {
 
         scene.cameras.main
             .setScroll(
-                Config.Start.CameraPosition.x - Consts.Viewport.Width / 2,
-                Config.Start.CameraPosition.y - Consts.Viewport.Height / 2)
+                Config.CameraPosition.x - Consts.Viewport.Width / 2,
+                Config.CameraPosition.y - Consts.Viewport.Height / 2)
             .setBounds(
                 scene.physics.world.bounds.x,
                 scene.physics.world.bounds.y,
@@ -40,28 +48,32 @@ export default class Start {
                 scene.physics.world.bounds.height);
 
         // core
-
         core._scene = scene;
-        Start._createLevel(scene);
-        core._cursor = Start._createCursor(scene);
-        core._groups = new Groups(scene);
+        core._desk = CompositionRoot._createTiles(scene);
+        core._cursor = CompositionRoot._createCursor(scene);
+        core._billPool = new BillPool(scene);
         core._cards = new Cards(scene);
         core._hud = new HUD(scene.add);
-        core._turnTimer = new Timer(Config.Start.Time.TurnSec * 1000, false);
-        core._lightTimer = new Timer(Config.Start.Time.LightSec * 1000, false);
-        core._darkTimer = new Timer(Config.Start.Time.DarkSec * 1000, true);
-        core._fade = Start._createFade(scene);
+
+        core._timers = [
+            new Timer(Config.Time.TurnSec * 1000, false),
+            new Timer(Config.Time.LightSec * 1000, false),
+            new Timer(Config.Time.DarkSec * 1000, true)
+        ];
+
+        core._fade = CompositionRoot._createFade(scene);
+        core._graphics = new Graphics(scene);
 
         // context
 
         const context = new Context();
 
-        context.status = new Status(Config.Start.PiecePositions, Config.Start.Player, Config.Start.State);
-        context.fields = new Fields(scene, Config.Start.PiecePositions);
+        context.status = new Status(Config.StartPiecePositions, Config.StartPlayer);
+        context.fields = new Fields(scene, Config.StartPiecePositions);
 
         context.pieces = [];
-        for (let player = 0; player < Config.Start.PlayerCount; ++player) {
-            const position = context.fields.movePiece(player, 0, Config.Start.PiecePositions[player]);
+        for (let player = 0; player < Config.PlayerCount; ++player) {
+            const position = context.fields.movePiece(player, 0, Config.StartPiecePositions[player]);
             const piece = new Piece(scene, position.x, position.y, player);
             context.pieces.push(piece);
         }
@@ -75,32 +87,35 @@ export default class Start {
             6);
 
         context.hands = [];
-        for (let i = 0; i < Config.Start.PlayerCount; ++i)
+        for (let i = 0; i < Config.PlayerCount; ++i)
             context.hands.push(new Hand(scene, i));
 
+        const housePool = new HousePool(scene);
         context.players = [];
-        for (let i = 0; i < Config.Start.PlayerCount; ++ i) {
-            const player = new Player(scene, i, Config.Start.Money, core._groups);
+        for (let i = 0; i < Config.PlayerCount; ++ i) {
+            const player = new Player(scene, i, Config.Money, housePool);
             context.players.push(player);
         }
 
-        core._ai = Start._createAI(context);
+        core._ai = CompositionRoot._createAI(context);
         core._context = context;
 
         // init
 
-        for (let i = 0; i < Config.Start.PlayerCount; ++i)
-            Start._initPlayer(i, core, context);
+        for (let i = 0; i < Config.PlayerCount; ++i)
+            CompositionRoot._initPlayer(i, core, context);
 
-        core._setState(Config.Start.State);
+        core._setState(Enums.GameState.BEGIN);
 
         // colliders
 
-        scene.physics.add.collider(core._context.dice1.toGameObject(), core._context.dice2.toGameObject());
+        scene.physics.add.collider(
+            core._context.dice1.toGameObject(), 
+            core._context.dice2.toGameObject());
 
         // Debug
 
-        if (Config.Debug.Global && Config.Debug.ShowTextLog) {
+        if (Utils.isDebug(Config.Debug.ShowTextLog)) {
             core._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
@@ -113,15 +128,19 @@ export default class Start {
 
     static _createCursor(scene) {
         return scene.physics.add.image(
-            Config.Start.CameraPosition.x, 
-            Config.Start.CameraPosition.y, 
+            Config.CameraPosition.x, 
+            Config.CameraPosition.y, 
             'cursor')
             .setDepth(Consts.Depth.Max)
             .setVisible(false)
             .setCollideWorldBounds(true);
     }
 
-    static _createLevel(scene) {
+    /**
+     * @param {Phaser.Scene} scene 
+     * @returns {Phaser.Tilemaps.TilemapLayer}
+     */
+    static _createTiles(scene) {
         const level = [
             [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
             [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
@@ -138,13 +157,13 @@ export default class Start {
 
         const map = scene.make.tilemap({ data: level, tileWidth: 500, tileHeight: 500 });
         const tiles = map.addTilesetImage('table');
-        const layer = map.createLayer(0, tiles, -2750, -2750);
+        return map.createLayer(0, tiles, -2750, -2750);
     }
 
     static _createFade(scene) {
-        return scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
+        return scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade_black')
             .setScrollFactor(0)
-            .setDepth(Consts.Depth.Fade)
+            .setDepth(Consts.Depth.PauseFade)
             .setAlpha(0.75)
             .setVisible(false);
     }
@@ -161,22 +180,22 @@ export default class Start {
 
     static _initPlayer(player, core, context) {
         // start fields
-        for (let i = 0; i < Config.Start.Fields[player].length; ++i) {
-            const field = Config.Start.Fields[player][i];
-            const index = isNaN(field) ? field.index : index;
+        for (let i = 0; i < Config.Fields[player].length; ++i) {
+            const field = Config.Fields[player][i];
+            const index = isNaN(field) ? field.index : field;
             core._buyField(index, player, true);
 
             if (!isNaN(field))
                 continue;
 
             for (let j = 0; j < field.houses; ++j)
-                context.players[player].addHouse(
+                context.players[player].addBuilding(
                     index, 
                     context.fields.getFieldPosition(index));
         }
 
         //start rent
-        if (Config.Start.Fields[player].length > 0)
+        if (Config.Fields[player].length > 0)
             core._updateRent(player);
 
         // hud

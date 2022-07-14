@@ -1,19 +1,22 @@
 import Phaser from '../lib/phaser.js';
 
-import Player from './Entities/Player.js';
+import AI from './Entities/AI.js';
+import BillPool from './Entities/BillPool.js';
+import Context from './Entities/Context.js';
 import Cards from './Entities/Cards.js';
-import Groups from './Entities/Groups.js'; 
+import Graphics from './Entities/Graphics.js';
 import HUD from './Entities/HUD.js';
+import Timer from './Entities/Timer.js';
+
+import State from './StateMachine/State.js';
+import States from './StateMachine/States.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import FieldInfo from './FieldInfo.js';
-import Utils from './Utils.js';
 import Helper from './Helper.js';
-import Timer from './Entities/Timer.js';
-import AI from './Entities/AI.js';
-import Context from './Entities/Context.js';
+import Utils from './Utils.js';
 
 export default class Core {
 
@@ -32,17 +35,11 @@ export default class Core {
     /** @type {Phaser.GameObjects.Text} */
     _log;
 
-    /** @type {Groups} */
-    _groups;
+    /** @type {BillPool} */
+    _billPool;
 
-    /** @type {Timer} */
-    _turnTimer;
-
-    /** @type {Timer} */
-    _lightTimer;
-
-    /** @type {Timer} */
-    _darkTimer;
+    /** @type {Timer[]} */
+    _timers;
 
     /** @type {Phaser.GameObjects.Image} */
     _fade;
@@ -53,61 +50,65 @@ export default class Core {
     /** @type {Context} */
     _context;
 
+    /** @type {Phaser.Tilemaps.TilemapLayer} */
+    _desk;
+
+    /** @type {State} */
+    _gameState;
+
+    /** @type {Graphics} */
+    _graphics;
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {Function} createStartState
+     */
+    constructor(scene, createStartState) {
+        const me = this;
+
+        me._scene = scene;
+        me._gameState = createStartState(me);
+    }
+
+    /**
+     * @param {Number} delta 
+     */
     update(delta) {
         const me = this;
 
-        if (Config.Debug.Global && Config.Debug.ShowTextLog) {
-            let text = 
-            `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
-            `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` + 
-            `trn: ${(me._turnTimer.getRemain()) / 1000 | 0}\n` +
-            `lgt: ${(me._lightTimer.getRemain()) / 1000 | 0}\n` +
-            `drk: ${(me._darkTimer.getRemain()) / 1000 | 0}\n` +
-            `pse: ${!me._scene.input.mouse.locked}`;
-            me._log.setText(text)
-        }
+        me._updateDebugLog();
 
         if (me._checkPause())
             return;
 
-        if (me._context.status.state != Enums.GameState.DARK) {
-            if (me._lightTimer.check()) 
-                return me._startDark();
-
-            me._updateLightGame(delta);
-        } else {
-            if (me._darkTimer.check())
-                return me._stopDark();
-        }
+        me._gameState.updateGame(delta);
     }
 
+    /**
+     * @param {Phaser.Input.Pointer} pointer 
+     */
     onPointerMove(pointer) {
         const me = this;
 
         if (me._context.status.isPause) 
             return;
 
-        me._cursor.x += pointer.movementX;
-        me._cursor.y += pointer.movementY;
+        me._updateCursorPos(pointer);
 
         const point = Utils.toPoint(me._cursor);
-
-        let index = me._context.fields.getFieldIndex(point);
-        if (index == null)
-            index = me._cards.getFieldIndex(point);
-
-        index != null
-            ? me._hud.showField(index)
-            : me._hud.hideField();
-
-        if (me._isHumanTurn())
-            me._getCurrentPlayer().player.updateButtonSelection(point);
+        me._updateFieldHud(point);
+        me._updateButtonSelection(point);
     }
 
+    /**
+     * @param {Phaser.Input.Pointer} pointer 
+     */
     onPointerDown(pointer) {
         const me = this;
 
-        if (me._scene.input.mouse.locked) {
+        const isCursorActive = me._scene.input.mouse.locked;
+
+        if (isCursorActive) {
             const point = Utils.toPoint(me._cursor);
             me._processHumanTurn(point, pointer.rightButtonDown());
         }
@@ -119,44 +120,103 @@ export default class Core {
         }
     }
 
+    /**
+     * @param {Number} deltaY 
+     */
     onMouseWheel(deltaY) {
         const me = this;
 
         if (me._context.status.isPause)
             return;
 
-        if (deltaY > 0)
-            me._hud.show();
-        else if (deltaY < 0)
-            me._hud.hide();
-    }
-
-    debugDropDices(value) {
-        const me = this;
-
-        if (me._context.status.state == Enums.GameState.BEGIN) {
-            Utils.debugLog(`debug drop: ${value}`);
-            me._applyDiceDrop(value, 0);
-        }
+        const showHud = deltaY > 0;
+        me._hud.updateVisibility(showHud);
     }
 
     /**
-     * @param {Phaser.Geom.Point} point 
-     * @param {Boolean} isRightButton 
+     * @param {KeyboardEvent} event 
      */
-     _processHumanTurn(point, isRightButton) {
+    onKeyDown(event) {
         const me = this;
 
-        if (!me._isHumanTurn())
+        if (!Config.Debug.Global)
             return;
 
-        me._processTurn(point, isRightButton);
+        if (!!event.repeat)
+            return;
+            
+        if (event.key == 'r') {
+            scene.input.mouse.releasePointerLock();
+            scene.start('game');
+            return;
+        }
+
+        if (event.key == 'q')
+            return me._debugChangeMode();
+
+        if (Utils.stringIsDigit(event.key)) {
+            const value = +event.key;
+            me._debugDropDices(value);
+        }
+    }
+
+    _debugChangeMode() {
+        const me = this;
+
+        if (me._gameState.getName() === Enums.GameState.DARK)
+            me._gameState._stopDark();
+        else
+            me._gameState._startDark();
+    }
+
+    _runDark() {
+        const me = this;
+
+        me._context.status.needRunDark = false;
+
+        me._graphics.showDarkFade();
+
+        me._cancelTurn(true);
+
+        me._context.status.stateToReturn = me._gameState.getName();
+
+        me._timers[Enums.TimerIndex.LIGHT].pause();
+        me._timers[Enums.TimerIndex.TURN].pause();
+        me._timers[Enums.TimerIndex.DARK].reset();
+
+        me._desk.setVisible(false);
+        me._cards.startDark();
+        me._context.startDark();
+
+        me._setState(Enums.GameState.DARK);
+    }
+
+    _debugDropDices(value) {
+        const me = this;
+
+        if (me._context.status.state !== Enums.GameState.BEGIN)
+            return;
+
+        Utils.debugLog(`debug drop: ${value}`);
+        me._applyDiceDrop(value, 0);        
+    }
+
+     _processHumanTurn(point, isCancel) {
+        const me = this;
+
+        if (me._isHumanTurn())
+            me._processTurn(point, isCancel);
     }
 
     _processCpuTurn() {
         const me = this;
 
-        const point = me._ai[me._context.status.player].nextPoint();
+        if (me.getCurrent().hand.isBusy() || me._context.status.isBusy)
+            return;
+
+        const playerIndex = me._context.status.player;
+        const ai = me._ai[playerIndex];
+        const point = me._gameState.getAiNextPoint(ai);
 
         if (point != null)
             me._processTurn(point, false);
@@ -165,21 +225,14 @@ export default class Core {
     _isHumanTurn() {
         const me = this;
 
-        return me._context.status.player == Enums.Player.HUMAN;
+        return me._context.status.player == Enums.Player.HUMAN
+            || me._gameState.getName() === Enums.GameState.DARK;
     }
 
-    /**
-     * @param {Phaser.Geom.Point} point 
-     * @param {Boolean} isCancel 
-     */
      _processTurn(point, isCancel) {
         const me = this;
 
-        const currentPlayer = me._getCurrentPlayer();
-        const player = currentPlayer.player;
-        const hand = currentPlayer.hand;
-
-        if (hand.isBusy() || me._context.status.isBusy)
+        if (me.getCurrent().hand.isBusy() || me._context.status.isBusy)
             return;
 
         if (isCancel)
@@ -188,436 +241,134 @@ export default class Core {
         if (me._trySelectOwnField(point))
             return;
 
-        const fieldSelected = 
-            Utils.contains(Consts.States.SellField, me._context.status.state) 
-            && me._trySelectOwnField(point)
-
-        if (fieldSelected) 
-            return me._setState(Enums.GameState.OWN_FIELD_SELECTED);
-
-        switch (me._context.status.state) {
-            case Enums.GameState.BEGIN: {
-
-                let canTakeDice = hand.tryMakeAction(
-                    point,
-                    Enums.HandAction.TAKE_DICE,
-                    {
-                        image: me._context.dice1.toGameObject(),
-                        type: Enums.HandState.DICES
-                    },
-                    () => {
-                        me._setState(Enums.GameState.FIRST_DICE_TAKED)
-                    });
-                
-                if (canTakeDice)
-                    return;
-
-                hand.tryMakeAction(
-                    point,
-                    Enums.HandAction.TAKE_DICE,
-                    {
-                        image: me._context.dice2.toGameObject(),
-                        type: Enums.HandState.DICES
-                    },
-                    () => {
-                        me._setState(Enums.GameState.FIRST_DICE_TAKED)
-                    });
-
-                break;
-            }
-
-            case Enums.GameState.FIRST_DICE_TAKED: {
-
-                let canTakeDice = hand.tryMakeAction(
-                    point,
-                    Enums.HandAction.TAKE_DICE,
-                    {
-                        image: me._context.dice1.toGameObject(),
-                        type: Enums.HandState.DICES
-                    },
-                    () => {
-                        me._setState(Enums.GameState.SECOND_DICE_TAKED)
-                    });
-                
-                if (canTakeDice)
-                    return;
-
-               hand.tryMakeAction(
-                    point,
-                    Enums.HandAction.TAKE_DICE,
-                    {
-                        image: me._context.dice2.toGameObject(),
-                        type: Enums.HandState.DICES
-                    },
-                    () => {
-                        me._setState(Enums.GameState.SECOND_DICE_TAKED)
-                    });
-
-                break;
-            }
-
-            case Enums.GameState.SECOND_DICE_TAKED: {
-
-                hand.tryMakeAction(
-                    point,
-                    Enums.HandAction.DROP_DICES,
-                    null,
-                    () => {
-                        const first = Utils.getRandom(1, 6, 1);
-                        const second = Utils.getRandom(1, 6, 0);
-
-                        me._context.dice1.roll('first_dice_roll');
-                        me._context.dice2.roll('second_dice_roll');
-
-                        me._context.status.isBusy = true;
-
-                        me._scene.time.delayedCall(
-                            Utils.getRandom(1000, 2000, 1000),
-                            () => {
-                                me._context.dice1.stop(first);
-                                me._context.dice2.stop(second);
-
-                                Utils.debugLog(`${first} ${second} (${first + second})`);
-
-                                me._context.status.isBusy = false;
-                                me._applyDiceDrop(first, second);    
-                            },
-                            null,
-                            me);
-                });
-
-                break;
-            }
-
-            case Enums.GameState.DICES_DROPED: {
-                
-                hand.tryMakeAction(
-                    point,
-                    Enums.HandAction.TAKE_PIECE,
-                    {
-                        image: me._context.pieces[me._context.status.player].toGameObject(),
-                        type: Enums.HandState.PIECE,
-                    },
-                    () => { me._setState(Enums.GameState.PIECE_TAKED) });
-
-                break;
-            }
-
-            case Enums.GameState.PIECE_TAKED: {
-                
-                const field = me._context.fields.tryMoveToFieldAtPoint(
-                    me._context.status.player,
-                    me._context.status.pieceIndicies[me._context.status.player],
-                    point);
-
-                if (!field)
-                    return;
-
-                if (field.index != me._context.status.targetPieceIndex)
-                    return;
-
-                hand.tryMakeAction(
-                    field.position,
-                    Enums.HandAction.DROP_PIECE,
-                    null,
-                    () => { me._onPieceDrop(field)}
-                );
-
-                break;
-            }
-
-            case Enums.GameState.PIECE_ON_FREE_FIELD: {
-
-                if (me._tryManageMoney(point))
-                    return;
-
-                if (player.canClickButton(point, Enums.ActionType.NEXT_TURN))
-                    return me._finishTurn();
-
-                if (!player.canClickButton(point, Enums.ActionType.BUY_FIELD))
-                    return;
-
-                hand.tryMakeAction(
-                    point,
-                    Enums.HandAction.CLICK_BUTTON,
-                    null,
-                    () => {
-                        const handMoney = hand.getTotalMoney();
-                        hand.dropMoney();
-                        const diff = me._context.status.updatePayAmount(handMoney);
-
-                        if (diff > 0)
-                            return;
-
-                        const field = me._context.status.targetPieceIndex;
-
-                        me._buyField(field, player.index);
-                        me._updateRent(player.index);
-                        me._addMoney(-diff, point, player);
-
-                        me._context.status.buyHouseOnCurrentTurn = true;
-
-                        me._setState(Enums.GameState.FINAL);
-                    }
-                );
-                break;
-            }
-
-            case Enums.GameState.PIECE_ON_ENEMY_FIELD: {
-
-                if (me._tryManageMoney(point))
-                    return;
-                
-                /** @type {Player} */
-                const enemy = Utils.single(me._context.players, (p) => p.hasField(me._context.status.targetPieceIndex));
-                if (!me._context.hands[enemy.index].isClick(point))
-                    return;
-
-                hand.tryMakeAction(
-                    point,
-                    Enums.HandAction.CLICK_BUTTON,
-                    null,
-                    () => {
-                        const total = hand.getTotalMoney();
-                        hand.dropMoney();
-
-                        const change = me._context.status.updatePayAmount(total);
-                        if (change > 0)
-                            return;
-
-                        me._addMoney(-change, point, player);
-
-                        const rent = enemy.getRent(me._context.status.targetPieceIndex);
-                        me._addMoney(rent, point, enemy);
-
-                        me._context.hands[enemy.index].toWait();
-
-                        me._setState(Enums.GameState.FINAL);
-                    }
-                );
-
-                break;
-            }
-
-            case Enums.GameState.OWN_FIELD_SELECTED: {
-
-                const sellField = player.canClickButton(point, Enums.ActionType.SELL_FIELD);
-                const sellHouse = player.canClickButton(point, Enums.ActionType.SELL_HOUSE);
-
-                if (sellField || sellHouse) {
-                    return hand.tryMakeAction(
-                        point,
-                        Enums.HandAction.CLICK_BUTTON,
-                        null,
-                        () => {
-                            const index = me._context.status.selectedField;
-                            const cost = player.trySell(index, me._context.fields.getFieldPosition(index));
-                            if (cost == null)
-                                return;
-                        
-                            player.showButtons([]);
-
-                            me._updateRent(player.index);
-                            if (sellField) {
-                                me._context.fields.sellField(index);
-                                me._cards.sell(index, player.index, player.getCardGrid());
-                            }
-
-                            me._addMoney(cost, point, player);
-
-                            Utils.debugLog(`SELL: ${Utils.enumToString(Enums.Player, player.index)} => ${index}`);
-                            return me._setState(me._context.status.stateToReturn);
-                        });
-                }
-                
-                if (me._tryManageMoney(point))
-                    return;
-
-                if (!player.canClickButton(point, Enums.ActionType.BUY_HOUSE))
-                    return;
-
-                hand.tryMakeAction(
-                    point,
-                    Enums.HandAction.CLICK_BUTTON,
-                    null,
-                    () => {
-                        const field = FieldInfo.Config[me._context.status.selectedField];
-
-                        if (me._context.status.stateToReturn == Enums.GameState.PIECE_ON_FREE_FIELD) {
-                            me._context.status.stateToReturn = Enums.GameState.FINAL;
-                            me._context.status.payAmount = 0;
-                        }
-
-                        if (me._context.status.payAmount == 0) {
-                            me._context.status.setPayAmount(field.costHouse);
-                        }
-
-                        const handMoney = hand.getTotalMoney();
-                        hand.dropMoney();
-                        const diff = me._context.status.updatePayAmount(handMoney);
-                        if (diff > 0)
-                            return;
-
-                        const fieldIndex = me._context.status.selectedField;
-                        player.addHouse(fieldIndex, me._context.fields.getFieldPosition(fieldIndex));
-                        me._updateRent(player.index);
-                        me._addMoney(-diff, point, player);
-
-                        me._context.status.buyHouseOnCurrentTurn = true;
-                        me._setState(me._context.status.stateToReturn);
-                });
-
-                break;
-            }
-
-            case Enums.GameState.FINAL: {
-
-                if (player.canClickButton(point, Enums.ActionType.NEXT_TURN))
-                    return me._finishTurn();
-
-                if (me._tryManageMoney(point))
-                    return;
-
-                break;
-            }
-
-            default: 
-                throw `can't process state: ${Utils.enumToString(Enums.GameState, me._context.status.state)}`;
-        }
+        return me._gameState.processTurn(point);
     }
 
     _tryManageMoney(point) {
         const me = this;
 
-        const current = me._getCurrentPlayer();
-        const billIndex = current.player.findBillOnPoint(point);
+        const current = me.getCurrent();
+        const billIndex = current.player.findBillIndexOnPoint(point);
 
-        if (billIndex >= 0) {
-            const taked = current.hand.tryMakeAction(
+        const canTakeMoney = billIndex >= 0;
+        if (canTakeMoney) 
+            return current.hand.tryMakeAction(
                 point,
                 Enums.HandAction.TAKE_BILL,
                 { index: billIndex },
-                () => {
-                    current.player.takeBill(billIndex);
+                () => { me._takeBill(billIndex); });
 
-                    const action = current.hand.getMoneyAction();
-                    if (action == null)
-                        return false;
-
-                    if (action == Enums.ActionType.MERGE_MONEY)
-                        current.player.hideButton(Enums.ActionType.SPLIT_MONEY);
-
-                    current.player.showButtons([ action ], true);
-                }
-            );
-            return taked;
-        }
-
-        if (current.player.canClickButton(point, Enums.ActionType.SPLIT_MONEY)) {
-            current.hand.tryMakeAction(
+        const canSplitMoney = current.player.canClickButton(point, Enums.ActionType.SPLIT_MONEY);
+        if (canSplitMoney)
+            return current.hand.tryMakeAction(
                 point,
                 Enums.HandAction.CLICK_BUTTON,
                 null,
-                () => {
-                    const money = current.hand.dropMoney();
-                    const splited = Helper.splitBillToBills(money);
-                    current.player.hideButton(Enums.ActionType.SPLIT_MONEY);
-                    me._addBills(splited, point, current.player);
-                }
-            );
-            return true;
-        }
+                () => { me._manageMoney(point, Enums.ActionType.SPLIT_MONEY) });
 
-        if (current.player.canClickButton(point, Enums.ActionType.MERGE_MONEY)) {
-            current.hand.tryMakeAction(
+        const canMergeMoney = current.player.canClickButton(point, Enums.ActionType.MERGE_MONEY);
+        if (canMergeMoney)
+            return current.hand.tryMakeAction(
                 point,
                 Enums.HandAction.CLICK_BUTTON,
                 null,
-                () => {
-                    const money = current.hand.dropMoney();
-                    const merged = Helper.mergeBills(money);
-                    current.player.hideButton(Enums.ActionType.MERGE_MONEY);
-                    me._addBills(merged, point, current.player);
-                }
-            );
-            return true;
-        }
+                () => { me._manageMoney(point, Enums.ActionType.MERGE_MONEY) });
 
         return false;
+    }
+
+    _manageMoney(point, action) {
+        const me = this,
+              current = me.getCurrent();
+
+        const bills = current.hand.dropBills();
+        const newBills = Helper.manageBills(bills, action);
+
+        current.player.hideButton(action);
+
+        me._addBills(newBills, point, current.player);
+    }
+
+    _takeBill(billIndex) {
+        const me = this,
+              current = me.getCurrent();
+
+        current.player.removeBill(billIndex);
+
+        const availableAction = current.hand.getAvailableMoneyAction();
+        if (availableAction == null)
+            return false;
+
+        if (availableAction == Enums.ActionType.MERGE_MONEY)
+            current.player.hideButton(Enums.ActionType.SPLIT_MONEY);
+
+        current.player.showButtons([ availableAction ], true);
     }
 
     _applyDiceDrop(first, second) {
         const me = this;
 
-        const current = me._context.status.pieceIndicies[me._context.status.player];
-        me._context.status.targetPieceIndex = (current + first + second) % Consts.FieldCount;
+        const currentFieldIndex = me._context.status.pieceIndicies[me._context.status.player];
+        me._context.status.targetFieldIndex = (currentFieldIndex + first + second) % Consts.FieldCount;
         me._context.status.diceResult = first + second;
 
-        for (let i = 0; i < Config.Start.PlayerCount; ++i)
+        for (let i = 0; i < Config.PlayerCount; ++i)
             me._updateRent(i);
 
         me._setState(Enums.GameState.DICES_DROPED);
     }
 
-    _cancelTurn() {
-        const me = this;
+    _cancelTurn(ignoreTween) {
+        const me = this,
+              current = me.getCurrent();
 
-        const current = me._getCurrentPlayer();
-        const money = current.hand.dropMoney();
+        const money = current.hand.dropBills();
         me._addBills(money, current.hand.toPoint(), current.player);
 
         current.player.showButtons([]);
 
         me._context.status.selectedField = null;
-        const next = me._getNextStateAfterCancel();
+        const nextState = me._gameState.getNextStateAfterCancel();
 
         me._context.status.isBusy = true;
-        current.hand.cancel(() => {
-            me._context.status.isBusy = false;
-            me._setState(next);
-        });
+        if (!!ignoreTween) {
+            current.hand.cancel();
+            me._cancelTurnCallback(nextState);
+        } else {
+            current.hand.cancel(() => me._cancelTurnCallback(nextState));
+        }
     }
 
-    _getNextStateAfterCancel() {
+    _cancelTurnCallback(nextState) {
         const me = this;
 
-        switch (me._context.status.state) {
-            case Enums.GameState.FIRST_DICE_TAKED:
-            case Enums.GameState.SECOND_DICE_TAKED:
-                return Enums.GameState.BEGIN;
-
-            case Enums.GameState.PIECE_TAKED:
-                return Enums.GameState.DICES_DROPED;
-
-            case Enums.GameState.OWN_FIELD_SELECTED:
-                return me._context.status.stateToReturn;
-            
-            default:
-                return me._context.status.state;
-        }
+        me._context.status.isBusy = false;
+        me._setState(nextState);
     }
 
     _finishTurn() {
         const me = this;
 
-        me._getCurrentPlayer().hand.toWait();
-        me._context.status.player = me._context.status.getNextPlayerIndex();
-        me._hud.select(me._context.status.player);
-        if (me._context.status.player != Enums.Player.HUMAN)
-            me._ai[me._context.status.player].resetState();
+        me.getCurrent().hand.toWaitPosition();
+        const nextPlayer = me._context.status.setNextPlayerIndex();
+        me._hud.select(nextPlayer);
+
+        if (nextPlayer != Enums.Player.HUMAN)
+            me._ai[nextPlayer].resetState();
         
         for (let i = 0; i < me._context.players.length; ++i)
-            me._context.players[i].showButtons(i == me._context.status.player);
+            me._context.players[i].showButtons(i == nextPlayer);
 
         me._context.status.reset();
-        me._turnTimer.reset();
+        me._timers[Enums.TimerIndex.TURN].reset();
         me._setState(Enums.GameState.BEGIN);
     }
 
-    _getCurrentPlayer() {
+    getCurrent() {
         const me = this;
 
         const current = me._context.status.player;
+        // TODO : extract improved player class
         return {
            player: me._context.players[current],
            hand: me._context.hands[current],
@@ -625,26 +376,53 @@ export default class Core {
         };
     }
 
-    _killPlayer() {
+    _processGameOver(gameOverType) {
         const me = this;
 
-        const current = me._getCurrentPlayer();
-        if (current.player.index == Enums.Player.HUMAN) {
-            throw 'YOU LOSE!';
+        throw `GAME OVER: ${Utils.enumToString(Enums.PlayerDeathResult, gameOverType)}`;
+    }
+
+    _killPlayer() {
+        const me = this,
+              current = me.getCurrent(),
+              playerIndex = current.player.index;
+
+        const result = me._context.status.killCurrentPlayer();
+        if (result !== Enums.PlayerDeathResult.CONTINUE)
+            return me._processGameOver(result);
+
+        me._removePiece(playerIndex);
+        me._context.hands[playerIndex].hide(); // TODO: hide hand animation
+        me._sellAllCards(current.player);
+        current.player.kill();
+        me._hud.updateMoney(playerIndex, 0, 0);
+
+        Utils.debugLog(`Player ${Utils.enumToString(Enums.Player, playerIndex)} lose!`);
+
+        me._finishTurn();
+    }
+
+    _sellAllCards(player) {
+        const me = this;
+
+        const playerCards = [];
+        for (let i = 0; i < Consts.FieldCount; ++i) {
+            if (player.hasField(i)) {
+                me._context.fields.at(i).sell();
+                playerCards.push(i);
+            }
         }
 
-        me._context.status.activePlayers = me._context.status.activePlayers.filter(
-            (p) => p != current.player.index);
+        me._cards.sellAll(playerCards);
+    }
 
-        if (me._context.status.activePlayers.length == 1) {
-            throw 'YOU WIN!!!'
-        }        
+    _removePiece(playerIndex) {
+        const me = this;
 
-        me._context.fields.removePiece(
-            me._context.status.pieceIndicies[current.player.index], 
-            current.player.index);
+        const fieldIndex = me._context.status.pieceIndicies[playerIndex];
+        me._context.fields.at(fieldIndex).removePiece(playerIndex);
 
-        const piece = me._context.pieces[current.player.index].toGameObject(); 
+        const piece = me._context.pieces[playerIndex].toGameObject(); 
         const target = Utils.buildPoint(0, 0);
         me._scene.tweens.add({
             targets: piece,
@@ -657,174 +435,101 @@ export default class Core {
                 target, 
                 Consts.Speed.CenterEntranceDuration)
         });
-
-        me._context.hands[current.player.index].hide();
-
-        const playerCards = [];
-        for (let i = 0; i < Consts.FieldCount; ++i) {
-            if (current.player.hasField(i)) {
-                me._context.fields.sellField(i);
-                playerCards.push(i);
-            }
-        }
-
-        me._cards.sellAll(playerCards);
-
-        current.player.kill();
-
-        me._hud.updateMoney(current.player.index, 0, 0);
-
-        Utils.debugLog(`Player ${Utils.enumToString(Enums.Player, me._context.status.player)} lose!`);
-        me._finishTurn();
     }
 
     _trySelectOwnField(point) {
-        const me = this;
+        const me = this,
+              current = me.getCurrent(),
+              player = current.player;
 
-        if (!Utils.contains(Consts.States.SellField, me._context.status.state))
+        if (!Utils.contains(Consts.States.Sell, me._context.status.state))
             return false;
 
-        let field = me._context.fields.getFieldIndex(point);
-        if (field == null)       
-            field = me._cards.getFieldIndex(point);
-
+        const field = me._findFieldIndex(point);
         if (field == null)
             return false;
 
         if (!Utils.contains(Consts.BuyableFieldTypes, FieldInfo.Config[field].type))
             return false;
 
-        const current = me._getCurrentPlayer();
-        if (!current.player.hasField(field))
+        if (!player.hasField(field))
             return false;
 
-        current.hand.tryMakeAction(
+        return current.hand.tryMakeAction(
             point,
             Enums.HandAction.CLICK_BUTTON,
             null,
-            () => {
-                me._context.status.selectedField = field;
-                me._context.status.stateToReturn = me._context.status.state;
+            () => { me._clickButton(player, field) });
+    }
 
-                const actions = [];
+    _clickButton(player, field) {
+        const me = this,
+              status = me._context.status;
 
-                const action = current.player.canSellSmth(field);
-                if (action != null)
-                    actions.push(action);
-                
-                const canBuyHouse = current.player.canBuyHouse(field)
-                                    && me._context.status.isBuyHouseAvailable();
-                if (canBuyHouse) 
-                    actions.push(Enums.ActionType.BUY_HOUSE);
+        status.selectedField = field;
+        status.stateToReturn = status.state;
 
-                current.player.showButtons(actions);
+        const actions = me._getFieldActions(player, field);
+        player.showButtons(actions);
 
-                Utils.debugLog(`select field ${field}`);
-                me._setState(Enums.GameState.OWN_FIELD_SELECTED);
-        });
+        Utils.debugLog(`select field ${field}`);
 
-        return true;
+        me._setState(Enums.GameState.OWN_FIELD_SELECTED);
+    }
+
+    _getFieldActions(player, field) {
+        const me = this,
+              result = [];
+
+        const sellAction = player.canSellSmth(field);
+        if (sellAction != null)
+            result.push(sellAction);
+        
+        const canBuyHouse = player.canBuyHouse(field)
+                            && me._context.status.isBuyHouseAvailable();
+        if (canBuyHouse) 
+            result.push(Enums.ActionType.BUY_HOUSE);
+
+        return result;
     }
 
     _setState(state) {
         const me = this;
 
-        const player = me._getCurrentPlayer().player;
-
-        switch (state) {
-            case Enums.GameState.BEGIN:
-                player.showButtons([]);
-                break;
-
-            case Enums.GameState.FINAL:
-                player.showButtons([ Enums.ActionType.NEXT_TURN ]);
-                break;
-
-            case Enums.GameState.PIECE_ON_FREE_FIELD:
-                player.showButtons([Enums.ActionType.BUY_FIELD, Enums.ActionType.NEXT_TURN]);
-                break;    
-        }
+        if (!!me._context.status.needRunDark)
+            return me._runDark();
 
         me._context.status.setState(state);
+        me._gameState = States.next(state, me);
+        me._gameState.showButtons();
         me._restoreSelection();
     }
 
-    _getCursorOffset() {
-        const me = this;
-
-        return Utils.buildPoint(
-            me._cursor.x + 100,
-            me._cursor.y + 200);
-    }
-
-    _onPieceDrop(field) {
-        const me = this;
-
-        const current = me._getCurrentPlayer(); 
-        me._context.status.pieceIndicies[me._context.status.player] = me._context.status.targetPieceIndex;
-
-        const fieldConfig = FieldInfo.Config[field.index];
-
-        if (fieldConfig.type == Enums.FieldType.GOTOJAIL)
-            return me._moveToJail(field.index);
-
-        if (!Utils.contains(Consts.BuyableFieldTypes, fieldConfig.type))
-            return me._setState(Enums.GameState.FINAL);
-            
-        const enemyIndex = Utils.firstOrDefaultIndex(
-            me._context.players, 
-            (p) => p.index != me._context.status.player && p.hasField(field.index));
-
-        if (enemyIndex != null) {
-            const rent = me._context.players[enemyIndex].getRent(field.index, me._context.status.diceResult);
-            
-            if (rent > current.player.getTotalMoney())
-                return me._killPlayer();
-
-            me._context.status.setPayAmount(rent);
-
-            me._context.hands[enemyIndex].prepareToRent();
-            
-            return me._setState(Enums.GameState.PIECE_ON_ENEMY_FIELD);
-        }
-
-        const canBuyField = me._isHumanTurn() || current.ai.canBuyField(field.index);
-
-        if (!current.player.hasField(field.index) && canBuyField) {
-            me._context.status.setPayAmount(fieldConfig.cost);
-            return me._setState(Enums.GameState.PIECE_ON_FREE_FIELD);
-        }
-
-        return me._setState(Enums.GameState.FINAL)
-    }
-
     _moveToJail(fieldFrom) {
-        const me = this;
+        const me = this,
+              status = me._context.status;
 
         const jail = me._context.fields.movePiece(
-            me._context.status.player, 
+            status.player, 
             fieldFrom, 
             Consts.JailFieldIndex, 
             true);
 
-        me._context.status.pieceIndicies[me._context.status.player] = Consts.JailFieldIndex;
+        status.pieceIndicies[status.player] = Consts.JailFieldIndex;
+        status.isBusy = true;
 
-        me._context.status.isBusy = true;
-        return me._scene.tweens.add({
-            targets: me._context.pieces[me._context.status.player].toGameObject(),
-            x: jail.x,
-            y: jail.y,
-            ease: 'Sine.easeInOut',
-            duration: Utils.getTweenDuration(
-                Utils.toPoint(me._context.pieces[me._context.status.player].toGameObject()),
-                jail,
-                Consts.Speed.HandAction
-            ),
-            onComplete: () => { 
-                me._context.status.isBusy = false;
+        const piece = me._context.pieces[status.player].toGameObject();
+
+        return Utils.startMovementTween(
+            me._scene,
+            piece,
+            jail,
+            Consts.Speed.HandAction,
+            () => {
+                status.isBusy = false;
                 me._finishTurn();
             }
-        });
+        );
     }
 
     _updateRent(playerIndex) {
@@ -835,7 +540,7 @@ export default class Core {
         for (let i = 0; i < Consts.FieldCount; ++i)
             if (player.hasField(i)) {
                 const rent = player.getRent(i, me._context.status.diceResult);
-                me._context.fields.updateRent(i, playerIndex, rent)
+                me._context.fields.at(i).updateRent(rent);
             }      
     }
 
@@ -843,7 +548,7 @@ export default class Core {
         const me = this;
 
         const cardGrid = me._context.players[playerIndex].addField(field);
-        me._context.fields.buyField(field, playerIndex);
+        me._context.fields.at(field).buy(playerIndex);
         me._cards.buy(field, playerIndex, cardGrid, ignoreTween);
     }
 
@@ -868,11 +573,12 @@ export default class Core {
         const billIndicies = Helper.enumBills(bills);
 
         for (let i = 0; i < billIndicies.length; ++i) {
-            const bill = me._groups.createBill(
+            const bill = me._billPool.create(
                 from.x,
                 from.y,
                 player.index,
                 billIndicies[i]);
+
             const target = player.getBillPosition(billIndicies[i]);
 
             me._scene.tweens.add({
@@ -886,7 +592,7 @@ export default class Core {
                     Consts.Speed.CenterEntranceDuration),
                 delay: i * 50,
                 onComplete: () => {
-                    me._groups.killBill(bill);
+                    me._billPool.remove(bill);
                 }
             });
         }
@@ -895,11 +601,16 @@ export default class Core {
     _pause() {
         const me = this;
 
+        if (me._context.status.isPause)
+            return;
+
         me._scene.input.mouse.releasePointerLock();
         me._scene.tweens.pauseAll();
-        me._turnTimer.pause();
         me._context.status.isPause = true;
         me._fade.setVisible(true);
+
+        for (let i = 0; i < me._timers.length; ++i)
+            me._timers[i].pause();
     }
 
     _unpause() {
@@ -907,107 +618,129 @@ export default class Core {
 
         me._scene.tweens.resumeAll();
         me._context.status.isPause = false;
-        me._turnTimer.resume();
         me._restoreSelection();
         me._fade.setVisible(false);
+        me._gameState.unpause();
     }
 
     _restoreSelection() {
         const me = this;
 
-        const isHuman = me._isHumanTurn();
-        if (!isHuman) {
-            me._context.dice1.unselect();
-            me._context.dice2.unselect();
-            me._context.pieces[Enums.Player.HUMAN].unselect();
-            me._context.fields.unselect();
-            return;
-        }
-
-        switch (me._context.status.state) {
-            case Enums.GameState.BEGIN:
-                me._context.dice1.select();
-                me._context.dice2.select();
-                break;
-
-            case Enums.GameState.SECOND_DICE_TAKED:
-                me._context.dice1.unselect();
-                me._context.dice2.unselect();
-
-                break;
-
-            case Enums.GameState.DICES_DROPED:
-                me._context.pieces[Enums.Player.HUMAN].select();
-
-                break;
-
-            case Enums.GameState.PIECE_TAKED:
-                me._context.pieces[Enums.Player.HUMAN].unselect();
-                me._context.fields.select(me._context.status.targetPieceIndex);
-                break;
-
-            case Enums.GameState.PIECE_ON_ENEMY_FIELD:
-            case Enums.GameState.PIECE_ON_FREE_FIELD:
-            case Enums.GameState.FINAL:
-                me._context.fields.unselect();
-            break;
-        }
+        if (me._isHumanTurn())
+            return me._gameState.restoreSelection();
+            
+        me._context.dice1.unselect();
+        me._context.dice2.unselect();
+        me._context.pieces[Enums.Player.HUMAN].unselect();
+        me._context.fields.unselectAll();
     }
 
     _checkPause() {
         const me = this;
 
-        if (Config.Debug.Global && Config.Debug.IgnorePause)
+        if (Utils.isDebug(Config.Debug.IgnorePause))
             return false;
 
-        if (!me._scene.input.mouse.locked) {
-            if (!me._context.status.isPause)
-                me._pause();
-
+        const isMouseOutsideView = !me._scene.input.mouse.locked;
+        if (isMouseOutsideView) {
+            me._pause();
             return true;
-        } else if (me._context.status.isPause) {
+        } 
+        
+        if (me._context.status.isPause)
             me._unpause();
-            return false;
-        }
+
+        return false;
     }
 
     _updateLightGame(delta) {
         const me = this;
 
-        const skipTurn = Config.Debug.Global 
-                && Config.Debug.SkipHuman
-                && !me._context.status.isBusy 
-                && me._context.status.player == Enums.Player.HUMAN;
-
-        if (me._turnTimer.check() || skipTurn) {
-            Utils.debugLog('Turn timeout!');
-
-            me._cancelTurn();
-            me._moveToJail(me._context.status.pieceIndicies[me._context.status.player]);
-            me._turnTimer.pause();
+        if (me._checkTurnEnd())
             return;
-        }
 
-        if (me._isHumanTurn()) {
-            const target = me._getCursorOffset();
-            me._getCurrentPlayer().hand.moveTo(target, delta);
-        } else {
-            me._processCpuTurn();
-        }
+        me._isHumanTurn()
+            ? me._moveHumanHand(delta)
+            : me._processCpuTurn();
     }
 
-    _startDark() {
+    _checkTurnEnd() {
+        const me = this,
+              status = me._context.status;
+
+        const skipTurn = Utils.isDebug(Config.Debug.SkipHuman)
+                         && !status.isBusy 
+                         && status.player == Enums.Player.HUMAN;
+
+        if (!skipTurn && !me._timers[Enums.TimerIndex.TURN].check())
+            return false;
+
+        Utils.debugLog('Turn timeout!');
+
+        me._cancelTurn();
+        me._moveToJail(status.pieceIndicies[status.player]);
+        me._timers[Enums.TimerIndex.TURN].pause();
+        return true;
+    }
+
+    _moveHumanHand(delta) {
         const me = this;
 
-        me._lightTimer.pause();
-        me._turnTimer.pause();
-        me._darkTimer.reset();
-        me._setState(Enums.GameState.DARK);
+        const offset = Utils.buildPoint(
+            me._cursor.x + 100,
+            me._cursor.y + 200);
+
+        me._context.hands[Enums.Player.HUMAN].moveTo(offset, delta);
     }
 
-    _stopDark() {
-        const me =this;
+    _updateDebugLog() {
+        const me = this;
 
-        me._setState(Enums.GameState.BEGIN);
+        if (!Config.Debug.Global || !Config.Debug.ShowTextLog)
+            return;
+
+        let text = 
+            `ptr: ${me._cursor.x | 0} ${me._cursor.y | 0}\n` + 
+            `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` + 
+            `trn: ${(me._timers[Enums.TimerIndex.TURN].getRemain()) / 1000 | 0}\n` +
+            `lgt: ${(me._timers[Enums.TimerIndex.LIGHT].getRemain()) / 1000 | 0}\n` +
+            `drk: ${(me._timers[Enums.TimerIndex.DARK].getRemain()) / 1000 | 0}\n` +
+            `pse: ${!me._scene.input.mouse.locked}\n` +
+            `ste: ${Utils.enumToString(Enums.GameState, me._gameState.getName())}`;
+        me._log.setText(text);
+    }
+
+    _updateCursorPos(pointer) {
+        const me = this;
+
+        me._cursor.x += pointer.movementX;
+        me._cursor.y += pointer.movementY;
+    }
+
+    _updateButtonSelection(point) {
+        const me = this;
+
+        if (me._isHumanTurn())
+            me.getCurrent().player.updateButtonSelection(point);
+    }
+
+    _updateFieldHud(point) {
+        const me = this;
+
+        const fieldIndex = me._findFieldIndex(point);
+
+        fieldIndex != null
+            ? me._hud.showField(fieldIndex)
+            : me._hud.hideField();
+    }
+
+    _findFieldIndex(point) {
+        const me = this;
+
+        let fieldIndex = me._context.fields.getFieldIndex(point);
+        if (fieldIndex == null)
+            fieldIndex = me._cards.findFieldIndex(point);
+
+        return fieldIndex;
     }
 }

@@ -17,7 +17,8 @@ export default class Consts {
         Hand: 5000,
         ActiveItem: 7500,
         HUD: 10000,
-        Fade: 20000,
+        Fade: 15000,
+        PauseFade: 20000,
         Max: 100000
     };
 
@@ -49,7 +50,6 @@ export default class Consts {
     };
 
     static FieldCount = 40;
-    static  BillCount = 7;
 
     static PiecePosition = {
         Usual: [
@@ -81,6 +81,8 @@ export default class Consts {
         ]
     };
 
+    static BillCount = 7;
+
     static BillValue = [
         1,
         5,
@@ -109,7 +111,7 @@ export default class Consts {
     ];
 
     static States = {
-        SellField: [
+        Sell: [
             Enums.GameState.PIECE_ON_FREE_FIELD,
             Enums.GameState.PIECE_ON_ENEMY_FIELD,
             Enums.GameState.FINAL
@@ -131,7 +133,9 @@ export default class Consts {
         CardShiftDuration: 1000,
         CenterEntranceDuration: 1500,
 
-        Selection: 500
+        Selection: 500,
+        PhaseChangeDuration: 10000,
+        PhaseChangeDelay: 1000
     };
 
     static HandWaitPosition = {
@@ -151,32 +155,59 @@ export default class Consts {
         height: 1300
     };
 
+    static HandMovementOffset = 10;
+
     static JailFieldIndex = 10;
 
     static SplitBillLimit = [ 15, 6, 6, 9, 6, 6 ];
 
     static MaxHandBillCount = 10;
 
-    static FieldTextColor = '#232429';
+    static ButtonSelectionColor = 0xd4d6e1;
+
+    static FieldTextColorLight = '#232429';
+    static FieldTextColorDark = '#d4d6e1';
+
     static Font = 'Arial';
 
     static TextStyle = {
-        FieldSmall: {
-            color: Consts.FieldTextColor,
+        FieldSmallLight: {
+            color: Consts.FieldTextColorLight,
             fontFamily: Consts.Font,
             align: 'center',
             fontSize: 18
         },
 
-        FieldMiddle: {
-            color: Consts.FieldTextColor,
+        FieldSmallDark: {
+            color: Consts.FieldTextColorDark,
+            fontFamily: Consts.Font,
+            align: 'center',
+            fontSize: 18
+        },
+
+        FieldMiddleLight: {
+            color: Consts.FieldTextColorLight,
             fontFamily: Consts.Font,
             align: 'center',
             fontSize: 22
         },
 
-        FieldBig: {
-            color: Consts.FieldTextColor,
+        FieldMiddleDark: {
+            color: Consts.FieldTextColorDark,
+            fontFamily: Consts.Font,
+            align: 'center',
+            fontSize: 22
+        },
+
+        FieldBigLight: {
+            color: Consts.FieldTextColorLight,
+            fontFamily: Consts.Font,
+            align: 'center',
+            fontSize: 28
+        },
+
+        FieldBigDark: {
+            color: Consts.FieldTextColorDark,
             fontFamily: Consts.Font,
             align: 'center',
             fontSize: 28

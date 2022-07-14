@@ -2,15 +2,20 @@ import Phaser from "../../lib/phaser.js";
 
 import Consts from "../Consts.js";
 import Enums from "../Enums.js";
+import Helper from "../Helper.js";
 
 export default class Piece {
     
+    /** @type {Phaser.GameObjects.Image} */
     _sprite;
 
+    /** @type {Phaser.GameObjects.Image} */
     _selection;
 
+    /** @type {Phaser.Tweens.Tween} */
     _tween;
 
+    /** @type {Phaser.GameObjects.Container} */
     _container;
 
     /**
@@ -18,7 +23,7 @@ export default class Piece {
      * @param {Phaser.Scene} scene 
      * @param {Number} x 
      * @param {Number} y 
-     * @param {Number} frame 
+     * @param {Number} player 
      */
     constructor(scene, x, y, player) {
         const me = this;
@@ -41,12 +46,17 @@ export default class Piece {
             });
     }
 
+    /**
+     * @returns {Phaser.GameObjects.GameObject}
+     */
     toGameObject() {
         const me = this;
 
         return me._container;
     }
 
+    /**
+     */
     select() {
         const me = this;
 
@@ -54,10 +64,30 @@ export default class Piece {
         me._tween.resume();
     }
 
+    /** */
     unselect() {
         const me = this;
 
         me._selection.setVisible(false);
-        me._tween.pause();
+
+        if (!!me._tween)
+            me._tween.pause();
+    }
+
+    /**
+     */
+    startDark() {
+        const me = this;
+
+        me.unselect();
+        Helper.toDark(me._sprite);
+    }
+
+    /**
+    */
+    stopDark() {
+        const me = this;
+
+        Helper.toLight(me._sprite);
     }
 }

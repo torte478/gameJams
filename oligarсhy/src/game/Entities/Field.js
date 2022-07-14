@@ -3,11 +3,13 @@ import Phaser from '../../lib/phaser.js';
 import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
-import Utils from '../Utils.js';
 import FieldInfo from '../FieldInfo.js';
+import Helper from '../Helper.js';
+import Utils from '../Utils.js';
 
 export default class Field {
 
+    // TODO : to independent class (and everywhere)
     /** @type {Phaser.GameObjects.Container} */
     _container;
 
@@ -17,29 +19,43 @@ export default class Field {
     /** @type {Number} */
     _index;
 
+    // TODO : to independent class (and everywhere)
     /** @type {Phaser.GameObjects.Image} */
     _selection;
 
     /** @type {Phaser.Tweens.Tween} */
-    _tween;
+    _selectionTween;
+
+    /** @type {Object} */
+    _rentBlock = {
+        /** @type {Phaser.GameObjects.Text} */
+        cost: null,
+        /** @type {Phaser.GameObjects.Image} */
+        icon: null,
+        /** @type {Phaser.GameObjects.Image} */
+        rect: null,
+    }
+
+    /** @type {Number} */
+    _player;
 
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} x 
      * @param {Number} y 
-     * @param {String} backgroundTexture 
+     * @param {String} texture 
      * @param {Number} angle 
      * @param {Number} index 
      */
-    constructor(scene, x, y, backgroundTexture, angle, index) {
+    constructor(scene, x, y, texture, angle, index) {
         const me = this;
 
         const config = FieldInfo.Config[index],
-              content = me._getFieldContent(scene.add, config);
+              content = me._initFieldContent(scene.add, config);
 
-        me._selection = scene.add.image(0, 0, backgroundTexture, 2).setVisible(false);
+        me._selection = scene.add.image(0, 0, texture, 2).setVisible(false);
 
-        me._tween = scene.tweens.add({
+        me._selectionTween = scene.tweens.add({
             targets: me._selection,
             scaleX: { from: 1.1, to: 1.25 },
             scaleY: { from: 1.2, to: 1.4 },
@@ -50,7 +66,7 @@ export default class Field {
 
         const children = [ 
             me._selection,
-            scene.add.image(0, 0, backgroundTexture, 0) 
+            scene.add.image(0, 0, texture, 0) 
             ]
             .concat(content);
 
@@ -59,9 +75,11 @@ export default class Field {
         me._index = index;
         
         me._pieces = [];
-        for (let i = 0; i < Config.Start.PlayerCount; ++i) {
+        for (let i = 0; i < Config.PlayerCount; ++i) {
             me._pieces.push(Enums.Player.NOONE)
         }
+
+        me._player = Enums.Player.NOONE;
     }
 
     /**
@@ -74,12 +92,12 @@ export default class Field {
     }
 
     /**
-     * @returns {Phaser.Geom.Point}
+     * @returns {Phaser.GameObjects.GameObject}
      */
-    toPoint() {
+    toGameObject() {
         const me = this;
 
-        return new Phaser.Geom.Point(me._container.x, me._container.y);
+        return me._container;
     }
 
     /**
@@ -111,60 +129,197 @@ export default class Field {
         throw `can't find free space for player: ${player}`;
     }
 
-    buy(player, rent) {
+    /**
+     * @param {Number} player 
+     */
+    buy(player) {
         const me = this;
 
-        const items = me._container.getAll();
+        me._player = player;
 
-        items[items.length - 3]
+        me._rentBlock.rect
             .setFrame(player == Enums.Player.HUMAN ? 9 : 10)
             .setVisible(true);
 
-        items[items.length - 2]
+        me._rentBlock.icon
             .setFrame(player * 2)
             .setVisible(true);
 
-        items[items.length - 1].setVisible(true);
+        me._rentBlock.cost
+            .setVisible(true);
     }
 
-    updateRent(player, rent) {
+    /**
+     * @param {Number} rent 
+     */
+    updateRent(rent) {
         const me = this;
 
-        const items = me._container.getAll();
-        const text = `${player == Enums.Player.HUMAN ? '+' : '-'} ${rent}`;
-        items[items.length - 1].setText(text);
+        const text = `${me._player == Enums.Player.HUMAN ? '+' : '-'} ${rent}`;
+        me._rentBlock.cost.setText(text);
     }
 
+    /**
+     */
     sell() {
         const me = this;
 
-        const items = me._container.getAll();
-        items[items.length - 3].setVisible(false);
-        items[items.length - 2].setVisible(false);
-        items[items.length - 1].setVisible(false);
+        me._player = Enums.Player.NOONE;
+
+        me._rentBlock.rect.setVisible(false);
+        me._rentBlock.cost.setVisible(false);
+        me._rentBlock.icon.setVisible(false);
     }
 
+    /**
+     */
     select() {
         const me = this;
 
-        const items = me._container.getAll();
         const buyed = Utils.contains(Consts.BuyableFieldTypes, FieldInfo.Config[me._index].type)
-                      &&  items[items.length - 3].visible;
+                      &&  me._rentBlock.rect.visible;
 
         me._selection
             .setVisible(true)
             .setPosition(0, buyed ? 25 : 0);
 
-        me._tween.resume();
+        me._selectionTween.resume();
         me._container.setDepth(Consts.Depth.SelectedField);
     }
 
+    /**
+     */
     unselect() {
         const me = this;
 
         me._selection.setVisible(false);
         me._container.setDepth(Consts.Depth.Board);
-        me._tween.pause();
+        me._selectionTween.pause();
+    }
+
+    /**
+     */
+    startDark() {
+        const me = this;
+
+        const config = FieldInfo.Config[me._index];
+        const items = me._container.getAll();
+        me.unselect();
+
+        items[1].setFrame(1);
+
+        switch (config.type) {
+            case Enums.FieldType.PROPERTY:
+                items[2].setFrame(0);
+                Helper.toDark(items[3]);
+                items[4].setStyle(Consts.TextStyle.FieldSmallDark);
+                items[5].setStyle(Consts.TextStyle.FieldMiddleDark);
+                items[6].setFrame(0);
+                Helper.toDark(items[7]);
+                items[8].setStyle(Consts.TextStyle.FieldMiddleDark);
+                break;
+
+            case Enums.FieldType.CHANCE:
+                Helper.toDark(items[2]);
+                items[3].setStyle(Consts.TextStyle.FieldBigDark);
+                break;
+
+            case Enums.FieldType.TAX:
+                Helper.toDark(items[2]);
+                items[3].setStyle(Consts.TextStyle.FieldBigDark);
+                items[4].setStyle(Consts.TextStyle.FieldMiddleDark);
+                break;
+            
+            case Enums.FieldType.RAILSTATION:
+                Helper.toDark(items[2]);
+                items[3].setStyle(Consts.TextStyle.FieldMiddleDark);
+                items[4].setStyle(Consts.TextStyle.FieldMiddleDark);
+                items[5].setFrame(0);
+                Helper.toDark(items[6]);
+                items[7].setStyle(Consts.TextStyle.FieldMiddleDark);
+                break;
+            
+            case Enums.FieldType.UTILITY:
+                Helper.toDark(items[2]);
+                items[3].setStyle(Consts.TextStyle.FieldSmallDark);
+                items[4].setStyle(Consts.TextStyle.FieldMiddleDark);
+                items[5].setFrame(0);
+                Helper.toDark(items[6]);
+                items[7].setStyle(Consts.TextStyle.FieldMiddleDark);
+                break;
+
+            case Enums.FieldType.START:
+            case Enums.FieldType.FREE:
+            case Enums.FieldType.GOTOJAIL:
+            case Enums.FieldType.JAIL:
+                Helper.toDark(items[2]);
+                break;
+
+            default:
+                throw `Unknown field type ${config.type}`;
+        }
+    }
+
+    /**
+     */
+    stopDark() {
+        const me = this;
+
+        const config = FieldInfo.Config[me._index];
+        const items = me._container.getAll();
+
+        items[1].setFrame(0);
+
+        switch (config.type) {
+            case Enums.FieldType.PROPERTY:
+                items[2].setFrame(config.color);
+                Helper.toLight(items[3]);
+                items[4].setStyle(Consts.TextStyle.FieldSmallLight);
+                items[5].setStyle(Consts.TextStyle.FieldMiddleLight);
+                items[6].setFrame(me._player == Enums.Player.HUMAN ? 9 : 1);
+                Helper.toLight(items[7]);
+                items[8].setStyle(Consts.TextStyle.FieldMiddleLight);
+                break;
+
+            case Enums.FieldType.CHANCE:
+                Helper.toLight(items[2]);
+                items[3].setStyle(Consts.TextStyle.FieldBigLight);
+                break;
+
+            case Enums.FieldType.TAX:
+                Helper.toLight(items[2]);
+                items[3].setStyle(Consts.TextStyle.FieldBigLight);
+                items[4].setStyle(Consts.TextStyle.FieldMiddleLight);
+                break;
+            
+            case Enums.FieldType.RAILSTATION:
+                Helper.toLight(items[2]);
+                items[3].setStyle(Consts.TextStyle.FieldMiddleLight);
+                items[4].setStyle(Consts.TextStyle.FieldMiddleLight);
+                items[5].setFrame(me._player == Enums.Player.HUMAN ? 9 : 1);
+                Helper.toLight(items[6]);
+                items[7].setStyle(Consts.TextStyle.FieldMiddleLight);
+                break;
+            
+            case Enums.FieldType.UTILITY:
+                Helper.toLight(items[2]);
+                items[3].setStyle(Consts.TextStyle.FieldSmallLight);
+                items[4].setStyle(Consts.TextStyle.FieldMiddleLight);
+                items[5].setFrame(me._player == Enums.Player.HUMAN ? 9 : 1);
+                Helper.toLight(items[6]);
+                items[7].setStyle(Consts.TextStyle.FieldMiddleLight);
+                break;
+
+            case Enums.FieldType.START:
+            case Enums.FieldType.FREE:
+            case Enums.FieldType.GOTOJAIL:
+            case Enums.FieldType.JAIL:
+                Helper.toLight(items[2]);
+                break;
+
+            default:
+                throw `Unknown field type ${config.type}`;
+        }
     }
 
      /**
@@ -172,52 +327,54 @@ export default class Field {
      * @param {Object} config 
      * @returns {Phaser.GameObjects.GameObject[]}
      */
-    _getFieldContent(factory, config) {
+    _initFieldContent(factory, config) {
         const me = this;
+
+        me._initRentBlock(factory, config.type);
 
         switch (config.type) {
             case Enums.FieldType.PROPERTY:
                 return [
                     factory.image(0, -95, 'field_header', config.color),
                     factory.image(0, 20, 'icons', config.icon),
-                    factory.text(0, -40, config.name, Consts.TextStyle.FieldSmall).setOrigin(0.5),
-                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
-                    factory.image(0, 144, 'field_header', 9).setVisible(false),
-                    factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
-                    factory.text(20, 144, 'RENT', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
+                    factory.text(0, -40, config.name, Consts.TextStyle.FieldSmallLight).setOrigin(0.5),
+                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddleLight).setOrigin(0.5),
+                    me._rentBlock.rect,
+                    me._rentBlock.icon,
+                    me._rentBlock.cost
                 ];
 
             case Enums.FieldType.CHANCE:
                 return [
                     factory.image(0, 20, 'icons_big', 0),
-                    factory.text(0, -90, 'CHANCE', Consts.TextStyle.FieldBig).setOrigin(0.5)
+                    factory.text(0, -90, 'CHANCE', Consts.TextStyle.FieldBigLight).setOrigin(0.5)
                 ];
 
             case Enums.FieldType.TAX:
                 return [
                     factory.image(0, 0, 'icons_big', 2),
-                    factory.text(0, -90, 'TAX', Consts.TextStyle.FieldBig).setOrigin(0.5),
-                    factory.text(0, 95, `PAY ${config.cost}`, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
+                    factory.text(0, -90, 'TAX', Consts.TextStyle.FieldBigLight).setOrigin(0.5),
+                    factory.text(0, 95, `PAY ${config.cost}`, Consts.TextStyle.FieldMiddleLight).setOrigin(0.5),
                 ];
 
             case Enums.FieldType.RAILSTATION:
                 return [
                     factory.image(0, 0, 'icons_big', 4),
-                    factory.text(0, -90, config.name, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
-                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
-                    factory.image(0, 144, 'field_header', 9).setVisible(false),
-                    factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
-                    factory.text(20, 144, 'RENT', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
+                    factory.text(0, -90, config.name, Consts.TextStyle.FieldMiddleLight).setOrigin(0.5),
+                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddleLight).setOrigin(0.5),
+                    me._rentBlock.rect,
+                    me._rentBlock.icon,
+                    me._rentBlock.cost
                 ];
 
             case Enums.FieldType.UTILITY:
                 return [
                     factory.image(0, 0, 'icons_big', config.icon),
-                    factory.text(0, -90, config.name, Consts.TextStyle.FieldSmall).setOrigin(0.5),
-                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddle).setOrigin(0.5),
-                    factory.image(0, 144, 'field_header', 9).setVisible(false),
-                    factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false),
-                    factory.text(20, 144, 'RENT', Consts.TextStyle.FieldMiddle).setOrigin(0.5).setVisible(false)
+                    factory.text(0, -90, config.name, Consts.TextStyle.FieldSmallLight).setOrigin(0.5),
+                    factory.text(0, 95, config.cost, Consts.TextStyle.FieldMiddleLight).setOrigin(0.5),
+                    me._rentBlock.rect,
+                    me._rentBlock.icon,
+                    me._rentBlock.cost
                 ];
 
             case Enums.FieldType.START:
@@ -243,5 +400,17 @@ export default class Field {
             default:
                 throw `Unknown field type ${config.type}`;
         }
+    }
+
+    _initRentBlock(factory, type) {
+        const me = this;
+
+        const hasRent = Utils.contains(Consts.BuyableFieldTypes, type);
+        if (!hasRent)
+            return;
+
+        me._rentBlock.rect = factory.image(0, 144, 'field_header', 9).setVisible(false);
+        me._rentBlock.icon = factory.image(-50, 144, 'pieces', 0).setScale(0.5).setVisible(false);
+        me._rentBlock.cost = factory.text(20, 144, 'RENT', Consts.TextStyle.FieldMiddleLight).setOrigin(0.5).setVisible(false);
     }
 }

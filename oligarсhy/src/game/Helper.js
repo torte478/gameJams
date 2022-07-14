@@ -1,4 +1,5 @@
 import Consts from "./Consts.js";
+import Enums from "./Enums.js";
 import Utils from "./Utils.js";
 
 export default class Helper {
@@ -66,27 +67,41 @@ export default class Helper {
     }
 
     /**
-     * @param {Number[]} money 
+     * @param {Number[]} bills 
      * @returns {Number[]}
      */
-    static splitBillToBills(money) {
+    static splitBillToMany(bills) {
         let totalCount = 0;
-        money.forEach((x) => totalCount += x);
+        bills.forEach((x) => totalCount += x);
         if (totalCount != 1)
-            throw `can't split money array. wrong bill count`;
+                throw `can't split bill. bill count != 1`;
 
-        let billIndex = Consts.BillCount - 1;
-        while (money[billIndex] == 0)
-            --billIndex;
+        let index = Consts.BillCount - 1;
+        while (bills[index] === 0)
+            --index;
 
-        if (billIndex == 0)
+        if (index === 0)
             throw `can't split min bill`;
 
-        const amount = Consts.BillValue[billIndex] - Consts.BillValue[billIndex - 1];
+        const amount = Consts.BillValue[index] - Consts.BillValue[index - 1];
         const result = Helper.splitValueToBills(amount);
-        result[billIndex - 1]++;
+        result[index - 1]++;
         
         return result;
+    }
+
+    /**
+     * @param {Number[]} bills 
+     * @param {Number} action 
+     * @returns {Number[]}
+     */
+     static manageBills(bills, action) {
+        if (action == Enums.ActionType.MERGE_MONEY)
+            return Helper.mergeBills(bills);
+        else if (action == Enums.ActionType.SPLIT_MONEY)
+            return Helper.splitBillToMany(bills);
+        else 
+            throw `Unknown money management type ${Utils.enumToString(Enums.ActionType, action)}`;
     }
 
     /**
@@ -96,7 +111,7 @@ export default class Helper {
     static mergeBills(money) {
         const total = Helper.getTotalMoney(money);
         
-        if (total == 0)
+        if (total === 0)
             throw `can't merge zero money`;
 
         return Helper.splitValueToBills(total);
@@ -113,7 +128,6 @@ export default class Helper {
     }
 
     /**
-     * 
      * @param {Phaser.Geom.Point} point 
      * @param {Number} side 
      * @returns {Phaser.Geom.Point}
@@ -130,6 +144,7 @@ export default class Helper {
     }
 
     /**
+     * [2, 1, 3] => [0, 1, 2, 0, 2, 2]
      * @param {Number[]} money 
      * @returns {Number[]}
      */
@@ -151,5 +166,19 @@ export default class Helper {
         }
 
         return result;
+    }
+
+    /**
+     * @param {Phaser.GameObjects.Image} image 
+     */
+    static toDark(image) {
+        image.setFrame(image.frame.name + 1);
+    }
+
+    /**
+     * @param {Phaser.GameObjects.Image} image 
+     */
+    static toLight(image) {
+        image.setFrame(image.frame.name - 1);
     }
 }
