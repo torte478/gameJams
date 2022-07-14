@@ -224,6 +224,37 @@ export default class Utils {
         return scene.load.image(name, `assets/${name}.png`);
     }
 
+    // --- Debug ---
+
+    /**
+     * @param {Boolean} flag 
+     * @param {Function} func 
+     * @returns {Boolean}
+     */
+     static ifDebug(flag, func) {
+        if (Utils.isDebug(flag))
+            return func();
+
+        return false;
+    }
+
+    /**
+     * @param {Boolean} flag 
+     * @returns {Boolean}
+     */
+    static isDebug(flag) {
+        return Config.Debug.Global && flag;
+    }
+
+    /**
+     * @param {String} msg 
+     */
+    static debugLog(msg) {
+        Utils.ifDebug(Config.Debug.Log, () => {
+            console.log(msg);
+        })  
+    }
+
     // --- Other ---
 
     /**
@@ -258,11 +289,11 @@ export default class Utils {
     }
 
     /**
-     * @param {String} msg 
+     * @param {String} s 
+     * @returns {Boolean}
      */
-    static debugLog(msg) {
-        if (Config.Debug.Global && Config.Debug.Log)
-            console.log(msg);
+     static stringIsDigit(s) {
+        return !(isNaN(s));
     }
 
     // --- New ---

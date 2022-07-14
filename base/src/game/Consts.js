@@ -1,7 +1,9 @@
 export default class Consts {
 
     static Viewport = {
-        Width: 1000,
-        Height: 800
+        Width: 1024,
+        Height: 768
     };
+
+    static Unit = 32;
 }
