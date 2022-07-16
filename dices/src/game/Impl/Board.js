@@ -64,12 +64,28 @@ export default class Board {
      * @param {Number} field 
      * @return {Phaser.Geom.Point}
      */
-    getPiecePosition(player, field) {
+    getFieldPosition(player, field) {
         const me = this;
 
-        const corner = Consts.PlayerCornerByCount[Config.PlayerCount][player];
+        const corner = me._getPlayerCorner(player);
         const fields = me._getFieldsFrom(corner);
         return me._fieldToPoint(fields[field]);
+    }
+
+    getStoragePosition(player) {
+        const me = this;
+
+        const corner = me._getPlayerCorner(player);
+        const offset = Consts.StorageByCorner[corner];
+
+        return Utils.buildPoint(
+            me._position.x + me._side * offset.sideX + offset.x,
+            me._position.y + me._side * offset.sideY + offset.y
+        );
+    }
+
+    _getPlayerCorner(player) {
+        return Consts.PlayerCornerByCount[Config.PlayerCount - 1][player];
     }
 
     _fieldToPoint(field) {

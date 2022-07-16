@@ -9,10 +9,13 @@ export default class Piece {
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Geom.Point} position 
      * @param {Number} frame 
+     * @param {Number} scale
      */
-    constructor(scene, position, frame) {
+    constructor(scene, position, frame, scale) {
         const me = this;
 
-        me._sprite = scene.add.sprite(position.x, position.y, 'piece', frame);
+        me._sprite = scene.add
+            .sprite(position.x, position.y, 'piece', frame)
+            .setScale(scale);
     }
 }
