@@ -5,5 +5,10 @@ export default class Consts {
         Height: 768
     };
 
-    static Unit = 32;
+    static Unit = 64;
+    static UnitHalf = Consts.Unit / 2;
+
+    static Depth = {
+        Max: 999999
+    };
 }
