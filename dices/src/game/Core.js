@@ -142,7 +142,8 @@ export default class Core {
 
         let text = 
             `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` +
-            `crs: ${me._carousel._cards.map(x => !!x ? x.bonusType : '-')}`;
+            `crs: ${me._carousel._cards.map(x => !!x ? x.bonusType : '-')}\n` +
+            `lvl: ${me._carousel._minCount}`;
 
         me._log.setText(text);
     }
@@ -243,11 +244,17 @@ export default class Core {
 
     _getBonusesToCreate() {
         const me = this;
-        const bonuses = [];
+        const bonuses = Utils.copyArray(Config.DefaultBonuses);
 
-        for (let i = 1; i <= 6; ++i)
+        for (let i = 1; i <= 5; ++i)
             if (me._players.getAvailableSteps(i).length > 0)
                 bonuses.push(i);
+
+        if (me._carousel._minCount > Config.Carousel.Min)
+            bonuses.push(Enums.Bonus.LESS_CARDS);
+
+        if (me._carousel._minCount < Config.Carousel.Max)
+            bonuses.push(Enums.Bonus.MORE_CARDS);
 
         // TODO: return bonuses;
         return null;
@@ -263,7 +270,13 @@ export default class Core {
             case Enums.Bonus.DICE_4:
             case Enums.Bonus.DICE_5:
             case Enums.Bonus.DICE_6:
-                    return me._players.getAvailableSteps(bonus);
+                return me._players.getAvailableSteps(bonus);
+
+            case Enums.Bonus.LESS_CARDS:
+                return me._carousel._minCount > Config.Carousel.Min;
+
+            case Enums.Bonus.MORE_CARDS:
+                return me._carousel._minCount < Config.Carousel.Max;
 
             default:
                 throw `unknown bonus type: ${bonus}`;
@@ -281,6 +294,16 @@ export default class Core {
             case Enums.Bonus.DICE_5:
             case Enums.Bonus.DICE_6:
                 return me._dice.roll(false, me._onDiceRoll, me, bonus);
+
+            case Enums.Bonus.LESS_CARDS: {
+                me._carousel.changeLevel(-1);
+                return me._finishTurn();
+            }
+
+            case Enums.Bonus.MORE_CARDS: {
+                me._carousel.changeLevel(+1);
+                return me._finishTurn();
+            }
 
             default:
                 throw `unknown bonus type: ${bonus}`;

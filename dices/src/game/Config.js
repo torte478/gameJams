@@ -13,12 +13,15 @@ export default class Config {
     static BoardSize = 4;
 
     static Carousel = {
-        Start: 1
+        Min: 1,
+        Start: 1,
+        Max: 3
     };
 
     static DefaultBonuses = [
-        Enums.Bonus.DICE_6,
+        Enums.Bonus.MORE_CARDS,
 
+        // Enums.Card.DICE_6,
         // Enums.Card.MORE_CARDS,
         // Enums.Card.REROLL,
         // Enums.Card.CARD_PACK,

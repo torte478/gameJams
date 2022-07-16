@@ -91,6 +91,15 @@ export default class Carousel {
         return true;
     }
 
+    changeLevel(delta) {
+        const me = this;
+
+        me._minCount += delta;
+        
+        if (me._minCount < Config.Carousel.Min || me._minCount > Config.Carousel.Max)
+            throw `wrong carousel level: ${me._minCount}`;
+    }
+
     _onRoll(last, callback, context) {
         const me = this;      
         
