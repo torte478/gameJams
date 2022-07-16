@@ -4,27 +4,38 @@ export default class Config {
         Global: true,
         Log: true,
         TraceLog: true,
+        IgnoreRollAnim: true
     };
 
-    static BoardSize = 4;
+    static BoardSize = 8;
+
+    static DebugWeight = [
+        100,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1
+    ];
 
     static Start = [
         { 
-            count: 2,
-            positions: [ 0, 1 ]
-        },
-        {
-            count: 2,
+            count: 4,
             positions: [ ]
         },
-        // { 
-        //     count: 4,
-        //     positions: [ ]
-        // },
-        // {
-        //     count: 4,
-        //     positions: [ ]
-        // }
+        {
+            count: 4,
+            positions: [ ]
+        },
+        { 
+            count: 4,
+            positions: [ ]
+        },
+        {
+            count: 4,
+            positions: [ ]
+        }
     ];
 
     static PlayerCount = Config.Start.length;

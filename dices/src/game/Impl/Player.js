@@ -95,6 +95,12 @@ export default class Player {
         return steps;       
     }
 
+    hasPieceAt(target) {
+        const me = this;
+
+        return Utils.any(me._pieces, p => target.isEqualPos(p.cell));
+    }
+
     _tryGetAvailableStep(piece, value, steps, isCycle) {
         const me = this;
 
@@ -148,7 +154,7 @@ export default class Player {
     /**
      * @param {Cell} target 
      */
-    tryKill(target) {
+    tryKill(target, callback, context) {
         const me = this;
 
         /** @type {Piece} */
@@ -160,7 +166,12 @@ export default class Player {
             return false;
 
         const position = me._getPositionInStorage();
-        piece.move(position, Consts.PieceScale.Storage,() => { me._onKill(piece) }, me);
+        piece.move(
+            position, 
+            Consts.PieceScale.Storage,
+            () => { me._onKill(piece, callback, context) }, 
+            me);
+        return true;
     }
 
     isStorageClick(point) {
@@ -176,11 +187,14 @@ export default class Player {
         return Phaser.Geom.Rectangle.ContainsPoint(storageRect, point);
     }
 
-    _onKill(piece) {
+    _onKill(piece, callback, context) {
         const me = this;
 
         me._pieces = me._pieces.filter(p => p !== piece);
         me._storage.push(piece);
+
+        if (!!callback)
+            callback.call(context);
     }
 
     _getPositionInStorage() {

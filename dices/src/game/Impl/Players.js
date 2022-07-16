@@ -1,6 +1,7 @@
 import Phaser from '../../lib/phaser.js';
 
 import Config from '../Config.js';
+import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
 import Board from './Board.js';
@@ -51,14 +52,14 @@ export default class Players {
         me._getCurrent().makeStep(from, to, callback, context);
     }
 
-    tryKill(cell) {
+    tryKill(cell, callback, context) {
         const me = this;
 
         for (let i = 0; i < me._players.length; ++i) {
             if (i == me._context.player)
                 continue;
 
-            if (me._players[i].tryKill(cell))
+            if (me._players[i].tryKill(cell, callback, context))
                 return true;
         }
 
@@ -69,6 +70,19 @@ export default class Players {
         const me = this;
 
         return me._getCurrent().isStorageClick(point);
+    }
+
+    /**
+     * @param {Cell} target 
+     */
+    getPlayerAt(target) {
+        const me = this;
+
+        for (let i = 0; i < me._players.length; ++i)
+            if (me._players[i].hasPieceAt(target))
+                return i;
+
+        return Consts.Undefinedl
     }
 
     _getCurrent() {

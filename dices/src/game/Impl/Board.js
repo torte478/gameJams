@@ -1,6 +1,6 @@
 import Phaser from '../../lib/phaser.js';
-import Config from '../Config.js';
 
+import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
@@ -32,7 +32,6 @@ export default class Board {
         me._position = Utils.buildPoint(
             (Consts.Viewport.Width - me._side) / 2,
             (Consts.Viewport.Height - me._side) / 2);
-
 
         const array = me._buildTileArray(size);
 
@@ -69,7 +68,7 @@ export default class Board {
     getCell(player, index, isCycle) {
         const me = this;
 
-        const corner = me._getPlayerCorner(player);
+        const corner = me._getCornerIndex(player);
         const fields = me._getFieldsFrom(corner);
         return me._fieldToCell(player, index, fields, !!isCycle);
     }
@@ -77,7 +76,7 @@ export default class Board {
     getStoragePosition(player) {
         const me = this;
 
-        const corner = me._getPlayerCorner(player);
+        const corner = me._getCornerIndex(player);
         const offset = Consts.StorageByCorner[corner];
 
         return Utils.buildPoint(
@@ -112,7 +111,7 @@ export default class Board {
     getSpawn(player) {
         const me = this;
 
-        const corner = me._corners[me._getPlayerCorner(player)];
+        const corner = me._corners[me._getCornerIndex(player)];
         const position = me._rowColToPoint(corner.row, corner.col);
         return new Cell({
             player: player,
@@ -124,7 +123,32 @@ export default class Board {
         });
     }
 
-    _getPlayerCorner(player) {
+    getCircleLength() {
+        const me = this;
+
+        return (me._size - 1) * 4;
+    }
+
+    /**
+     * @param {Number} player 
+     * @param {Cell} target 
+     * @returns {Boolean}
+     */
+    isOwnCorner(player, target) {
+        const me = this;
+
+        const corner = me._corners[me._getCornerIndex(player)];
+
+        return target.isEqualPos(corner);
+    }
+
+    isCorner(target) {
+        const me = this;
+
+        return Utils.any(me._corners, c => target.isEqualPos(c));
+    }
+
+    _getCornerIndex(player) {
         return Consts.PlayerCornerByCount[Config.PlayerCount - 1][player];
     }
 
@@ -148,12 +172,6 @@ export default class Board {
             col: field.col,
             index: index
         });
-    }
-
-    getCircleLength() {
-        const me = this;
-
-        return (me._size - 1) * 4;
     }
 
     _rowColToPoint(row, col) {

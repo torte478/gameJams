@@ -19,4 +19,14 @@ export default class Enums {
         DICE_ROLL: 0,
         MAKE_STEP: 1
     };
+
+    static AiWeight = {
+        WIN: 0,
+        KILL: 1,
+        SPAWN: 2,
+        ENTER_HOME: 3,
+        INSIDE_HOME: 4,
+        MOVE_FROM_OWN_SPAWN: 4,
+        MOVE_FROM_ENEMY_SPAWN: 5,
+    };
 }

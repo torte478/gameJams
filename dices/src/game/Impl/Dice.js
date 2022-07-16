@@ -1,4 +1,5 @@
 import Phaser from '../../lib/phaser.js';
+import Config from '../Config.js';
 
 import Consts from '../Consts.js';
 import Utils from '../Utils.js';
@@ -49,6 +50,15 @@ export default class Dice {
         if (!contains)
             return;
 
+        if (Utils.isDebug(Config.Debug.IgnoreRollAnim))
+            ignoreAnimation = true;
+
+        me.roll(ignoreAnimation, callback, context);
+    }
+
+    roll(ignoreAnimation, callback, context) {
+        const me = this;
+
         me._sprite.play('dice_roll');
         me._rollTask = me._scene.time.delayedCall(
             ignoreAnimation ? 0 :  Consts.DiceRollTime, 
@@ -68,7 +78,7 @@ export default class Dice {
             me._rollTask.paused = true;
 
         const value = Utils.getRandom(1, 6);
-        Utils.debugLog(`roll: ${value}`);
+        Utils.debugLog(`roll: ${value} ${value === Consts.DiceSpawnValue ? 'Spawn!' : ''}`);
 
         if (!callback)
             return;

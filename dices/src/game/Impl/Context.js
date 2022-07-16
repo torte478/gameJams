@@ -38,4 +38,12 @@ export default class State {
                      + ` => ${Utils.enumToString(Enums.GameState, state)}`);
         me.state = state;
     }
+
+    setPlayer(player) {
+        const me = this;
+
+        me.player = player;
+
+        Utils.debugLog(`player: ${player}`);
+    }
 }

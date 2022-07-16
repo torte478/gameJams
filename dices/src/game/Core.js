@@ -10,6 +10,7 @@ import Helper from './Helper.js';
 import Utils from './Utils.js';
 import Players from './Impl/Players.js';
 import Context from './Impl/Context.js';
+import AI from './Impl/AI.js';
 
 export default class Core {
 
@@ -27,6 +28,9 @@ export default class Core {
 
     /** @type {Context} */
     _context;
+
+    /** @type {AI[]} */
+    _ai;
 
     /** @type {Phaser.GameObjects.Text} */
     _log;
@@ -46,6 +50,12 @@ export default class Core {
         me._board = new Board(scene, boardSize);
         me._dice = new Dice(scene, me._board.getBounds());
         me._players = new Players(scene, me._board, me._context);
+
+        me._ai = [ null ]
+        for (let i = 1; i < 4; ++i) {
+            const ai = new AI(i, me._context, me._players, me._board, Config.DebugWeight);
+            me._ai.push(ai);
+        }
 
         // Debug
 
@@ -73,7 +83,7 @@ export default class Core {
         if (me._context.state === Enums.GameState.DICE_ROLL)
             me._dice.tryRoll(point, false, me._onDiceRoll, me);
         else if (me._context.state === Enums.GameState.MAKE_STEP)
-            me._tryMovePiece(point);
+            me._tryMakeStep(point);
     }
 
     /**
@@ -106,6 +116,14 @@ export default class Core {
         const available = me._players.getAvailableSteps(value);
         me._context.setAvailableSteps(available);
         me._context.setState(Enums.GameState.MAKE_STEP);
+
+        if (available.length === 0)
+            return me._finishTurn();
+
+        if (me._context.player !== Enums.Player.HUMAN) {
+            const step = me._ai[me._context.player].getStep();
+            return me._makeStep(step);
+        }
     }
 
     _updateDebugLog() {
@@ -120,7 +138,7 @@ export default class Core {
         me._log.setText(text);
     }
 
-    _tryMovePiece(point) {
+    _tryMakeStep(point) {
         const me = this;
 
         const spawnStep = Utils.firstOrNull(me._context.availableSteps, c => c.from.index === Consts.Undefined);
@@ -153,8 +171,19 @@ export default class Core {
     _onPlayerStep(step) {
         const me = this;
 
-        me._players.tryKill(step.to);
+        if (me._players.tryKill(step.to, me._finishTurn, me))
+            return;
 
+        me._finishTurn();
+    }
+
+    _finishTurn() {
+        const me = this;
+
+        me._context.setPlayer((me._context.player + 1) % Config.PlayerCount);
         me._context.setState(Enums.GameState.DICE_ROLL);
+
+        if (me._context.player !== Enums.Player.HUMAN)
+            return me._dice.roll(true, me._onDiceRoll, me);
     }
 }
