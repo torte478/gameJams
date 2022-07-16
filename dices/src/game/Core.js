@@ -62,6 +62,30 @@ export default class Core {
         me._dice.tryRoll(point, false, me._onDiceRoll, me);
     }
 
+    /**
+     * @param {KeyboardEvent} event 
+     */
+    onKeyDown(event) {
+        const me = this;
+
+        if (!Config.Debug.Global)
+            return;
+
+        if (!!event.repeat)
+            return;
+            
+        if (event.key == 'r') {
+            // me._scene.input.mouse.releasePointerLock();
+            me._scene.scene.start('game');
+            return;
+        }
+
+        if (Utils.stringIsDigit(event.key)) {
+            const value = +event.key;
+            me._onDiceRoll(value);
+        }
+    }
+
     _onDiceRoll() {
         console.log(this, arguments[0]);
     }

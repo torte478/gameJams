@@ -22,6 +22,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'dice', Consts.UnitBig);
 
         me.input.on('pointerdown', me._onPointerDown, me);
+        me.input.keyboard.on('keydown', (e) => me._onKeyDown(e), me);
     }
 
     create() {
@@ -42,5 +43,11 @@ export default class Game extends Phaser.Scene {
         const me = this;
 
         me._core.onPointerDown(pointer);
+    }
+
+    _onKeyDown(event) {
+        const me = this;
+
+        me._core.onKeyDown(event);
     }
 }
