@@ -128,14 +128,15 @@ export default class Core {
         me._context.setAvailableSteps(available);
         me._context.setState(Enums.GameState.MAKE_STEP);
 
-        if (available.length > 0) {
+        const needDisableBooster = Utils.any(available, step => !step.bonus);
+        if (needDisableBooster) {
             me._players.disableBooster();
 
             const isCycle = Utils.any(available, step => !!step.isCycle);
             if (isCycle)
                 me._players.applyCycleBooster();
         }
-        else {
+        else if (available.length === 0) {
             me._players.applyBooster(value);
             return me._finishTurn();
         }
@@ -165,7 +166,10 @@ export default class Core {
     _tryMakeStep(point) {
         const me = this;
 
-        const spawnStep = Utils.firstOrNull(me._context.availableSteps, c => c.from.index === Consts.Undefined);
+        const spawnStep = Utils.firstOrNull(
+            me._context.availableSteps, 
+            step => step.from.index === Consts.Undefined && !step.bonus);
+
         if (spawnStep != null && me._players.isStorageClick(point))
             return me._makeStep(spawnStep);
 
