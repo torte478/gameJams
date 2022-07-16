@@ -13,6 +13,9 @@ export default class Booster {
     /** @type {Boolean[]} */
     _values;
 
+    /** @type {Number} */
+    _cycleCounter;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
@@ -29,6 +32,7 @@ export default class Booster {
 
         me._container = scene.add.container(position.x, position.y, me._dices);
         me._values = Utils.buildArray(6, true);
+        me._cycleCounter = 0;
     }
 
     disable() {
@@ -43,11 +47,14 @@ export default class Booster {
     enable(value) {
         const me = this;
 
+        if (value < 0 && value >= me._dices.length)
+            throw `invalid booster value: ${value}`;
+
         me._values[value - 1] = false;
         me._dices[value - 1].setVisible(false);
     }
 
-    toValues()  {
+    toValues(endgame)  {
         const me = this;
 
         const result = [];
@@ -55,6 +62,29 @@ export default class Booster {
             if (!!me._values[i])
                 result.push(i + 1);
 
-        return result;
+        if (endgame === Consts.Undefined)
+            return result;
+
+        const shuffled = Utils.shuffle(result);
+        const endGameResult = [ endgame ];
+        for (let i = 0; i < shuffled.length && endGameResult.length < 6 - me._cycleCounter; ++i)
+            if (shuffled[i] != endgame)
+                endGameResult.push(shuffled[i]);
+
+        Utils.debugLog(`endgame: (${endgame}) [${result}] => [${endGameResult}]`);
+
+        return endGameResult;
+    }
+
+    applyCycle() {
+        const me = this;
+
+        ++me._cycleCounter;
+    }
+
+    disableCycle() {
+        const me = this;
+
+        me._cycleCounter = 0;
     }
 }

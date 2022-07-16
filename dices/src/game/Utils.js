@@ -297,4 +297,45 @@ export default class Utils {
     }
 
     // --- New ---
+
+    /**
+     * @param {Array} array 
+     * @param {Number} count 
+     * @returns {Array}
+     */
+    static getRandomElems(array, count) {
+        if (count < array.length)
+            throw `invalid count: ${count}`;
+
+        const result = [];
+        let arr = Utils.copyArray(array);
+        while (result.length < count) {
+            const index = Phaser.Math.Between(0, arr.length - 1);
+            result.push(arr[index]);
+            arr = Utils.removeAt(arr, index);
+        }
+
+        return result;
+    }
+
+    /**
+     * @param {Array} array 
+     * @param {Number} index 
+     * @returns {Array}
+     */
+    static removeAt(array, index) {
+        const result = [];
+        for (let i = 0; i < array.length; ++i)
+            if (i != index)
+                result.push(array[i]);
+        return result;
+    }
+
+    /**
+     * @param {Array} array 
+     * @returns {Array}
+     */
+    static shuffle(array) {
+        return Utils.getRandomElems(array, array.length);
+    }
 }

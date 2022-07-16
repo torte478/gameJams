@@ -10,7 +10,34 @@ export default class Config {
         Random: false
     };
 
-    static BoardSize = 8;
+    static BoardSize = 4;
+
+    static Start = [
+        {
+            count: 2,
+            positions: [11, 13],
+        },
+        {
+            count: 2,
+            positions: [],
+        },
+        // { 
+        //     count: 4,
+        //     positions: []
+        // },
+        // {
+        //     count: 4,
+        //     positions: []
+        // },
+        // { 
+        //     count: 4,
+        //     positions: [ ]
+        // },
+        // {
+        //     count: 4,
+        //     positions: [ ]
+        // }
+    ];
 
     static Carousel = {
         Min: 1,
@@ -25,24 +52,6 @@ export default class Config {
         Enums.Bonus.CARD_PACK
     ];
 
-    static Start = [
-        { 
-            count: 4,
-            positions: []
-        },
-        {
-            count: 4,
-            positions: []
-        },
-        { 
-            count: 4,
-            positions: [ ]
-        },
-        {
-            count: 4,
-            positions: [ ]
-        }
-    ];
 
     static DebugWeight = [
         100,

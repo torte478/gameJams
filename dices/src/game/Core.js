@@ -130,6 +130,10 @@ export default class Core {
 
         if (available.length > 0) {
             me._players.disableBooster();
+
+            const isCycle = Utils.any(available, step => !!step.isCycle);
+            if (isCycle)
+                me._players.applyCycleBooster();
         }
         else {
             me._players.applyBooster(value);
@@ -152,7 +156,8 @@ export default class Core {
             `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` +
             `crs: ${me._carousel._cards.map(x => !!x ? x.bonusType : '-')}\n` +
             `lvl: ${me._carousel._minCount}\n` +
-            `pck: ${me._carousel._packSize}`;
+            `pck: ${me._carousel._packSize}\n` +
+            `cle: ${me._players._players.map(x => x._booster._cycleCounter)}`;
 
         me._log.setText(text);
     }

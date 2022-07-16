@@ -152,7 +152,28 @@ export default class Player {
     getBoosterValues() {
         const me = this;
 
-        return me._booster.toValues();
+        const endGame = me._getEndgame();
+
+        return me._booster.toValues(endGame);
+    }
+
+    _getEndgame() {
+        const me = this;
+
+        if (me._storage.length > 0)
+            return Consts.Undefined;
+
+        const circleLength = me._board.getCircleLength();
+        if (me._pieces.filter(p => p.cell.index < circleLength).length !== 1)
+            return Consts.Undefined;
+
+        /** @type {Piece} */
+        const piece = Utils.firstOrNull(me._pieces, p => p.cell.index < circleLength);
+        if (piece == null)
+            throw `can't calculate endgame`;
+
+        const endgame = circleLength - piece.cell.index;
+        return endgame <= 6 ? endgame : Consts.Undefined;
     }
 
     _tryGetAvailableMovementStep(piece, value, steps, isCycle) {
@@ -168,7 +189,7 @@ export default class Player {
         if (!isAvailable) 
             return false;
 
-        steps.push({ from: piece.cell, to: target });
+        steps.push({ from: piece.cell, to: target, isCycle: isCycle });
         return true;
     }
 
@@ -226,12 +247,19 @@ export default class Player {
                && Utils.all(me._pieces, p => p.cell.index >= circleLength);
     }
 
+    applyCycleBooster() {
+        const me = this;
+
+        me._booster.applyCycle();
+    }
+
     _onKill(piece, callback, context) {
         const me = this;
 
         me._pieces = me._pieces.filter(p => p !== piece);
         me._storage.push(piece);
         me._booster.disable();
+        me._booster.disableCycle();
 
         if (!!callback)
             callback.call(context);

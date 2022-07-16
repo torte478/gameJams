@@ -109,6 +109,12 @@ export default class Players {
         return me._getCurrent().getBoosterValues();
     }
 
+    applyCycleBooster() {
+        const me = this;
+
+        return me._getCurrent().applyCycleBooster();
+    }
+
     _getCurrent() {
         const me = this;
 
