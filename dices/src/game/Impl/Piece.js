@@ -36,10 +36,11 @@ export default class Piece {
 
     /**
      * @param {Cell} target 
+     * @param {Number}
      * @param {Function} callback 
      * @param {Context} context 
      */
-    makeStep(target, callback, context) {
+    move(target, scale, callback, context) {
         const me = this;
 
         if (!!me._movementTween && !me._movementTween.paused)
@@ -49,6 +50,7 @@ export default class Piece {
             targets: me._sprite,
             x: target.x,
             y: target.y,
+            scale: scale,
             duration: Consts.Speed.PieceMovementMs,
             onComplete: () => {
                 me.cell = target;

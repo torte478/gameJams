@@ -131,11 +131,13 @@ export default class Core {
         if (step === null)
             return false;
 
-        me._players.makeStep(step.from, step.to, me._onPlayerStep, me);
+        me._players.makeStep(step.from, step.to, () => me._onPlayerStep(step), me);
     }
 
-    _onPlayerStep() {
+    _onPlayerStep(step) {
         const me = this;
+
+        me._players.tryKill(step.to);
 
         me._context.setState(Enums.GameState.DICE_ROLL);
     }

@@ -4,6 +4,7 @@ import Config from '../Config.js';
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
 import Board from './Board.js';
+import Cell from './Cell.js';
 import Context from './Context.js';
 import Player from './Player.js';
 
@@ -48,6 +49,21 @@ export default class Players {
         const me = this;
 
         me._getCurrent().makeStep(from, to, callback, context);
+    }
+
+
+    tryKill(cell) {
+        const me = this;
+
+        for (let i = 0; i < me._players.length; ++i) {
+            if (i == me._context.player)
+                continue;
+
+            if (me._players[i].tryKill(cell))
+                return true;
+        }
+
+        return false;
     }
 
     _getCurrent() {
