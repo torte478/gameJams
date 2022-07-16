@@ -2,6 +2,8 @@ import Phaser from '../../lib/phaser.js';
 
 import Config from '../Config.js';
 import Consts from '../Consts.js';
+import Carousel from './Carousel.js';
+import Enums from '../Enums.js';
 import Utils from '../Utils.js';
 import Board from './Board.js';
 import Cell from './Cell.js';
@@ -24,16 +26,20 @@ export default class Player {
     /** @type {Phaser.Geom.Point} */
     _storagePosition;
 
+    /** @type {Carousel} */
+    _carousel;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Board} board 
      * @param {Number} playerIndex 
      */
-    constructor(scene, board, playerIndex) {
+    constructor(scene, board, playerIndex, carousel) {
         const me = this;
 
         me._playerIndex = playerIndex;
         me._board = board;
+        me._carousel = carousel;
 
         const config = Config.Start[playerIndex];
 
@@ -73,14 +79,14 @@ export default class Player {
         for (let i = 0; i < me._pieces.length; ++i) {
             const piece = me._pieces[i];
 
-            const success = me._tryGetAvailableStep(piece, value, steps, false);
+            const success = me._tryGetAvailableMovementStep(piece, value, steps, false);
 
             const needTryCycle = !success 
                                  && me._storage.length == 0 
                                  && me._pieces.filter(p => p.cell.index <= circleLength).length === 1
                                  && piece.cell.index < circleLength;
             if (needTryCycle)
-                me._tryGetAvailableStep(piece, value, steps, true);
+                me._tryGetAvailableMovementStep(piece, value, steps, true);
         }
 
         const spawn = me._board.getSpawn(me._playerIndex);
@@ -92,6 +98,12 @@ export default class Player {
             steps.push({ from: piece.cell, to: spawn });
         }
 
+        const card = me._carousel.getCardType(value);
+        if (me._playerIndex === Enums.Player.HUMAN && card != Consts.Undefined) {
+            const dummy = new Cell();
+            steps.push({ from: dummy, to: dummy, card: card });
+        }
+
         return steps;       
     }
 
@@ -101,7 +113,32 @@ export default class Player {
         return Utils.any(me._pieces, p => target.isEqualPos(p.cell));
     }
 
-    _tryGetAvailableStep(piece, value, steps, isCycle) {
+    /**
+     * @param {Object} step
+     * @param {Function} callback
+     * @param {Object} context
+     */
+     makeStep(step, callback, context) {
+        const me = this;
+
+        const from = step.from;
+        const to = step.to;
+
+        const isSpawn = from.index === Consts.Undefined && to.index === 0;
+        if (isSpawn) {
+            const piece = me._storage[me._storage.length - 1];
+            piece.move(to, Consts.PieceScale.Normal, () => me._onSpawn(piece, callback, context), me);
+        } else {
+            /** @type {Piece} */
+            const piece = Utils.firstOrNull(me._pieces, p => p.cell.index === from.index);
+            if (piece === null)
+                throw `can't find piece on cell: ${from.index}`;
+
+            piece.move(to, Consts.PieceScale.Normal, callback, context);    
+        }
+    }
+
+    _tryGetAvailableMovementStep(piece, value, steps, isCycle) {
         const me = this;
 
         const target = me._board.getCell(me._playerIndex, piece.cell.index + value, isCycle);
@@ -116,29 +153,6 @@ export default class Player {
 
         steps.push({ from: piece.cell, to: target });
         return true;
-    }
-
-    /**
-     * @param {Cell} from 
-     * @param {Cell} to 
-     * @param {Function} callback
-     * @param {Object} context
-     */
-     makeStep(from, to, callback, context) {
-        const me = this;
-
-        const isSpawn = from.index === Consts.Undefined && to.index === 0;
-        if (isSpawn) {
-            const piece = me._storage[me._storage.length - 1];
-            piece.move(to, Consts.PieceScale.Normal, () => me._onSpawn(piece, callback, context), me);
-        } else {
-            /** @type {Piece} */
-            const piece = Utils.firstOrNull(me._pieces, p => p.cell.index === from.index);
-            if (piece === null)
-                throw `can't find piece on cell: ${from.index}`;
-
-            piece.move(to, Consts.PieceScale.Normal, callback, context);    
-        }
     }
 
     _onSpawn(piece, callback, context) {

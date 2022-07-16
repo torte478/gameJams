@@ -5,6 +5,7 @@ import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
 import Board from './Board.js';
+import Carousel from './Carousel.js';
 import Cell from './Cell.js';
 import Context from './Context.js';
 import Player from './Player.js';
@@ -21,11 +22,11 @@ export default class Players {
      * @param {Phaser.Scene} scene 
      * @param {Board}
      */
-    constructor(scene, board, context) {
+    constructor(scene, board, context, carousel) {
         const me = this;
 
         me._players = Config.Start.map(
-            (_, index) => new Player(scene, board, index));
+            (_, index) => new Player(scene, board, index, carousel));
 
         me._context = context;
     }
@@ -41,15 +42,17 @@ export default class Players {
     }
 
     /**
-     * @param {Cell} from 
-     * @param {Cell} to 
+     * @param {Object} step
      * @param {Function} callback
      * @param {Object} context
      */
-    makeStep(from, to, callback, context) {
+    makeStep(step, callback, context) {
         const me = this;
 
-        me._getCurrent().makeStep(from, to, callback, context);
+        if (!!step.card)
+            return console.log('card!');
+
+        me._getCurrent().makeStep(step, callback, context);
     }
 
     tryKill(cell, callback, context) {

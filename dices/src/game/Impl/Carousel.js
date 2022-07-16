@@ -3,7 +3,6 @@ import Config from '../Config.js';
 
 import Consts from '../Consts.js';
 import Utils from '../Utils.js';
-import Board from './Board.js';
 
 export default class Carousel {
 
@@ -60,6 +59,36 @@ export default class Carousel {
             duration: Consts.Speed.CarouselMs,
             onComplete: () => me._onRoll(last, callback, context)
         });
+    }
+
+    /**
+     * @param {Number} value 
+     * @returns {Number}
+     */
+    getCardType(value) {
+        const me = this;
+
+        const card = me._cards[value - 1];
+        return !!card ? 1 : Consts.Undefined;
+    }
+
+    tryCardClick(value, point) {
+        const me = this;
+
+        const card = me._cards[value - 1];
+        if (!card)
+            return false;
+
+        const contains = Phaser.Geom.Rectangle.ContainsPoint(
+            card.getBounds(),
+            point);
+
+        if (!contains)
+            return false;
+
+        me._cards[value - 1] = null;
+        me._pool.killAndHide(card);
+        return true;
     }
 
     _onRoll(last, callback, context) {

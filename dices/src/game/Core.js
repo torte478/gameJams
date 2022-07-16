@@ -53,8 +53,8 @@ export default class Core {
         me._context = new Context();
         me._board = new Board(scene, boardSize);
         me._dice = new Dice(scene, me._board.getBounds());
-        me._players = new Players(scene, me._board, me._context);
         me._carousel = new Carousel(scene);
+        me._players = new Players(scene, me._board, me._context, me._carousel);
 
         me._ai = [ null ]
         for (let i = 1; i < 4; ++i) {
@@ -119,6 +119,7 @@ export default class Core {
         const me = this;
 
         const available = me._players.getAvailableSteps(value);
+        me._context.setRoll(value);
         me._context.setAvailableSteps(available);
         me._context.setState(Enums.GameState.MAKE_STEP);
 
@@ -151,6 +152,10 @@ export default class Core {
         if (spawnStep != null && me._players.isStorageClick(point))
             return me._makeStep(spawnStep);
 
+        const cardStep = Utils.firstOrNull(me._context.availableSteps, step => !!step.card);
+        if (cardStep != null && me._carousel.tryCardClick(me._context.roll, point))
+            return me._makeStep(cardStep);
+
         const cell = me._board.findCell(point);
         if (cell.row === Consts.Undefined)
             return;
@@ -167,9 +172,9 @@ export default class Core {
 
     _makeStep(step) {
         const me = this;
+
         return me._players.makeStep(
-            step.from, 
-            step.to, 
+            step, 
             () => me._onPlayerStep(step), 
             me);
     }

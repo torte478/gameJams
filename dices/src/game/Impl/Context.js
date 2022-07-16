@@ -13,6 +13,9 @@ export default class State {
     /** @type {Number} */
     player;
 
+    /** @type {Number} */
+    roll;
+
     constructor() {
         const me = this;
 
@@ -28,7 +31,9 @@ export default class State {
 
         me.availableSteps = available;
         Utils.debugLog(me.availableSteps.map(
-            step => `${step.from.index} => ${step.to.index}`));
+            step => !step.card
+                    ? `${step.from.index} => ${step.to.index}`
+                    : `card(${step.card})`));
     }
 
     setState(state) {
@@ -45,5 +50,11 @@ export default class State {
         me.player = player;
 
         Utils.debugLog(`player: ${player}`);
+    }
+
+    setRoll(value) {
+        const me = this;
+
+        me.roll = value;
     }
 }
