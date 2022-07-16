@@ -17,6 +17,8 @@ export default class Consts {
         Max: 999999
     };
 
+    static CarouselPosition = { x: 112, y: 144 };
+
     static DiceRollTime = 1000;
 
     static StorageSize = {

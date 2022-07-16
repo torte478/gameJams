@@ -11,6 +11,7 @@ import Utils from './Utils.js';
 import Players from './Impl/Players.js';
 import Context from './Impl/Context.js';
 import AI from './Impl/AI.js';
+import Carousel from './Impl/Carousel.js';
 
 export default class Core {
 
@@ -32,6 +33,9 @@ export default class Core {
     /** @type {AI[]} */
     _ai;
 
+    /** @type {Carousel} */
+    _carousel;
+
     /** @type {Phaser.GameObjects.Text} */
     _log;
 
@@ -50,6 +54,7 @@ export default class Core {
         me._board = new Board(scene, boardSize);
         me._dice = new Dice(scene, me._board.getBounds());
         me._players = new Players(scene, me._board, me._context);
+        me._carousel = new Carousel(scene, me._board);
 
         me._ai = [ null ]
         for (let i = 1; i < 4; ++i) {
