@@ -40,7 +40,7 @@ export default class Carousel {
             me._cards[i] = me._createCard(i);
     }
 
-    roll(callback, context) {
+    roll(available, callback, context) {
         const me = this;
 
         const last = me._cards[me._cards.length - 1];
@@ -50,7 +50,7 @@ export default class Carousel {
 
         me._cards[0] = null;
         if (me._cards.filter(x => !!x).length < me._minCount)
-            me._cards[0] = me._createCard(-1);
+            me._cards[0] = me._createCard(-1, available);
 
         const shift = `+=${Consts.CardSize.Height}`;
         me._scene.add.tween({
@@ -69,7 +69,7 @@ export default class Carousel {
         const me = this;
 
         const card = me._cards[value - 1];
-        return !!card ? 1 : Consts.Undefined;
+        return !!card ? card.bonusType : Consts.Undefined;
     }
 
     tryCardClick(value, point) {
@@ -110,10 +110,16 @@ export default class Carousel {
         );
     }
 
-    _createCard(index) {
+    _createCard(index, available) {
         const me = this;
 
         const position = me._getPosition(index);
-        return me._pool.create(position.x, position.y, 'card');
+        const card = me._pool.create(position.x, position.y, 'card');
+
+        const types = !!available ? available : Config.DefaultCards;
+        const type = Utils.getRandomEl(types);
+        card.bonusType = type;
+
+        return card;
     }
 }

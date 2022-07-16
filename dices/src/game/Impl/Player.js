@@ -2,7 +2,6 @@ import Phaser from '../../lib/phaser.js';
 
 import Config from '../Config.js';
 import Consts from '../Consts.js';
-import Carousel from './Carousel.js';
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
 import Board from './Board.js';

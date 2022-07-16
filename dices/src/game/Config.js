@@ -1,3 +1,5 @@
+import Enums from "./Enums.js";
+
 export default class Config {
 
     static Debug = {
@@ -13,6 +15,15 @@ export default class Config {
     static Carousel = {
         Start: 1
     };
+
+    static DefaultCards = [
+        Enums.Card.DICE_1,
+
+        // Enums.Card.MORE_CARDS,
+        // Enums.Card.REROLL,
+        // Enums.Card.CARD_PACK,
+        // Enums.Card.SKIP_TURN,
+    ];
 
     static Start = [
         { 

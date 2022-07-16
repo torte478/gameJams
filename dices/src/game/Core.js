@@ -140,7 +140,7 @@ export default class Core {
 
         let text = 
             `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` +
-            `crs: ${me._carousel._cards.map(x => !!x ? 'x' : '-')}`;
+            `crs: ${me._carousel._cards.map(x => !!x ? x.bonusType : '-')}`;
 
         me._log.setText(text);
     }
@@ -173,10 +173,12 @@ export default class Core {
     _makeStep(step) {
         const me = this;
 
-        return me._players.makeStep(
-            step, 
-            () => me._onPlayerStep(step), 
-            me);
+        return !!step.card
+            ? me._makeCardStep(step.card)
+            : me._players.makeStep(
+                step, 
+                () => me._onPlayerStep(step), 
+                me);
     }
 
     _onPlayerStep(step) {
@@ -195,7 +197,7 @@ export default class Core {
         if (winner != null)
             return me._gameOver(winner);
 
-        me._carousel.roll(me._nextTurn, me);
+        me._carousel.roll(me._getAvailableBonuses(), me._nextTurn, me);
     }
 
     _nextTurn() {
@@ -217,5 +219,17 @@ export default class Core {
             console.log("===== YOU LOSE =( =====");
 
         me._context.setState(Enums.GameState.GAME_OVER)
+    }
+
+    _getAvailableBonuses() {
+        const me = this;
+
+        return [];
+    }
+
+    _makeCardStep(card) {
+        const me = this;
+
+        console.log(`card! (${card})`);
     }
 }

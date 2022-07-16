@@ -49,9 +49,6 @@ export default class Players {
     makeStep(step, callback, context) {
         const me = this;
 
-        if (!!step.card)
-            return console.log('card!');
-
         me._getCurrent().makeStep(step, callback, context);
     }
 

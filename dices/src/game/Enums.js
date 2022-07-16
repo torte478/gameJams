@@ -30,4 +30,18 @@ export default class Enums {
         MOVE_FROM_OWN_SPAWN: 5,
         MOVE_FROM_ENEMY_SPAWN: 6,
     };
+
+    static Card = {
+        DICE_1: 1,
+        DICE_2: 2,
+        DICE_3: 3,
+        DICE_4: 4,
+        DICE_5: 5,
+        DICE_6: 6,
+        LESS_CARDS: 7,
+        MORE_CARDS: 8,
+        CARD_PACK: 9,
+        REROLL: 10,
+        SKIP_TURN: 11
+    }
 }
