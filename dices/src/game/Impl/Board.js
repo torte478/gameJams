@@ -63,14 +63,15 @@ export default class Board {
     /**
      * @param {Number} player 
      * @param {Number} index 
+     * @param {Boolean} isCycle
      * @return {Cell}
      */
-    getCell(player, index) {
+    getCell(player, index, isCycle) {
         const me = this;
 
         const corner = me._getPlayerCorner(player);
         const fields = me._getFieldsFrom(corner);
-        return me._fieldToCell(player, index, fields);
+        return me._fieldToCell(player, index, fields, !!isCycle);
     }
 
     getStoragePosition(player) {
@@ -127,8 +128,11 @@ export default class Board {
         return Consts.PlayerCornerByCount[Config.PlayerCount - 1][player];
     }
 
-    _fieldToCell(player, index, fields) {
+    _fieldToCell(player, index, fields, isCycle) {
         const me = this;
+
+        if (isCycle)
+            index = index % me.getCircleLength();
 
         if (index >= fields.length)
             return new Cell({player: player, index: Consts.Undefined});
@@ -144,6 +148,12 @@ export default class Board {
             col: field.col,
             index: index
         });
+    }
+
+    getCircleLength() {
+        const me = this;
+
+        return (me._size - 1) * 4;
     }
 
     _rowColToPoint(row, col) {
@@ -167,8 +177,9 @@ export default class Board {
         let shiftCol = start.shiftCol;
 
         let current = { row: start.row, col: start.col };
-        const fields = [ {...current}]
-        while (fields.length <= (me._size - 1) * 4) {
+        const fields = [ {...current}];
+        const circleLength = me.getCircleLength();
+        while (fields.length <= circleLength) {
             current.row += shiftRow;
             current.col += shiftCol;
             fields.push({...current});

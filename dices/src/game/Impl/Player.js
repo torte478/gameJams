@@ -68,17 +68,19 @@ export default class Player {
         const me = this;
 
         const steps = [];
+
+        const circleLength = me._board.getCircleLength();
         for (let i = 0; i < me._pieces.length; ++i) {
             const piece = me._pieces[i];
-            const target = me._board.getCell(me._playerIndex, piece.cell.index + value);
 
-            const isAvailable = target.index != Consts.Undefined
-                                && Utils.all(
-                                    me._pieces, 
-                                    (p) => !target.isEqualPos(p.cell));
+            const success = me._tryGetAvailableStep(piece, value, steps, false);
 
-            if (isAvailable)
-                steps.push({ from: piece.cell, to: target });
+            const needTryCycle = !success 
+                                 && me._storage.length == 0 
+                                 && me._pieces.filter(p => p.cell.index <= circleLength).length === 1
+                                 && piece.cell.index < circleLength;
+            if (needTryCycle)
+                me._tryGetAvailableStep(piece, value, steps, true);
         }
 
         const spawn = me._board.getSpawn(me._playerIndex);
@@ -91,6 +93,23 @@ export default class Player {
         }
 
         return steps;       
+    }
+
+    _tryGetAvailableStep(piece, value, steps, isCycle) {
+        const me = this;
+
+        const target = me._board.getCell(me._playerIndex, piece.cell.index + value, isCycle);
+
+        const isAvailable = target.index != Consts.Undefined
+                            && Utils.all(
+                                me._pieces, 
+                                (p) => !target.isEqualPos(p.cell));
+
+        if (!isAvailable) 
+            return false;
+
+        steps.push({ from: piece.cell, to: target });
+        return true;
     }
 
     /**

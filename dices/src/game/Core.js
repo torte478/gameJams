@@ -90,8 +90,8 @@ export default class Core {
             
         if (event.key == 'r') {
             // me._scene.input.mouse.releasePointerLock();
-            me._scene.scene.start('game');
-            return;
+            Utils.debugLog('restart');
+            return me._scene.scene.start('game');
         }
 
         if (Utils.stringIsDigit(event.key)) {

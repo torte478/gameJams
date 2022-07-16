@@ -6,24 +6,24 @@ export default class Config {
         TraceLog: true,
     };
 
-    static BoardSize = 8;
+    static BoardSize = 4;
 
     static Start = [
         { 
-            count: 4,
-            positions: [ 1, 2 ]
+            count: 2,
+            positions: [ 0, 1 ]
         },
         {
             count: 2,
-            positions: [ 5 ]
+            positions: [ ]
         },
-        // {
-        //     count: 2,
-        //     positions: []
-        // },
         // { 
-        //     count: 1,
-        //     positions: []
+        //     count: 4,
+        //     positions: [ ]
+        // },
+        // {
+        //     count: 4,
+        //     positions: [ ]
         // }
     ];
 
