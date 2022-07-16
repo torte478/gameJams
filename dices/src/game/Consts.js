@@ -1,3 +1,5 @@
+import Enums from "./Enums.js";
+
 export default class Consts {
 
     static Viewport = {
@@ -14,4 +16,25 @@ export default class Consts {
     };
 
     static DiceRollTime = 1000;
+
+    static PlayerCornerByCount = [
+        [ 
+            Enums.Corner.BOTTOM_RIGHT 
+        ],
+        [
+            Enums.Corner.BOTTOM_RIGHT, 
+            Enums.Corner.TOP_LEFT,
+        ],
+        [
+            Enums.Corner.BOTTOM_RIGHT, 
+            Enums.Corner.BOTTOM_LEFT,
+            Enums.Corner.TOP_LEFT,
+        ],
+        [
+            Enums.Corner.BOTTOM_RIGHT, 
+            Enums.Corner.BOTTOM_LEFT,
+            Enums.Corner.TOP_LEFT,
+            Enums.Corner.TOP_RIGHT
+        ]
+    ];
 }

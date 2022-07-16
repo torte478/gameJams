@@ -49,17 +49,12 @@ export default class Dice {
         if (!contains)
             return;
 
-        if (!!ignoreAnimation) {
-            me._stopRoll(callback, context);
-        }
-        else {
-            me._sprite.play('dice_roll');
-            me._rollTask = me._scene.time.delayedCall(
-                Consts.DiceRollTime, 
-                me._stopRoll,
-                [ callback, context ], 
-                me);
-        }
+        me._sprite.play('dice_roll');
+        me._rollTask = me._scene.time.delayedCall(
+            ignoreAnimation ? 0 :  Consts.DiceRollTime, 
+            me._stopRoll,
+            [ callback, context ], 
+            me);
     }
 
     /**

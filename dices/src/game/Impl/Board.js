@@ -1,6 +1,8 @@
 import Phaser from '../../lib/phaser.js';
+import Config from '../Config.js';
 
 import Consts from '../Consts.js';
+import Enums from '../Enums.js';
 import Utils from '../Utils.js';
 
 export default class Board {
@@ -13,6 +15,9 @@ export default class Board {
 
     /** @type {Number} */
     _side;
+
+    /** @rtpe {Object[]} */
+    _corners;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -36,6 +41,8 @@ export default class Board {
             tileHeight: Consts.UnitSmall });
         const tiles = map.addTilesetImage('board');
         const layer = map.createLayer(0, tiles, me._position.x, me._position.y);
+
+        me._corners = me._createCornerConfig();
     }
 
     /**
@@ -50,6 +57,81 @@ export default class Board {
             me._side,
             me._side
         );
+    }
+
+    /**
+     * @param {Number} player 
+     * @param {Number} field 
+     * @return {Phaser.Geom.Point}
+     */
+    getPiecePosition(player, field) {
+        const me = this;
+
+        const corner = Consts.PlayerCornerByCount[Config.PlayerCount][player];
+        const fields = me._getFieldsFrom(corner);
+        return me._fieldToPoint(fields[field]);
+    }
+
+    _fieldToPoint(field) {
+        const me = this;
+
+        const offset = 2 * Consts.UnitSmall;
+        return Utils.buildPoint(
+            me._position.x + offset + field.col * Consts.Unit,
+            me._position.y + offset + field.row * Consts.Unit,
+        );
+    }
+
+    /**
+     * @param {Number} corner
+     * @returns {Object[]}
+     */
+    _getFieldsFrom(corner) {
+        const me = this;
+
+        const start = me._corners[corner];
+        let shiftRow = start.shiftRow;
+        let shiftCol = start.shiftCol;
+
+        let current = { row: start.row, col: start.col };
+        const fields = [ {...current}]
+        while (fields.length <= (me._size - 1) * 4) {
+            current.row += shiftRow;
+            current.col += shiftCol;
+            fields.push({...current});
+
+            const currentCorner = me._getCorner(current.row, current.col);
+            if (currentCorner != Enums.Corner.UNKNOWN) {
+                shiftRow = me._corners[currentCorner].shiftRow;
+                shiftCol = me._corners[currentCorner].shiftCol;
+            }
+        }
+
+        const nextCorner = (corner + 1) % 4;
+        shiftRow = start.shiftRow + me._corners[nextCorner].shiftRow;
+        shiftCol = start.shiftCol + me._corners[nextCorner].shiftCol;
+        for (let i = 0; i < me._size / 2 - 1; ++i) {
+            current.row += shiftRow;
+            current.col += shiftCol;
+            fields.push({...current});
+        }
+
+        return fields;
+    }
+
+    _getCorner(row, col) {
+        const me = this;
+
+        if (row == 0 && col == 0)
+            return Enums.Corner.TOP_LEFT;
+        if (row == 0 && col == me._size - 1)
+            return Enums.Corner.TOP_RIGHT;
+        if (row == me._size - 1 && col == me._size - 1)
+            return Enums.Corner.BOTTOM_RIGHT;
+        if (row == me._size - 1 && col == 0)
+            return Enums.Corner.BOTTOM_LEFT;
+
+        return Enums.Corner.UNKNOWN;
     }
 
     _buildTileArray(size) {
@@ -83,5 +165,35 @@ export default class Board {
         level.push(borderRow);
 
         return level;       
+    }
+
+    _createCornerConfig() {
+        const me = this;
+        return [
+            {
+                row: 0,
+                col: 0,
+                shiftRow: 0,
+                shiftCol: 1
+            },
+            {
+                row: 0,
+                col: me._size - 1,
+                shiftRow: 1,
+                shiftCol: 0
+            },
+            {
+                row: me._size - 1,
+                col: me._size - 1,
+                shiftRow: 0,
+                shiftCol: -1
+            },
+            {
+                row: me._size - 1,
+                col: 0,
+                shiftRow: -1,
+                shiftCol: 0
+            }
+        ];
     }
 }
