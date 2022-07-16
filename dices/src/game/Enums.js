@@ -17,7 +17,8 @@ export default class Enums {
 
     static GameState = {
         DICE_ROLL: 0,
-        MAKE_STEP: 1
+        MAKE_STEP: 1,
+        GAME_OVER: 3
     };
 
     static AiWeight = {
@@ -26,7 +27,7 @@ export default class Enums {
         SPAWN: 2,
         ENTER_HOME: 3,
         INSIDE_HOME: 4,
-        MOVE_FROM_OWN_SPAWN: 4,
-        MOVE_FROM_ENEMY_SPAWN: 5,
+        MOVE_FROM_OWN_SPAWN: 5,
+        MOVE_FROM_ENEMY_SPAWN: 6,
     };
 }

@@ -187,6 +187,14 @@ export default class Player {
         return Phaser.Geom.Rectangle.ContainsPoint(storageRect, point);
     }
 
+    isWinner() {
+        const me = this;
+
+        const circleLength = me._board.getCircleLength();
+        return me._storage.length === 0
+               && Utils.all(me._pieces, p => p.cell.index >= circleLength);
+    }
+
     _onKill(piece, callback, context) {
         const me = this;
 

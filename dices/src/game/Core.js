@@ -180,10 +180,25 @@ export default class Core {
     _finishTurn() {
         const me = this;
 
+        const winner = me._players.findWnner();
+        if (winner != null)
+            return me._gameOver(winner);
+
         me._context.setPlayer((me._context.player + 1) % Config.PlayerCount);
         me._context.setState(Enums.GameState.DICE_ROLL);
 
         if (me._context.player !== Enums.Player.HUMAN)
             return me._dice.roll(true, me._onDiceRoll, me);
+    }
+
+    _gameOver(winner) {
+        const me = this;
+
+        if (winner === Enums.Player.HUMAN)
+            console.log("===== YOU WIN ====");
+        else 
+            console.log("===== YOU LOSE =( =====");
+
+        me._context.setState(Enums.GameState.GAME_OVER)
     }
 }

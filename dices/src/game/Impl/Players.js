@@ -85,6 +85,12 @@ export default class Players {
         return Consts.Undefinedl
     }
 
+    findWnner() {
+        const me = this;
+
+        return Utils.firstIndexOrNull(me._players, p => p.isWinner());
+    }
+
     _getCurrent() {
         const me = this;
 

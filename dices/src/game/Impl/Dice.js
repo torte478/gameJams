@@ -77,7 +77,7 @@ export default class Dice {
         if (!!me._rollTask)
             me._rollTask.paused = true;
 
-        const value = Utils.getRandom(1, 6);
+        const value = Utils.getRandom(1, 6, 2);
         Utils.debugLog(`roll: ${value} ${value === Consts.DiceSpawnValue ? 'Spawn!' : ''}`);
 
         if (!callback)
