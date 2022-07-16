@@ -21,6 +21,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'board', Consts.UnitSmall);
         Utils.loadSpriteSheet(me, 'dice', Consts.UnitBig);
         Utils.loadSpriteSheet(me, 'piece', Consts.Unit);
+        Utils.loadSpriteSheet(me, 'dice_small', Consts.UnitSmall);
         Utils.loadImage(me, 'storage');
         Utils.loadImage(me, 'card');
 

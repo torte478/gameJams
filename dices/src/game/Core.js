@@ -86,10 +86,13 @@ export default class Core {
 
         const point = Utils.buildPoint(pointer.worldX, pointer.worldY);
 
-        if (me._context.state === Enums.GameState.DICE_ROLL)
-            me._dice.tryRoll(point, false, me._onDiceRoll, me);
-        else if (me._context.state === Enums.GameState.MAKE_STEP)
+        if (me._context.state === Enums.GameState.DICE_ROLL) {
+            const boostValues = me._players.getBoosterValues();
+            me._dice.tryRoll(point, false, boostValues, me._onDiceRoll, me);
+        }
+        else if (me._context.state === Enums.GameState.MAKE_STEP) {
             me._tryMakeStep(point);
+        }
     }
 
     /**
@@ -125,8 +128,13 @@ export default class Core {
         me._context.setAvailableSteps(available);
         me._context.setState(Enums.GameState.MAKE_STEP);
 
-        if (available.length === 0)
+        if (available.length > 0) {
+            me._players.disableBooster();
+        }
+        else {
+            me._players.applyBooster(value);
             return me._finishTurn();
+        }
 
         if (me._context.player !== Enums.Player.HUMAN) {
             const step = me._ai[me._context.player].getStep();
@@ -211,7 +219,7 @@ export default class Core {
         me._context.setState(Enums.GameState.DICE_ROLL);
 
         if (me._context.player !== Enums.Player.HUMAN)
-            return me._dice.roll(true, me._onDiceRoll, me);
+            return me._dice.roll(true, me._players.getBoosterValues(), me._onDiceRoll, me);
     }
 
     _gameOver(winner) {
@@ -303,7 +311,7 @@ export default class Core {
             case Enums.Bonus.DICE_4:
             case Enums.Bonus.DICE_5:
             case Enums.Bonus.DICE_6:
-                return me._dice.roll(false, me._onDiceRoll, me, bonus);
+                return me._dice.roll(false, null, me._onDiceRoll, me, bonus);
 
             case Enums.Bonus.LESS_CARDS: {
                 me._carousel.changeLevel(-1);
@@ -321,7 +329,7 @@ export default class Core {
             }
 
             case Enums.Bonus.REROLL: 
-                return me._dice.roll(false, me._onDiceRoll, me);
+                return me._dice.roll(false, me._players.getBoosterValues(), me._onDiceRoll, me);
 
             default:
                 throw `unknown bonus type: ${bonus}`;

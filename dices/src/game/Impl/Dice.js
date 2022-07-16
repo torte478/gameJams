@@ -34,10 +34,11 @@ export default class Dice {
     /**
      * @param {Phaser.Geom.Point} point 
      * @param {Boolean} ignoreAnimation
+     * @param {Number[]} values
      * @param {Function} callback
      * @param {Object} context
      */
-    tryRoll(point, ignoreAnimation, callback, context) {
+    tryRoll(point, ignoreAnimation, values, callback, context) {
         const me = this;
 
         if (!!me._rollTask && !me._rollTask.paused)
@@ -50,35 +51,35 @@ export default class Dice {
         if (!contains)
             return;
 
-        me.roll(ignoreAnimation, callback, context);
+        me.roll(ignoreAnimation, values, callback, context);
     }
 
-    roll(ignoreAnimation, callback, context, expected) {
+    roll(ignoreAnimation, values, callback, context, expected) {
         const me = this;
 
         if (Utils.isDebug(Config.Debug.IgnoreRollAnim))
             ignoreAnimation = true;
 
         me._sprite.play('dice_roll');
+        const value = !!expected ? expected : Utils.getRandomEl(values);
 
         me._rollTask = me._scene.time.delayedCall(
             ignoreAnimation ? 0 :  Consts.DiceRollTime, 
             me._stopRoll,
-            [ expected, callback, context ], 
+            [ value, callback, context ], 
             me);
     }
 
     /**
      * @param {Function} callback 
      */
-    _stopRoll(expected, callback, context) {
+    _stopRoll(value, callback, context) {
         const me = this;
 
         me._sprite.stop();
         if (!!me._rollTask)
             me._rollTask.paused = true;
 
-        const value = !!expected ? expected : Utils.getRandom(1, 6, 2);
         Utils.debugLog(`roll: ${value} ${value === Consts.DiceSpawnValue ? 'Spawn!' : ''}`);
 
         if (!callback)

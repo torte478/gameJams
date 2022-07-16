@@ -44,10 +44,17 @@ export default class Consts {
     };
 
     static StorageByCorner = [
-        { x: 0, y: -Consts.Unit, sideX: 0, sideY: 0 },
-        { x: -Consts.StorageSize.Width, y: -Consts.Unit, sideX: 1, sideY: 0 },
-        { x: -Consts.StorageSize.Width, y: Consts.UnitSmall, sideX: 1, sideY: 1 },
-        { x: 0, y: Consts.UnitSmall, sideX: 0, sideY: 1 }
+        { x: 0, y:  -1.25 * Consts.UnitSmall, sideX: 0, sideY: 0 },
+        { x: -Consts.StorageSize.Width, y: -1.25 * Consts.UnitSmall, sideX: 1, sideY: 0 },
+        { x: -Consts.StorageSize.Width, y: 0.25 * Consts.UnitSmall, sideX: 1, sideY: 1 },
+        { x: 0, y: 0.25 * Consts.UnitSmall, sideX: 0, sideY: 1 }
+    ];
+
+    static BoosterByCorner = [
+        { x: -0.5 * Consts.UnitSmall, y: -2 * Consts.UnitSmall, sideX: 0, sideY: 0 },
+        { x: -Consts.StorageSize.Width - 0.5 * Consts.UnitSmall, y: -2 * Consts.UnitSmall, sideX: 1, sideY: 0 },
+        { x: -Consts.StorageSize.Width - 0.5 * Consts.UnitSmall, y: Consts.Unit, sideX: 1, sideY: 1 },
+        { x: -0.5 * Consts.UnitSmall, y: Consts.Unit, sideX: 0, sideY: 1 }
     ];
 
     static PlayerCornerByCount = [

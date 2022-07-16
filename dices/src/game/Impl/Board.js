@@ -85,6 +85,18 @@ export default class Board {
         );
     }
 
+    getBoosterPosition(player) {
+        const me = this;
+
+        const corner = me._getCornerIndex(player);
+        const offset = Consts.BoosterByCorner[corner];
+
+        return Utils.buildPoint(
+            me._position.x + me._side * offset.sideX + offset.x,
+            me._position.y + me._side * offset.sideY + offset.y
+        );
+    }
+
     findCell(point) {
         const me = this;
 

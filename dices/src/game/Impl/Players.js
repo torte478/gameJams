@@ -91,6 +91,24 @@ export default class Players {
         return Utils.firstIndexOrNull(me._players, p => p.isWinner());
     }
 
+    disableBooster() {
+        const me = this;
+
+        return me._getCurrent().disableBooster();
+    }
+
+    applyBooster(value) {
+        const me = this;
+
+        return me._getCurrent().applyBooster(value);
+    }
+
+    getBoosterValues() {
+        const me = this;
+
+        return me._getCurrent().getBoosterValues();
+    }
+
     _getCurrent() {
         const me = this;
 

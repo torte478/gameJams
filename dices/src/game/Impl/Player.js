@@ -5,6 +5,7 @@ import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
 import Board from './Board.js';
+import Booster from './Booster.js';
 import Cell from './Cell.js';
 import Piece from './Piece.js';
 
@@ -27,6 +28,9 @@ export default class Player {
 
     /** @type {Carousel} */
     _carousel;
+
+    /** @type {Booster} */
+    _booster;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -57,6 +61,8 @@ export default class Player {
             const piece = new Piece(scene, cell, playerIndex, Consts.PieceScale.Storage);
             me._storage.push(piece);
         }
+
+        me._booster = new Booster(scene, board.getBoosterPosition(playerIndex));
 
         scene.add.image(
             me._storagePosition.x + Consts.StorageSize.Width / 2, 
@@ -111,7 +117,7 @@ export default class Player {
      * @param {Function} callback
      * @param {Object} context
      */
-     makeStep(step, callback, context) {
+    makeStep(step, callback, context) {
         const me = this;
 
         const from = step.from;
@@ -129,6 +135,24 @@ export default class Player {
 
             piece.move(to, Consts.PieceScale.Normal, callback, context);    
         }
+    }
+
+    disableBooster() {
+        const me = this;
+
+        return me._booster.disable();
+    }
+
+    applyBooster(value) {
+        const me = this;
+
+        return me._booster.enable(value);
+    }
+
+    getBoosterValues() {
+        const me = this;
+
+        return me._booster.toValues();
     }
 
     _tryGetAvailableMovementStep(piece, value, steps, isCycle) {
@@ -207,6 +231,7 @@ export default class Player {
 
         me._pieces = me._pieces.filter(p => p !== piece);
         me._storage.push(piece);
+        me._booster.disable();
 
         if (!!callback)
             callback.call(context);
