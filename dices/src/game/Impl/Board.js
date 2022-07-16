@@ -105,6 +105,24 @@ export default class Board {
         });
     }
 
+    /**
+     * @param {Number} player 
+     */
+    getSpawn(player) {
+        const me = this;
+
+        const corner = me._corners[me._getPlayerCorner(player)];
+        const position = me._rowColToPoint(corner.row, corner.col);
+        return new Cell({
+            player: player,
+            x: position.x,
+            y: position.y,
+            row: corner.row,
+            col: corner.col,
+            index: 0
+        });
+    }
+
     _getPlayerCorner(player) {
         return Consts.PlayerCornerByCount[Config.PlayerCount - 1][player];
     }
@@ -117,15 +135,24 @@ export default class Board {
 
         const field = fields[index];
 
-        const offset = 2 * Consts.UnitSmall;
+        const position = me._rowColToPoint(field.row, field.col);
         return new Cell({
             player: player,
-            x: me._position.x + offset + field.col * Consts.Unit,
-            y: me._position.y + offset + field.row * Consts.Unit,
+            x: position.x,
+            y: position.y,
             row: field.row,
             col: field.col,
             index: index
         });
+    }
+
+    _rowColToPoint(row, col) {
+        const me = this;
+
+        const offset = 2 * Consts.UnitSmall;
+        return Utils.buildPoint(
+            me._position.x + offset + col * Consts.Unit,
+            me._position.y + offset + row * Consts.Unit);
     }
 
     /**

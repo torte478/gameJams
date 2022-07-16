@@ -34,6 +34,8 @@ export default class State {
     setState(state) {
         const me = this;
 
+        me.availableSteps = null;
+
         Utils.debugLog(`${Utils.enumToString(Enums.GameState, me.state)}`
                      + ` => ${Utils.enumToString(Enums.GameState, state)}`);
         me.state = state;

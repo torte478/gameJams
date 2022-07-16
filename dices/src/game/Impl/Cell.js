@@ -1,4 +1,5 @@
 import Phaser from '../../lib/phaser.js';
+
 import Consts from '../Consts.js';
 import Utils from '../Utils.js';
 
@@ -34,5 +35,11 @@ export default class Cell {
     toString() {
         const me = this;
         return JSON.stringify(me);
+    }
+
+    isEqualPos(other) {
+        const me = this;
+
+        return me.row === other.row && me.col === other.col;
     }
 }

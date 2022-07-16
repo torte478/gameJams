@@ -29,15 +29,17 @@ export default class Consts {
         Storage: 0.5
     };
 
+    static DiceSpawnValue = 6;
+
     static Speed = {
         PieceMovementMs: 350
     };
 
     static StorageByCorner = [
-        { x: 0.5 * Consts.UnitSmall, y: -2.5 * Consts.UnitSmall, sideX: 0, sideY: 0 },
-        { x: -3.5 * Consts.UnitSmall, y: -2.5 * Consts.UnitSmall, sideX: 1, sideY: 0 },
-        { x: -3.5 * Consts.UnitSmall, y: -0.5 * Consts.UnitSmall, sideX: 1, sideY: 1 },
-        { x: 0.5 * Consts.UnitSmall, y: -0.5 * Consts.UnitSmall, sideX: 0, sideY: 1 }
+        { x: 0, y: -Consts.Unit, sideX: 0, sideY: 0 },
+        { x: -Consts.StorageSize.Width, y: -Consts.Unit, sideX: 1, sideY: 0 },
+        { x: -Consts.StorageSize.Width, y: Consts.UnitSmall, sideX: 1, sideY: 1 },
+        { x: 0, y: Consts.UnitSmall, sideX: 0, sideY: 1 }
     ];
 
     static PlayerCornerByCount = [

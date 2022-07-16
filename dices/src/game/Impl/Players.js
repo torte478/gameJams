@@ -51,7 +51,6 @@ export default class Players {
         me._getCurrent().makeStep(from, to, callback, context);
     }
 
-
     tryKill(cell) {
         const me = this;
 
@@ -64,6 +63,12 @@ export default class Players {
         }
 
         return false;
+    }
+
+    isStorageClick(point) {
+        const me = this;
+
+        return me._getCurrent().isStorageClick(point);
     }
 
     _getCurrent() {

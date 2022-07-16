@@ -123,15 +123,31 @@ export default class Core {
     _tryMovePiece(point) {
         const me = this;
 
+        const spawnStep = Utils.firstOrNull(me._context.availableSteps, c => c.from.index === Consts.Undefined);
+        if (spawnStep != null && me._players.isStorageClick(point))
+            return me._makeStep(spawnStep);
+
         const cell = me._board.findCell(point);
         if (cell.row === Consts.Undefined)
-            return null;
+            return;
 
-        const step = Utils.firstOrNull(me._context.availableSteps, c => c.from.row === cell.row && c.from.col === cell.col);
+        const step = Utils.firstOrNull(
+            me._context.availableSteps, 
+            c => c.from.row === cell.row && c.from.col === cell.col);
+
         if (step === null)
-            return false;
+            return;
+            
+        return me._makeStep(step);
+    }
 
-        me._players.makeStep(step.from, step.to, () => me._onPlayerStep(step), me);
+    _makeStep(step) {
+        const me = this;
+        return me._players.makeStep(
+            step.from, 
+            step.to, 
+            () => me._onPlayerStep(step), 
+            me);
     }
 
     _onPlayerStep(step) {

@@ -25,7 +25,7 @@ export default class Player {
     _storagePosition;
 
     /**
-     * @param {Phaser.Scenes} scene 
+     * @param {Phaser.Scene} scene 
      * @param {Board} board 
      * @param {Number} playerIndex 
      */
@@ -48,11 +48,16 @@ export default class Player {
         me._storage = [];
         me._storagePosition = board.getStoragePosition(playerIndex);
         for (let i = 0; i < config.count - me._pieces.length; ++i) {
-            const index = me._storage.length;
             const cell = me._getPositionInStorage();
             const piece = new Piece(scene, cell, playerIndex, Consts.PieceScale.Storage);
             me._storage.push(piece);
         }
+
+        scene.add.image(
+            me._storagePosition.x + Consts.StorageSize.Width / 2, 
+            me._storagePosition.y + Consts.StorageSize.Height / 2, 
+            'storage')
+            .setDepth(-100);
     }
 
     /**
@@ -68,11 +73,23 @@ export default class Player {
             const target = me._board.getCell(me._playerIndex, piece.cell.index + value);
 
             const isAvailable = target.index != Consts.Undefined
-                                && Utils.all(me._pieces, (p) => p.cell.index != target.index);
+                                && Utils.all(
+                                    me._pieces, 
+                                    (p) => !target.isEqualPos(p.cell));
 
             if (isAvailable)
                 steps.push({ from: piece.cell, to: target });
         }
+
+        const spawn = me._board.getSpawn(me._playerIndex);
+        const canSpawn = value === Consts.DiceSpawnValue
+                         && me._storage.length > 0
+                         && Utils.all(me._pieces, p => !spawn.isEqualPos(p.cell));
+        if (canSpawn) {
+            const piece = me._storage[me._storage.length - 1];
+            steps.push({ from: piece.cell, to: spawn });
+        }
+
         return steps;       
     }
 
@@ -85,12 +102,28 @@ export default class Player {
      makeStep(from, to, callback, context) {
         const me = this;
 
-        /** @type {Piece} */
-        const piece = Utils.firstOrNull(me._pieces, p => p.cell.index === from.index);
-        if (piece === null)
-            throw `can't find piece on cell: ${from.index}`;
+        const isSpawn = from.index === Consts.Undefined && to.index === 0;
+        if (isSpawn) {
+            const piece = me._storage[me._storage.length - 1];
+            piece.move(to, Consts.PieceScale.Normal, () => me._onSpawn(piece, callback, context), me);
+        } else {
+            /** @type {Piece} */
+            const piece = Utils.firstOrNull(me._pieces, p => p.cell.index === from.index);
+            if (piece === null)
+                throw `can't find piece on cell: ${from.index}`;
 
-        piece.move(to, Consts.PieceScale.Normal, callback, context);
+            piece.move(to, Consts.PieceScale.Normal, callback, context);    
+        }
+    }
+
+    _onSpawn(piece, callback, context) {
+        const me = this;
+
+        me._storage = me._storage.filter(p => p !== piece);
+        me._pieces.push(piece);
+
+        if (!!callback)
+            callback.call(context);
     }
 
     /**
@@ -111,6 +144,19 @@ export default class Player {
         piece.move(position, Consts.PieceScale.Storage,() => { me._onKill(piece) }, me);
     }
 
+    isStorageClick(point) {
+        const me = this;
+
+        const storageRect = new Phaser.Geom.Rectangle(
+            me._storagePosition.x,
+            me._storagePosition.y,
+            Consts.StorageSize.Width,
+            Consts.StorageSize.Height
+        );
+
+        return Phaser.Geom.Rectangle.ContainsPoint(storageRect, point);
+    }
+
     _onKill(piece) {
         const me = this;
 
@@ -124,8 +170,8 @@ export default class Player {
         const index = me._storage.length;
         return new Cell({
             player: me._playerIndex,
-            x: me._storagePosition.x + Consts.StorageSize.Width - index * Consts.UnitSmall - Consts.UnitSmall,
-            y: me._storagePosition.y + Consts.StorageSize.Height + Consts.UnitSmall / 2
+            x: me._storagePosition.x + Consts.StorageSize.Width - index * Consts.UnitSmall - 0.5 * Consts.UnitSmall,
+            y: me._storagePosition.y + Consts.StorageSize.Height / 2
         });
     }
 }
