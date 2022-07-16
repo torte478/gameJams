@@ -6,7 +6,8 @@ export default class Consts {
     };
 
     static Unit = 64;
-    static UnitHalf = Consts.Unit / 2;
+    static UnitSmall = Consts.Unit / 2;
+    static UnitBig = Consts.Unit * 2;
 
     static Depth = {
         Max: 999999

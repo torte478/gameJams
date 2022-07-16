@@ -1,16 +1,24 @@
 import Phaser from '../lib/phaser.js';
 
+import Board from './Impl/Board.js';
+import Dice from './Impl/Dice.js';
+
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Helper from './Helper.js';
-import Board from './Impl/Board.js';
 import Utils from './Utils.js';
 
 export default class Core {
 
     /** @type {Phaser.Scene} */
     _scene;
+
+    /** @type {Board} */
+    _board;
+
+    /** @type {Dice} */
+    _dice;
 
     /** @type {Phaser.GameObjects.Text} */
     _log;
@@ -26,7 +34,8 @@ export default class Core {
 
         // My
 
-        const board = new Board(scene, boardSize); // TODO
+        me._board = new Board(scene, boardSize); // TODO
+        me._dice = new Dice(scene, me._board.getBounds());
 
         // Debug
 

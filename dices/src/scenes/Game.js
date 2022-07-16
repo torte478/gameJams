@@ -18,7 +18,8 @@ export default class Game extends Phaser.Scene {
     preload() {
         const me = this;
 
-        Utils.loadSpriteSheet(me, 'board', Consts.UnitHalf);
+        Utils.loadSpriteSheet(me, 'board', Consts.UnitSmall);
+        Utils.loadSpriteSheet(me, 'dice', Consts.UnitBig);
     }
 
     create() {

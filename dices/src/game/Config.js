@@ -6,5 +6,7 @@ export default class Config {
         TraceLog: true,
     };
 
+    // static BoardSize = 4;
+    // static BoardSize = 6;
     static BoardSize = 8;
 }
