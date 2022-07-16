@@ -12,6 +12,7 @@ import Players from './Impl/Players.js';
 import Context from './Impl/Context.js';
 import AI from './Impl/AI.js';
 import Carousel from './Impl/Carousel.js';
+import Cell from './Impl/Cell.js';
 
 export default class Core {
 
@@ -118,7 +119,8 @@ export default class Core {
     _onDiceRoll(value) {
         const me = this;
 
-        const available = me._players.getAvailableSteps(value);
+        let available = me._players.getAvailableSteps(value);
+        available = available.concat(me._getBonusToChoose(value));
         me._context.setRoll(value);
         me._context.setAvailableSteps(available);
         me._context.setState(Enums.GameState.MAKE_STEP);
@@ -152,9 +154,9 @@ export default class Core {
         if (spawnStep != null && me._players.isStorageClick(point))
             return me._makeStep(spawnStep);
 
-        const cardStep = Utils.firstOrNull(me._context.availableSteps, step => !!step.card);
-        if (cardStep != null && me._carousel.tryCardClick(me._context.roll, point))
-            return me._makeStep(cardStep);
+        const bonusStep = Utils.firstOrNull(me._context.availableSteps, step => !!step.bonus);
+        if (bonusStep != null && me._carousel.tryCardClick(me._context.roll, point))
+            return me._makeStep(bonusStep);
 
         const cell = me._board.findCell(point);
         if (cell.row === Consts.Undefined)
@@ -173,8 +175,8 @@ export default class Core {
     _makeStep(step) {
         const me = this;
 
-        return !!step.card
-            ? me._makeCardStep(step.card)
+        return !!step.bonus
+            ? me._makeBonusStep(step.bonus)
             : me._players.makeStep(
                 step, 
                 () => me._onPlayerStep(step), 
@@ -197,7 +199,7 @@ export default class Core {
         if (winner != null)
             return me._gameOver(winner);
 
-        me._carousel.roll(me._getAvailableBonuses(), me._nextTurn, me);
+        me._carousel.roll(me._getBonusesToCreate(), me._nextTurn, me);
     }
 
     _nextTurn() {
@@ -221,15 +223,67 @@ export default class Core {
         me._context.setState(Enums.GameState.GAME_OVER)
     }
 
-    _getAvailableBonuses() {
+    _getBonusToChoose(value) {
         const me = this;
 
-        return [];
+        const bonus = me._carousel.getBonusType(value);
+
+        const result = [];
+        if (me._context.player !== Enums.Player.HUMAN || bonus == Consts.Undefined)
+            return result;
+
+        const isAvailable = me._checkBonus(bonus);
+        if (!isAvailable)
+            return result;
+            
+        const dummy = new Cell();
+        result.push({ from: dummy, to: dummy, bonus: bonus });
+        return result;
     }
 
-    _makeCardStep(card) {
+    _getBonusesToCreate() {
+        const me = this;
+        const bonuses = [];
+
+        for (let i = 1; i <= 6; ++i)
+            if (me._players.getAvailableSteps(i).length > 0)
+                bonuses.push(i);
+
+        // TODO: return bonuses;
+        return null;
+    }
+
+    _checkBonus(bonus) {
         const me = this;
 
-        console.log(`card! (${card})`);
+        switch (bonus) {
+            case Enums.Bonus.DICE_1:
+            case Enums.Bonus.DICE_2:
+            case Enums.Bonus.DICE_3:
+            case Enums.Bonus.DICE_4:
+            case Enums.Bonus.DICE_5:
+            case Enums.Bonus.DICE_6:
+                    return me._players.getAvailableSteps(bonus);
+
+            default:
+                throw `unknown bonus type: ${bonus}`;
+        }
+    }
+
+    _makeBonusStep(bonus) {
+        const me = this;
+
+        switch (bonus) {
+            case Enums.Bonus.DICE_1:
+            case Enums.Bonus.DICE_2:
+            case Enums.Bonus.DICE_3:
+            case Enums.Bonus.DICE_4:
+            case Enums.Bonus.DICE_5:
+            case Enums.Bonus.DICE_6:
+                return me._dice.roll(false, me._onDiceRoll, me, bonus);
+
+            default:
+                throw `unknown bonus type: ${bonus}`;
+        }
     }
 }

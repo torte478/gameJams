@@ -56,28 +56,28 @@ export default class Dice {
         me.roll(ignoreAnimation, callback, context);
     }
 
-    roll(ignoreAnimation, callback, context) {
+    roll(ignoreAnimation, callback, context, expected) {
         const me = this;
 
         me._sprite.play('dice_roll');
         me._rollTask = me._scene.time.delayedCall(
             ignoreAnimation ? 0 :  Consts.DiceRollTime, 
             me._stopRoll,
-            [ callback, context ], 
+            [ expected, callback, context ], 
             me);
     }
 
     /**
      * @param {Function} callback 
      */
-    _stopRoll(callback, context) {
+    _stopRoll(expected, callback, context) {
         const me = this;
 
         me._sprite.stop();
         if (!!me._rollTask)
             me._rollTask.paused = true;
 
-        const value = Utils.getRandom(1, 6, 2);
+        const value = !!expected ? expected : Utils.getRandom(1, 6, 2);
         Utils.debugLog(`roll: ${value} ${value === Consts.DiceSpawnValue ? 'Spawn!' : ''}`);
 
         if (!callback)

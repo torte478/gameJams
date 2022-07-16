@@ -31,9 +31,9 @@ export default class State {
 
         me.availableSteps = available;
         Utils.debugLog(me.availableSteps.map(
-            step => !step.card
+            step => !step.bonus
                     ? `${step.from.index} => ${step.to.index}`
-                    : `card(${step.card})`));
+                    : `bonus(${step.bonus})`));
     }
 
     setState(state) {

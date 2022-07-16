@@ -65,7 +65,7 @@ export default class Carousel {
      * @param {Number} value 
      * @returns {Number}
      */
-    getCardType(value) {
+    getBonusType(value) {
         const me = this;
 
         const card = me._cards[value - 1];
@@ -116,7 +116,7 @@ export default class Carousel {
         const position = me._getPosition(index);
         const card = me._pool.create(position.x, position.y, 'card');
 
-        const types = !!available ? available : Config.DefaultCards;
+        const types = !!available ? available : Config.DefaultBonuses;
         const type = Utils.getRandomEl(types);
         card.bonusType = type;
 

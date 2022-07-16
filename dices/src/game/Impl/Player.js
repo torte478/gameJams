@@ -97,12 +97,6 @@ export default class Player {
             steps.push({ from: piece.cell, to: spawn });
         }
 
-        const card = me._carousel.getCardType(value);
-        if (me._playerIndex === Enums.Player.HUMAN && card != Consts.Undefined) {
-            const dummy = new Cell();
-            steps.push({ from: dummy, to: dummy, card: card });
-        }
-
         return steps;       
     }
 

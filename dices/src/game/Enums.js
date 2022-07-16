@@ -31,7 +31,7 @@ export default class Enums {
         MOVE_FROM_ENEMY_SPAWN: 6,
     };
 
-    static Card = {
+    static Bonus = {
         DICE_1: 1,
         DICE_2: 2,
         DICE_3: 3,

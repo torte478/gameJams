@@ -16,8 +16,8 @@ export default class Config {
         Start: 1
     };
 
-    static DefaultCards = [
-        Enums.Card.DICE_1,
+    static DefaultBonuses = [
+        Enums.Bonus.DICE_6,
 
         // Enums.Card.MORE_CARDS,
         // Enums.Card.REROLL,
