@@ -1,6 +1,6 @@
 import Phaser from '../../lib/phaser.js';
-import Config from '../Config.js';
 
+import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Utils from '../Utils.js';
 
@@ -136,7 +136,7 @@ export default class Carousel {
         const position = me._getPosition(index);
         const card = me._pool.create(position.x, position.y, 'card');
 
-        const types = !!available ? available : Config.DefaultBonuses;
+        const types = !!available ? available : Config.StartBonuses;
         const type = Utils.getRandomEl(types);
         card.bonusType = type;
 

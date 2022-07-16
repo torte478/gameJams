@@ -10,7 +10,7 @@ export default class Config {
         Random: false
     };
 
-    static BoardSize = 4;
+    static BoardSize = 8;
 
     static Carousel = {
         Min: 1,
@@ -18,33 +18,30 @@ export default class Config {
         Max: 3
     };
 
-    static DefaultBonuses = [
-        Enums.Bonus.SKIP_TURN,
-
-        // Enums.Card.DICE_6,
-        // Enums.Card.MORE_CARDS,
-        // Enums.Card.REROLL,
-        // Enums.Card.CARD_PACK,
-        // Enums.Card.SKIP_TURN,
+    static StartBonuses = [
+        Enums.Bonus.DICE_6,
+        Enums.Bonus.MORE_CARDS,
+        Enums.Bonus.REROLL,
+        Enums.Bonus.CARD_PACK
     ];
 
     static Start = [
         { 
-            count: 2,
-            positions: [ 0 ]
+            count: 4,
+            positions: []
         },
         {
-            count: 2,
-            positions: [ 0 ]
+            count: 4,
+            positions: []
         },
-        // { 
-        //     count: 4,
-        //     positions: [ ]
-        // },
-        // {
-        //     count: 4,
-        //     positions: [ ]
-        // }
+        { 
+            count: 4,
+            positions: [ ]
+        },
+        {
+            count: 4,
+            positions: [ ]
+        }
     ];
 
     static DebugWeight = [

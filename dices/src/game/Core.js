@@ -245,10 +245,16 @@ export default class Core {
 
     _getBonusesToCreate() {
         const me = this;
-        const bonuses = Utils.copyArray(Config.DefaultBonuses);
+
+        const bonuses = [
+            Enums.Bonus.DICE_6,
+            Enums.Bonus.REROLL,
+            Enums.Bonus.CARD_PACK
+        ];
 
         for (let i = 1; i <= 5; ++i)
-            if (me._players.getAvailableSteps(i).length > 0)
+            if (me._context.player === Enums.Player.HUMAN 
+                && me._players.getAvailableSteps(i).length > 0)
                 bonuses.push(i);
 
         if (me._carousel._minCount > Config.Carousel.Min)
@@ -257,8 +263,7 @@ export default class Core {
         if (me._carousel._minCount < Config.Carousel.Max)
             bonuses.push(Enums.Bonus.MORE_CARDS);
 
-        // TODO: return bonuses;
-        return null;
+        return bonuses;
     }
 
     _checkBonus(bonus) {
@@ -271,7 +276,7 @@ export default class Core {
             case Enums.Bonus.DICE_4:
             case Enums.Bonus.DICE_5:
             case Enums.Bonus.DICE_6:
-                return me._players.getAvailableSteps(bonus);
+                return me._players.getAvailableSteps(bonus).length > 0;
 
             case Enums.Bonus.LESS_CARDS:
                 return me._carousel._minCount > Config.Carousel.Min;
@@ -281,7 +286,6 @@ export default class Core {
 
             case Enums.Bonus.CARD_PACK:
             case Enums.Bonus.REROLL:
-            case Enums.Bonus.SKIP_TURN:
                 return true;
 
             default:

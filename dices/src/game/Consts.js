@@ -14,6 +14,7 @@ export default class Consts {
     static UnitBig = Consts.Unit * 2;
 
     static Depth = {
+        Window: 1000,
         Max: 999999
     };
 

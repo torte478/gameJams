@@ -41,7 +41,6 @@ export default class Enums {
         LESS_CARDS: 7,
         MORE_CARDS: 8,
         CARD_PACK: 9,
-        REROLL: 10,
-        SKIP_TURN: 11
+        REROLL: 10
     }
 }
