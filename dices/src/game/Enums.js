@@ -23,12 +23,13 @@ export default class Enums {
 
     static AiWeight = {
         WIN: 0,
-        KILL: 1,
-        SPAWN: 2,
-        ENTER_HOME: 3,
-        INSIDE_HOME: 4,
-        MOVE_FROM_OWN_SPAWN: 5,
-        MOVE_FROM_ENEMY_SPAWN: 6,
+        KILL_HUMAN: 1,
+        KILL_ANY: 2,
+        SPAWN: 3,
+        ENTER_HOME: 4,
+        INSIDE_HOME: 5,
+        MOVE_FROM_OWN_SPAWN: 6,
+        MOVE_FROM_ENEMY_SPAWN: 7,
     };
 
     static Bonus = {

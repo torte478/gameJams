@@ -22,11 +22,11 @@ export default class Players {
      * @param {Phaser.Scene} scene 
      * @param {Board}
      */
-    constructor(scene, board, context, carousel) {
+    constructor(scene, board, context, carousel, players) {
         const me = this;
 
-        me._players = Config.Start.map(
-            (_, index) => new Player(scene, board, index, carousel));
+        me._players = players.map(
+            (config, index) => new Player(scene, board, index, carousel, config));
 
         me._context = context;
     }

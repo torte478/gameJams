@@ -37,14 +37,12 @@ export default class Player {
      * @param {Board} board 
      * @param {Number} playerIndex 
      */
-    constructor(scene, board, playerIndex, carousel) {
+    constructor(scene, board, playerIndex, carousel, config) {
         const me = this;
 
         me._playerIndex = playerIndex;
         me._board = board;
         me._carousel = carousel;
-
-        const config = Config.Start[playerIndex];
 
         me._pieces = [];
         const pieceCount = !!config.positions ? config.positions.length : 0;

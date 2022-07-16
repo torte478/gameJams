@@ -61,10 +61,14 @@ export default class AI {
             if (isWin)
                 scores[i] += me._weight[Enums.AiWeight.WIN];
 
-            // kill
+            // kill human/any
             const enemy = me._players.getPlayerAt(target);
-            if (enemy !== Consts.Undefined && enemy !== myIndex)
-                scores[i] += me._weight[Enums.AiWeight.KILL];
+            if (enemy !== Consts.Undefined && enemy !== myIndex) {
+                const killWeight = enemy === Enums.Player.HUMAN
+                                   ? Enums.AiWeight.KILL_HUMAN
+                                   : Enums.AiWeight.KILL_ANY;
+                scores[i] += me._weight[killWeight];
+            }
 
             // spawn
             const isSpawn = step.from.index === Consts.Undefined && step.to.index === 0;
@@ -82,11 +86,11 @@ export default class AI {
                 scores[i] += me._weight[Enums.AiWeight.INSIDE_HOME];
 
             // move from own spawn
-            if (step.from.index === 0)
+            if (step.from.index === 0 || step.from.index === circleLength)
                 scores[i] += me._weight[Enums.AiWeight.MOVE_FROM_OWN_SPAWN];
 
             // move fron enemy spawn
-            if (me._board.isCorner(target))
+            if (me._board.isCorner(target) && !me._board.isOwnCorner(myIndex, target))
                 scores[i] += me._weight[Enums.AiWeight.MOVE_FROM_ENEMY_SPAWN];
         }
 

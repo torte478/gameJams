@@ -34,7 +34,7 @@ export default class Game extends Phaser.Scene {
 
         Animation.init(me);
 
-        me._core = new Core(me, Config.BoardSize);
+        me._core = new Core(me);
     }
 
     update() {

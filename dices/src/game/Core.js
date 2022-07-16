@@ -42,24 +42,36 @@ export default class Core {
 
     /**
      * @param {Phaser.Scene} scene 
-     * @param {Number} boardSize
      */
-    constructor(scene, boardSize) {
+    constructor(scene, level) {
         const me = this;
 
         me._scene = scene;
 
         // My
 
+        level = Config.LevelIndex; //TODO
+
+        const boardSize = Utils.isDebug(Config.Debug.Level)
+            ? Config.BoardSize
+            : Config.Levels[level].size;
+
+        const playerConfig = Utils.isDebug(Config.Debug.Level)
+            ? Config.Start
+            : Utils.buildArray(Config.Levels[level].ai.length + 1, { count: boardSize / 2, positions: []});
+
         me._context = new Context();
         me._board = new Board(scene, boardSize);
         me._dice = new Dice(scene, me._board.getBounds());
         me._carousel = new Carousel(scene);
-        me._players = new Players(scene, me._board, me._context, me._carousel);
+        me._players = new Players(scene, me._board, me._context, me._carousel, playerConfig);
 
         me._ai = [ null ]
-        for (let i = 1; i < 4; ++i) {
-            const ai = new AI(i, me._context, me._players, me._board, Config.DebugWeight);
+        for (let i = 1; i < playerConfig.length; ++i) {
+            const weight = Utils.isDebug(Config.Debug.Level) 
+                           ? Config.DebugWeight
+                           : Config.AI[Config.Levels[level].ai[i - 1]];
+            const ai = new AI(i, me._context, me._players, me._board, weight);
             me._ai.push(ai);
         }
 

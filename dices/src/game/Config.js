@@ -7,36 +7,39 @@ export default class Config {
         Log: true,
         TraceLog: true,
         IgnoreRollAnim: true,
-        Random: false
+        Random: false,
+        Level: false,
     };
 
-    static BoardSize = 4;
+    static BoardSize = 8;
+
+    static LevelIndex = 5;
 
     static Start = [
-        {
-            count: 2,
-            positions: [11, 13],
-        },
-        {
-            count: 2,
-            positions: [],
-        },
-        // { 
-        //     count: 4,
-        //     positions: []
+        // {
+        //     count: 2,
+        //     positions: [11, 13],
         // },
         // {
-        //     count: 4,
-        //     positions: []
+        //     count: 2,
+        //     positions: [],
         // },
-        // { 
-        //     count: 4,
-        //     positions: [ ]
-        // },
-        // {
-        //     count: 4,
-        //     positions: [ ]
-        // }
+        { 
+            count: 4,
+            positions: []
+        },
+        {
+            count: 4,
+            positions: []
+        },
+        { 
+            count: 4,
+            positions: [ ]
+        },
+        {
+            count: 4,
+            positions: [ ]
+        }
     ];
 
     static Carousel = {
@@ -52,6 +55,83 @@ export default class Config {
         Enums.Bonus.CARD_PACK
     ];
 
+    static Levels = [
+        { size: 6, ai: [ 0 ] },
+        { size: 4, ai: [ 1 ] },
+        { size: 6, ai: [ 2 ] },
+        { size: 6, ai: [ 2, 3 ] },
+        { size: 8, ai: [ 3, 4 ] },
+        { size: 8, ai: [ 4, 4, 5 ] },
+    ]
+
+    static AI = [
+        // 0
+        [
+            1, //win
+            0, //kill human
+            0, //kill any
+            4, //spawn
+            2, //enter home
+            3, //inside home
+            0, //move from own spawn
+            0  //move from enemy spawn
+        ],
+        // 1
+        [
+            10, //win
+            1, //kill human
+            2, //kill any
+            4, //spawn
+            0, //enter home
+            4, //inside home
+            1, //move from own spawn
+            0  //move from enemy spawn
+        ],
+        // 2
+        [
+            10, //win
+            4, //kill human
+            5, //kill any
+            4, //spawn
+            3, //enter home
+            3, //inside home
+            3, //move from own spawn
+            3  //move from enemy spawn
+        ],
+        // 3
+        [
+            10, //win
+            9, //kill human
+            9, //kill any
+            8, //spawn
+            3, //enter home
+            4, //inside home
+            5, //move from own spawn
+            5  //move from enemy spawn
+        ],
+        // 4
+        [
+            10, //win
+            9, //kill human
+            9, //kill any
+            8, //spawn
+            7, //enter home
+            4, //inside home
+            6, //move from own spawn
+            5  //move from enemy spawn
+        ],
+        // 5
+        [
+            1000, //win
+            500, //kill human
+            10, //kill any
+            9, //spawn
+            11, //enter home
+            4, //inside home
+            6, //move from own spawn
+            2  //move from enemy spawn
+        ],
+    ]
 
     static DebugWeight = [
         100,
