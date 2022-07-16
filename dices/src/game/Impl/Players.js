@@ -24,4 +24,20 @@ export default class Players {
 
         me._current = Enums.Player.HUMAN;
     }
+
+    /**
+     * @param {Number} value 
+     * @returns {Number[]}
+     */
+    getAvailableSteps(value) {
+        const me = this;
+
+        return me._getCurrent().getAvailableSteps(value);
+    }
+
+    _getCurrent() {
+        const me = this;
+
+        return me._players[me._current];
+    }
 }

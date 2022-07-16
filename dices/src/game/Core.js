@@ -9,6 +9,7 @@ import Enums from './Enums.js';
 import Helper from './Helper.js';
 import Utils from './Utils.js';
 import Players from './Impl/Players.js';
+import Context from './Impl/Context.js';
 
 export default class Core {
 
@@ -23,6 +24,9 @@ export default class Core {
 
     /** @type {Players} */
     _players;
+
+    /** @type {Context} */
+    _context;
 
     /** @type {Phaser.GameObjects.Text} */
     _log;
@@ -41,6 +45,7 @@ export default class Core {
         me._board = new Board(scene, boardSize);
         me._dice = new Dice(scene, me._board.getBounds());
         me._players = new Players(scene, me._board);
+        me._context = new Context();
 
         // Debug
 
@@ -64,7 +69,7 @@ export default class Core {
         const me = this;
 
         const point = Utils.buildPoint(pointer.worldX, pointer.worldY);
-        me._dice.tryRoll(point, true, me._onDiceRoll, me);
+        me._dice.tryRoll(point, false, me._onDiceRoll, me);
     }
 
     /**
@@ -91,8 +96,11 @@ export default class Core {
         }
     }
 
-    _onDiceRoll() {
-        console.log(this, arguments[0]);
+    _onDiceRoll(value) {
+        const me = this;
+
+        const available = me._players.getAvailableSteps(value);
+        me._context.setAvailableSteps(available);
     }
 
     _updateDebugLog() {

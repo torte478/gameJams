@@ -4,6 +4,7 @@ import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
+import Cell from './Cell.js';
 
 export default class Board {
 
@@ -61,15 +62,15 @@ export default class Board {
 
     /**
      * @param {Number} player 
-     * @param {Number} field 
-     * @return {Phaser.Geom.Point}
+     * @param {Number} index 
+     * @return {Cell}
      */
-    getFieldPosition(player, field) {
+    getCell(player, index) {
         const me = this;
 
         const corner = me._getPlayerCorner(player);
         const fields = me._getFieldsFrom(corner);
-        return me._fieldToPoint(fields[field]);
+        return me._fieldToCell(player, index, fields);
     }
 
     getStoragePosition(player) {
@@ -88,14 +89,23 @@ export default class Board {
         return Consts.PlayerCornerByCount[Config.PlayerCount - 1][player];
     }
 
-    _fieldToPoint(field) {
+    _fieldToCell(player, index, fields) {
         const me = this;
 
+        if (index >= fields.length)
+            return new Cell({player: player, index: Consts.Undefined});
+
+        const field = fields[index];
+
         const offset = 2 * Consts.UnitSmall;
-        return Utils.buildPoint(
-            me._position.x + offset + field.col * Consts.Unit,
-            me._position.y + offset + field.row * Consts.Unit,
-        );
+        return new Cell({
+            player: player,
+            x: me._position.x + offset + field.col * Consts.Unit,
+            y: me._position.y + offset + field.row * Consts.Unit,
+            row: field.row,
+            col: field.col,
+            index: index
+        });
     }
 
     /**

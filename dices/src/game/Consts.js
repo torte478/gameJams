@@ -7,6 +7,8 @@ export default class Consts {
         Height: 768
     };
 
+    static Undefined = -1;
+
     static Unit = 64;
     static UnitSmall = Consts.Unit / 2;
     static UnitBig = Consts.Unit * 2;

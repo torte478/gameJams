@@ -4,6 +4,7 @@ import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Utils from '../Utils.js';
 import Board from './Board.js';
+import Cell from './Cell.js';
 import Piece from './Piece.js';
 
 export default class Player {
@@ -17,6 +18,9 @@ export default class Player {
     /** @type {Piece[]} */
     _pieces;
 
+    /** @type {Board} */
+    _board;
+
     /**
      * @param {Phaser.Scenes} scene 
      * @param {Board} board 
@@ -26,13 +30,15 @@ export default class Player {
         const me = this;
 
         me._index = playerIndex;
+        me._board = board;
+
         const config = Config.Start[playerIndex];
 
         me._pieces = [];
         const pieceCount = !!config.positions ? config.positions.length : 0;
         for (let i = 0; i < pieceCount; ++i) {
-            const position = board.getFieldPosition(playerIndex, config.positions[i]);
-            const piece = new Piece(scene, position, playerIndex, Consts.PieceScale.Normal);
+            const cell = board.getCell(playerIndex, config.positions[i]);
+            const piece = new Piece(scene, cell, playerIndex, Consts.PieceScale.Normal);
             me._pieces.push(piece);
         }
 
@@ -40,12 +46,34 @@ export default class Player {
         const storagePosition = board.getStoragePosition(playerIndex);
         for (let i = 0; i < config.count - me._pieces.length; ++i) {
             const index = me._storage.length;
-            const position = Utils.buildPoint(
-                storagePosition.x + Consts.StorageSize.Width - index * Consts.UnitSmall - Consts.UnitSmall,
-                storagePosition.y + Consts.StorageSize.Height + Consts.UnitSmall / 2
-            );
-            const piece = new Piece(scene, position, playerIndex, Consts.PieceScale.Storage);
+            const cell = new Cell({
+                player: playerIndex,
+                x: storagePosition.x + Consts.StorageSize.Width - index * Consts.UnitSmall - Consts.UnitSmall,
+                y: storagePosition.y + Consts.StorageSize.Height + Consts.UnitSmall / 2
+            });
+            const piece = new Piece(scene, cell, playerIndex, Consts.PieceScale.Storage);
             me._storage.push(piece);
         }
+    }
+
+    /**
+     * @param {Number} value 
+     * @returns {Cell[]}
+     */
+    getAvailableSteps(value) {
+        const me = this;
+
+        const steps = [];
+        for (let i = 0; i < me._pieces.length; ++i) {
+            const piece = me._pieces[i];
+            const target = me._board.getCell(me._index, piece.cell.index + value);
+
+            const isAvailable = target.index != Consts.Undefined
+                                && Utils.all(me._pieces, (p) => p.cell.index != target.index);
+
+            if (isAvailable)
+                steps.push(target);
+        }
+        return steps;       
     }
 }
