@@ -17,19 +17,16 @@ export default class Core {
 
     /**
      * @param {Phaser.Scene} scene 
+     * @param {Number} boardSize
      */
-    constructor(scene) {
+    constructor(scene, boardSize) {
         const me = this;
 
         me._scene = scene;
 
-        // Phaser
-
-        scene.cameras.main.setScroll(-224, -96);
-
         // My
 
-        const board = new Board(scene, 8); // TODO
+        const board = new Board(scene, boardSize); // TODO
 
         // Debug
 

@@ -12,12 +12,25 @@ export default class Board {
         const me = this;
 
         const array = me._buildTileArray(size);
+        const position = me._getPosition(size);
+
         const map = scene.make.tilemap({ 
             data: array, 
             tileWidth: Consts.UnitHalf, 
             tileHeight: Consts.UnitHalf });
         const tiles = map.addTilesetImage('board');
-        const layer = map.createLayer(0, tiles, 0, 0);
+        const layer = map.createLayer(0, tiles, position.x, position.y);
+    }
+
+    _getPosition(size) {
+        const me = this;
+
+        const side = (size * 2 + 2) * Consts.UnitHalf;
+
+        return Utils.buildPoint(
+            (Consts.Viewport.Width - side) / 2,
+            (Consts.Viewport.Height - side) / 2,
+        )
     }
 
     _buildTileArray(size) {
