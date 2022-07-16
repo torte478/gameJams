@@ -11,20 +11,20 @@ export default class Config {
     static Start = [
         { 
             count: 4,
-            positions: []
-        },
-        {
-            count: 3,
-            positions: []
+            positions: [ 1, 2 ]
         },
         {
             count: 2,
-            positions: []
+            positions: [ 5 ]
         },
-        { 
-            count: 1,
-            positions: []
-        }
+        // {
+        //     count: 2,
+        //     positions: []
+        // },
+        // { 
+        //     count: 1,
+        //     positions: []
+        // }
     ];
 
     static PlayerCount = Config.Start.length;

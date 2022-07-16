@@ -14,4 +14,9 @@ export default class Enums {
         BOTTOM_RIGHT: 2,
         BOTTOM_LEFT: 3
     };
+
+    static GameState = {
+        DICE_ROLL: 0,
+        MAKE_STEP: 1
+    };
 }

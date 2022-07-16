@@ -14,6 +14,9 @@ export default class Cell {
     constructor(config) {
         const me = this;
 
+        if (config === undefined)
+            config = {};
+
         me.player = config.player === undefined ? Consts.Undefined : config.player;
         me.x = config.x === undefined ? Consts.Undefined : config.x;
         me.y = config.y === undefined ? Consts.Undefined : config.y;
@@ -25,6 +28,11 @@ export default class Cell {
     toPoint() {
         const me = this;
 
-        return Utils.buildPoint(x, y);
+        return Utils.buildPoint(me.x, me.y);
+    }
+
+    toString() {
+        const me = this;
+        return JSON.stringify(me);
     }
 }

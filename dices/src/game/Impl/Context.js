@@ -1,21 +1,41 @@
 import Phaser from '../../lib/phaser.js';
+import Enums from '../Enums.js';
+import Utils from '../Utils.js';
 
 export default class State {
 
-    /** @type {Number[]} */
-    _availableSteps;
+    /** @type {Object[]} */
+    availableSteps;
+
+    /** @type {Number} */
+    state;
+
+    /** @type {Number} */
+    player;
 
     constructor() {
         const me = this;
+
+        me.state = Enums.GameState.DICE_ROLL;
+        me.player = Enums.Player.HUMAN;
     }
 
     /**
-     * @param {Cell[]} available 
+     * @param {Object[]} available 
      */
     setAvailableSteps(available) {
         const me = this;
 
-        me._availableSteps = available.map(cell => cell.index);
-        console.log(me._availableSteps);
+        me.availableSteps = available;
+        Utils.debugLog(me.availableSteps.map(
+            step => `${step.from.index} => ${step.to.index}`));
+    }
+
+    setState(state) {
+        const me = this;
+
+        Utils.debugLog(`${Utils.enumToString(Enums.GameState, me.state)}`
+                     + ` => ${Utils.enumToString(Enums.GameState, state)}`);
+        me.state = state;
     }
 }

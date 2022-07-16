@@ -24,17 +24,21 @@ export default class Consts {
         Height: Consts.UnitSmall
     };
 
+    static PieceScale = {
+        Normal: 1,
+        Storage: 0.5
+    };
+
+    static Speed = {
+        PieceMovementMs: 350
+    };
+
     static StorageByCorner = [
         { x: 0.5 * Consts.UnitSmall, y: -2.5 * Consts.UnitSmall, sideX: 0, sideY: 0 },
         { x: -3.5 * Consts.UnitSmall, y: -2.5 * Consts.UnitSmall, sideX: 1, sideY: 0 },
         { x: -3.5 * Consts.UnitSmall, y: -0.5 * Consts.UnitSmall, sideX: 1, sideY: 1 },
         { x: 0.5 * Consts.UnitSmall, y: -0.5 * Consts.UnitSmall, sideX: 0, sideY: 1 }
     ];
-
-    static PieceScale = {
-        Normal: 1,
-        Storage: 0.5
-    };
 
     static PlayerCornerByCount = [
         [ 

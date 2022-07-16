@@ -42,10 +42,10 @@ export default class Core {
 
         // My
 
+        me._context = new Context();
         me._board = new Board(scene, boardSize);
         me._dice = new Dice(scene, me._board.getBounds());
-        me._players = new Players(scene, me._board);
-        me._context = new Context();
+        me._players = new Players(scene, me._board, me._context);
 
         // Debug
 
@@ -69,7 +69,11 @@ export default class Core {
         const me = this;
 
         const point = Utils.buildPoint(pointer.worldX, pointer.worldY);
-        me._dice.tryRoll(point, false, me._onDiceRoll, me);
+
+        if (me._context.state === Enums.GameState.DICE_ROLL)
+            me._dice.tryRoll(point, false, me._onDiceRoll, me);
+        else if (me._context.state === Enums.GameState.MAKE_STEP)
+            me._tryMovePiece(point);
     }
 
     /**
@@ -101,6 +105,7 @@ export default class Core {
 
         const available = me._players.getAvailableSteps(value);
         me._context.setAvailableSteps(available);
+        me._context.setState(Enums.GameState.MAKE_STEP);
     }
 
     _updateDebugLog() {
@@ -113,5 +118,25 @@ export default class Core {
             `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}`;
 
         me._log.setText(text);
+    }
+
+    _tryMovePiece(point) {
+        const me = this;
+
+        const cell = me._board.findCell(point);
+        if (cell.row === Consts.Undefined)
+            return null;
+
+        const step = Utils.firstOrNull(me._context.availableSteps, c => c.from.row === cell.row && c.from.col === cell.col);
+        if (step === null)
+            return false;
+
+        me._players.makeStep(step.from, step.to, me._onPlayerStep, me);
+    }
+
+    _onPlayerStep() {
+        const me = this;
+
+        me._context.setState(Enums.GameState.DICE_ROLL);
     }
 }

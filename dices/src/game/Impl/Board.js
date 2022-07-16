@@ -85,6 +85,26 @@ export default class Board {
         );
     }
 
+    findCell(point) {
+        const me = this;
+
+        const inside = point.x > me._position.x + Consts.UnitSmall
+                       && point.x < me._position.x + me._side - Consts.UnitSmall
+                       && point.y > me._position.y + Consts.UnitSmall
+                       && point.y < me._position.y + me._side - Consts.UnitSmall;
+
+        if (!inside)
+            return new Cell({index: Consts.Undefined});
+
+        const row = Math.floor((point.y - me._position.y - Consts.UnitSmall) / Consts.Unit); 
+        const col = Math.floor((point.x - me._position.x - Consts.UnitSmall) / Consts.Unit);
+        
+        return new Cell({
+            row: row,
+            col: col
+        });
+    }
+
     _getPlayerCorner(player) {
         return Consts.PlayerCornerByCount[Config.PlayerCount - 1][player];
     }

@@ -58,7 +58,7 @@ export default class Player {
 
     /**
      * @param {Number} value 
-     * @returns {Cell[]}
+     * @returns {Object[]}
      */
     getAvailableSteps(value) {
         const me = this;
@@ -72,8 +72,24 @@ export default class Player {
                                 && Utils.all(me._pieces, (p) => p.cell.index != target.index);
 
             if (isAvailable)
-                steps.push(target);
+                steps.push({ from: piece.cell, to: target });
         }
         return steps;       
+    }
+
+    /**
+     * @param {Cell} from 
+     * @param {Cell} to 
+     * @param {Function} callback
+     * @param {Object} context
+     */
+     makeStep(from, to, callback, context) {
+        const me = this;
+
+        const piece = Utils.firstOrNull(me._pieces, p => p.cell.index === from.index);
+        if (piece === null)
+            throw `can't find piece on cell: ${from.index}`;
+
+        piece.makeStep(to, callback, context);
     }
 }
