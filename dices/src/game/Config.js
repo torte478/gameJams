@@ -19,7 +19,7 @@ export default class Config {
     };
 
     static DefaultBonuses = [
-        Enums.Bonus.MORE_CARDS,
+        Enums.Bonus.SKIP_TURN,
 
         // Enums.Card.DICE_6,
         // Enums.Card.MORE_CARDS,

@@ -143,7 +143,8 @@ export default class Core {
         let text = 
             `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` +
             `crs: ${me._carousel._cards.map(x => !!x ? x.bonusType : '-')}\n` +
-            `lvl: ${me._carousel._minCount}`;
+            `lvl: ${me._carousel._minCount}\n` +
+            `pck: ${me._carousel._packSize}`;
 
         me._log.setText(text);
     }
@@ -278,6 +279,11 @@ export default class Core {
             case Enums.Bonus.MORE_CARDS:
                 return me._carousel._minCount < Config.Carousel.Max;
 
+            case Enums.Bonus.CARD_PACK:
+            case Enums.Bonus.REROLL:
+            case Enums.Bonus.SKIP_TURN:
+                return true;
+
             default:
                 throw `unknown bonus type: ${bonus}`;
         }
@@ -304,6 +310,14 @@ export default class Core {
                 me._carousel.changeLevel(+1);
                 return me._finishTurn();
             }
+
+            case Enums.Bonus.CARD_PACK: {
+                me._carousel.startPack();
+                return me._finishTurn();
+            }
+
+            case Enums.Bonus.REROLL: 
+                return me._dice.roll(false, me._onDiceRoll, me);
 
             default:
                 throw `unknown bonus type: ${bonus}`;

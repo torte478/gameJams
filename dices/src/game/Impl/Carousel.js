@@ -21,6 +21,9 @@ export default class Carousel {
     /** @type {Number} */
     _minCount;
 
+    /** @type {Number} */
+    _packSize;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -30,6 +33,7 @@ export default class Carousel {
         me._pool = scene.add.group();
         me._scene = scene;
         me._cards = Utils.buildArray(6, null);
+        me._packSize = 0;
 
         me._startPosition = Utils.toPoint(
             Consts.CarouselPosition);
@@ -49,8 +53,9 @@ export default class Carousel {
             me._cards[i] = me._cards[i - 1];
 
         me._cards[0] = null;
-        if (me._cards.filter(x => !!x).length < me._minCount)
-            me._cards[0] = me._createCard(-1, available);
+        const needUsePack = me._packSize > 0;
+        if (me._cards.filter(x => !!x).length < me._minCount || needUsePack)
+            me._cards[0] = me._createCard(-1, available, needUsePack);
 
         const shift = `+=${Consts.CardSize.Height}`;
         me._scene.add.tween({
@@ -95,9 +100,15 @@ export default class Carousel {
         const me = this;
 
         me._minCount += delta;
-        
+
         if (me._minCount < Config.Carousel.Min || me._minCount > Config.Carousel.Max)
             throw `wrong carousel level: ${me._minCount}`;
+    }
+
+    startPack() {
+        const me = this;
+
+        me._packSize = 6;
     }
 
     _onRoll(last, callback, context) {
@@ -119,7 +130,7 @@ export default class Carousel {
         );
     }
 
-    _createCard(index, available) {
+    _createCard(index, available, needUsePack) {
         const me = this;
 
         const position = me._getPosition(index);
@@ -128,6 +139,9 @@ export default class Carousel {
         const types = !!available ? available : Config.DefaultBonuses;
         const type = Utils.getRandomEl(types);
         card.bonusType = type;
+
+        if (needUsePack)
+            me._packSize = Math.max(me._packSize - 1, 0);
 
         return card;
     }
