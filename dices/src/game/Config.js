@@ -10,14 +10,18 @@ export default class Config {
 
     static BoardSize = 4;
 
+    static Carousel = {
+        Start: 1
+    };
+
     static Start = [
         { 
             count: 2,
-            positions: [ ]
+            positions: [ 0 ]
         },
         {
             count: 2,
-            positions: []
+            positions: [ 0 ]
         },
         // { 
         //     count: 4,

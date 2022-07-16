@@ -54,7 +54,7 @@ export default class Core {
         me._board = new Board(scene, boardSize);
         me._dice = new Dice(scene, me._board.getBounds());
         me._players = new Players(scene, me._board, me._context);
-        me._carousel = new Carousel(scene, me._board);
+        me._carousel = new Carousel(scene);
 
         me._ai = [ null ]
         for (let i = 1; i < 4; ++i) {
@@ -138,7 +138,8 @@ export default class Core {
             return;
 
         let text = 
-            `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}`;
+            `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}\n` +
+            `crs: ${me._carousel._cards.map(x => !!x ? 'x' : '-')}`;
 
         me._log.setText(text);
     }
@@ -188,6 +189,12 @@ export default class Core {
         const winner = me._players.findWnner();
         if (winner != null)
             return me._gameOver(winner);
+
+        me._carousel.roll(me._nextTurn, me);
+    }
+
+    _nextTurn() {
+        const me = this;
 
         me._context.setPlayer((me._context.player + 1) % Config.PlayerCount);
         me._context.setState(Enums.GameState.DICE_ROLL);

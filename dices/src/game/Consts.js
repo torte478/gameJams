@@ -17,6 +17,10 @@ export default class Consts {
         Max: 999999
     };
 
+    static CardSize = {
+        Width: 128,
+        Height: 96
+    };
     static CarouselPosition = { x: 112, y: 144 };
 
     static DiceRollTime = 1000;
@@ -34,7 +38,8 @@ export default class Consts {
     static DiceSpawnValue = 6;
 
     static Speed = {
-        PieceMovementMs: 350
+        PieceMovementMs: 350,
+        CarouselMs: 500
     };
 
     static StorageByCorner = [
