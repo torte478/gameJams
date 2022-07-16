@@ -12,4 +12,6 @@ export default class Consts {
     static Depth = {
         Max: 999999
     };
+
+    static DiceRollTime = 1000;
 }

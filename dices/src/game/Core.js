@@ -52,6 +52,20 @@ export default class Core {
         me._updateDebugLog();
     }
 
+    /**
+     * @param {Phaser.Input.Pointer} pointer 
+     */
+    onPointerDown(pointer) {
+        const me = this;
+
+        const point = Utils.buildPoint(pointer.worldX, pointer.worldY);
+        me._dice.tryRoll(point, false, me._onDiceRoll, me);
+    }
+
+    _onDiceRoll() {
+        console.log(this, arguments[0]);
+    }
+
     _updateDebugLog() {
         const me = this;
 
