@@ -104,6 +104,13 @@ export default class Core {
             .on('pointermove', () => { rest.setScale(0.75) })
             .on('pointerout', () => { rest.setScale(0.5) });
 
+        const text2 = scene.add.text(
+            452,
+            10,
+            `DIFFICULTY: ${level + 1}/6`,
+            { fontFamily: 'Arial Black', fontSize: 14, color: '#645b6a' }
+        );
+
         // Debug
 
         if (Utils.isDebug(Config.Debug.TraceLog)) {

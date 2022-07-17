@@ -41,13 +41,13 @@ export default class Consts {
     static DiceSpawnValue = 6;
 
     static Speed = {
-        PieceMovement: 300,
-        CarouselMs: 500,
-        DiceRollMs: 1000,
+        PieceMovement: 400,
+        CarouselMs: 350,
+        DiceRollMs: 750,
         Selection: 750,
-        ArrowMs: 750,
+        ArrowMs: 500,
         PieceStorageMs: 350,
-        AiPath: 750
+        AiPath: 500
     };
 
     static AiHardestLevel = 5;

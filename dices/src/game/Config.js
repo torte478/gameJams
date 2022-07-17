@@ -12,48 +12,48 @@ export default class Config {
         BoosterVisible: false,
     };
 
-    static BoardSize = 4;
+    static BoardSize = 8;
 
-    static LevelIndex = 5;
+    static LevelIndex = 4;
 
     static Volume = {
-        Click: 0.5,
-        Death: 0.5,
+        Click: 0.25,
+        Death: 0.25,
         GameOver: 0.5,
-        Hit: 0.5,
+        Hit: 0.25,
         Lose: 0.5,
         Win: 0.5
     };
 
     static Start = [
-        {
-            count: 2,
-            positions: [ 11, 10],
-        },
-        {
-            count: 2,
-            positions: [ 11, 10 ],
-        },
-        // { 
+        // {
+        //     count: 4,
+        //     positions: [ ],
+        // },
+        // {
         //     count: 4,
         //     positions: [],
-        //     skin: 0,
         // },
-        // {
-        //     count: 4,
-        //     positions: [0, 1, 2, 3],
-        //     skin: 2,
-        // },
-        // { 
-        //     count: 4,
-        //     positions: [0, 1, 2, 3],
-        //     skin: 4,
-        // },
-        // {
-        //     count: 4,
-        //     positions: [0, 1, 2, 3],
-        //     skin: 6,
-        // }
+        { 
+            count: 4,
+            positions: [],
+            skin: 0,
+        },
+        {
+            count: 4,
+            positions: [],
+            skin: 2,
+        },
+        { 
+            count: 4,
+            positions: [],
+            skin: 4,
+        },
+        {
+            count: 4,
+            positions: [ 28 ],
+            skin: 6,
+        }
     ];
 
     static Carousel = {

@@ -103,9 +103,7 @@ export default class Highlight {
                 const tile = me._pool.create(cell.x, cell.y, 'highlight', frame);
                 tile.setDepth(Consts.Depth.Highlight);
                 tile.setVisible(false);
-                const alphaFactor = path.length <= 10 
-                    ? 1 
-                    : (j + 1) / path.length;
+                const alphaFactor = (j + 1) / path.length;
                 tile.setAlpha(minAlpha + alphaFactor * (maxAlpha - minAlpha));
 
                 hightlight.push(tile);
