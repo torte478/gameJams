@@ -90,6 +90,13 @@ export default class Board {
         return me._fieldToCell(player, index, fields, !!isCycle);
     }
 
+    getHome(player) {
+        const me = this;
+
+        const circle = me.getCircleLength();
+        return me.getPath(player, circle, circle + me._size / 2 - 1);
+    }
+
     /**
      * @param {Number} player 
      * @param {Number} from 

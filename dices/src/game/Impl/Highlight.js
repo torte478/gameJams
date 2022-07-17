@@ -104,7 +104,7 @@ export default class Highlight {
                 tile.setVisible(false);
                 const alphaFactor = path.length <= 10 
                     ? 1 
-                    : (path.length - j - 1) / path.length;
+                    : (j + 1) / path.length;
                 tile.setAlpha(minAlpha + alphaFactor * (maxAlpha - minAlpha));
 
                 hightlight.push(tile);
@@ -219,5 +219,16 @@ export default class Highlight {
             tile: tile
         };
         me._homeSteps.push(homeStep);
+    }
+
+    clearAll() {
+        const me = this;
+
+        me.clearHighlights();
+
+        for (let i = 0; i < me._homeSteps.length; ++i)
+            me._pool.killAndHide(me._homeSteps[i].tile);
+
+        me._homeSteps = [];
     }
 }

@@ -147,6 +147,12 @@ export default class Core {
             return me._scene.scene.start('game');
         }
 
+        if (event.key == 'l')
+            return me._gameOver(Enums.Player.CPU1);
+        
+        if (event.key == 'w')
+            return me._gameOver(Enums.Player.HUMAN);
+
         if (Utils.stringIsDigit(event.key)) {
             const value = +event.key;
             me._onDiceRoll(value);
@@ -316,10 +322,35 @@ export default class Core {
     _gameOver(winner) {
         const me = this;
 
-        if (winner === Enums.Player.HUMAN)
-            console.log("===== YOU WIN ====");
-        else 
-            console.log("===== YOU LOSE =( =====");
+        me._highlight.clearAll();
+
+        const isHumanWinner = winner === Enums.Player.HUMAN;
+
+        const home = me._board.getHome(winner);
+        const tiles = [];
+        for (let i = 0; i < home.length; ++i) {
+            const tile = me._scene.add.image(home[i].x, home[i].y, 'highlight', isHumanWinner ? 2 : 3)
+                .setDepth(Consts.Depth.Highlight);
+            tiles.push(tile);
+        }
+
+        const text = me._scene.add.text(
+            820,
+            600,
+            isHumanWinner ? 'YOU WIN' : 'YOU LOSE',
+            { fontFamily: 'Arial Black', fontSize: 32, color: isHumanWinner ? '#009179' : '#912900' }
+        );
+        text.setStroke('#fcf8ff', 10);
+        text.setShadow(2, 2, "#333333", 2, true, true);
+
+        me._scene.time.addEvent({
+            delay: 500,
+            repeat: -1,
+            callback: () => {
+                for (let i = 0; i < tiles.length; ++i)
+                    tiles[i].setVisible(!tiles[i].visible);
+            }
+        });
 
         me._context.setState(Enums.GameState.GAME_OVER)
     }

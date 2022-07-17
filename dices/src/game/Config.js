@@ -7,23 +7,23 @@ export default class Config {
         Log: true,
         TraceLog: true,
         IgnoreRollAnim: false,
-        Random: false,
-        Level: false,
+        Random: true,
+        Level: true,
         BoosterVisible: false,
     };
 
-    static BoardSize = 8;
+    static BoardSize = 4;
 
     static LevelIndex = 5;
 
     static Start = [
         {
-            count: 3,
-            positions: [ ],
+            count: 2,
+            positions: [ 11, 10],
         },
         {
-            count: 3,
-            positions: [ 16, 17, 18 ],
+            count: 2,
+            positions: [ 11, 10 ],
         },
         // { 
         //     count: 4,
@@ -49,7 +49,7 @@ export default class Config {
 
     static Carousel = {
         Min: 1,
-        Start: 6,
+        Start: 1,
         Max: 3
     };
 
@@ -138,7 +138,7 @@ export default class Config {
         ],
     ]
 
-    static DebugAI = 3;
+    static DebugAI = 4;
 
     static PlayerCount = Config.Start.length;
 }
