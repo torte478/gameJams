@@ -245,6 +245,7 @@ export default class Core {
 
         me._context.setPlayer((me._context.player + 1) % me._players._players.length);
         me._context.setState(Enums.GameState.DICE_ROLL);
+        me._board.moveArrow(me._context.player);
 
         if (me._context.player !== Enums.Player.HUMAN) {
             let values = me._players.getBoosterValues();

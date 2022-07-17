@@ -41,6 +41,7 @@ export default class Consts {
         CarouselMs: 500,
         DiceRollMs: 1000,
         Selection: 750,
+        ArrowMs: 750
     };
 
     static AiHardestLevel = 5;

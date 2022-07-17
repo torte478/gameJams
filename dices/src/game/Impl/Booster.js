@@ -1,4 +1,5 @@
 import Phaser from '../../lib/phaser.js';
+import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Utils from '../Utils.js';
 
@@ -30,7 +31,8 @@ export default class Booster {
             me._dices.push(dice);
         }
 
-        me._container = scene.add.container(position.x, position.y, me._dices);
+        me._container = scene.add.container(position.x, position.y, me._dices)
+            .setVisible(Utils.isDebug(Config.Debug.isDebug));
         me._values = Utils.buildArray(6, true);
         me._cycleCounter = 0;
     }

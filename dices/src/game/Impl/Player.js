@@ -64,11 +64,11 @@ export default class Player {
 
         me._booster = new Booster(scene, board.getBoosterPosition(playerIndex));
 
-        scene.add.image(
-            me._storagePosition.x + Consts.StorageSize.Width / 2, 
-            me._storagePosition.y + Consts.StorageSize.Height / 2, 
-            'storage')
-            .setDepth(-100);
+        // scene.add.image(
+        //     me._storagePosition.x + Consts.StorageSize.Width / 2, 
+        //     me._storagePosition.y + Consts.StorageSize.Height / 2, 
+        //     'storage')
+        //     .setDepth(-100);
     }
 
     /**

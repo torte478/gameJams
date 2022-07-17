@@ -23,6 +23,12 @@ export default class Board {
     /** @type {Number} */
     _playerCount;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _arrow;
+
+    /** @type {Phaser.Scene} */
+    _scene;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} size 
@@ -31,6 +37,7 @@ export default class Board {
     constructor(scene, size, playerCount) {
         const me = this;
 
+        me._scene = scene;
         me._size = size;
         me._playerCount = playerCount;
         me._side = (size * 2 + 2) * Consts.UnitSmall;
@@ -48,6 +55,11 @@ export default class Board {
         const layer = map.createLayer(0, tiles, me._position.x, me._position.y);
 
         me._corners = me._createCornerConfig();
+
+        const arrowPosition = me._getArrowPosition(Enums.Corner.BOTTOM_RIGHT);
+        me._arrow = scene.add.image(arrowPosition.pos.x, arrowPosition.pos.y, 'arrow')
+            .setAngle(arrowPosition.angle)
+            .setDepth(Consts.Depth.Max);
     }
 
     /**
@@ -157,6 +169,62 @@ export default class Board {
         const corner = me._corners[me._getCornerIndex(player)];
 
         return target.isEqualPos(corner);
+    }
+
+    moveArrow(player) {
+        const me = this;
+        const corner = me._getCornerIndex(player);
+        const nextPosition = me._getArrowPosition(corner);
+
+
+        me._scene.add.tween({
+            targets: me._arrow,
+            x: nextPosition.pos.x,
+            y: nextPosition.pos.y,
+            angle: nextPosition.angle,
+            duration: Consts.Speed.ArrowMs,
+            ease: 'Sine.easeInOut'
+        });
+    }
+
+    _getArrowPosition(corner) {
+        const me = this;
+
+        switch (corner) {
+            case Enums.Corner.BOTTOM_RIGHT:
+                return {
+                    pos: Utils.buildPoint(
+                        me._position.x + me._side + 0.5 * Consts.UnitSmall, 
+                        me._position.y + me._side + 0.5 * Consts.UnitSmall),
+                    angle: 180
+                };
+
+            case Enums.Corner.BOTTOM_LEFT:
+                return {
+                    pos: Utils.buildPoint(
+                        me._position.x - 0.5 * Consts.UnitSmall, 
+                        me._position.y + me._side + 0.5 * Consts.UnitSmall),
+                    angle: -90
+                };
+
+            case Enums.Corner.TOP_LEFT:
+                return {
+                    pos: Utils.buildPoint(
+                        me._position.x - 0.5 * Consts.UnitSmall, 
+                        me._position.y - 0.5 * Consts.UnitSmall),
+                    angle: 0
+                };
+
+            case Enums.Corner.TOP_RIGHT:
+                return {
+                    pos: Utils.buildPoint(
+                        me._position.x + me._side + 0.5 * Consts.UnitSmall, 
+                        me._position.y - 0.5 * Consts.UnitSmall),
+                    angle: 90
+                };
+            default:
+                throw `unknown corner: ${corner}`;
+        }
     }
 
     isCorner(target) {

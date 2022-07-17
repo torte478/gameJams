@@ -9,6 +9,7 @@ export default class Config {
         IgnoreRollAnim: false,
         Random: false,
         Level: false,
+        BoosterVisible: false,
     };
 
     static BoardSize = 8;
