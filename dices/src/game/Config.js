@@ -8,7 +8,7 @@ export default class Config {
         TraceLog: true,
         IgnoreRollAnim: true,
         Random: false,
-        Level: false,
+        Level: true,
     };
 
     static BoardSize = 8;
@@ -26,19 +26,19 @@ export default class Config {
         // },
         { 
             count: 4,
-            positions: []
+            positions: [0, 1, 2, 3]
         },
         {
             count: 4,
-            positions: []
+            positions: [0, 1, 2, 3]
         },
         { 
             count: 4,
-            positions: [ ]
+            positions: [0, 1, 2, 3]
         },
         {
             count: 4,
-            positions: [ ]
+            positions: [0, 1, 2, 3]
         }
     ];
 

@@ -49,6 +49,10 @@ export default class Core {
 
         // My
 
+        scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'background')
+            .setDepth(Consts.Depth.Background)
+            .setScrollFactor(0);
+
         level = Config.LevelIndex; //TODO
 
         const boardSize = Utils.isDebug(Config.Debug.Level)
