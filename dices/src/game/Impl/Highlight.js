@@ -1,5 +1,6 @@
 import Phaser from '../../lib/phaser.js';
 import Consts from '../Consts.js';
+import Enums from '../Enums.js';
 import Utils from '../Utils.js';
 import Board from './Board.js';
 import Players from './Players.js';
@@ -87,7 +88,9 @@ export default class Highlight {
             for (let j = 0; j < path.length; ++j) {
                 const cell = path[j];
 
-                const tile = me._pool.create(cell.x, cell.y, 'highlight', 0);
+                const frame = pieceCell.player === Enums.Player.HUMAN ? 0 : 1;
+
+                const tile = me._pool.create(cell.x, cell.y, 'highlight', frame);
                 tile.setDepth(Consts.Depth.Highlight);
                 tile.setVisible(false);
                 const alphaFactor = path.length <= 10 
@@ -123,7 +126,9 @@ export default class Highlight {
             for (let j = 0; j < path.length; ++j) {
                 const cell = path[j];
 
-                const tile = me._pool.create(cell.x, cell.y, 'highlight', 0);
+                const frame = player === Enums.Player.HUMAN ? 0 : 1;
+
+                const tile = me._pool.create(cell.x, cell.y, 'highlight', frame);
                 tile.setDepth(Consts.Depth.Highlight);
                 tile.setVisible(false);
                 tile.setAlpha(maxAlpha);
