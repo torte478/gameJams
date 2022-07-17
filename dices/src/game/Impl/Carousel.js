@@ -24,6 +24,10 @@ export default class Carousel {
     /** @type {Number} */
     _packSize;
 
+    _mask;
+
+    _selectTween;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -40,11 +44,11 @@ export default class Carousel {
 
         me._minCount = Config.Carousel.Start;
 
+        me._mask = scene.add.image(176 / 2, Consts.Viewport.Height / 2, 'carousel_back')
+            .setDepth(Consts.Depth.CarouselBack);
+
         for (let i = 0; i < me._minCount; ++i)
             me._cards[i] = me._createCard(i);
-
-        scene.add.image(176 / 2, Consts.Viewport.Height / 2, 'carousel_back')
-            .setDepth(Consts.Depth.CarouselBack);
 
         scene.add.image(176 / 2, Consts.Viewport.Height / 2, 'carousel')
             .setDepth(Consts.Depth.Carousel);
@@ -144,6 +148,7 @@ export default class Carousel {
 
         const position = me._getPosition(index);
         const card = me._pool.create(position.x, position.y, 'card', type);
+        card.mask = new Phaser.Display.Masks.BitmapMask(me._scene, me._mask);
 
         card.bonusType = type;
 
@@ -151,5 +156,48 @@ export default class Carousel {
             me._packSize = Math.max(me._packSize - 1, 0);
 
         return card;
+    }
+
+    select(value) {
+        const me = this;
+
+        me.unselect();
+
+        const card = me._cards[value - 1];
+        if (!card)
+            return;
+
+        const left = card.x - 12;
+        const right = card.x + 32;
+
+        me._selectTween = me._scene.tweens.timeline({
+            targets: card,
+            repeat: -1,       
+            tweens: [
+                {
+                    x: left,
+                    duration: Consts.Speed.Selection / 2,
+                    ease: 'Sine.easeInOut',
+                    yoyo: true,
+                },
+                {
+                    x: right,
+                    duration: Consts.Speed.Selection / 2,
+                    ease: 'Sine.easeInOut',
+                    yoyo: true,
+                }
+            ]});
+    }
+
+    unselect() {
+        const me = this;
+
+        if (!!me._selectTween) {
+            me._selectTween.pause();
+            me._selectTween = null;
+            for (let i = 0; i < me._cards.length; ++i)
+                if (!!me._cards[i])
+                    me._cards[i].setX(me._startPosition.x);
+        }
     }
 }

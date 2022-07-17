@@ -234,6 +234,7 @@ export default class Core {
     _makeStep(step) {
         const me = this;
 
+        me._carousel.unselect();
         me._players.unselect();
         me._highlight.checkHomeStepToDelete(step);
         me._context.step = step;
@@ -335,6 +336,8 @@ export default class Core {
         const isAvailable = me._checkBonus(bonus);
         if (!isAvailable)
             return result;
+
+        me._carousel.select(value);
             
         const dummy = new Cell();
         result.push({ from: dummy, to: dummy, bonus: bonus });
