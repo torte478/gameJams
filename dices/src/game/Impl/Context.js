@@ -16,11 +16,15 @@ export default class State {
     /** @type {Number} */
     roll;
 
+    stepMaded;
+
     constructor() {
         const me = this;
 
         me.state = Enums.GameState.DICE_ROLL;
         me.player = Enums.Player.HUMAN;
+
+        me.stepMaded = false;
     }
 
     /**
@@ -38,6 +42,8 @@ export default class State {
 
     setState(state) {
         const me = this;
+
+        me.stepMaded = false;
 
         Utils.debugLog(`${Utils.enumToString(Enums.GameState, me.state)}`
                      + ` => ${Utils.enumToString(Enums.GameState, state)}`);

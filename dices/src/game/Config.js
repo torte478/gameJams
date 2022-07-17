@@ -14,7 +14,7 @@ export default class Config {
 
     static BoardSize = 8;
 
-    static LevelIndex = 5;
+    static LevelIndex = 1;
 
     static Start = [
         // {
@@ -27,7 +27,7 @@ export default class Config {
         // },
         { 
             count: 4,
-            positions: [0, 1, 2, 3],
+            positions: [],
             skin: 0,
         },
         {
@@ -138,15 +138,7 @@ export default class Config {
         ],
     ]
 
-    static DebugWeight = [
-        100,
-        6,
-        5,
-        4,
-        3,
-        2,
-        1
-    ];
+    static DebugAI = 3;
 
     static PlayerCount = Config.Start.length;
 }

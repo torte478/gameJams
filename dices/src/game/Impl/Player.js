@@ -32,6 +32,8 @@ export default class Player {
     /** @type {Booster} */
     _booster;
 
+    _isStorageBusy;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Board} board 
@@ -43,6 +45,7 @@ export default class Player {
         me._playerIndex = playerIndex;
         me._board = board;
         me._carousel = carousel;
+        me._isStorageBusy = false;
 
         me._pieces = [];
         const pieceCount = !!config.positions ? config.positions.length : 0;
@@ -123,8 +126,12 @@ export default class Player {
         const from = step.from;
         const to = step.to;
 
+        if (me._isStorageBusy)
+            return;
+
         const isSpawn = from.index === Consts.Undefined && to.index === 0;
         if (isSpawn) {
+            me._isStorageBusy = true;
             const piece = me._storage[me._storage.length - 1];
             piece.move(to, Consts.PieceScale.Normal, () => me._onSpawn(piece, callback, context), me);
         } else {
@@ -155,6 +162,29 @@ export default class Player {
         const endGame = me._getEndgame();
 
         return me._booster.toValues(endGame);
+    }
+
+    selectPieces(steps) {
+        const me = this;
+
+        if (Utils.any(steps, s => s.from.index === -1 && s.to.index === 0))
+            for (let i = 0; i < me._storage.length; ++i)
+                me._storage[i].select();
+
+        const piecesToSelect = me._pieces
+            .filter(p => Utils.any(steps, s => s.from.index === p.cell.index));
+        for (let i = 0; i < piecesToSelect.length; ++i)
+            piecesToSelect[i].select();
+    }
+
+    unselect() {
+        const me = this;
+
+        for (let i = 0; i < me._storage.length; ++i)
+            me._storage[i].unselect();
+
+        for (let i= 0; i < me._pieces.length; ++i)
+            me._pieces[i].unselect();
     }
 
     _getEndgame() {
@@ -195,6 +225,8 @@ export default class Player {
 
     _onSpawn(piece, callback, context) {
         const me = this;
+
+        me._isStorageBusy = false;
 
         me._storage = me._storage.filter(p => p !== piece);
         me._pieces.push(piece);

@@ -74,7 +74,7 @@ export default class Core {
         for (let i = 1; i < playerConfig.length; ++i) {
             const aiLevel = Config.Levels[level].ai[i - 1];
             const weight = Utils.isDebug(Config.Debug.Level) 
-                           ? Config.DebugWeight
+                           ? Config.AI[Config.DebugAI]
                            : Config.AI[aiLevel];
             const ai = new AI(i, me._players, me._board, weight, aiLevel);
             me._ai.push(ai);
@@ -110,7 +110,14 @@ export default class Core {
             me._dice.tryRoll(point, false, boostValues, me._onDiceRoll, me);
         }
         else if (me._context.state === Enums.GameState.MAKE_STEP) {
-            me._tryMakeStep(point);
+            if (me._context.stepMaded)
+                return;
+
+            const result = me._tryMakeStep(point);
+            if (!!result) {
+                Utils.debugLog('action!')
+                me._context.stepMaded = true;
+            }
         }
     }
 
@@ -163,6 +170,8 @@ export default class Core {
         if (me._context.player !== Enums.Player.HUMAN) {
             const decision = me._ai[me._context.player].chooseStep(me._context.availableSteps);
             return me._makeStep(decision.step);
+        } else {
+            return me._players.selectPieces();
         }
     }
 
@@ -213,6 +222,8 @@ export default class Core {
     _makeStep(step) {
         const me = this;
 
+        me._players.unselect();
+
         return !!step.bonus
             ? me._makeBonusStep(step.bonus)
             : me._players.makeStep(
@@ -245,15 +256,16 @@ export default class Core {
 
         me._context.setPlayer((me._context.player + 1) % me._players._players.length);
         me._context.setState(Enums.GameState.DICE_ROLL);
-        me._board.moveArrow(me._context.player);
+        me._board.moveArrow(me._context.player, () => {
 
-        if (me._context.player !== Enums.Player.HUMAN) {
-            let values = me._players.getBoosterValues();
-            values = me._getAiSupportedValues(values);
-            return me._dice.roll(false, values, me._onDiceRoll, me);
-        } else {
-            me._dice.select();
-        }
+            if (me._context.player !== Enums.Player.HUMAN) {
+                let values = me._players.getBoosterValues();
+                values = me._getAiSupportedValues(values);
+                return me._dice.roll(false, values, me._onDiceRoll, me);
+            } else {
+                return me._dice.select();
+            }},
+            me);
     }
 
     _getAiSupportedValues(values) {

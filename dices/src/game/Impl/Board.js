@@ -171,11 +171,10 @@ export default class Board {
         return target.isEqualPos(corner);
     }
 
-    moveArrow(player) {
+    moveArrow(player, callback, context) {
         const me = this;
         const corner = me._getCornerIndex(player);
         const nextPosition = me._getArrowPosition(corner);
-
 
         me._scene.add.tween({
             targets: me._arrow,
@@ -183,7 +182,11 @@ export default class Board {
             y: nextPosition.pos.y,
             angle: nextPosition.angle,
             duration: Consts.Speed.ArrowMs,
-            ease: 'Sine.easeInOut'
+            ease: 'Sine.easeInOut',
+            onComplete: () => {
+                if (!!callback)
+                    callback.call(context);
+            }
         });
     }
 

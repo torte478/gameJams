@@ -50,6 +50,7 @@ export default class Players {
         const me = this;
 
         me._getCurrent().makeStep(step, callback, context);
+        return true;
     }
 
     tryKill(cell, callback, context) {
@@ -113,6 +114,18 @@ export default class Players {
         const me = this;
 
         return me._getCurrent().applyCycleBooster();
+    }
+
+    selectPieces() {
+        const me = this;
+
+        return me._getCurrent().selectPieces(me._context.availableSteps);
+    }
+
+    unselect() {
+        const me = this;
+
+        return me._getCurrent().unselect();
     }
 
     _getCurrent() {
