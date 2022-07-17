@@ -144,6 +144,12 @@ export default class Player {
         }
     }
 
+    getAllPieces() {
+        const me = this;
+
+        return me._pieces.map(p => p.cell);
+    }
+
     disableBooster() {
         const me = this;
 

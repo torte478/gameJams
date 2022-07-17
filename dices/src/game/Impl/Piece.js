@@ -39,7 +39,8 @@ export default class Piece {
 
         me._sprite = scene.add
             .sprite(cell.x, cell.y, 'piece', frame)
-            .setScale(scale);
+            .setScale(scale)
+            .setDepth(Consts.Depth.Piece);
     }
 
     /**

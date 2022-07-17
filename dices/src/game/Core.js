@@ -12,6 +12,7 @@ import Context from './Impl/Context.js';
 import AI from './Impl/AI.js';
 import Carousel from './Impl/Carousel.js';
 import Cell from './Impl/Cell.js';
+import Highlight from './Impl/Highlight.js';
 
 export default class Core {
 
@@ -38,6 +39,9 @@ export default class Core {
 
     /** @type {Phaser.GameObjects.Text} */
     _log;
+
+    /** @type {Highlight} */
+    _highlight;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -80,6 +84,8 @@ export default class Core {
             me._ai.push(ai);
         }
 
+        me._highlight = new Highlight(scene, me._board, me._players);
+
         me._dice.select();
 
         // Debug
@@ -94,6 +100,7 @@ export default class Core {
     update() {
         const me = this;
 
+        me._highlight.update();
         me._updateDebugLog();
     }
 

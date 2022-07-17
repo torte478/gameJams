@@ -86,6 +86,19 @@ export default class Players {
         return Consts.Undefined;
     }
 
+    /**
+     * @returns {Cell[]}
+     */
+    getAllPieces() {
+        const me = this;
+
+        let result = [];
+        for (let i = 0; i < me._players.length; ++i)
+            result = result.concat(me._players[i].getAllPieces());
+
+        return result;
+    }
+
     findWnner() {
         const me = this;
 

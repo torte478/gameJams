@@ -90,6 +90,28 @@ export default class Board {
         return me._fieldToCell(player, index, fields, !!isCycle);
     }
 
+    /**
+     * @param {Number} player 
+     * @param {Number} index 
+     * @returns {Cell[]}
+     */
+    getPath(player, index) {
+        const me = this;
+
+        const corner = me._getCornerIndex(player);
+        const fields = me._getFieldsFrom(corner);
+        const cells = fields.map((f, i) => me._fieldToCell(player, i, fields, false));
+
+        const result = [];
+        const length = index == 0
+                        ? me.getCircleLength()
+                        : cells.length;
+        for (let i = index + 1; i < length; ++i)
+            result.push(cells[i]);
+
+        return result;
+    }
+
     getStoragePosition(player) {
         const me = this;
 

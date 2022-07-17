@@ -8,43 +8,43 @@ export default class Config {
         TraceLog: true,
         IgnoreRollAnim: false,
         Random: false,
-        Level: false,
+        Level: true,
         BoosterVisible: false,
     };
 
-    static BoardSize = 8;
+    static BoardSize = 4;
 
     static LevelIndex = 1;
 
     static Start = [
-        // {
-        //     count: 2,
-        //     positions: [11, 13],
-        // },
-        // {
-        //     count: 2,
-        //     positions: [],
-        // },
-        { 
-            count: 4,
+        {
+            count: 2,
+            positions: [11],
+        },
+        {
+            count: 2,
             positions: [],
-            skin: 0,
         },
-        {
-            count: 4,
-            positions: [0, 1, 2, 3],
-            skin: 2,
-        },
-        { 
-            count: 4,
-            positions: [0, 1, 2, 3],
-            skin: 4,
-        },
-        {
-            count: 4,
-            positions: [0, 1, 2, 3],
-            skin: 6,
-        }
+        // { 
+        //     count: 4,
+        //     positions: [],
+        //     skin: 0,
+        // },
+        // {
+        //     count: 4,
+        //     positions: [0, 1, 2, 3],
+        //     skin: 2,
+        // },
+        // { 
+        //     count: 4,
+        //     positions: [0, 1, 2, 3],
+        //     skin: 4,
+        // },
+        // {
+        //     count: 4,
+        //     positions: [0, 1, 2, 3],
+        //     skin: 6,
+        // }
     ];
 
     static Carousel = {

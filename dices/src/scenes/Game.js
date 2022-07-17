@@ -26,6 +26,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadImage(me, 'card');
         Utils.loadImage(me, 'background');
         Utils.loadImage(me, 'arrow');
+        Utils.loadSpriteSheet(me, 'highlight', Consts.Unit);
 
         me.input.on('pointerdown', me._onPointerDown, me);
         me.input.keyboard.on('keydown', (e) => me._onKeyDown(e), me);
