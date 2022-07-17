@@ -24,6 +24,8 @@ export default class Highlight {
 
     _isEnemyStep;
 
+    _homeSteps;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Board} board 
@@ -37,6 +39,7 @@ export default class Highlight {
         me._board = board;
         me._players = players;
         me._isEnemyStep = false;
+        me._homeSteps = [];
 
         me._highlights = [];
         me.initStartHighlits();
@@ -60,6 +63,9 @@ export default class Highlight {
 
     _mouseOnPiece(mouse, piece) {
         const me = this;
+
+        if (piece.index == -1)
+            return me._players.isStorageClick(mouse);
 
         return mouse.x >= piece.x - Consts.UnitSmall
             && mouse.x <= piece.x + Consts.UnitSmall
@@ -122,7 +128,7 @@ export default class Highlight {
             if (step.from.index === -1)
                 path = [ step.to ];
             else
-                path = me._board.getPath(player, step.from.index, step.to.index);
+                path = me._board.getPath(player, step.from.index, step.to.index, step.isCycle);
             if (!path || path.length == 0)
                 continue;
 
@@ -182,5 +188,36 @@ export default class Highlight {
                 me._pool.killAndHide(me._highlights[i].tiles[j]);
 
         me._highlights = [];
+    }
+
+    checkHomeStepToDelete(step) {
+        const me = this;
+
+        const index = Utils.firstIndexOrNull(me._homeSteps, h => h.cell.isEqualPos(step.from));
+        if (index == null)
+            return;
+
+        me._pool.killAndHide(me._homeSteps[index].tile);
+        me._homeSteps = Utils.removeAt(index);
+    }
+
+    checkHomeStepToAdd(step) {
+        const me = this;
+
+        const circle = me._board.getCircleLength();
+        if (step.to.index <= circle)
+            return;
+
+        const cell = step.to;
+        const frame = step.from.player === Enums.Player.HUMAN ? 2 : 3;
+        const tile = me._pool.create(cell.x, cell.y, 'highlight', frame);
+        tile.setDepth(Consts.Depth.Highlight);
+        tile.setAlpha(1);
+
+        const homeStep = {
+            cell: cell,
+            tile: tile
+        };
+        me._homeSteps.push(homeStep);
     }
 }

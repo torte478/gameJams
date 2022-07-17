@@ -235,6 +235,8 @@ export default class Core {
         const me = this;
 
         me._players.unselect();
+        me._highlight.checkHomeStepToDelete(step);
+        me._context.step = step;
 
         return !!step.bonus
             ? me._makeBonusStep(step.bonus)
@@ -257,6 +259,9 @@ export default class Core {
 
     _finishTurn() {
         const me = this;
+
+        if (!!me._context.step)
+            me._highlight.checkHomeStepToAdd(me._context.step);
 
         const winner = me._players.findWnner();
         if (winner != null)

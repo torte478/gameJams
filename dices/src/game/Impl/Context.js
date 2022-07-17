@@ -44,6 +44,8 @@ export default class State {
         const me = this;
 
         me.stepMaded = false;
+        if (state == Enums.GameState.DICE_ROLL)
+            me.step = null;
 
         Utils.debugLog(`${Utils.enumToString(Enums.GameState, me.state)}`
                      + ` => ${Utils.enumToString(Enums.GameState, state)}`);

@@ -39,7 +39,7 @@ export default class Consts {
     static DiceSpawnValue = 6;
 
     static Speed = {
-        PieceMovement: 200,
+        PieceMovement: 300,
         CarouselMs: 500,
         DiceRollMs: 1000,
         Selection: 750,

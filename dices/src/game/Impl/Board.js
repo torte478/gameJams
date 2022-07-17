@@ -106,14 +106,14 @@ export default class Board {
         let length = from == 0
                         ? me.getCircleLength()
                         : cells.length;
-        if (!!to)
+        if (!!to && !isCycle)
             length = to + 1;
 
-        for (let i = from + 1; i < length; ++i)
+        for (let i = from; i < length; ++i)
             result.push(cells[i]);
 
         if (isCycle)
-            for (let i = 0; i < length; ++i)
+            for (let i = 0; i < to + 1; ++i)
                 result.push(cells[i]);
 
         return result;
