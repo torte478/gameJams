@@ -6,7 +6,7 @@ export default class Config {
         Global: true,
         Log: true,
         TraceLog: true,
-        IgnoreRollAnim: true,
+        IgnoreRollAnim: false,
         Random: false,
         Level: false,
     };

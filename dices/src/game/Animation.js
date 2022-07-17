@@ -8,8 +8,8 @@ export default class Animation {
     static init(scene) {
         scene.anims.create({
             key: 'dice_roll',
-            frames: Animation.getFrames(scene, 'dice', [ 0, 1 ]),
-            frameRate: 16,
+            frames: Animation.getFrames(scene, 'dice', [ 6, 7, 8, 9, 10, 11 ]),
+            frameRate: 32,
             repeat: -1
         });
     }

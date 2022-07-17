@@ -80,4 +80,6 @@ export default class Consts {
             Enums.Corner.TOP_RIGHT
         ]
     ];
+
+    static MainColor = '#FCF8FF';
 }
