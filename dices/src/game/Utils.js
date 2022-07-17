@@ -304,7 +304,7 @@ export default class Utils {
      * @returns {Array}
      */
     static getRandomElems(array, count) {
-        if (count < array.length)
+        if (count > array.length)
             throw `invalid count: ${count}`;
 
         const result = [];

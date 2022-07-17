@@ -82,7 +82,7 @@ export default class Players {
             if (me._players[i].hasPieceAt(target))
                 return i;
 
-        return Consts.Undefinedl
+        return Consts.Undefined;
     }
 
     findWnner() {

@@ -12,9 +12,6 @@ import Players from './Players.js';
 
 export default class AI {
     
-    /** @type {Context} */
-    _context;
-
     /** @type {Players} */
     _players;
 
@@ -27,21 +24,23 @@ export default class AI {
     /** @type {Board} */
     _board;
 
-    constructor(index, context, players, board, weight) {
+    /** @type {Number} */
+    level;
+
+    constructor(index, players, board, weight, level) {
         const me = this;
 
-        me._context = context;
         me._players = players;
         me._weight = weight;
         me._board = board;
+        me.level = level;
 
         me._player = me._players._players[index];
     }
 
-    getStep() {
+    chooseStep(steps) {
         const me = this;
 
-        const steps = me._context.availableSteps;
         const myIndex = me._player._playerIndex;
         const circleLength = me._board.getCircleLength();
 
@@ -49,6 +48,7 @@ export default class AI {
 
         for (let i = 0; i < steps.length; ++i) {
             const step = steps[i];
+            const decisions = [];
 
             /** @type {Cell} */
             const target = step.to;
@@ -58,8 +58,10 @@ export default class AI {
                           && me._player._storage.length == 0
                           && me._player._pieces.filter(p => p.cell.index > circleLength).length 
                              == me._player._pieces.length - 1;
-            if (isWin)
+            if (isWin) {
+                decisions.push(Enums.AiWeight.WIN);
                 scores[i] += me._weight[Enums.AiWeight.WIN];
+            }
 
             // kill human/any
             const enemy = me._players.getPlayerAt(target);
@@ -68,30 +70,43 @@ export default class AI {
                                    ? Enums.AiWeight.KILL_HUMAN
                                    : Enums.AiWeight.KILL_ANY;
                 scores[i] += me._weight[killWeight];
+                decisions.push(killWeight);
             }
 
             // spawn
             const isSpawn = step.from.index === Consts.Undefined && step.to.index === 0;
-            if (isSpawn)
+            if (isSpawn) {
+                decisions.push(Enums.AiWeight.SPAWN);
                 scores[i] += me._weight[Enums.AiWeight.SPAWN];
+            }
 
             // move to home
             const homeIncome = step.from.index <= circleLength && target.index > circleLength;
-            if (homeIncome)
+            if (homeIncome) {
+                decisions.push(Enums.AiWeight.ENTER_HOME);
                 scores[i] += me._weight[Enums.AiWeight.ENTER_HOME];
+            }
 
             // move inside home
             const insideHome = step.from.index > circleLength && target.index > circleLength;
-            if (insideHome)
+            if (insideHome) {
+                decisions.push(Enums.AiWeight.INSIDE_HOME);
                 scores[i] += me._weight[Enums.AiWeight.INSIDE_HOME];
+            }
 
             // move from own spawn
-            if (step.from.index === 0 || step.from.index === circleLength)
+            if (step.from.index === 0 || step.from.index === circleLength) {
+                decisions.push(Enums.AiWeight.MOVE_FROM_OWN_SPAWN);
                 scores[i] += me._weight[Enums.AiWeight.MOVE_FROM_OWN_SPAWN];
+            }
 
-            // move fron enemy spawn
-            if (me._board.isCorner(target) && !me._board.isOwnCorner(myIndex, target))
+            // move from enemy spawn
+            if (me._board.isCorner(step.from) && !me._board.isOwnCorner(myIndex, step.from)) {
+                decisions.push(Enums.AiWeight.MOVE_FROM_ENEMY_SPAWN);
                 scores[i] += me._weight[Enums.AiWeight.MOVE_FROM_ENEMY_SPAWN];
+            }
+
+            Utils.debugLog(`ai ${step.from.index} => ${target.index}: ${decisions}`);
         }
 
         let maxIndex = 0;
@@ -108,6 +123,6 @@ export default class AI {
         
         Utils.debugLog(`scores: ${scores} => ${scores[max]} (${max})`);
 
-        return steps[max];
+        return { step: steps[max], score: scores[max] };
     }
 }

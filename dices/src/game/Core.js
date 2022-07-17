@@ -6,7 +6,6 @@ import Dice from './Impl/Dice.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
-import Helper from './Helper.js';
 import Utils from './Utils.js';
 import Players from './Impl/Players.js';
 import Context from './Impl/Context.js';
@@ -68,10 +67,11 @@ export default class Core {
 
         me._ai = [ null ]
         for (let i = 1; i < playerConfig.length; ++i) {
+            const aiLevel = Config.Levels[level].ai[i - 1];
             const weight = Utils.isDebug(Config.Debug.Level) 
                            ? Config.DebugWeight
-                           : Config.AI[Config.Levels[level].ai[i - 1]];
-            const ai = new AI(i, me._context, me._players, me._board, weight);
+                           : Config.AI[aiLevel];
+            const ai = new AI(i, me._players, me._board, weight, aiLevel);
             me._ai.push(ai);
         }
 
@@ -154,8 +154,8 @@ export default class Core {
         }
 
         if (me._context.player !== Enums.Player.HUMAN) {
-            const step = me._ai[me._context.player].getStep();
-            return me._makeStep(step);
+            const decision = me._ai[me._context.player].chooseStep(me._context.availableSteps);
+            return me._makeStep(decision.step);
         }
     }
 
@@ -239,8 +239,36 @@ export default class Core {
         me._context.setPlayer((me._context.player + 1) % me._players._players.length);
         me._context.setState(Enums.GameState.DICE_ROLL);
 
-        if (me._context.player !== Enums.Player.HUMAN)
-            return me._dice.roll(true, me._players.getBoosterValues(), me._onDiceRoll, me);
+        if (me._context.player !== Enums.Player.HUMAN) {
+            let values = me._players.getBoosterValues();
+            values = me._getAiSupportedValues(values);
+            return me._dice.roll(true, values, me._onDiceRoll, me);
+        }
+    }
+
+    _getAiSupportedValues(values) {
+        const me = this;
+
+        const ai = me._ai[me._context.player];
+        if (ai.level != Consts.AiHardestLevel || values.length <= Consts.MaxAiAttempts) 
+            return values;
+        
+        const guesses = Utils.getRandomElems(values, Consts.MaxAiAttempts);
+        const steps = guesses
+            .map(value => me._players.getAvailableSteps(value))
+            .map(sts => ai.chooseStep(sts));
+
+        let maxI = 0;
+        for (let i = 1; i < steps.length; ++i)
+            if (steps[maxI].score == undefined 
+                || steps[i].score > steps[maxI].score 
+                || (steps[i].score == steps[maxI].score && guesses[i] > guesses[maxI])) {
+                    maxI = i;
+                }
+
+        Utils.debugLog(
+            `super ai: [${steps.map((x, i) => `${guesses[i]}-${x.score}`)}] => ${steps[maxI].score}`);
+        return [ guesses[maxI] ];
     }
 
     _gameOver(winner) {

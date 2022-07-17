@@ -43,6 +43,9 @@ export default class Consts {
         CarouselMs: 500
     };
 
+    static AiHardestLevel = 5;
+    static MaxAiAttempts = 2;
+
     static StorageByCorner = [
         { x: 0, y:  -1.25 * Consts.UnitSmall, sideX: 0, sideY: 0 },
         { x: -Consts.StorageSize.Width, y: -1.25 * Consts.UnitSmall, sideX: 1, sideY: 0 },

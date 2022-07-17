@@ -13,7 +13,7 @@ export default class Config {
 
     static BoardSize = 8;
 
-    static LevelIndex = 5;
+    static LevelIndex = 1;
 
     static Start = [
         // {
@@ -60,7 +60,7 @@ export default class Config {
         { size: 4, ai: [ 1 ] },
         { size: 6, ai: [ 2 ] },
         { size: 6, ai: [ 2, 3 ] },
-        { size: 8, ai: [ 3, 4 ] },
+        { size: 8, ai: [ 2, 3, 4 ] },
         { size: 8, ai: [ 4, 4, 5 ] },
     ]
 
@@ -122,7 +122,7 @@ export default class Config {
         ],
         // 5
         [
-            1000, //win
+            0, //win
             500, //kill human
             10, //kill any
             9, //spawn
