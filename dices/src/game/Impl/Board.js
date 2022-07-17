@@ -95,12 +95,12 @@ export default class Board {
      * @param {Number} from 
      * @returns {Cell[]}
      */
-    getPath(player, from, to) {
+    getPath(player, from, to, isCycle) {
         const me = this;
 
         const corner = me._getCornerIndex(player);
         const fields = me._getFieldsFrom(corner);
-        const cells = fields.map((f, i) => me._fieldToCell(player, i, fields, false));
+        const cells = fields.map((f, i) => me._fieldToCell(player, i, fields, !!isCycle));
 
         const result = [];
         let length = from == 0
@@ -111,6 +111,10 @@ export default class Board {
 
         for (let i = from + 1; i < length; ++i)
             result.push(cells[i]);
+
+        if (isCycle)
+            for (let i = 0; i < length; ++i)
+                result.push(cells[i]);
 
         return result;
     }

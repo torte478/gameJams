@@ -22,6 +22,8 @@ export default class Highlight {
     /** @type {Players} */
     _players;
 
+    _isEnemyStep;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Board} board 
@@ -34,6 +36,7 @@ export default class Highlight {
         me._pool = scene.add.group();
         me._board = board;
         me._players = players;
+        me._isEnemyStep = false;
 
         me._highlights = [];
         me.initStartHighlits();
@@ -42,7 +45,7 @@ export default class Highlight {
     update() {
         const me = this;
 
-        if (!me._highlights)
+        if (me._isEnemyStep)
             return;
 
         const pointer = Utils.buildPoint(
@@ -72,7 +75,7 @@ export default class Highlight {
     initStartHighlits() {
         const me = this;
 
-        me._clearHighlights();
+        me.clearHighlights();
 
         const minAlpha = 0.3;
         const maxAlpha = 0.8;
@@ -107,7 +110,7 @@ export default class Highlight {
     initStepHightlits(player, available) {
         const me = this;
 
-        me._clearHighlights();
+        me.clearHighlights();
         const maxAlpha = 0.8;
 
         for (let i = 0; i < available.length; ++i) {
@@ -115,10 +118,11 @@ export default class Highlight {
             if (!!step.bonus)
                 continue;
 
+            let path;
             if (step.from.index === -1)
-                continue; //TODO
-
-            const path = me._board.getPath(player, step.from.index, step.to.index);
+                path = [ step.to ];
+            else
+                path = me._board.getPath(player, step.from.index, step.to.index);
             if (!path || path.length == 0)
                 continue;
 
@@ -139,9 +143,40 @@ export default class Highlight {
         }
     }
 
-    _clearHighlights() {
+    showEnemy(step) {
+        const me = this;
+        me.clearHighlights();
+
+        let path;
+        if (step.from.index === -1)
+            path = [ step.to ];
+        else
+            path = me._board.getPath(step.from.player, step.from.index, step.to.index, step.isCycle);
+
+        if (!path || path.length == 0)
+            return;
+
+        const hightlight = [];
+        const maxAlpha = 0.8;
+        for (let j = 0; j < path.length; ++j) {
+            const cell = path[j];
+
+            const frame = 1;
+
+            const tile = me._pool.create(cell.x, cell.y, 'highlight', frame);
+            tile.setDepth(Consts.Depth.Highlight);
+            tile.setAlpha(maxAlpha);
+
+            hightlight.push(tile);
+        }
+        me._highlights.push({piece: step.from, tiles: hightlight}); 
+        me._isEnemyStep = true;           
+    }
+
+    clearHighlights() {
         const me = this;
 
+        me._isEnemyStep = false;
         for (let i = 0; i < me._highlights.length; ++i)
             for (let j = 0; j < me._highlights[i].tiles.length; ++j)
                 me._pool.killAndHide(me._highlights[i].tiles[j]);

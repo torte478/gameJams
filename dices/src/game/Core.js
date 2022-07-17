@@ -123,7 +123,7 @@ export default class Core {
             const result = me._tryMakeStep(point);
             if (!!result) {
                 Utils.debugLog('action!')
-                me._highlight._clearHighlights();
+                me._highlight.clearHighlights();
                 me._context.stepMaded = true;
             }
         }
@@ -178,7 +178,10 @@ export default class Core {
 
         if (me._context.player !== Enums.Player.HUMAN) {
             const decision = me._ai[me._context.player].chooseStep(me._context.availableSteps);
-            return me._makeStep(decision.step);
+        me._highlight.showEnemy(decision.step);
+            return me._scene.time.delayedCall(
+                Consts.Speed.AiPath, 
+                () => me._makeStep(decision.step));
         } else {
             return me._players.selectPieces();
         }
@@ -243,6 +246,8 @@ export default class Core {
 
     _onPlayerStep(step) {
         const me = this;
+
+        me._highlight.clearHighlights();
 
         if (me._players.tryKill(step.to, me._finishTurn, me))
             return;

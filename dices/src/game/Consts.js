@@ -44,7 +44,8 @@ export default class Consts {
         DiceRollMs: 1000,
         Selection: 750,
         ArrowMs: 750,
-        PieceStorageMs: 350
+        PieceStorageMs: 350,
+        AiPath: 750
     };
 
     static AiHardestLevel = 5;
