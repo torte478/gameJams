@@ -17,17 +17,22 @@ export default class Board {
     /** @type {Number} */
     _side;
 
-    /** @rtpe {Object[]} */
+    /** @type {Object[]} */
     _corners;
+
+    /** @type {Number} */
+    _playerCount;
 
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} size 
+     * @param {Number} playerCount
      */
-    constructor(scene, size) {
+    constructor(scene, size, playerCount) {
         const me = this;
 
         me._size = size;
+        me._playerCount = playerCount;
         me._side = (size * 2 + 2) * Consts.UnitSmall;
         me._position = Utils.buildPoint(
             (Consts.Viewport.Width - me._side) / 2,
@@ -161,7 +166,9 @@ export default class Board {
     }
 
     _getCornerIndex(player) {
-        return Consts.PlayerCornerByCount[Config.PlayerCount - 1][player];
+        const me = this;
+
+        return Consts.PlayerCornerByCount[me._playerCount - 1][player];
     }
 
     _fieldToCell(player, index, fields, isCycle) {

@@ -61,7 +61,7 @@ export default class Core {
             : Utils.buildArray(Config.Levels[level].ai.length + 1, { count: boardSize / 2, positions: []});
 
         me._context = new Context();
-        me._board = new Board(scene, boardSize);
+        me._board = new Board(scene, boardSize, playerConfig.length);
         me._dice = new Dice(scene, me._board.getBounds());
         me._carousel = new Carousel(scene);
         me._players = new Players(scene, me._board, me._context, me._carousel, playerConfig);
@@ -236,7 +236,7 @@ export default class Core {
     _nextTurn() {
         const me = this;
 
-        me._context.setPlayer((me._context.player + 1) % Config.PlayerCount);
+        me._context.setPlayer((me._context.player + 1) % me._players._players.length);
         me._context.setState(Enums.GameState.DICE_ROLL);
 
         if (me._context.player !== Enums.Player.HUMAN)
