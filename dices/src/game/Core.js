@@ -80,6 +80,8 @@ export default class Core {
             me._ai.push(ai);
         }
 
+        me._dice.select();
+
         // Debug
 
         if (Utils.isDebug(Config.Debug.TraceLog)) {
@@ -247,7 +249,9 @@ export default class Core {
         if (me._context.player !== Enums.Player.HUMAN) {
             let values = me._players.getBoosterValues();
             values = me._getAiSupportedValues(values);
-            return me._dice.roll(true, values, me._onDiceRoll, me);
+            return me._dice.roll(false, values, me._onDiceRoll, me);
+        } else {
+            me._dice.select();
         }
     }
 

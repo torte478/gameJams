@@ -24,8 +24,6 @@ export default class Consts {
     };
     static CarouselPosition = { x: 112, y: 144 };
 
-    static DiceRollTime = 1000;
-
     static StorageSize = {
         Width: 4 * Consts.UnitSmall,
         Height: Consts.UnitSmall
@@ -40,7 +38,9 @@ export default class Consts {
 
     static Speed = {
         PieceMovementMs: 350,
-        CarouselMs: 500
+        CarouselMs: 500,
+        DiceRollMs: 1000,
+        Selection: 750,
     };
 
     static AiHardestLevel = 5;

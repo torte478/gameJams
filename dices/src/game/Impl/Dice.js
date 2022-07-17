@@ -15,6 +15,9 @@ export default class Dice {
     /** @type {Phaser.Time.TimerEvent} */
     _rollTask;
 
+    /** @type {Phaser.Tweens.Tween} */
+    _selectTween;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Geom.Rectangle} board
@@ -28,7 +31,7 @@ export default class Dice {
             (Consts.Viewport.Width + (board.x + board.width)) / 2,
             Consts.Viewport.Height / 2,
             'dice',
-            0);
+            Utils.getRandom(0, 5));
     }
 
     /**
@@ -60,14 +63,42 @@ export default class Dice {
         if (Utils.isDebug(Config.Debug.IgnoreRollAnim))
             ignoreAnimation = true;
 
+        if (!!me._selectTween) {
+            me._selectTween.pause();
+            me._selectTween = null;
+            me._sprite.setScale(1);
+        }
+
         me._sprite.play('dice_roll');
         const value = !!expected ? expected : Utils.getRandomEl(values);
 
-        me._rollTask = me._scene.time.delayedCall(
-            ignoreAnimation ? 0 :  Consts.DiceRollTime, 
-            me._stopRoll,
-            [ value, callback, context ], 
-            me);
+        me._rollTask = me._scene.add.tween({
+            targets: me._sprite,
+            scale: { from: 1.25, to: 0.75 },
+            yoyo: true,
+            duration: (ignoreAnimation ? 0 : Consts.Speed.DiceRollMs) / 2,
+            ease: 'Sine.easeInOut',
+            onComplete: () => me._stopRoll(value, callback, context)
+        });
+    }
+
+    select() {
+        const me = this;
+
+        if (!!me._selectTween) {
+            me._selectTween.pause();
+            me._selectTween = null;
+            me._sprite.setScale(1);
+        }
+
+        me._selectTween = me._scene.add.tween({
+            targets: me._sprite,
+            scale: { from: 1, to: 1.25 },
+            yoyo: true,
+            duration: Consts.Speed.Selection,
+            ease: 'Sine.easeInOut',
+            repeat: -1,
+        });
     }
 
     /**
@@ -77,6 +108,9 @@ export default class Dice {
         const me = this;
 
         me._sprite.stop();
+        me._sprite.setFrame(value - 1);
+        me._sprite.setScale(1);
+        
         if (!!me._rollTask)
             me._rollTask.paused = true;
 
