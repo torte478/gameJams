@@ -258,32 +258,40 @@ export default class Board {
     _buildTileArray(size) {
         const me = this;
 
-        const border = 2;
-        const white = 0;
-        const black = 1;
-
         const level = [];
 
-        const borderRow = Utils.buildArray(size * 2 + 2, border);
+        const topBorder = [ 10 ].concat(Utils.buildArray(size * 2, 8)).concat(11);
 
-        level.push(borderRow);
+        level.push(topBorder);
 
         for (let i = 0; i < size; ++i)
         {
-            const row = [];
-            row.push(border);
+            const firstRow = [];
+            firstRow.push(9);
             for (let j = 0; j < size; ++j) {
-                const color = (i + j) % 2 === 0 ? white : black;
-                row.push(color);
-                row.push(color);
+                const color = (i + j) % 2 === 0 ? 2 : 0;
+                firstRow.push(color);
+                firstRow.push(color + 1);
             }
-            row.push(border);
+            firstRow.push(9);
 
-            level.push(row);
-            level.push(row);
+            level.push(firstRow);
+
+
+            const secondRow = [];
+            secondRow.push(9);
+            for (let j = 0; j < size; ++j) {
+                const color = (i + j) % 2 === 0 ? 2 : 0;
+                secondRow.push(4 + color);
+                secondRow.push(4 + color + 1);
+            }
+            secondRow.push(9);
+
+            level.push(secondRow);
         }
 
-        level.push(borderRow);
+        const bottomBorder = [ 12 ].concat(Utils.buildArray(size * 2, 8)).concat(13);
+        level.push(bottomBorder);
 
         return level;       
     }
