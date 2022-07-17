@@ -48,7 +48,8 @@ export default class Player {
         const pieceCount = !!config.positions ? config.positions.length : 0;
         for (let i = 0; i < pieceCount; ++i) {
             const cell = board.getCell(playerIndex, config.positions[i]);
-            const piece = new Piece(scene, cell, playerIndex, Consts.PieceScale.Normal);
+            const frame = config.skin + i % (config.skin < 8 ? 2 : 4);
+            const piece = new Piece(scene, cell, frame, Consts.PieceScale.Normal);
             me._pieces.push(piece);
         }
 
@@ -56,7 +57,8 @@ export default class Player {
         me._storagePosition = board.getStoragePosition(playerIndex);
         for (let i = 0; i < config.count - me._pieces.length; ++i) {
             const cell = me._getPositionInStorage();
-            const piece = new Piece(scene, cell, playerIndex, Consts.PieceScale.Storage);
+            const frame = config.skin + i % (config.skin < 8 ? 2 : 4);
+            const piece = new Piece(scene, cell, frame, Consts.PieceScale.Storage);
             me._storage.push(piece);
         }
 

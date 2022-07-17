@@ -61,7 +61,8 @@ export default class Core {
 
         const playerConfig = Utils.isDebug(Config.Debug.Level)
             ? Config.Start
-            : Utils.buildArray(Config.Levels[level].ai.length + 1, { count: boardSize / 2, positions: []});
+            : Config.Levels[level].skin
+                .map(s => { return { count: boardSize / 2, positions: [], skin: s } });
 
         me._context = new Context();
         me._board = new Board(scene, boardSize, playerConfig.length);

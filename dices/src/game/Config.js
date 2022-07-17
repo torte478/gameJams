@@ -8,12 +8,12 @@ export default class Config {
         TraceLog: true,
         IgnoreRollAnim: true,
         Random: false,
-        Level: true,
+        Level: false,
     };
 
     static BoardSize = 8;
 
-    static LevelIndex = 1;
+    static LevelIndex = 5;
 
     static Start = [
         // {
@@ -26,19 +26,23 @@ export default class Config {
         // },
         { 
             count: 4,
-            positions: [0, 1, 2, 3]
+            positions: [0, 1, 2, 3],
+            skin: 0,
         },
         {
             count: 4,
-            positions: [0, 1, 2, 3]
+            positions: [0, 1, 2, 3],
+            skin: 2,
         },
         { 
             count: 4,
-            positions: [0, 1, 2, 3]
+            positions: [0, 1, 2, 3],
+            skin: 4,
         },
         {
             count: 4,
-            positions: [0, 1, 2, 3]
+            positions: [0, 1, 2, 3],
+            skin: 6,
         }
     ];
 
@@ -56,12 +60,12 @@ export default class Config {
     ];
 
     static Levels = [
-        { size: 6, ai: [ 0 ] },
-        { size: 4, ai: [ 1 ] },
-        { size: 6, ai: [ 2 ] },
-        { size: 6, ai: [ 2, 3 ] },
-        { size: 8, ai: [ 2, 3, 4 ] },
-        { size: 8, ai: [ 4, 4, 5 ] },
+        { size: 6, ai: [ 0 ], skin: [ 0, 2 ] },
+        { size: 4, ai: [ 1 ], skin: [ 0, 2 ] },
+        { size: 6, ai: [ 2 ], skin: [ 0, 4 ] },
+        { size: 6, ai: [ 2, 3 ], skin: [ 0, 2, 4 ] },
+        { size: 8, ai: [ 2, 3, 4 ], skin: [ 0, 2, 4, 6 ] },
+        { size: 8, ai: [ 4, 4, 5 ], skin: [ 0, 4, 6, 8 ] },
     ]
 
     static AI = [
