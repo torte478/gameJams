@@ -41,6 +41,13 @@ export default class Game extends Phaser.Scene {
         Utils.loadImage(me, 'carousel_back');
         Utils.loadSpriteSheet(me, 'buttons', 100);
 
+        me.load.audio('click', 'assets/sfx/click.wav');
+        me.load.audio('death', 'assets/sfx/death.wav');
+        me.load.audio('gameover', 'assets/sfx/gameover.mp3');
+        me.load.audio('hit', 'assets/sfx/hit.wav');
+        me.load.audio('lose', 'assets/sfx/lose.wav');
+        me.load.audio('win', 'assets/sfx/win.wav');
+
         me.input.on('pointerdown', me._onPointerDown, me);
         me.input.keyboard.on('keydown', (e) => me._onKeyDown(e), me);
     }

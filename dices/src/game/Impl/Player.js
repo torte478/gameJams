@@ -42,6 +42,8 @@ export default class Player {
     constructor(scene, board, playerIndex, carousel, config) {
         const me = this;
 
+
+        me._scene = scene;
         me._playerIndex = playerIndex;
         me._board = board;
         me._carousel = carousel;
@@ -254,6 +256,11 @@ export default class Player {
 
         if (piece == null)
             return false;
+
+        if (me._playerIndex === Enums.Player.HUMAN)
+            me._scene.sound.play('death', { volume: Config.Volume.Death });
+        else
+            me._scene.sound.play('hit', { volume: Config.Volume.Hit });
 
         const position = me._getPositionInStorage();
         piece.move(

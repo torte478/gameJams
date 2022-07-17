@@ -70,6 +70,8 @@ export default class Dice {
         }
 
         me._sprite.play('dice_roll');
+        me._scene.sound.stopByKey('click');
+        me._scene.sound.play('click', { volume: Config.Volume.Click });
         const value = !!expected ? expected : Utils.getRandomEl(values);
 
         me._rollTask = me._scene.add.tween({

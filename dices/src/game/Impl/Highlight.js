@@ -1,4 +1,5 @@
 import Phaser from '../../lib/phaser.js';
+import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Enums from '../Enums.js';
 import Utils from '../Utils.js';
@@ -219,6 +220,11 @@ export default class Highlight {
             tile: tile
         };
         me._homeSteps.push(homeStep);
+
+        if (step.from.player === Enums.Player.HUMAN)       
+            me._scene.sound.play('win', { volume: Config.Volume.Win });
+        else
+            me._scene.sound.play('lose', { volume: Config.Volume.Lose });
     }
 
     clearAll() {

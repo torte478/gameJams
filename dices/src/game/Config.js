@@ -3,18 +3,27 @@ import Enums from "./Enums.js";
 export default class Config {
 
     static Debug = {
-        Global: true,
+        Global: false,
         Log: true,
         TraceLog: true,
         IgnoreRollAnim: false,
         Random: true,
-        Level: false,
+        Level: true,
         BoosterVisible: false,
     };
 
     static BoardSize = 4;
 
     static LevelIndex = 5;
+
+    static Volume = {
+        Click: 0.5,
+        Death: 0.5,
+        GameOver: 0.5,
+        Hit: 0.5,
+        Lose: 0.5,
+        Win: 0.5
+    };
 
     static Start = [
         {

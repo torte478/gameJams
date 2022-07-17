@@ -261,6 +261,9 @@ export default class Core {
         me._highlight.checkHomeStepToDelete(step);
         me._context.step = step;
 
+        me._scene.sound.stopByKey('click');
+        me._scene.sound.play('click', { volume: Config.Volume.Click });
+
         return !!step.bonus
             ? me._makeBonusStep(step.bonus)
             : me._players.makeStep(
@@ -367,6 +370,8 @@ export default class Core {
                     tiles[i].setVisible(!tiles[i].visible);
             }
         });
+
+        me._scene.sound.play('gameover', { volume: Config.Volume.GameOver });
 
         me._context.setState(Enums.GameState.GAME_OVER)
     }
