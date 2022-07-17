@@ -23,10 +23,12 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'piece', Consts.Unit);
         Utils.loadSpriteSheet(me, 'dice_small', Consts.UnitSmall);
         Utils.loadImage(me, 'storage');
-        Utils.loadImage(me, 'card');
+        Utils.loadSpriteSheet(me, 'card', Consts.CardSize.Width, Consts.CardSize.Height);
         Utils.loadImage(me, 'background');
         Utils.loadImage(me, 'arrow');
         Utils.loadSpriteSheet(me, 'highlight', Consts.Unit);
+        Utils.loadImage(me, 'carousel');
+        Utils.loadImage(me, 'carousel_back');
 
         me.input.on('pointerdown', me._onPointerDown, me);
         me.input.keyboard.on('keydown', (e) => me._onKeyDown(e), me);

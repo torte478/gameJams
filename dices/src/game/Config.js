@@ -8,22 +8,22 @@ export default class Config {
         TraceLog: true,
         IgnoreRollAnim: false,
         Random: false,
-        Level: true,
+        Level: false,
         BoosterVisible: false,
     };
 
-    static BoardSize = 4;
+    static BoardSize = 8;
 
-    static LevelIndex = 1;
+    static LevelIndex = 5;
 
     static Start = [
         {
-            count: 2,
-            positions: [11],
+            count: 3,
+            positions: [ ],
         },
         {
-            count: 2,
-            positions: [],
+            count: 3,
+            positions: [ 16, 17, 18 ],
         },
         // { 
         //     count: 4,
@@ -49,7 +49,7 @@ export default class Config {
 
     static Carousel = {
         Min: 1,
-        Start: 1,
+        Start: 6,
         Max: 3
     };
 

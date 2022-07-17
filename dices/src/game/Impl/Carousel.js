@@ -42,6 +42,12 @@ export default class Carousel {
 
         for (let i = 0; i < me._minCount; ++i)
             me._cards[i] = me._createCard(i);
+
+        scene.add.image(176 / 2, Consts.Viewport.Height / 2, 'carousel_back')
+            .setDepth(Consts.Depth.CarouselBack);
+
+        scene.add.image(176 / 2, Consts.Viewport.Height / 2, 'carousel')
+            .setDepth(Consts.Depth.Carousel);
     }
 
     roll(available, callback, context) {
@@ -133,11 +139,12 @@ export default class Carousel {
     _createCard(index, available, needUsePack) {
         const me = this;
 
-        const position = me._getPosition(index);
-        const card = me._pool.create(position.x, position.y, 'card');
-
         const types = !!available ? available : Config.StartBonuses;
         const type = Utils.getRandomEl(types);
+
+        const position = me._getPosition(index);
+        const card = me._pool.create(position.x, position.y, 'card', type);
+
         card.bonusType = type;
 
         if (needUsePack)

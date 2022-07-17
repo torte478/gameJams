@@ -15,6 +15,8 @@ export default class Consts {
 
     static Depth = {
         Background: -100,
+        CarouselBack: -50,
+        Carousel: 300,
         Highlight: 100,
         Piece: 500,
         Max: 999999
