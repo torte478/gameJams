@@ -86,6 +86,24 @@ export default class Core {
 
         me._dice.select();
 
+        const exit = scene.add.sprite(970, 40, 'buttons', 1).setScale(0.5).setInteractive();
+
+        exit
+            .on('pointerdown', () => { 
+                scene.scene.start('start')
+                })
+            .on('pointermove', () => { exit.setScale(0.75) })
+            .on('pointerout', () => { exit.setScale(0.5) });
+
+        const rest = scene.add.sprite(970, 110, 'buttons', 0).setScale(0.5).setInteractive();
+
+        rest
+            .on('pointerdown', () => { 
+                scene.scene.start('game', { level: level })
+                })
+            .on('pointermove', () => { rest.setScale(0.75) })
+            .on('pointerout', () => { rest.setScale(0.5) });
+
         // Debug
 
         if (Utils.isDebug(Config.Debug.TraceLog)) {

@@ -13,6 +13,8 @@ export default class Game extends Phaser.Scene {
 
     constructor() {
         super('game');
+
+        this._levelIndex = Config.LevelIndex;
     }
 
     init(data) {
@@ -20,7 +22,7 @@ export default class Game extends Phaser.Scene {
 
         me._levelIndex = data.level != undefined
             ? data.level
-            : Config.Debug.LevelIndex;
+            : Config.LevelIndex;
     }
 
     preload() {
@@ -37,6 +39,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'highlight', Consts.Unit);
         Utils.loadImage(me, 'carousel');
         Utils.loadImage(me, 'carousel_back');
+        Utils.loadSpriteSheet(me, 'buttons', 100);
 
         me.input.on('pointerdown', me._onPointerDown, me);
         me.input.keyboard.on('keydown', (e) => me._onKeyDown(e), me);
