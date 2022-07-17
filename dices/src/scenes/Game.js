@@ -15,6 +15,14 @@ export default class Game extends Phaser.Scene {
         super('game');
     }
 
+    init(data) {
+        const me = this;
+
+        me._levelIndex = data.level != undefined
+            ? data.level
+            : Config.Debug.LevelIndex;
+    }
+
     preload() {
         const me = this;
 
@@ -39,7 +47,7 @@ export default class Game extends Phaser.Scene {
 
         Animation.init(me);
 
-        me._core = new Core(me);
+        me._core = new Core(me, me._levelIndex);
     }
 
     update() {

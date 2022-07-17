@@ -57,8 +57,6 @@ export default class Core {
             .setDepth(Consts.Depth.Background)
             .setScrollFactor(0);
 
-        level = Config.LevelIndex; //TODO
-
         const boardSize = Utils.isDebug(Config.Debug.Level)
             ? Config.BoardSize
             : Config.Levels[level].size;

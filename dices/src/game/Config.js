@@ -8,7 +8,7 @@ export default class Config {
         TraceLog: true,
         IgnoreRollAnim: false,
         Random: true,
-        Level: true,
+        Level: false,
         BoosterVisible: false,
     };
 
@@ -61,10 +61,10 @@ export default class Config {
     ];
 
     static Levels = [
-        { size: 6, ai: [ 0 ], skin: [ 0, 2 ] },
-        { size: 4, ai: [ 1 ], skin: [ 0, 2 ] },
-        { size: 6, ai: [ 2 ], skin: [ 0, 4 ] },
-        { size: 6, ai: [ 2, 3 ], skin: [ 0, 2, 4 ] },
+        { size: 4, ai: [ 0 ], skin: [ 0, 2 ] },
+        { size: 6, ai: [ 1 ], skin: [ 0, 2 ] },
+        { size: 6, ai: [ 1, 2 ], skin: [ 0, 2, 4 ] },
+        { size: 6, ai: [ 1, 2, 3 ], skin: [ 0, 2, 4, 6 ] },
         { size: 8, ai: [ 2, 3, 4 ], skin: [ 0, 2, 4, 6 ] },
         { size: 8, ai: [ 4, 4, 5 ], skin: [ 0, 4, 6, 8 ] },
     ]
