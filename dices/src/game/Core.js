@@ -123,6 +123,7 @@ export default class Core {
             const result = me._tryMakeStep(point);
             if (!!result) {
                 Utils.debugLog('action!')
+                me._highlight._clearHighlights();
                 me._context.stepMaded = true;
             }
         }
@@ -160,6 +161,7 @@ export default class Core {
         me._context.setRoll(value);
         me._context.setAvailableSteps(available);
         me._context.setState(Enums.GameState.MAKE_STEP);
+        me._highlight.initStepHightlits(me._context.player, available);
 
         const needDisableBooster = Utils.any(available, step => !step.bonus);
         if (needDisableBooster) {
@@ -264,7 +266,7 @@ export default class Core {
         me._context.setPlayer((me._context.player + 1) % me._players._players.length);
         me._context.setState(Enums.GameState.DICE_ROLL);
         me._board.moveArrow(me._context.player, () => {
-
+            me._highlight.initStartHighlits();
             if (me._context.player !== Enums.Player.HUMAN) {
                 let values = me._players.getBoosterValues();
                 values = me._getAiSupportedValues(values);

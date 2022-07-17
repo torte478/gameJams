@@ -35,7 +35,7 @@ export default class Highlight {
         me._players = players;
 
         me._highlights = [];
-        me._initStartHighlits();
+        me.initStartHighlits();
     }
 
     update() {
@@ -68,7 +68,7 @@ export default class Highlight {
             sprites[i].setVisible(visible);
     }
 
-    _initStartHighlits() {
+    initStartHighlits() {
         const me = this;
 
         me._clearHighlights();
@@ -98,6 +98,39 @@ export default class Highlight {
                 hightlight.push(tile);
             }
             me._highlights.push({piece: pieceCell, tiles: hightlight});
+        }
+    }
+
+    initStepHightlits(player, available) {
+        const me = this;
+
+        me._clearHighlights();
+        const maxAlpha = 0.8;
+
+        for (let i = 0; i < available.length; ++i) {
+            const step = available[i];
+            if (!!step.bonus)
+                continue;
+
+            if (step.from.index === -1)
+                continue; //TODO
+
+            const path = me._board.getPath(player, step.from.index, step.to.index);
+            if (!path || path.length == 0)
+                continue;
+
+            const hightlight = [];
+            for (let j = 0; j < path.length; ++j) {
+                const cell = path[j];
+
+                const tile = me._pool.create(cell.x, cell.y, 'highlight', 0);
+                tile.setDepth(Consts.Depth.Highlight);
+                tile.setVisible(false);
+                tile.setAlpha(maxAlpha);
+
+                hightlight.push(tile);
+            }
+            me._highlights.push({piece: step.from, tiles: hightlight});
         }
     }
 

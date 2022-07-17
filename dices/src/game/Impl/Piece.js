@@ -87,11 +87,17 @@ export default class Piece {
 
         me.unselect();
 
+        const duration = me.cell.index == -1
+                ? Consts.Speed.Selection / 1
+                : Consts.Speed.Selection;
+
+        const scaleFactor = me.cell.index == -1 ? 2 : 1.25;
+
         me._selectTween = me._scene.add.tween({
             targets: me._sprite,
-            scale: { from: me._currentScale, to: 1.25 * me._currentScale },
+            scale: { from: me._currentScale, to: scaleFactor * me._currentScale },
             yoyo: true,
-            duration: Consts.Speed.Selection,
+            duration: duration,
             ease: 'Sine.easeInOut',
             repeat: -1,
         });
