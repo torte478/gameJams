@@ -373,6 +373,7 @@ export default class Hand {
 
             case Enums.HandAction.DROP_PIECE:
             case Enums.HandAction.CLICK_BUTTON:
+            case Enums.HandAction.ADD_BILLS:
                 return true;
 
             case Enums.HandAction.TAKE_BILL:
@@ -422,6 +423,7 @@ export default class Hand {
                 return me._takeBill(config.index);
 
             case Enums.HandAction.CLICK_BUTTON:
+            case Enums.HandAction.ADD_BILLS:
                 return;
 
             default: 

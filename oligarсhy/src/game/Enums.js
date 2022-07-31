@@ -100,7 +100,8 @@ export default class Enums {
         TAKE_PIECE: 3,
         DROP_PIECE: 4,
         TAKE_BILL: 5,
-        CLICK_BUTTON: 6
+        CLICK_BUTTON: 6,
+        ADD_BILLS: 7,
     };
 
     static AiAction = {

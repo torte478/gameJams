@@ -477,6 +477,84 @@ export default class Player {
             Helper.toLight(me._bills[i].image);
     }
 
+    /**
+     * @param {Phaser.Geom.Point} point 
+     * @returns {Boolean}
+     */
+    isBillAreaClick(point) {
+        const me = this;
+
+        return Phaser.Geom.Rectangle.ContainsPoint(
+            me._getBillArea(), 
+            point)
+    }
+
+    /**
+     * @returns {Phaser.Geom.Point}
+     */
+    getBillAreaCenter() {
+        const me = this;
+
+        const area = me._getBillArea();
+        return Utils.buildPoint(area.centerX, area.centerY);
+    }
+
+    /**
+     * @returns {Phaser.Geom.Rectangle}
+     */
+    _getBillArea() {
+        const me = this;
+
+        switch (me.index) {
+            case Enums.Player.HUMAN: {
+                const topLeft = me._bills[0].image.getBottomLeft();
+                const bottomRight = me._bills[me._bills.length - 1].image.getTopRight();
+                return new Phaser.Geom.Rectangle(
+                    topLeft.x,
+                    topLeft.y,
+                    bottomRight.x - topLeft.x,
+                    bottomRight.y - topLeft.y
+                );
+            }
+
+            case Enums.Player.AI1: {
+                const topLeft = me._bills[0].image.getBottomRight();
+                const bottomRight = me._bills[me._bills.length - 1].image.getTopLeft();
+                return new Phaser.Geom.Rectangle(
+                    topLeft.x,
+                    topLeft.y,
+                    bottomRight.x - topLeft.x,
+                    bottomRight.y - topLeft.y
+                );
+            }
+
+            case Enums.Player.AI2: {
+                const topLeft = me._bills[me._bills.length - 1].image.getTopRight();
+                const bottomRight = me._bills[0].image.getBottomLeft();
+                return new Phaser.Geom.Rectangle(
+                    topLeft.x,
+                    topLeft.y,
+                    bottomRight.x - topLeft.x,
+                    bottomRight.y - topLeft.y
+                );
+            }
+
+            case Enums.Player.AI3: {
+                const topLeft = me._bills[me._bills.length - 1].image.getTopLeft();
+                const bottomRight = me._bills[0].image.getBottomRight();
+                return new Phaser.Geom.Rectangle(
+                    topLeft.x,
+                    topLeft.y,
+                    bottomRight.x - topLeft.x,
+                    bottomRight.y - topLeft.y
+                );
+            }
+
+            default:
+                Utils.throwUnknownEnumMemberError(Enums.Player, me.index);
+        }
+    }
+
     _getCost(index) {
         const me = this;
 

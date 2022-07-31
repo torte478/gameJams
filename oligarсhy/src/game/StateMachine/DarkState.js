@@ -1,8 +1,8 @@
 import Phaser from '../../lib/phaser.js';
+import Consts from '../Consts.js';
 
 import Core from '../Core.js';
 import Enums from '../Enums.js';
-import Utils from '../Utils.js';
 
 import State from './State.js';
 
@@ -70,16 +70,47 @@ export default class DarkState extends State {
                 continue;
 
             const bill = context.players[enemy].findBillIndexOnPoint(point);
-            if (bill < 0)
-                continue;
+            if (bill > -1)
+                return me._tryStealBill(point, bill, enemy);
 
-            return context.hands[current].tryMakeAction(
-                point,
-                Enums.HandAction.TAKE_BILL,
-                { index: bill },
-                () => { context.players[enemy].removeBill(bill); }
-            );
+            if (context.players[current].isBillAreaClick(point) && context.hands[current].getTotalMoney() > 0)
+                return me._addEnemyBills(context.players[enemy]);
         }        
+    }
+
+    _addEnemyBills(enemy) {
+        const me = this,
+              context = me.core._context,
+              current = Enums.Player.HUMAN;
+
+        const hand = context.hands[current];
+        const player = context.players[current];
+        const billAreaCenter = player.getBillAreaCenter();
+
+        return hand.tryMakeAction(
+            billAreaCenter,
+            Enums.HandAction.ADD_BILLS,
+            null,
+            () => { 
+                me.core._addBills(hand.dropBills(), billAreaCenter, player); 
+            }
+        );
+    }
+
+    _tryStealBill(point, bill, enemy) {
+        const me = this,
+              context = me.core._context,
+              current = Enums.Player.HUMAN;
+
+        return context.hands[current].tryMakeAction(
+            point,
+            Enums.HandAction.TAKE_BILL,
+            { index: bill },
+            () => { 
+                context.players[enemy].removeBill(bill); 
+                me.core._addMoney(-Consts.BillValue[bill], null, context.players[enemy]);
+            }
+        );
     }
 
     _stopDark() {

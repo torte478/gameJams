@@ -312,4 +312,12 @@ export default class Utils {
     static stringIsDigit(s) {
         return !(isNaN(s));
     }
+
+    /**
+     * @param {Object} enumObj 
+     * @param {Number} value 
+     */
+    static throwUnknownEnumMemberError(enumObj, value) {
+        throw `Unknown enum member ${Utils.enumToString(enumObj, value)}`;
+    }
 }

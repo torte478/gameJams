@@ -137,7 +137,8 @@ export default class Core {
      * @param {KeyboardEvent} event 
      */
     onKeyDown(event) {
-        const me = this;
+        const me = this,
+              scene = me._scene;
 
         if (!Config.Debug.Global)
             return;
@@ -147,7 +148,7 @@ export default class Core {
             
         if (event.key == 'r') {
             scene.input.mouse.releasePointerLock();
-            scene.start('game');
+            scene.scene.start('game');
             return;
         }
 
