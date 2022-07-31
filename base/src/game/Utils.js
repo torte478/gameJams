@@ -224,6 +224,37 @@ export default class Utils {
         return scene.load.image(name, `assets/${name}.png`);
     }
 
+    // --- Debug ---
+
+    /**
+     * @param {Boolean} flag 
+     * @param {Function} func 
+     * @returns {Boolean}
+     */
+     static ifDebug(flag, func) {
+        if (Utils.isDebug(flag))
+            return func();
+
+        return false;
+    }
+
+    /**
+     * @param {Boolean} flag 
+     * @returns {Boolean}
+     */
+    static isDebug(flag) {
+        return Config.Debug.Global && flag;
+    }
+
+    /**
+     * @param {String} msg 
+     */
+    static debugLog(msg) {
+        Utils.ifDebug(Config.Debug.Log, () => {
+            console.log(msg);
+        })  
+    }
+
     // --- Other ---
 
     /**
@@ -258,12 +289,53 @@ export default class Utils {
     }
 
     /**
-     * @param {String} msg 
+     * @param {String} s 
+     * @returns {Boolean}
      */
-    static debugLog(msg) {
-        if (Config.Debug.Global && Config.Debug.Log)
-            console.log(msg);
+     static stringIsDigit(s) {
+        return !(isNaN(s));
     }
 
     // --- New ---
+
+    /**
+     * @param {Array} array 
+     * @param {Number} count 
+     * @returns {Array}
+     */
+    static getRandomElems(array, count) {
+        if (count > array.length)
+            throw `invalid count: ${count}`;
+
+        const result = [];
+        let arr = Utils.copyArray(array);
+        while (result.length < count) {
+            const index = Phaser.Math.Between(0, arr.length - 1);
+            result.push(arr[index]);
+            arr = Utils.removeAt(arr, index);
+        }
+
+        return result;
+    }
+
+    /**
+     * @param {Array} array 
+     * @param {Number} index 
+     * @returns {Array}
+     */
+    static removeAt(array, index) {
+        const result = [];
+        for (let i = 0; i < array.length; ++i)
+            if (i != index)
+                result.push(array[i]);
+        return result;
+    }
+
+    /**
+     * @param {Array} array 
+     * @returns {Array}
+     */
+    static shuffle(array) {
+        return Utils.getRandomElems(array, array.length);
+    }
 }

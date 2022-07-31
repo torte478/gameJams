@@ -16,4 +16,8 @@ export default class Core {
 
         Utils.debugLog('Hello, world!');
     }
+
+    update() {
+        const me = this;
+    }
 }
