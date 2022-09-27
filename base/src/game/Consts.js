@@ -6,4 +6,8 @@ export default class Consts {
     };
 
     static Unit = 32;
+
+    static Depth = {
+        Max: 100000
+    };
 }

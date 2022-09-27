@@ -224,6 +224,24 @@ export default class Utils {
         return scene.load.image(name, `assets/${name}.png`);
     }
 
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {String} name 
+     * @returns 
+     */
+    static loadWav(scene, name) {
+        return scene.load.audio(name, `assets/${name}.wav`);
+    }
+
+    /**
+     * @param {Phaser.Scene} scene 
+     * @param {String} name 
+     * @returns 
+     */
+    static loadMp3(scene, name) {
+        return scene.load.audio(name, `assets/${name}.mp3`);
+    }
+
     // --- Debug ---
 
     /**
