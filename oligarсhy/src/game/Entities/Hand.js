@@ -34,6 +34,9 @@ export default class Hand {
     /** @type {Phaser.GameObjects.Image} */
     _sprite;
 
+    /** @type {Number} */
+    _moneyOwner;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -49,6 +52,7 @@ export default class Hand {
         me._money = [];
         for (let i = 0; i < Consts.BillCount; ++i)
             me._money.push(0);
+        me._moneyOwner = Enums.Player.NOONE;
 
         me._sprite = scene.add.image(0, 0, 'hand', 0);
 
@@ -326,6 +330,15 @@ export default class Hand {
         Helper.toLight(me._sprite);
     }
 
+    /**
+     * @returns {Number}
+     */
+    getMoneyOwner() {
+        const me = this;
+
+        return me._moneyOwner;
+    }
+
     _startGrabTimeline(target, callback) {
         const me = this;
 
@@ -420,7 +433,7 @@ export default class Hand {
                 return me._dropAll(point);
 
             case Enums.HandAction.TAKE_BILL: 
-                return me._takeBill(config.index);
+                return me._takeBill(config.index, config.player);
 
             case Enums.HandAction.CLICK_BUTTON:
             case Enums.HandAction.ADD_BILLS:
@@ -481,11 +494,12 @@ export default class Hand {
         me._sprite.setFrame(0);
     }
 
-    _takeBill(index) {
+    _takeBill(index, player) {
         const me = this;
 
         ++me._money[index];
         me._state = Enums.HandState.MONEY;
+        me._moneyOwner = player;
 
         Utils.debugLog(`money: ${me._money.join(';')} (${Helper.getTotalMoney(me._money)})`);
     }

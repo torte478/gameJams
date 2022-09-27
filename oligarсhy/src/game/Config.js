@@ -9,10 +9,10 @@ export default class Config {
         Log: true,
         Random: false,
         SkipHuman: false,
-        ShowTextLog: true,
+        ShowTextLog: false,
         IgnorePause: true,
         CancelAiBuy: false,
-        IgnorePhaseFade: false,
+        IgnorePhaseFade: true,
     };
 
     static PlayerCount = 4;

@@ -177,7 +177,7 @@ export default class Core {
 
         me._graphics.showDarkFade();
 
-        me._cancelTurn(true);
+        me._cancelTurn(true, false);
 
         me._context.status.stateToReturn = me._gameState.getName();
 
@@ -256,7 +256,7 @@ export default class Core {
             return current.hand.tryMakeAction(
                 point,
                 Enums.HandAction.TAKE_BILL,
-                { index: billIndex },
+                { index: billIndex, player: me._context.status.player },
                 () => { me._takeBill(billIndex); });
 
         const canSplitMoney = current.player.canClickButton(point, Enums.ActionType.SPLIT_MONEY);
@@ -323,8 +323,12 @@ export default class Core {
         const me = this,
               current = me.getCurrent();
 
-        const money = current.hand.dropBills();
-        me._addBills(money, current.hand.toPoint(), current.player);
+        if (current.hand.getTotalMoney() > 0)
+        {
+            const moneyOwner = current.hand.getMoneyOwner();
+            const money = current.hand.dropBills();
+            me._addBills(money, current.hand.toPoint(), me._context.players[moneyOwner]);
+        }
 
         current.player.showButtons([]);
 

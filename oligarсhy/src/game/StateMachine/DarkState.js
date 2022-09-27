@@ -105,7 +105,7 @@ export default class DarkState extends State {
         return context.hands[current].tryMakeAction(
             point,
             Enums.HandAction.TAKE_BILL,
-            { index: bill },
+            { index: bill, player: enemy },
             () => { 
                 context.players[enemy].removeBill(bill); 
                 me.core._addMoney(-Consts.BillValue[bill], null, context.players[enemy]);
