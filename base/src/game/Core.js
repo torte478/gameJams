@@ -25,11 +25,11 @@ export default class Core {
 
         Utils.debugLog('Hello, world!');
 
-        if (Utils.isDebug(Config.Debug.ShowSceneLog)) {
+        Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
-        }
+        });
     }
 
     update() {
