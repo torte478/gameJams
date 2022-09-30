@@ -1,16 +1,20 @@
 import Phaser from '../lib/phaser.js';
 
-import Button from './Button.js';
+import Audio from './utils/Audio.js';
+import Button from './utils/Button.js';
+import ButtonConfig from './utils/ButtonConfig.js';
+import Utils from './utils/Utils.js';
+
 import Config from './Config.js';
 import Consts from './Consts.js';
-import Enums from './Enums.js';
-import Helper from './Helper.js';
-import Utils from './Utils.js';
 
 export default class Core {
 
     /** @type {Phaser.Scene} */
     _scene;
+
+    /** @type {Audio} */
+    _audio;
 
     /** @type {Phaser.GameObjects.Text} */
     _log;
@@ -22,8 +26,9 @@ export default class Core {
         const me = this;
 
         me._scene = scene;
+        me._audio = new Audio(scene);
 
-        Utils.debugLog('Hello, world!');
+        Utils.debugLog('PAST YOUR CODE HERE!');
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })

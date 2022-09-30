@@ -1,8 +1,9 @@
 import Phaser from '../lib/phaser.js';
 
+import Animation from '../game/utils/Animation.js';
+import Utils from '../game/utils/Utils.js';
+
 import Core from '../game/Core.js';
-import Animation from '../game/Animation.js';
-import Utils from '../game/Utils.js';
 
 export default class Game extends Phaser.Scene {
 

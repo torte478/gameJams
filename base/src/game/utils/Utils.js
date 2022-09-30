@@ -1,4 +1,4 @@
-import Config from "./Config.js";
+import Config from "../Config.js";
 
 export default class Utils {
 
@@ -153,6 +153,19 @@ export default class Utils {
         return result;
     }
 
+    /**
+     * @param {Array} array 
+     * @param {Number} index 
+     * @returns {Array}
+     */
+    static removeAt(array, index) {
+        const result = [];
+        for (let i = 0; i < array.length; ++i)
+            if (i != index)
+                result.push(array[i]);
+        return result;
+    }
+
     // --- Geometry ---
 
     /**
@@ -199,6 +212,34 @@ export default class Utils {
         return debug !== undefined && Config.Debug.Global && Config.Debug.Random
             ? debug
             : Phaser.Math.Between(from, to);
+    }
+
+    /**
+     * @param {Array} array 
+     * @param {Number} count 
+     * @returns {Array}
+     */
+     static getRandomElems(array, count) {
+        if (count > array.length)
+            throw `invalid count: ${count}`;
+
+        const result = [];
+        let arr = Utils.copyArray(array);
+        while (result.length < count) {
+            const index = Phaser.Math.Between(0, arr.length - 1);
+            result.push(arr[index]);
+            arr = Utils.removeAt(arr, index);
+        }
+
+        return result;
+    }
+    
+    /**
+     * @param {Array} array 
+     * @returns {Array}
+     */
+    static shuffle(array) {
+        return Utils.getRandomElems(array, array.length);
     }
 
     // --- Start loading ---
@@ -249,7 +290,7 @@ export default class Utils {
      * @param {Function} func 
      * @returns {Boolean}
      */
-     static ifDebug(flag, func) {
+    static ifDebug(flag, func) {
         if (Utils.isDebug(flag))
             return func();
 
@@ -281,7 +322,7 @@ export default class Utils {
      * @param {Number} speed 
      * @returns {Number}
      */
-     static getTweenDuration(from, to, speed) {
+    static getTweenDuration(from, to, speed) {
         const dist = Phaser.Math.Distance.Between(
             from.x,
             from.y,
@@ -297,7 +338,7 @@ export default class Utils {
      * @param {Object} enumObj 
      * @param {Number} value 
      */
-     static enumToString(enumObj, value) {
+    static enumToString(enumObj, value) {
         for (let name in enumObj) {
             if (enumObj[name] == value)
                 return name;
@@ -310,50 +351,9 @@ export default class Utils {
      * @param {String} s 
      * @returns {Boolean}
      */
-     static stringIsDigit(s) {
+    static stringIsDigit(s) {
         return !(isNaN(s));
     }
 
     // --- New ---
-
-    /**
-     * @param {Array} array 
-     * @param {Number} count 
-     * @returns {Array}
-     */
-    static getRandomElems(array, count) {
-        if (count > array.length)
-            throw `invalid count: ${count}`;
-
-        const result = [];
-        let arr = Utils.copyArray(array);
-        while (result.length < count) {
-            const index = Phaser.Math.Between(0, arr.length - 1);
-            result.push(arr[index]);
-            arr = Utils.removeAt(arr, index);
-        }
-
-        return result;
-    }
-
-    /**
-     * @param {Array} array 
-     * @param {Number} index 
-     * @returns {Array}
-     */
-    static removeAt(array, index) {
-        const result = [];
-        for (let i = 0; i < array.length; ++i)
-            if (i != index)
-                result.push(array[i]);
-        return result;
-    }
-
-    /**
-     * @param {Array} array 
-     * @returns {Array}
-     */
-    static shuffle(array) {
-        return Utils.getRandomElems(array, array.length);
-    }
 }

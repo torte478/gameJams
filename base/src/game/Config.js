@@ -4,5 +4,7 @@ export default class Config {
         Global: true,
         Log: true,
         ShowSceneLog: true,
+        PlaySound: true,
+        Random: false
     };
 }
