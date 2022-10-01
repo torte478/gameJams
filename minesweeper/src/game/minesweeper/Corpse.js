@@ -1,5 +1,6 @@
 import Phaser from '../../lib/phaser.js';
 import Consts from '../Consts.js';
+import Helper from '../Helper.js';
 import Utils from '../utils/Utils.js';
 
 export default class Corpse {
@@ -45,5 +46,19 @@ export default class Corpse {
         const me = this;
 
         me._sprite.setFrame(me._idleFrame);
+    }
+
+    updateShadow(downY, upY) {
+        const me = this;
+
+        Helper.updateShadow(
+            me._shadow,
+            downY,
+            me._container.y,
+            upY,
+            Consts.Shadow.Middle,
+            Consts.Shadow.Big,
+            Consts.Shadow.Offset
+        );
     }
 }

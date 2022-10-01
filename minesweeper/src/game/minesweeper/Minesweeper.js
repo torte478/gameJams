@@ -9,6 +9,8 @@ import SoldierPool from './SoldierPool.js';
 import Utils from '../utils/Utils.js';
 import Enums from '../Enums.js';
 import CorpsePool from './CorpsePool.js';
+import Helper from '../Helper.js';
+import Graphics from '../Graphics.js';
 
 export default class Minesweeper {
 
@@ -30,15 +32,20 @@ export default class Minesweeper {
     /** @type {CorpsePool} */
     _corpsePool;
 
+    /** @type {Graphics} */
+    _graphics;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Status} status
+     * @param {Graphics} graphics
      */
-    constructor(scene, status) {
+    constructor(scene, status, graphics) {
         const me = this;
 
         me._scene = scene;
         me._status = status;
+        me._graphics = graphics;
 
         scene.add.image(
                 Consts.Viewport.Width / 2, 
@@ -126,8 +133,13 @@ export default class Minesweeper {
 
         me._soldierPool.release(soldier);
 
+        const cellPosition = me._field.toPosition(cellIndex);
+        me._graphics.createSmoke(cellPosition)
+
         const position = soldier.toPoint();
         const corpse = me._corpsePool.getNext(position, Enums.Corpse.Body);
+
+        me._graphics.createExplosion(cellPosition);
 
         const upY = position.y - Consts.Explode.BodyHeight;
         const downY = position.y
@@ -146,6 +158,7 @@ export default class Minesweeper {
                     onComplete: () => { corpse.idle() }
                 }
             ],
+            onUpdate: () => { corpse.updateShadow(downY, upY) },
             onComplete: me._onExplodeMineComplete,
             onCompleteScope: me
         });

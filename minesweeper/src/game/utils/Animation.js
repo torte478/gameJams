@@ -12,6 +12,19 @@ export default class Animation {
             frameRate: 8,
             repeat: -1
         });
+
+        scene.anims.create({
+            key: 'mine_explosion',
+            frames: Animation.getFrames(scene, 'explosions', [0, 1, 2, 3, 2, 3, 2, 3, 4, 5]),
+            frameRate: 16,
+        });
+
+        scene.anims.create({
+            key: 'mine_smoke',
+            frames: Animation.getFrames(scene, 'items', [ 10, 11 ]),
+            frameRate: 1,
+            repeat: -1
+        });
     }
 
     static getFrames(scene, texture, frames) {

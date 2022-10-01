@@ -7,6 +7,7 @@ export default class Consts {
 
     static Unit = 55;
     static UnitSmall = 20;
+    static UnitMiddle = 120;
 
     static Depth = {
         Background: 0,

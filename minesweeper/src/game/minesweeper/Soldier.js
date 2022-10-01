@@ -1,6 +1,7 @@
 import Phaser from '../../lib/phaser.js';
 import Config from '../Config.js';
 import Consts from '../Consts.js';
+import Helper from '../Helper.js';
 import Utils from '../utils/Utils.js';
 
 export default class Soldier {
@@ -58,10 +59,6 @@ export default class Soldier {
         me._parachute
             .setVisible(true)
             .play('parachute');
-        me._shadow.setFrame(Consts.Shadow.StartFrame);
-
-        const totalDistance = pos.y - startY;
-        const distUnit = totalDistance / Consts.Shadow.AnimFramesCount;
 
         me._scene.add.tween({
             targets: me._container,
@@ -72,17 +69,14 @@ export default class Soldier {
                 Consts.Speed.Spawn),
             ease: 'Sine.easeOut',
 
-            onUpdate: () => {
-
-                const dist = pos.y - me._container.y;
-                const frame = Consts.Shadow.StartFrame + Math.floor((totalDistance - dist) / distUnit);
-
-                me._shadow
-                    .setFrame(frame)
-                    .setPosition(
-                        0,
-                        dist + Consts.Shadow.Offset);
-            },
+            onUpdate: () => { Helper.updateShadow(
+                me._shadow,
+                pos.y,
+                me._container.y,
+                startY,
+                Consts.Shadow.StartFrame,
+                Consts.Shadow.Middle,
+                Consts.Shadow.Offset)} ,
 
             onComplete: () => {
                 me._parachute.stop();

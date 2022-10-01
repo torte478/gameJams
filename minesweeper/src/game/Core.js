@@ -9,6 +9,7 @@ import Config from './Config.js';
 import Consts from './Consts.js';
 import Minesweeper from './minesweeper/Minesweeper.js';
 import Status from './Status.js';
+import Graphics from './Graphics.js';
 
 export default class Core {
 
@@ -37,7 +38,8 @@ export default class Core {
         me._audio = new Audio(scene);
 
         me._status = new Status(Config.StartLevelIndex); // TODO
-        me._minesweeper = new Minesweeper(scene, me._status);
+        const graphics = new Graphics(scene);
+        me._minesweeper = new Minesweeper(scene, me._status, graphics);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
