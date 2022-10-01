@@ -3,7 +3,7 @@ export default class Config {
     static Debug = {
         Global: true,
         Log: true,
-        ShowSceneLog: false,
+        ShowSceneLog: true,
         PlaySound: true,
         Random: false,
         Level: true,
@@ -41,7 +41,8 @@ export default class Config {
         {
             Mines: 10,
             TimerDeathProbability: 25,
-            ReserveStartCount: 5
+            ReserveStartCount: 5,
+            StartInCity: true
         }
     ]
 }

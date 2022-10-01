@@ -10,6 +10,7 @@ import Consts from './Consts.js';
 import Minesweeper from './minesweeper/Minesweeper.js';
 import Status from './Status.js';
 import Graphics from './Graphics.js';
+import City from './city/City.js';
 
 export default class Core {
 
@@ -28,6 +29,9 @@ export default class Core {
     /** @type {Status} */
     _status;
 
+    /** @type {City} */
+    _city;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -38,8 +42,15 @@ export default class Core {
         me._audio = new Audio(scene);
 
         me._status = new Status(Config.StartLevelIndex); // TODO
+
         const graphics = new Graphics(scene);
         me._minesweeper = new Minesweeper(scene, me._status, graphics);
+
+        me._city = new City(scene);
+
+        if (Config.Levels[me._status.level].StartInCity) 
+            scene.cameras.main.setScroll(
+                -Consts.Viewport.Width, 0);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
