@@ -1,5 +1,7 @@
 import Phaser from '../../lib/phaser.js';
+import Config from '../Config.js';
 import Consts from '../Consts.js';
+import Utils from '../utils/Utils.js';
 
 export default class Clock {
 
@@ -33,6 +35,9 @@ export default class Clock {
 
     reset() {
         const me = this;
+
+        if (Utils.isDebug(Config.Debug.Timer))
+            return;
 
         me.stop();
         me._expected = new Date().getTime() + me._delay;

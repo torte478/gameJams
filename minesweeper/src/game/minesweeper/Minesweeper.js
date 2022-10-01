@@ -154,8 +154,14 @@ export default class Minesweeper {
     _finishStep() {
         const me = this;
 
+        if (me._clock.isAlarm() && me._soldiers.length > 0)
+            return me._tryKillByClock();
+
         me._status.free();
         me._field.lockAlpha = false;
+
+        if (me._clock.isAlarm() && me._soldiers.length == 0)
+            me._clock.stop();
 
         if (!me._clock.isAlarm() && !me._clock.isRunning() && me._soldiers.length > 0)
             me._clock.reset();
@@ -177,6 +183,12 @@ export default class Minesweeper {
 
         me._status.busy();
         me._field.decreaseAlpha();
+
+        return me._tryKillByClock();
+    }
+
+    _tryKillByClock() {
+        const me = this;
 
         const indicies = me._soldiers.map((s, i) => i);
         const soldierIndex = Utils.getRandomEl(indicies);

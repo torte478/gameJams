@@ -8,9 +8,12 @@ export default class Config {
         Random: false,
         Level: true,
         Restart: true,
-        Mines: true,
-        TweenSpeed: true,
+        Mines: false,
+        TweenSpeed: false,
+        Timer: false,
     };
+
+    static Timer = 10000;
 
     static Field = {
         Width: 10,
@@ -31,8 +34,6 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ];
-
-    static Timer = 1000;
 
     static Levels = [
         //0
