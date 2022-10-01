@@ -12,6 +12,7 @@ import CorpsePool from './CorpsePool.js';
 import Helper from '../Helper.js';
 import Graphics from '../Graphics.js';
 import Clock from './Clock.js';
+import Reserve from './Reserve.js';
 
 export default class Minesweeper {
 
@@ -38,6 +39,9 @@ export default class Minesweeper {
 
     /** @type {Clock} */
     _clock;
+
+    /** @type {Reserve} */
+    _reserve;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -72,6 +76,13 @@ export default class Minesweeper {
 
         me._clock = new Clock(scene, Config.Timer);
         me._clock.emitter.on('alarm', me._onClockAlarm, me);
+
+        me._reserve = new Reserve(
+            scene, 
+            Consts.Viewport.Width - Consts.Unit, 
+            Consts.Viewport.Height - Consts.Unit,
+            Config.Levels[me._status.level].ReserveStartCount,
+            Config.ReserveMaxSize);
     }
 
     /** @type {Phaser.Geom.Point} */

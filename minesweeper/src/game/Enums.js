@@ -22,4 +22,11 @@ export default class Enums {
         Mine: 0,
         Shot: 1,
     };
+
+    static Reserve = {
+        Soilder: 0,
+        Empty: 1,
+        OpenCoffin: 2,
+        ClosedCoffin: 3
+    }
 }

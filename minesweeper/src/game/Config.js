@@ -8,12 +8,12 @@ export default class Config {
         Random: false,
         Level: true,
         Restart: true,
-        Mines: false,
-        TweenSpeed: false,
-        Timer: false,
+        Mines: true,
+        TweenSpeed: true,
+        Timer: true,
     };
 
-    static Timer = 10000;
+    static Timer = 1000;
 
     static Field = {
         Width: 10,
@@ -21,6 +21,7 @@ export default class Config {
     };
 
     static StartLevelIndex = 0;
+    static ReserveMaxSize = 5;
 
     static DebugMines = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -40,6 +41,7 @@ export default class Config {
         {
             Mines: 10,
             TimerDeathProbability: 25,
+            ReserveStartCount: 3
         }
     ]
 }
