@@ -5,11 +5,21 @@ export default class Config {
         Log: true,
         ShowSceneLog: true,
         PlaySound: true,
-        Random: false
+        Random: false,
+        Level: true,
     };
 
     static Field = {
         Width: 10,
         Height: 10
     };
+
+    static StartLevelIndex = 0;
+
+    static Levels = [
+        //0
+        {
+            Mines: 10
+        }
+    ]
 }

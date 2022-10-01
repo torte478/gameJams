@@ -2,6 +2,7 @@ import Phaser from '../lib/phaser.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Field from './Field.js';
+import Status from './Status.js';
 
 export default class Minesweeper {
 
@@ -13,18 +14,19 @@ export default class Minesweeper {
 
     /**
      * @param {Phaser.Scene} scene 
+     * @param {Status} status
      */
-    constructor(scene) {
+    constructor(scene, status) {
         const me = this;
 
         me._scene = scene;
 
         scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'minesweeper_background')
             .setDepth(Consts.Depth.Background);
-
         
         me._field = new Field(
             scene, 
+            status,
             (Consts.Viewport.Width - Consts.Unit * Config.Field.Width) / 2, 
             (Consts.Viewport.Height - Consts.Unit * Config.Field.Height) / 2, 
             Config.Field.Width, 

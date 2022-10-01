@@ -8,6 +8,7 @@ import Utils from './utils/Utils.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Minesweeper from './Minesweeper.js';
+import Status from './Status.js';
 
 export default class Core {
 
@@ -23,6 +24,9 @@ export default class Core {
     /** @type {Minesweeper} */
     _minesweeper;
 
+    /** @type {Status} */
+    _status;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -32,7 +36,8 @@ export default class Core {
         me._scene = scene;
         me._audio = new Audio(scene);
 
-        me._minesweeper = new Minesweeper(scene);
+        me._status = new Status(Config.StartLevelIndex); // TODO
+        me._minesweeper = new Minesweeper(scene, me._status);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })

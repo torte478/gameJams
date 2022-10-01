@@ -356,4 +356,57 @@ export default class Utils {
     }
 
     // --- New ---
+
+    /**
+     * @param {any[][]} arr 
+     * @param {Number} index 
+     * @returns {Object}
+     */
+    static toMatrixIndex(arr, index) {
+        const height = arr.length;
+        const width = arr[0].length;
+
+        return { i: Math.floor(index / height), j: index % width };
+    }
+
+    /**
+     * 
+     * @param {any[][]} arr 
+     * @param {Number} i 
+     * @param {Number} j 
+     * @returns {Number}
+     */
+    static fromMatrix(arr, i, j) {
+        const height = arr.length;
+        return i * height + j;
+    }
+
+    /**
+     * 
+     * @param {any[][]} arr 
+     * @param {Number} i 
+     * @param {Number} j 
+     * @returns {Object[]}
+     */
+    static getNeighbours(arr, i, j) {
+        const result = [];
+        for (let y = -1; y <= 1; ++y)
+            for (let x = -1; x <= 1; ++x) {
+                const nextI = i + y;
+                const nextJ = j + x;
+
+                if (nextI == i && nextJ == j)
+                    continue;
+
+                if (nextI < 0 || nextI >= arr.length)
+                    continue;
+
+                if (nextJ < 0 || nextJ >= arr[nextI].length)
+                    continue;
+
+                result.push({ i: nextI, j: nextJ });
+            }
+
+        return result;
+    }
 }

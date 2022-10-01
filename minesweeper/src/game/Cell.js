@@ -6,6 +6,15 @@ export default class Cell {
     /** @type {Phaser.GameObjects.Sprite} */
     _sprite;
 
+    /** @type {Number} */
+    _content;
+
+    /** @type {Boolean} */
+    _isOpen;
+
+    /** @type {Boolean} */
+    isMine;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
@@ -19,18 +28,32 @@ export default class Cell {
     constructor(scene, index, x, y, isOpen, frame, callback, context) {
         const me = this;
 
+        me._content = frame;
+        me._isOpen = isOpen;
+        me.isMine = false;
+
         me._sprite = scene.add.sprite(x, y, 'cells', isOpen ? frame : Enums.Cell.Unknown)
             .setInteractive();
 
-        me._sprite.on('pointerdown', () => { callback(index) }, context);
+        me._sprite.on('pointerdown', () => { callback.call(context, index) });
         me._sprite.on('pointerover', me._select, me);
         me._sprite.on('pointerout', me._unselect, me);
     }
 
+    /** @type {Phaser.GameObjects.GameObject} */
     toGameObject() {
         const me = this;
 
         return me._sprite;
+    }
+
+    /** @type {Number} */
+    setContent(content) {
+        const me = this;
+
+        me._content = content;
+        if (me.isOpen)
+            me._sprite.setFrame(content);
     }
 
     _select() {
