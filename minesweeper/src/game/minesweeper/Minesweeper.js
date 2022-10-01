@@ -86,7 +86,7 @@ export default class Minesweeper {
             Consts.Viewport.Width - Consts.Unit, 
             Consts.Viewport.Height - Consts.Unit,
             Config.Levels[me._status.level].ReserveStartCount,
-            Config.ReserveMaxSize);
+            Consts.ReserveMaxSize);
 
         me._reserve.emitter.on('coffinClick', me._onCoffinClick, me);
         me._corpses = [];

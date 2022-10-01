@@ -12,6 +12,7 @@ export default class Consts {
     static Depth = {
         Background: -1000,
         FieldBackground: -500,
+        CitizenBottom: 500,
         Field: 50000,
         Max: 100000
     };
@@ -45,5 +46,17 @@ export default class Consts {
     static Explode = {
         BodyHeight: 25,
         BodyDuration: 400
+    };
+
+    static ReserveMaxSize = 5;
+    
+    static Citizen = {
+        SkinCount: 4,
+        SkinLength: 4,
+        MaxCountPerScreen: 10,
+        LeftX: -850,
+        RightX: -100,
+        UpY: 300,
+        DownY: 450
     };
 }

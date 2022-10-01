@@ -21,7 +21,6 @@ export default class Config {
     };
 
     static StartLevelIndex = 0;
-    static ReserveMaxSize = 5;
 
     static DebugMines = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -42,7 +41,10 @@ export default class Config {
             Mines: 10,
             TimerDeathProbability: 25,
             ReserveStartCount: 5,
-            StartInCity: true
+            StartInCity: true,
+            CitizenCount: 20,
+            MinCitizenSpeed: 50,
+            MaxCitizenSpeed: 100,
         }
     ]
 }

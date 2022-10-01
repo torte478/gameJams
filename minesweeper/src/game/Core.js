@@ -46,11 +46,13 @@ export default class Core {
         const graphics = new Graphics(scene);
         me._minesweeper = new Minesweeper(scene, me._status, graphics);
 
-        me._city = new City(scene);
+        me._city = new City(scene, me._status);
 
-        if (Config.Levels[me._status.level].StartInCity) 
+        if (Config.Levels[me._status.level].StartInCity) {
+            me._city.spawnCitizens();
             scene.cameras.main.setScroll(
                 -Consts.Viewport.Width, 0);
+        }
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
