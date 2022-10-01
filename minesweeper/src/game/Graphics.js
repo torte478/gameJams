@@ -52,4 +52,16 @@ export default class Graphics {
         const spot = me._pool.create(pos.x, pos.y, 'items', 12);
         //spot.setDepth(corpseDepth - 1); // TODO
     }
+
+    createShot(pos) {
+        const me = this;
+
+        return me._pool.create(pos.x, pos.y, 'explosions', 6);
+    }
+
+    killAndHide(obj) {
+        const me = this;
+
+        me._pool.killAndHide(obj);
+    }
 }

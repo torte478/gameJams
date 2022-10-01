@@ -19,6 +19,7 @@ export default class Consts {
     static Speed = {
         Spawn: 200,
         SoilderMovement: 400,
+        Shot: 800
     };
 
     static FieldAlpha = {

@@ -32,7 +32,7 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ];
 
-    static Timer = 3000;
+    static Timer = 1000;
 
     static Levels = [
         //0

@@ -17,4 +17,9 @@ export default class Enums {
     static Corpse = {
         Body: 0,
     }
+
+    static Death = {
+        Mine: 0,
+        Shot: 1,
+    };
 }

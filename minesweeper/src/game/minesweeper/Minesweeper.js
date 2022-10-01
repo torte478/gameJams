@@ -71,7 +71,7 @@ export default class Minesweeper {
         me._corpsePool = new CorpsePool(scene);
 
         me._clock = new Clock(scene, Config.Timer);
-        me._clock.reset();
+        me._clock.emitter.on('alarm', me._onClockAlarm, me);
     }
 
     /** @type {Phaser.Geom.Point} */
@@ -111,7 +111,7 @@ export default class Minesweeper {
         me._soldiers.push(soldier);
         const soldierIndex = me._soldiers.length - 1;
 
-        me._field.decreaseAlpha(true);
+        me._field.decreaseAlpha();
 
         soldier.spawn(
             soldierIndex,
@@ -129,8 +129,7 @@ export default class Minesweeper {
         }
         else {
             me._field.openCell(cellIndex);
-            me._status.free();
-            me._field.lockAlpha = false;
+            me._finishStep();
         }
     }
 
@@ -140,24 +139,81 @@ export default class Minesweeper {
         const soldierPositions = me._soldiers.map(s => s.getCellIndex());
 
         if (Utils.any(soldierPositions, s => s === index))
-            return me._status.free();
+            return me._finishStep();
 
         const path = me._field.findPath(index, soldierPositions);
 
-        if (!path) {
-            console.log("can't find path");
-            return me._status.free();
-        }
+        if (!path) 
+            me._finishStep();
 
-        me._field.decreaseAlpha(true);
+        me._field.decreaseAlpha();
         const soldierIndex = Utils.firstIndexOrNull(me._soldiers, s => s.getCellIndex() === path.soldierIndex);
         me._soldiers[soldierIndex].move(soldierIndex, index, path.cells, me._onSoldierStep, me)
+    }
+
+    _finishStep() {
+        const me = this;
+
+        me._status.free();
+        me._field.lockAlpha = false;
+
+        if (!me._clock.isAlarm() && !me._clock.isRunning() && me._soldiers.length > 0)
+            me._clock.reset();
     }
 
     _explodeMine(soldierIndex, cellIndex) {
         const me = this;
 
         me._field.explode(cellIndex);
+        
+        me._killSoldier(soldierIndex, cellIndex, Enums.Death.Mine);
+    }
+
+    _onClockAlarm() {
+        const me = this;
+
+        if (me._status.isBusy || me._soldiers.length == 0)
+            return;
+
+        me._status.busy();
+        me._field.decreaseAlpha();
+
+        const indicies = me._soldiers.map((s, i) => i);
+        const soldierIndex = Utils.getRandomEl(indicies);
+
+        const soldier = me._soldiers[soldierIndex]
+        const position = soldier.toPoint();
+        const fromLeft = position.x < Consts.Viewport.Width / 2;
+
+        const shot = me._graphics.createShot(Utils.buildPoint(
+            fromLeft ? Consts.Viewport.Width + Consts.UnitMiddle : -Consts.UnitMiddle,
+            position.y));
+
+        const target = Utils.buildPoint(
+            position.x + Consts.Unit * (fromLeft ? -1 : 1),
+            position.y);
+
+        me._scene.add.tween({
+            targets: shot,
+            x: target.x,
+            duration: Utils.getTweenDuration(
+                Utils.toPoint(shot),
+                target,
+                Consts.Speed.Shot),
+            delay: 500,
+
+            onComplete: () => {
+                me._graphics.killAndHide(shot);
+                me._killSoldier(
+                    soldierIndex, 
+                    soldier.getCellIndex(),
+                    Enums.Death.Shot);
+            }
+        });
+    }
+
+    _killSoldier(soldierIndex, cellIndex, type) {
+        const me = this;
         
         const soldier = me._soldiers[soldierIndex];
         me._soldiers = Utils.removeAt(me._soldiers, soldierIndex);
@@ -193,16 +249,8 @@ export default class Minesweeper {
                 }
             ],
             onUpdate: () => { corpse.updateShadow(downY, upY) },
-            onComplete: me._onExplodeMineComplete,
+            onComplete: me._finishStep,
             onCompleteScope: me
         });
-    }
-
-    _onExplodeMineComplete() {
-        const me = this;
-
-        console.log('explode complete');
-        me._status.free();
-        me._field.lockAlpha = false;
     }
 }       

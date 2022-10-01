@@ -110,76 +110,21 @@ export default class Field {
             pointer);
 
         if (inside)
-            me.increaseAlpha(false);
+            me._increaseAlpha(false);
         else
-            me.decreaseAlpha(false);
+            me._decreaseAlpha(false);
     }
 
-    increaseAlpha(force) {
+    increaseAlpha() {
         const me = this;
 
-        const needStartTween = (!me._isIncreaseAlpha || !me._alphaTween || force) 
-                               && Math.abs(me._container.alpha - Consts.FieldAlpha.Max) > Consts.Eps;
-
-        if (!needStartTween)
-            return;
-
-        if (force)
-            me.lockAlpha = true;
-
-        if (!!me._alphaTween)
-            me._alphaTween.stop();
-
-        me._isIncreaseAlpha = true;
-        me._container.setDepth(Consts.Depth.Field);
-
-        const percentage = 1 - (me._container.alpha - Consts.FieldAlpha.Min) / (Consts.FieldAlpha.Max - Consts.FieldAlpha.Min);
-        const duration = Consts.FieldAlpha.DurationInc * percentage;
-
-        me._alphaTween = me._scene.add.tween({
-            targets: me._container,
-            alpha: { from: me._container.alpha, to: Consts.FieldAlpha.Max},
-            duration: duration,
-            ease: 'Sine.easeInOut',
-            onComplete: () => { 
-                me._alphaTween = null;
-                me._container.setAlpha(Consts.FieldAlpha.Max);
-            }
-        });
+        me._increaseAlpha(true);
     }
 
-    decreaseAlpha(force) {
+    decreaseAlpha() {
         const me = this;
 
-        const needStartTween = (me._isIncreaseAlpha || !me._alphaTween || force) 
-                               && Math.abs(me._container.alpha - Consts.FieldAlpha.Min) > Consts.Eps;
-
-        if (!needStartTween)
-            return;
-
-        if (force)
-            me.lockAlpha = true;
-
-        if (!!me._alphaTween)
-            me._alphaTween.stop();
-
-        me._isIncreaseAlpha = false;
-
-        const percentage = (me._container.alpha - Consts.FieldAlpha.Min) / (Consts.FieldAlpha.Max - Consts.FieldAlpha.Min);
-        const duration = Consts.FieldAlpha.DurationDec * percentage;
-
-        me._alphaTween = me._scene.add.tween({
-            targets: me._container,
-            alpha: { from: me._container.alpha, to: Consts.FieldAlpha.Min},
-            duration: duration,
-            ease: 'Sine.easeInOut',
-            onComplete: () => { 
-                me._alphaTween = null;
-                me._container
-                    .setAlpha(Consts.FieldAlpha.Min)
-                    .setDepth(Consts.Depth.FieldBackground);
-            }
-        });
+        me._decreaseAlpha(true);
     }
 
     /**
@@ -408,5 +353,72 @@ export default class Field {
             mines[i] = true;
 
         return Utils.shuffle(mines);
+    }
+
+    _increaseAlpha(force) {
+        const me = this;
+
+        const needStartTween = (!me._isIncreaseAlpha || !me._alphaTween || force) 
+                               && Math.abs(me._container.alpha - Consts.FieldAlpha.Max) > Consts.Eps;
+
+        if (!needStartTween)
+            return;
+
+        if (force)
+            me.lockAlpha = true;
+
+        if (!!me._alphaTween)
+            me._alphaTween.stop();
+
+        me._isIncreaseAlpha = true;
+        me._container.setDepth(Consts.Depth.Field);
+
+        const percentage = 1 - (me._container.alpha - Consts.FieldAlpha.Min) / (Consts.FieldAlpha.Max - Consts.FieldAlpha.Min);
+        const duration = Consts.FieldAlpha.DurationInc * percentage;
+
+        me._alphaTween = me._scene.add.tween({
+            targets: me._container,
+            alpha: { from: me._container.alpha, to: Consts.FieldAlpha.Max},
+            duration: duration,
+            ease: 'Sine.easeInOut',
+            onComplete: () => { 
+                me._alphaTween = null;
+                me._container.setAlpha(Consts.FieldAlpha.Max);
+            }
+        });
+    }
+
+    _decreaseAlpha(force) {
+        const me = this;
+
+        const needStartTween = (me._isIncreaseAlpha || !me._alphaTween || force) 
+                               && Math.abs(me._container.alpha - Consts.FieldAlpha.Min) > Consts.Eps;
+
+        if (!needStartTween)
+            return;
+
+        if (force)
+            me.lockAlpha = true;
+
+        if (!!me._alphaTween)
+            me._alphaTween.stop();
+
+        me._isIncreaseAlpha = false;
+
+        const percentage = (me._container.alpha - Consts.FieldAlpha.Min) / (Consts.FieldAlpha.Max - Consts.FieldAlpha.Min);
+        const duration = Consts.FieldAlpha.DurationDec * percentage;
+
+        me._alphaTween = me._scene.add.tween({
+            targets: me._container,
+            alpha: { from: me._container.alpha, to: Consts.FieldAlpha.Min},
+            duration: duration,
+            ease: 'Sine.easeInOut',
+            onComplete: () => { 
+                me._alphaTween = null;
+                me._container
+                    .setAlpha(Consts.FieldAlpha.Min)
+                    .setDepth(Consts.Depth.FieldBackground);
+            }
+        });
     }
 }
