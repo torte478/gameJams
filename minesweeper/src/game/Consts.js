@@ -17,6 +17,7 @@ export default class Consts {
 
     static Speed = {
         Spawn: 200,
+        SoilderMovement: 400,
     };
 
     static Shadow = {

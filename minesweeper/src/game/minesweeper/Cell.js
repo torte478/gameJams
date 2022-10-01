@@ -56,7 +56,7 @@ export default class Cell {
         const me = this;
 
         me._content = content;
-        if (me.isOpen)
+        if (me._isOpen)
             me._sprite.setFrame(content);
     }
 
@@ -67,6 +67,13 @@ export default class Cell {
             return;
 
         me._sprite.setFrame(me._content);
+        me._isOpen = true;
+    }
+
+    isOpen() {
+        const me = this;
+
+        return me._isOpen;
     }
 
     canExplode() {

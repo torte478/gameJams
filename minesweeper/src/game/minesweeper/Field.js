@@ -134,8 +134,102 @@ export default class Field {
         me._cells[cell.i][cell.j].explode();
     }
 
+    /**
+     * @param {Number} targetIndex 
+     * @param {Number[]} soldierPositions 
+     * @returns {Object}
+     */
+    findPath(targetIndex, soldierPositions) {
+        const me = this;
+
+        const matrix = [];
+        for (let i = 0; i < me._cells.length; ++i) {
+            const row = [];
+            for (let j = 0; j < me._cells[i].length; ++j)
+                row.push({
+                    dist: 9999999999,
+                    visited: false
+                });
+
+            matrix.push(row);
+        }
+
+        const target = Utils.toMatrixIndex(me._cells, targetIndex);
+        let toVisit = [ target ];
+        matrix[target.i][target.j].dist = 0;
+        matrix[target.i][target.j].visited = true;
+
+        while (toVisit.length > 0) {
+            const nextToVisit = [];
+
+            for (let k = 0; k < toVisit.length; ++k) {
+                const current = toVisit[k];
+                const neighbours = Utils
+                    .getNeighbours(me._cells, current.i, current.j)
+                    .filter(n => matrix[n.i][n.j].visited == false
+                                 && me._cells[n.i][n.j].isOpen());
+
+                for (let l = 0; l < neighbours.length; ++l) {
+                    const cell = neighbours[l];
+                    matrix[cell.i][cell.j].dist = matrix[current.i][current.j].dist + 1;
+                    matrix[cell.i][cell.j].visited = true;
+                    nextToVisit.push(cell);
+                }
+            }
+
+            toVisit = nextToVisit;
+        }
+
+        const soldiers = soldierPositions
+            .map(s => Utils.toMatrixIndex(matrix, s))
+            .filter(s => matrix[s.i][s.j].visited);
+
+        if (soldiers.length == 0)
+            return null;
+
+        let minIndex = 0;
+        let minDist = matrix[soldiers[0].i][soldiers[0].j].dist;
+
+        for (let i = 1; i < soldiers.length; ++i) { 
+            const curDist = matrix[soldiers[i].i][soldiers[i].j].dist;
+            if (curDist < minDist) {
+                minDist = curDist;
+                minIndex = i
+            };
+        }
+
+        const start = soldiers[minIndex];
+        const soldierIndex = Utils.fromMatrix(matrix, start.i, start.j);
+        const cells = [];
+
+        let currentPathCell = start;
+        let expectedDist = matrix[start.i][start.j].dist - 1;
+        do {
+
+            const nextCell = Utils
+                .getNeighbours(matrix, currentPathCell.i, currentPathCell.j)
+                .filter(n => matrix[n.i][n.j].dist == expectedDist)
+                [0];
+
+            const nextCellIndex = Utils.fromMatrix(matrix, nextCell.i, nextCell.j);
+            cells.push(me.toPosition(nextCellIndex));
+            expectedDist -= 1;
+            currentPathCell = nextCell;
+
+        } 
+        while (currentPathCell.i != target.i || currentPathCell.j != target.j);
+
+        return {
+            soldierIndex: soldierIndex,
+            cells: cells,
+        };
+    }
+
     _onCellClick(index) {
         const me = this;
+
+        if (me._status.isBusy)
+            return;
 
         if (!me._isGenerated)
             me._generate();

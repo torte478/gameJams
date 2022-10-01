@@ -1,7 +1,7 @@
 export default class Status {
 
     /** @type {Boolean} */
-    _isBusy;
+    isBusy;
 
     /** @type {Number} */
     level;
@@ -15,18 +15,18 @@ export default class Status {
     busy() {
         const me = this;
 
-        if (me._isBusy)
+        if (me.isBusy)
             throw 'status is already BUSY!';
 
-        me._isBusy = true;
+        me.isBusy = true;
     }
 
     free() {
         const me = this;
 
-        if (!me._isBusy)
+        if (!me.isBusy)
             throw 'status is already FREE!';
 
-        me._isBusy = false;
+        me.isBusy = false;
     }
 }

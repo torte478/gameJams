@@ -72,7 +72,7 @@ export default class Core {
             if (event.repeat || event.key != 'r') 
                 return;
             
-            Utils.debugLog('restart');
+            console.clear();
             me._scene.scene.start('game');
         })
     }

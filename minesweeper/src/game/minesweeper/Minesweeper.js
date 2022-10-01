@@ -78,7 +78,7 @@ export default class Minesweeper {
         const me = this;
 
         if (me._needSpawnSolder(index))
-            me._spawnSoldier(index);
+            me._trySpawnSoldier(index);
         else
             me._moveSoldier(index);
     }
@@ -89,7 +89,7 @@ export default class Minesweeper {
         return me._soldiers.length == 0; //TODO
     }
 
-    _spawnSoldier(index) {
+    _trySpawnSoldier(index) {
         const me = this;
 
         const soldier = me._soldierPool.getNext();
@@ -119,8 +119,16 @@ export default class Minesweeper {
     _moveSoldier(index) {
         const me = this;
 
-        console.log(`move soldier to ${index}`);
-        me._status.free();
+        const soldierPositions = me._soldiers.map(s => s.getCellIndex());
+        const path = me._field.findPath(index, soldierPositions);
+
+        if (!path) {
+            console.log("can't find path");
+            return me._status.free();
+        }
+
+        const soldierIndex = Utils.firstIndexOrNull(me._soldiers, s => s.getCellIndex() === path.soldierIndex);
+        me._soldiers[soldierIndex].move(soldierIndex, index, path.cells, me._onSoldierStep, me)
     }
 
     _explodeMine(soldierIndex, cellIndex) {
@@ -170,7 +178,7 @@ export default class Minesweeper {
     _onExplodeMineComplete() {
         const me = this;
 
-        console.log('complete');
+        console.log('explode complete');
         me._status.free();
     }
 }       

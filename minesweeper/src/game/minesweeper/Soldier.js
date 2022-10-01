@@ -1,5 +1,4 @@
 import Phaser from '../../lib/phaser.js';
-import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Helper from '../Helper.js';
 import Utils from '../utils/Utils.js';
@@ -20,6 +19,9 @@ export default class Soldier {
 
     /** @type {Phaser.GameObjects.Sprite} */
     _shadow;
+
+    /** @type {Number} */
+    _cellIndex;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -42,6 +44,8 @@ export default class Soldier {
             me._shadow,
             me._sprite 
         ]);
+
+        me._cellIndex = -1;
     }
 
     /**
@@ -86,6 +90,8 @@ export default class Soldier {
                     .setFrame(Consts.Shadow.Middle)
                     .setPosition(0, Consts.Shadow.Offset);
 
+                me._cellIndex = cellIndex;
+
                 callback.call(context, soldierIndex, cellIndex);
             }
         });
@@ -101,5 +107,42 @@ export default class Soldier {
         const me = this;
 
         return Utils.toPoint(me._container);
+    }
+
+    getCellIndex() {
+        const me = this;
+
+        return me._cellIndex;
+    }
+
+    /**
+     * @param {Number} soldierIndex
+     * @param {Number} cellIndex,
+     * @param {Phaser.Geom.Point[]} path 
+     * @param {Function} callback 
+     * @param {Object} scope 
+     */
+    move(soldierIndex, cellIndex, path, callback, scope) {
+        const me = this;
+
+        const tweens = [];
+        for (let i = 0; i < path.length; ++i) {
+            const tween = {
+                x: path[i].x,
+                y: path[i].y,
+                duration: Consts.Speed.SoilderMovement
+            };
+            tweens.push(tween);
+        }
+
+        me._scene.tweens.timeline({
+            targets: me._container,
+            tweens: tweens,
+
+            onComplete: () => { 
+                me._cellIndex = cellIndex;
+                callback.call(scope, soldierIndex, cellIndex)
+            }
+        });
     }
 }
