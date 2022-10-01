@@ -10,7 +10,8 @@ export default class Consts {
     static UnitMiddle = 120;
 
     static Depth = {
-        Background: 0,
+        Background: -1000,
+        FieldBackground: -500,
         Field: 50000,
         Max: 100000
     };
@@ -18,7 +19,6 @@ export default class Consts {
     static Speed = {
         Spawn: 200,
         SoilderMovement: 400,
-
     };
 
     static FieldAlpha = {

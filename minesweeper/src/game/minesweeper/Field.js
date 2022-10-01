@@ -93,7 +93,9 @@ export default class Field {
         me._status = status;
         me.emitter = new Phaser.Events.EventEmitter();
 
-        me._container.setAlpha(Consts.FieldAlpha.Min);
+        me._container
+            .setAlpha(Consts.FieldAlpha.Min)
+            .setDepth(Consts.Depth.FieldBackground);
     }
 
     /** @type {Phaser.Geom.Point} */
@@ -129,6 +131,7 @@ export default class Field {
             me._alphaTween.stop();
 
         me._isIncreaseAlpha = true;
+        me._container.setDepth(Consts.Depth.Field);
 
         const percentage = 1 - (me._container.alpha - Consts.FieldAlpha.Min) / (Consts.FieldAlpha.Max - Consts.FieldAlpha.Min);
         const duration = Consts.FieldAlpha.DurationInc * percentage;
@@ -172,7 +175,9 @@ export default class Field {
             ease: 'Sine.easeInOut',
             onComplete: () => { 
                 me._alphaTween = null;
-                me._container.setAlpha(Consts.FieldAlpha.Min);
+                me._container
+                    .setAlpha(Consts.FieldAlpha.Min)
+                    .setDepth(Consts.Depth.FieldBackground);
             }
         });
     }
