@@ -20,8 +20,15 @@ export default class Consts {
 
     static Shadow = {
         StartFrame: 2,
-        FullFrame: 5,
-        TotalFrames: 3,
+        Small: 3,
+        Middle: 5,
+        Big: 6,
+        AnimFramesCount: 3,
         Offset: 8 
     }
+
+    static Explode = {
+        BodyHeight: 25,
+        BodyDuration: 400
+    };
 }

@@ -33,7 +33,7 @@ export default class Soldier {
         me._parachute = scene.add.sprite(-Consts.UnitSmall, -Consts.UnitSmall, 'items', 0)
             .setVisible(false);
 
-        me._shadow = scene.add.sprite(0, Consts.Shadow.Offset, 'items', Consts.Shadow.FullFrame);
+        me._shadow = scene.add.sprite(0, Consts.Shadow.Offset, 'items', Consts.Shadow.Middle);
 
         me._sprite = scene.add.sprite(0, 0, 'soldiers', 0);
         me._container = scene.add.container(x, y, [ 
@@ -61,11 +61,7 @@ export default class Soldier {
         me._shadow.setFrame(Consts.Shadow.StartFrame);
 
         const totalDistance = pos.y - startY;
-        const distUnit = totalDistance / Consts.Shadow.TotalFrames;
-
-        let speed = Consts.Speed.Spawn;
-        if (Utils.isDebug(Config.Debug.TweenSpeed))
-            speed *= 10;
+        const distUnit = totalDistance / Consts.Shadow.AnimFramesCount;
 
         me._scene.add.tween({
             targets: me._container,
@@ -73,7 +69,7 @@ export default class Soldier {
             duration: Utils.getTweenDuration(
                 Utils.toPoint(me._container),
                 pos,
-                speed),
+                Consts.Speed.Spawn),
             ease: 'Sine.easeOut',
 
             onUpdate: () => {
@@ -93,11 +89,23 @@ export default class Soldier {
                 me._parachute.setVisible(false);
 
                 me._shadow
-                    .setFrame(Consts.Shadow.FullFrame)
+                    .setFrame(Consts.Shadow.Middle)
                     .setPosition(0, Consts.Shadow.Offset);
 
                 callback.call(context, soldierIndex, cellIndex);
             }
         });
+    }
+
+    dispose() {
+        const me = this;
+
+        me._container.destroy(false); //TODO
+    }   
+
+    toPoint() {
+        const me = this;
+
+        return Utils.toPoint(me._container);
     }
 }

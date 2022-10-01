@@ -17,4 +17,13 @@ export default class SoldierPool {
         const soldier = new Soldier(me._scene, 500, 500); //TODO
         return soldier;
     }
+
+    /**
+     * @param {Soldier} soldier 
+     */
+    release(soldier) {
+        const me = this;
+
+        soldier.dispose(); //TOOD
+    }
 }

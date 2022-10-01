@@ -13,7 +13,10 @@ export default class Cell {
     _isOpen;
 
     /** @type {Boolean} */
-    isMine;
+    _isMine;
+
+    /** @type {Boolean} */
+    _isExploded;
 
     /**
      * 
@@ -30,7 +33,8 @@ export default class Cell {
 
         me._content = frame;
         me._isOpen = isOpen;
-        me.isMine = false;
+        me._isMine = false;
+        me._isExploded = false;
 
         me._sprite = scene.add.sprite(x, y, 'cells', isOpen ? frame : Enums.Cell.Unknown)
             .setInteractive();
@@ -63,6 +67,26 @@ export default class Cell {
             return;
 
         me._sprite.setFrame(me._content);
+    }
+
+    canExplode() {
+        const me = this;
+
+        return me._isMine && !me._isExploded;
+    }
+
+    setMine() {
+        const me = this;
+
+        me._isMine = true;
+    }
+
+    explode() {
+        const me = this;
+
+        me._isExploded = true;
+        me._content = Enums.Cell.Exploded;
+        me.open();
     }
 
     _select() {

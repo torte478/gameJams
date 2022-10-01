@@ -11,6 +11,10 @@ export default class Enums {
         Empty8: 8,
         Unknown: 9,
         Flag: 10,
-        Empty: 11
+        Exploded: 11
+    }
+
+    static Corpse = {
+        Body: 0,
     }
 }

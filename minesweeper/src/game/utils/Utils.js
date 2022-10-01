@@ -317,24 +317,6 @@ export default class Utils {
     // --- Other ---
 
     /**
-     * @param {Phaser.Geom.Point} from 
-     * @param {Phaser.Geom.Point} to 
-     * @param {Number} speed 
-     * @returns {Number}
-     */
-    static getTweenDuration(from, to, speed) {
-        const dist = Phaser.Math.Distance.Between(
-            from.x,
-            from.y,
-            to.x,
-            to.y
-        );
-
-        const time = (dist / speed) * 1000;
-        return time;
-    }
-
-    /**
      * @param {Object} enumObj 
      * @param {Number} value 
      */
@@ -408,5 +390,27 @@ export default class Utils {
             }
 
         return result;
+    }
+
+    /**
+     * @param {Phaser.Geom.Point} from 
+     * @param {Phaser.Geom.Point} to 
+     * @param {Number} speed 
+     * @returns {Number}
+     */
+     static getTweenDuration(from, to, speed) {
+        const dist = Phaser.Math.Distance.Between(
+            from.x,
+            from.y,
+            to.x,
+            to.y
+        );
+
+        const tweenSpeed = Utils.isDebug(Config.Debug.TweenSpeed)
+            ? speed * 10
+            : speed;
+
+        const time = (dist / tweenSpeed) * 1000;
+        return time;
     }
 }

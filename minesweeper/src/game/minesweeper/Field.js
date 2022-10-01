@@ -107,11 +107,11 @@ export default class Field {
      * @param {Number} index
      * @returns {Boolean}
      */
-    isMine(index) {
+    canExplode(index) {
         const me = this;
 
         const cell = Utils.toMatrixIndex(me._cells, index);
-        return me._cells[cell.i][cell.j].isMine;
+        return me._cells[cell.i][cell.j].canExplode();
     }
 
     /**
@@ -122,6 +122,16 @@ export default class Field {
 
         const cell = Utils.toMatrixIndex(me._cells, index);
         me._cells[cell.i][cell.j].open();
+    }
+
+    /**
+     * @param {Number} index 
+     */
+    explode(index) {
+        const me = this;
+
+        const cell = Utils.toMatrixIndex(me._cells, index);
+        me._cells[cell.i][cell.j].explode();
     }
 
     _onCellClick(index) {
@@ -149,7 +159,7 @@ export default class Field {
             if (mines[i]) {
                 /** @type {Cell} */
                 const cur = Utils.toMatrixIndex(me._cells, i);
-                me._cells[cur.i][cur.j].isMine = true;
+                me._cells[cur.i][cur.j].setMine();
             }
 
         for (let i = 0; i < mines.length; ++i)
@@ -158,7 +168,7 @@ export default class Field {
 
                 const content = Utils
                     .getNeighbours(me._cells, cur.i, cur.j)
-                    .filter(c => me._cells[c.i][c.j].isMine)
+                    .filter(c => me._cells[c.i][c.j].canExplode())
                     .length;
 
                 me._cells[cur.i][cur.j].setContent(content);
