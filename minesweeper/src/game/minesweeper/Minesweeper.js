@@ -1,10 +1,10 @@
-import Phaser from '../lib/phaser.js';
+import Phaser from '../../lib/phaser.js';
 
-import Config from './Config.js';
-import Consts from './Consts.js';
+import Config from '../Config.js';
+import Consts from '../Consts.js';
 import Field from './Field.js';
 import Soldier from './Soldier.js';
-import Status from './Status.js';
+import Status from '../Status.js';
 
 export default class Minesweeper {
 

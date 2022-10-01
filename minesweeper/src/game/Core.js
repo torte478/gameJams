@@ -7,7 +7,7 @@ import Utils from './utils/Utils.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
-import Minesweeper from './Minesweeper.js';
+import Minesweeper from './minesweeper/Minesweeper.js';
 import Status from './Status.js';
 
 export default class Core {

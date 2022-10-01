@@ -1,5 +1,5 @@
-import Phaser from '../lib/phaser.js';
-import Enums from './Enums.js';
+import Phaser from '../../lib/phaser.js';
+import Enums from '../Enums.js';
 
 export default class Cell {
 
