@@ -130,10 +130,15 @@ export default class Soldier {
             const tween = {
                 x: path[i].x,
                 y: path[i].y,
-                duration: Consts.Speed.SoilderMovement
+                duration: Consts.Speed.SoilderMovement,
+                onStart: () => {
+                    me._container.setScale(path[i].x < me._container.x ? -1 : 1, 1);
+                }
             };
             tweens.push(tween);
         }
+
+        me._sprite.play('soldier_movement');
 
         me._scene.tweens.timeline({
             targets: me._container,
@@ -141,6 +146,7 @@ export default class Soldier {
 
             onComplete: () => { 
                 me._cellIndex = cellIndex;
+                me._sprite.stop().setFrame(0);
                 callback.call(scope, soldierIndex, cellIndex)
             }
         });

@@ -25,6 +25,13 @@ export default class Animation {
             frameRate: 1,
             repeat: -1
         });
+
+        scene.anims.create({
+            key: 'soldier_movement',
+            frames: Animation.getFrames(scene, 'soldiers', [ 1, 2, 3, 2 ]),
+            frameRate: 8,
+            repeat: -1
+        });
     }
 
     static getFrames(scene, texture, frames) {
