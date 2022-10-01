@@ -30,4 +30,11 @@ export default class Minesweeper {
             Config.Field.Width, 
             Config.Field.Height);
     }
+
+    /** @type {Phaser.Geom.Point} */
+    update(pointer) {
+        const me = this;
+
+        me._field.update(pointer);
+    }
 }

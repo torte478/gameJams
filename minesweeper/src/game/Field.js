@@ -1,4 +1,6 @@
+import phaser from '../lib/phaser.js';
 import Phaser from '../lib/phaser.js';
+
 import Cell from './Cell.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
@@ -47,7 +49,19 @@ export default class Field {
             for (let j = 0; j < me._cells[i].length; ++j)
                 children.push(me._cells[i][j].toGameObject());
 
-        me._container = scene.add.container(x, y, children);
+        me._container = scene.add.container(x, y, children)
+            .setSize(width * Consts.Unit, height * Consts.Unit);
+    }
+
+    /** @type {Phaser.Geom.Point} */
+    update(pointer) {
+        const me = this;
+
+        const inside = Phaser.Geom.Rectangle.ContainsPoint(
+            me._container.getBounds(),
+            pointer);
+
+        me._container.setAlpha(inside ? 1 : 0.05);
     }
 
     _onCellClick(index) {

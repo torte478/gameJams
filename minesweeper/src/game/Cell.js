@@ -23,11 +23,27 @@ export default class Cell {
             .setInteractive();
 
         me._sprite.on('pointerdown', () => { callback(index) }, context);
+        me._sprite.on('pointerover', me._select, me);
+        me._sprite.on('pointerout', me._unselect, me);
     }
 
     toGameObject() {
         const me = this;
 
         return me._sprite;
+    }
+
+    _select() {
+        const me = this;
+
+        me._sprite.setTint(0xff0000);
+        me._sprite.setAlpha(0.5);
+    }
+
+    _unselect() {
+        const me = this;
+
+        me._sprite.clearTint()
+        me._sprite.setAlpha(1);
     }
 }

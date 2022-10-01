@@ -44,9 +44,15 @@ export default class Core {
     update() {
         const me = this;
 
+        const pointer = Utils.buildPoint(
+            me._scene.input.activePointer.worldX,
+            me._scene.input.activePointer.worldY);
+
+        me._minesweeper.update(pointer);
+
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             let text = 
-                `mse: ${me._scene.input.activePointer.worldX} ${me._scene.input.activePointer.worldY}`;
+                `mse: ${pointer.x} ${pointer.y}`;
 
             me._log.setText(text);
         });
