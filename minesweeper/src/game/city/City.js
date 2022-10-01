@@ -44,6 +44,8 @@ export default class City {
             Consts.Citizen.RightX - Consts.Citizen.LeftX,
             Consts.Viewport.Height);
 
+        scene.physics.world.on('worldbounds', me._onWorldBounds);
+
         me._citizenPool = new CitizenPool(scene, status, me._onCitizenClick, me);       
         me._citizenCount = Config.Levels[status.level].CitizenCount;
     }
@@ -80,5 +82,10 @@ export default class City {
 
         me._citizenPool.killAndHide(citizen);
         me._status.free();
+    }
+
+    _onWorldBounds(body) {
+        const container = body.gameobject;
+        console.log('banana');
     }
 }

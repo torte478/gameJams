@@ -177,7 +177,7 @@ export default class Minesweeper {
         me._status.free();
         me._field.lockAlpha = false;
 
-        if (me._clock.isAlarm() && me._soldiers.length == 0)
+        if (me._soldiers.length == 0)
             me._clock.stop();
 
         if (!me._clock.isAlarm() && !me._clock.isRunning() && me._soldiers.length > 0)
