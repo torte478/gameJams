@@ -18,7 +18,17 @@ export default class Consts {
     static Speed = {
         Spawn: 200,
         SoilderMovement: 400,
+
     };
+
+    static FieldAlpha = {
+        Min: 0.05,
+        Max: 1,
+        DurationInc: 2000,
+        DurationDec: 250
+    };
+
+    static Eps = 0.01;
 
     static Shadow = {
         StartFrame: 2,

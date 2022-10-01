@@ -96,6 +96,8 @@ export default class Minesweeper {
         me._soldiers.push(soldier);
         const soldierIndex = me._soldiers.length - 1;
 
+        me._field.decreaseAlpha(true);
+
         soldier.spawn(
             soldierIndex,
             index,
@@ -113,6 +115,7 @@ export default class Minesweeper {
         else {
             me._field.openCell(cellIndex);
             me._status.free();
+            me._field.lockAlpha = false;
         }
     }
 
@@ -127,6 +130,7 @@ export default class Minesweeper {
             return me._status.free();
         }
 
+        me._field.decreaseAlpha(true);
         const soldierIndex = Utils.firstIndexOrNull(me._soldiers, s => s.getCellIndex() === path.soldierIndex);
         me._soldiers[soldierIndex].move(soldierIndex, index, path.cells, me._onSoldierStep, me)
     }
@@ -180,5 +184,6 @@ export default class Minesweeper {
 
         console.log('explode complete');
         me._status.free();
+        me._field.lockAlpha = false;
     }
 }       

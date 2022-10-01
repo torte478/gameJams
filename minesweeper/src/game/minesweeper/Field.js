@@ -9,6 +9,8 @@ import Utils from '../utils/Utils.js';
 
 export default class Field {
 
+    _scene;
+
     /** @type {Phaser.GameObjects.Container} */
     _container;
 
@@ -24,6 +26,15 @@ export default class Field {
     /** @type {Status} */
     _status;
 
+    /** @type {Phaser.Tweens.Tween} */
+    _alphaTween;
+
+    /** @type {Boolean} */
+    _isIncreaseAlpha;
+
+    /** @type {Boolean} */
+    lockAlpha;
+
     /** @type {Phaser.Events.EventEmitter} */
     emitter;
 
@@ -38,6 +49,10 @@ export default class Field {
      */
     constructor(scene, status, x, y, width, height) {
         const me = this
+
+        me._scene = scene;
+        me._isIncreaseAlpha = true;
+        me.lockAlpha = false;
 
         me._cells = [];
         for (let i = 0; i < height; ++i) {
@@ -77,17 +92,89 @@ export default class Field {
         me._isGenerated = false;
         me._status = status;
         me.emitter = new Phaser.Events.EventEmitter();
+
+        me._container.setAlpha(Consts.FieldAlpha.Min);
     }
 
     /** @type {Phaser.Geom.Point} */
     update(pointer) {
         const me = this;
 
+        if (me.lockAlpha)
+            return;
+
         const inside = Phaser.Geom.Rectangle.ContainsPoint(
             me._bounds,
             pointer);
 
-        me._container.setAlpha(inside ? 1 : 0.05);
+        if (inside)
+            me.increaseAlpha(false);
+        else
+            me.decreaseAlpha(false);
+    }
+
+    increaseAlpha(force) {
+        const me = this;
+
+        const needStartTween = (!me._isIncreaseAlpha || !me._alphaTween || force) 
+                               && Math.abs(me._container.alpha - Consts.FieldAlpha.Max) > Consts.Eps;
+
+        if (!needStartTween)
+            return;
+
+        if (force)
+            me.lockAlpha = true;
+
+        if (!!me._alphaTween)
+            me._alphaTween.stop();
+
+        me._isIncreaseAlpha = true;
+
+        const percentage = 1 - (me._container.alpha - Consts.FieldAlpha.Min) / (Consts.FieldAlpha.Max - Consts.FieldAlpha.Min);
+        const duration = Consts.FieldAlpha.DurationInc * percentage;
+
+        me._alphaTween = me._scene.add.tween({
+            targets: me._container,
+            alpha: { from: me._container.alpha, to: Consts.FieldAlpha.Max},
+            duration: duration,
+            ease: 'Sine.easeInOut',
+            onComplete: () => { 
+                me._alphaTween = null;
+                me._container.setAlpha(Consts.FieldAlpha.Max);
+            }
+        });
+    }
+
+    decreaseAlpha(force) {
+        const me = this;
+
+        const needStartTween = (me._isIncreaseAlpha || !me._alphaTween || force) 
+                               && Math.abs(me._container.alpha - Consts.FieldAlpha.Min) > Consts.Eps;
+
+        if (!needStartTween)
+            return;
+
+        if (force)
+            me.lockAlpha = true;
+
+        if (!!me._alphaTween)
+            me._alphaTween.stop();
+
+        me._isIncreaseAlpha = false;
+
+        const percentage = (me._container.alpha - Consts.FieldAlpha.Min) / (Consts.FieldAlpha.Max - Consts.FieldAlpha.Min);
+        const duration = Consts.FieldAlpha.DurationDec * percentage;
+
+        me._alphaTween = me._scene.add.tween({
+            targets: me._container,
+            alpha: { from: me._container.alpha, to: Consts.FieldAlpha.Min},
+            duration: duration,
+            ease: 'Sine.easeInOut',
+            onComplete: () => { 
+                me._alphaTween = null;
+                me._container.setAlpha(Consts.FieldAlpha.Min);
+            }
+        });
     }
 
     /**
