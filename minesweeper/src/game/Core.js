@@ -11,6 +11,7 @@ import Minesweeper from './minesweeper/Minesweeper.js';
 import Status from './Status.js';
 import Graphics from './Graphics.js';
 import City from './city/City.js';
+import Reserve from './Reserve.js';
 
 export default class Core {
 
@@ -32,6 +33,9 @@ export default class Core {
     /** @type {City} */
     _city;
 
+    /** @type {Reserve} */
+    _reserve;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -42,11 +46,17 @@ export default class Core {
         me._audio = new Audio(scene);
 
         me._status = new Status(Config.StartLevelIndex); // TODO
+        me._reserve = new Reserve(
+            scene, 
+            Consts.Viewport.Width - Consts.Unit, 
+            Consts.Viewport.Height - Consts.Unit,
+            Config.Levels[me._status.level].ReserveStartCount,
+            Consts.ReserveMaxSize);
 
         const graphics = new Graphics(scene);
-        me._minesweeper = new Minesweeper(scene, me._status, graphics);
+        me._minesweeper = new Minesweeper(scene, me._status, graphics, me._reserve);
 
-        me._city = new City(scene, me._status);
+        me._city = new City(scene, me._status, me._reserve);
 
         if (Config.Levels[me._status.level].StartInCity) {
             me._city.spawnCitizens();

@@ -19,12 +19,14 @@ export default class Citizen {
      * @param {Phaser.GameObjects.Group} pool 
      * @param {Phaser.Geom.Point} pos 
      * @param {Number} skin 
+     * @param {Function} clickCallback
+     * @param {Object} scope
      */
-    constructor(scene, pool, pos, skin, level) {
+    constructor(scene, pool, pos, skin, level, clickCallback, scope) {
         const me = this;
 
         me._scene = scene;
-        me._sprite = pool.create(0, 0, 'citizens', skin * Consts.Citizen.SkinLength);
+        me._sprite = pool.create(0, 0, 'citizens', skin * Consts.Citizen.SkinLength).setInteractive();
         me._shadow = pool.create(0, Consts.Shadow.Offset, 'items', Consts.Shadow.Middle);
 
         me._container = scene.add.container(pos.x, pos.y, [ me._shadow, me._sprite ])
@@ -40,7 +42,27 @@ export default class Citizen {
         me._container.body
             .setBounce(1, 0)
             .setCollideWorldBounds(true)
-            .setVelocity(velocity * direction, 0)
+            .setVelocity(velocity * direction, 0);
+
+        me._sprite.on('pointerdown', () => { clickCallback.call(scope, me) });
+    }
+
+    toGameObject() {
+        const me = this;
+
+        return me._container;
+    }
+
+    toPoint() {
+        const me = this;
+
+        return Utils.toPoint(me._container);
+    }
+
+    hideShadow() {
+        const me = this;
+
+        me._shadow.setVisible(false);
     }
     
     /**
@@ -54,5 +76,11 @@ export default class Citizen {
 
         me._scene.physics.world.disable(me._container);
         me._container.destroy();
+    }
+
+    disableBody() {
+        const me = this;
+
+        me._scene.physics.world.disable(me._container);
     }
 }

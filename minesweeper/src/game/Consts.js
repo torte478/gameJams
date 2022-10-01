@@ -14,6 +14,7 @@ export default class Consts {
         FieldBackground: -500,
         CitizenBottom: 500,
         Field: 50000,
+        UI: 65000,
         Max: 100000
     };
 
@@ -21,7 +22,7 @@ export default class Consts {
         Spawn: 200,
         SoilderMovement: 400,
         Shot: 7000,
-        FillCoffin: 400,
+        FillReserve: 400,
     };
 
     static FieldAlpha = {
