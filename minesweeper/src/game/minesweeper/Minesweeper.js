@@ -34,7 +34,10 @@ export default class Minesweeper {
         me._scene = scene;
         me._status = status;
 
-        scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'minesweeper_background')
+        scene.add.image(
+                Consts.Viewport.Width / 2, 
+                Consts.Viewport.Height / 2, 
+                'minesweeper_background')
             .setDepth(Consts.Depth.Background);
         
         me._field = new Field(
@@ -77,18 +80,26 @@ export default class Minesweeper {
 
         const soldier = me._soldierPool.getNext();
         me._soldiers.push(soldier);
+        const soldierIndex = me._soldiers.length - 1;
 
         soldier.spawn(
+            soldierIndex,
+            index,
             me._field.toPosition(index),
             me._onSoldierStep,
             me);
     }
 
-    _onSoldierStep() {
+    _onSoldierStep(soldierIndex, cellIndex) {
         const me = this;
 
-        console.log('step complete');
-        me._status.free(); //TODO
+        if (me._field.isMine(cellIndex)) {
+            console.log('babah');
+        }
+        else {
+            me._field.openCell(cellIndex);
+            me._status.free();
+        }
     }
 
     _moveSoldier(index) {
@@ -97,4 +108,4 @@ export default class Minesweeper {
         console.log(`move soldier to ${index}`);
         me._status.free();
     }
-}
+}       

@@ -1,4 +1,5 @@
 import Phaser from '../../lib/phaser.js';
+import Config from '../Config.js';
 import Consts from '../Consts.js';
 import Utils from '../utils/Utils.js';
 
@@ -43,11 +44,13 @@ export default class Soldier {
     }
 
     /**
+     * @param {Number} soldierIndex
+     * @param {Number} cellIndex
      * @param {Phaser.Geom.Point} pos 
      * @param {Function} callback 
      * @param {Object} context 
      */
-    spawn(pos, callback, context) {
+    spawn(soldierIndex, cellIndex, pos, callback, context) {
         const me = this;
 
         const startY = -Consts.Unit;
@@ -60,13 +63,17 @@ export default class Soldier {
         const totalDistance = pos.y - startY;
         const distUnit = totalDistance / Consts.Shadow.TotalFrames;
 
+        let speed = Consts.Speed.Spawn;
+        if (Utils.isDebug(Config.Debug.TweenSpeed))
+            speed *= 10;
+
         me._scene.add.tween({
             targets: me._container,
             y: pos.y,
             duration: Utils.getTweenDuration(
                 Utils.toPoint(me._container),
                 pos,
-                Consts.Speed.Spawn),
+                speed),
             ease: 'Sine.easeOut',
 
             onUpdate: () => {
@@ -80,7 +87,7 @@ export default class Soldier {
                         0,
                         dist + Consts.Shadow.Offset);
             },
-            
+
             onComplete: () => {
                 me._parachute.stop();
                 me._parachute.setVisible(false);
@@ -89,7 +96,7 @@ export default class Soldier {
                     .setFrame(Consts.Shadow.FullFrame)
                     .setPosition(0, Consts.Shadow.Offset);
 
-                callback.call(context);
+                callback.call(context, soldierIndex, cellIndex);
             }
         });
     }

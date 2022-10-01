@@ -56,6 +56,15 @@ export default class Cell {
             me._sprite.setFrame(content);
     }
 
+    open() {
+        const me = this;
+
+        if (me._isOpen)
+            return;
+
+        me._sprite.setFrame(me._content);
+    }
+
     _select() {
         const me = this;
 

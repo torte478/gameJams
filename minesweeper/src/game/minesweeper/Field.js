@@ -65,7 +65,8 @@ export default class Field {
                 children.push(me._cells[i][j].toGameObject());
 
         me._container = scene.add.container(x, y, children)
-            .setSize(width * Consts.Unit, height * Consts.Unit);
+            .setSize(width * Consts.Unit, height * Consts.Unit)
+            .setDepth(Consts.Depth.Field);
 
         me._bounds = new Phaser.Geom.Rectangle(
             x - Consts.Unit,
@@ -102,6 +103,27 @@ export default class Field {
             me._container.y + cell.i * Consts.Unit - Consts.UnitSmall)
     }
 
+    /**
+     * @param {Number} index
+     * @returns {Boolean}
+     */
+    isMine(index) {
+        const me = this;
+
+        const cell = Utils.toMatrixIndex(me._cells, index);
+        return me._cells[cell.i][cell.j].isMine;
+    }
+
+    /**
+     * @param {Number} index 
+     */
+    openCell(index) {
+        const me = this;
+
+        const cell = Utils.toMatrixIndex(me._cells, index);
+        me._cells[cell.i][cell.j].open();
+    }
+
     _onCellClick(index) {
         const me = this;
 
@@ -121,10 +143,7 @@ export default class Field {
     _generate() {
         const me = this;
 
-        let mines = Utils.buildArray(me._cells.length * me._cells[0].length, false);
-        for (let i = 0; i < Config.Levels[me._status.level].Mines; ++i)
-            mines[i] = true;
-        mines = Utils.shuffle(mines);
+        const mines = me._getMines();
 
         for (let i = 0; i < mines.length; ++i)
             if (mines[i]) {
@@ -146,5 +165,24 @@ export default class Field {
             }
 
         me._isGenerated = true;
+    }
+
+    _getMines() {
+        const me = this;
+
+        if (Utils.isDebug(Config.Debug.Mines)) {
+            const mines = [];
+            for (let i = 0; i < Config.DebugMines.length; ++i)
+                for (let j = 0; j < Config.DebugMines[i].length; ++j)
+                    mines.push(!!Config.DebugMines[i][j]);
+
+            return mines;
+        }
+
+        const mines = Utils.buildArray(me._cells.length * me._cells[0].length, false);
+        for (let i = 0; i < Config.Levels[me._status.level].Mines; ++i)
+            mines[i] = true;
+
+        return Utils.shuffle(mines);
     }
 }

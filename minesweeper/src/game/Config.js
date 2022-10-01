@@ -8,6 +8,8 @@ export default class Config {
         Random: false,
         Level: true,
         Restart: true,
+        Mines: true,
+        TweenSpeed: true,
     };
 
     static Field = {
@@ -16,6 +18,19 @@ export default class Config {
     };
 
     static StartLevelIndex = 0;
+
+    static DebugMines = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ]
 
     static Levels = [
         //0
