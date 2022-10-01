@@ -231,7 +231,69 @@ export default class Field {
      * @param {Number[]} soldierPositions 
      * @returns {Object}
      */
+    isReached(targetIndex, soldierPositions) {
+        const me = this;
+
+        const bfs = me._getReachedSoldiers(targetIndex, soldierPositions)
+
+        return bfs.soldiers.length > 0;
+    }
+
+    /**
+     * @param {Number} targetIndex 
+     * @param {Number[]} soldierPositions 
+     * @returns {Object}
+     */
     findPath(targetIndex, soldierPositions) {
+        const me = this;
+
+        const bfs = me._getReachedSoldiers(targetIndex, soldierPositions)
+        const target = bfs.target;
+        const soldiers = bfs.soldiers;
+        const matrix = bfs.matrix;
+
+        if (soldiers.length == 0)
+            return null;
+
+        let minIndex = 0;
+        let minDist = matrix[soldiers[0].i][soldiers[0].j].dist;
+
+        for (let i = 1; i < soldiers.length; ++i) { 
+            const curDist = matrix[soldiers[i].i][soldiers[i].j].dist;
+            if (curDist < minDist) {
+                minDist = curDist;
+                minIndex = i
+            };
+        }
+
+        const start = soldiers[minIndex];
+        const soldierIndex = Utils.fromMatrix(matrix, start.i, start.j);
+        const cells = [];
+
+        let currentPathCell = start;
+        let expectedDist = matrix[start.i][start.j].dist - 1;
+        do {
+
+            const nextCell = Utils
+                .getNeighbours(matrix, currentPathCell.i, currentPathCell.j)
+                .filter(n => matrix[n.i][n.j].dist == expectedDist)
+                [0];
+
+            const nextCellIndex = Utils.fromMatrix(matrix, nextCell.i, nextCell.j);
+            cells.push(me.toPosition(nextCellIndex));
+            expectedDist -= 1;
+            currentPathCell = nextCell;
+
+        } 
+        while (currentPathCell.i != target.i || currentPathCell.j != target.j);
+
+        return {
+            soldierIndex: soldierIndex,
+            cells: cells,
+        };
+    }
+
+    _getReachedSoldiers(targetIndex, soldierPositions) {
         const me = this;
 
         const matrix = [];
@@ -276,44 +338,10 @@ export default class Field {
             .map(s => Utils.toMatrixIndex(matrix, s))
             .filter(s => matrix[s.i][s.j].visited);
 
-        if (soldiers.length == 0)
-            return null;
-
-        let minIndex = 0;
-        let minDist = matrix[soldiers[0].i][soldiers[0].j].dist;
-
-        for (let i = 1; i < soldiers.length; ++i) { 
-            const curDist = matrix[soldiers[i].i][soldiers[i].j].dist;
-            if (curDist < minDist) {
-                minDist = curDist;
-                minIndex = i
-            };
-        }
-
-        const start = soldiers[minIndex];
-        const soldierIndex = Utils.fromMatrix(matrix, start.i, start.j);
-        const cells = [];
-
-        let currentPathCell = start;
-        let expectedDist = matrix[start.i][start.j].dist - 1;
-        do {
-
-            const nextCell = Utils
-                .getNeighbours(matrix, currentPathCell.i, currentPathCell.j)
-                .filter(n => matrix[n.i][n.j].dist == expectedDist)
-                [0];
-
-            const nextCellIndex = Utils.fromMatrix(matrix, nextCell.i, nextCell.j);
-            cells.push(me.toPosition(nextCellIndex));
-            expectedDist -= 1;
-            currentPathCell = nextCell;
-
-        } 
-        while (currentPathCell.i != target.i || currentPathCell.j != target.j);
-
         return {
-            soldierIndex: soldierIndex,
-            cells: cells,
+            target: target,
+            soldiers: soldiers,
+            matrix: matrix
         };
     }
 

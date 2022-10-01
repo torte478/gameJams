@@ -86,7 +86,14 @@ export default class Minesweeper {
     _needSpawnSolder(index) {
         const me = this;
 
-        return me._soldiers.length == 0; //TODO
+        const solderIndicies = me._soldiers.map(s => s.getCellIndex());
+        if (Utils.any(solderIndicies, s => s === index))
+            return false;
+
+        return me._soldiers.length == 0
+            || !me._field.isReached(
+                index, 
+                solderIndicies);
     }
 
     _trySpawnSoldier(index) {
@@ -123,6 +130,10 @@ export default class Minesweeper {
         const me = this;
 
         const soldierPositions = me._soldiers.map(s => s.getCellIndex());
+
+        if (Utils.any(soldierPositions, s => s === index))
+            return me._status.free();
+
         const path = me._field.findPath(index, soldierPositions);
 
         if (!path) {
@@ -141,7 +152,7 @@ export default class Minesweeper {
         me._field.explode(cellIndex);
         
         const soldier = me._soldiers[soldierIndex];
-        Utils.removeAt(me._soldiers, soldierIndex);
+        me._soldiers = Utils.removeAt(me._soldiers, soldierIndex);
 
         me._soldierPool.release(soldier);
 
