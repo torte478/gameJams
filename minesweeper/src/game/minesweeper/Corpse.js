@@ -7,6 +7,8 @@ export default class Corpse {
 
     _sprite;
     _shadow;
+
+    /** @type {Phaser.GameObjects.Container} */
     _container;
 
     _idleFrame;
@@ -60,5 +62,11 @@ export default class Corpse {
             Consts.Shadow.Big,
             Consts.Shadow.Offset
         );
+    }
+
+    getDepth() {
+        const me = this;
+
+        return me._container.depth;
     }
 }

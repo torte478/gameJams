@@ -44,4 +44,12 @@ export default class Graphics {
                 smoke.stop().setFrame(9);
             });
     }
+
+    createBloodSpot(pos, corpseDepth) {
+        const me = this;
+
+        /** @type {Phaser.GameObjects.Sprite} */
+        const spot = me._pool.create(pos.x, pos.y, 'items', 12);
+        //spot.setDepth(corpseDepth - 1); // TODO
+    }
 }

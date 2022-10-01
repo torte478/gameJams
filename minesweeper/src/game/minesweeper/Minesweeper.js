@@ -155,7 +155,10 @@ export default class Minesweeper {
                     y: downY,
                     duration: Consts.Explode.BodyDuration,
                     ease: 'Sine.easeIn',
-                    onComplete: () => { corpse.idle() }
+                    onComplete: () => { 
+                        corpse.idle();
+                        me._graphics.createBloodSpot(cellPosition, corpse.getDepth())
+                     }
                 }
             ],
             onUpdate: () => { corpse.updateShadow(downY, upY) },
