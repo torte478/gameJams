@@ -183,14 +183,18 @@ export default class Minesweeper {
 
         const soldier = me._soldiers[soldierIndex]
         const position = soldier.toPoint();
-        const fromLeft = position.x < Consts.Viewport.Width / 2;
+        const fromRight = position.x < Consts.Viewport.Width / 2;
+
+        const isDeath = Utils.getRandom(1, 100, 99) <= Config.Levels[me._status.level].TimerDeathProbability;
 
         const shot = me._graphics.createShot(Utils.buildPoint(
-            fromLeft ? Consts.Viewport.Width + Consts.UnitMiddle : -Consts.UnitMiddle,
+            fromRight ? Consts.Viewport.Width + Consts.UnitMiddle : -Consts.UnitMiddle,
             position.y));
 
         const target = Utils.buildPoint(
-            position.x + Consts.Unit * (fromLeft ? -1 : 1),
+            isDeath 
+                ? position.x + Consts.Unit * (fromRight ? -1 : 1)
+                : (fromRight ? -Consts.UnitMiddle : Consts.Viewport.Width + Consts.UnitMiddle),
             position.y);
 
         me._scene.add.tween({
@@ -204,10 +208,15 @@ export default class Minesweeper {
 
             onComplete: () => {
                 me._graphics.killAndHide(shot);
-                me._killSoldier(
-                    soldierIndex, 
-                    soldier.getCellIndex(),
-                    Enums.Death.Shot);
+                me._clock.stop();
+                
+                if (isDeath)
+                    me._killSoldier(
+                        soldierIndex, 
+                        soldier.getCellIndex(),
+                        Enums.Death.Shot);
+                else
+                    me._finishStep();
             }
         });
     }
@@ -221,12 +230,15 @@ export default class Minesweeper {
         me._soldierPool.release(soldier);
 
         const cellPosition = me._field.toPosition(cellIndex);
-        me._graphics.createSmoke(cellPosition)
+
+        if (type == Enums.Death.Mine)
+            me._graphics.createSmoke(cellPosition)
 
         const position = soldier.toPoint();
         const corpse = me._corpsePool.getNext(position, Enums.Corpse.Body);
 
-        me._graphics.createExplosion(cellPosition);
+        if (type == Enums.Death.Mine)
+            me._graphics.createExplosion(cellPosition);
 
         const upY = position.y - Consts.Explode.BodyHeight;
         const downY = position.y

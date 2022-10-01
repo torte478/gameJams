@@ -37,7 +37,8 @@ export default class Config {
     static Levels = [
         //0
         {
-            Mines: 10
+            Mines: 10,
+            TimerDeathProbability: 25,
         }
     ]
 }
