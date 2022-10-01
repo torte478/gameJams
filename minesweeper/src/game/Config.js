@@ -7,4 +7,9 @@ export default class Config {
         PlaySound: true,
         Random: false
     };
+
+    static Field = {
+        Width: 10,
+        Height: 10
+    };
 }

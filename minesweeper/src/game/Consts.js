@@ -5,9 +5,10 @@ export default class Consts {
         Height: 768
     };
 
-    static Unit = 32;
+    static Unit = 55;
 
     static Depth = {
+        Background: 0,
         Max: 100000
     };
 }

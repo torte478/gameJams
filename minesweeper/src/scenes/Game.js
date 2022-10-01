@@ -4,6 +4,7 @@ import Animation from '../game/utils/Animation.js';
 import Utils from '../game/utils/Utils.js';
 
 import Core from '../game/Core.js';
+import Consts from '../game/Consts.js';
 
 export default class Game extends Phaser.Scene {
 
@@ -16,6 +17,10 @@ export default class Game extends Phaser.Scene {
 
     preload() {
         const me = this;
+
+        Utils.loadImage(me, 'minesweeper_background');
+
+        Utils.loadSpriteSheet(me, 'cells', Consts.Unit);
 
         Utils.loadWav(me, 'button_click');
     }
