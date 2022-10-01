@@ -22,6 +22,9 @@ export default class Field {
     /** @type {Status} */
     _status;
 
+    /** @type {Phaser.Events.EventEmitter} */
+    emitter;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
@@ -64,6 +67,7 @@ export default class Field {
 
         me._isGenerated = false;
         me._status = status;
+        me.emitter = new Phaser.Events.EventEmitter();
     }
 
     /** @type {Phaser.Geom.Point} */
@@ -80,16 +84,17 @@ export default class Field {
     _onCellClick(index) {
         const me = this;
 
-        if (me._isGenerated)
-            me._makeStep(index);
-        else 
+        if (!me._isGenerated)
             me._generate();
+            
+        me._makeStep(index);
     }
 
     _makeStep(index) {
         const me = this;
 
-        console.log('step ' + index);
+        me._status.busy();
+        me.emitter.emit('cellClick', index);
     }
 
     _generate() {

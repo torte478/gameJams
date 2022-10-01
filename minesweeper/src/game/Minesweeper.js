@@ -1,7 +1,9 @@
 import Phaser from '../lib/phaser.js';
+
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Field from './Field.js';
+import Soldier from './Soldier.js';
 import Status from './Status.js';
 
 export default class Minesweeper {
@@ -12,6 +14,12 @@ export default class Minesweeper {
     /** @type {Field} */
     _field;
 
+    /** @type {Soldier[]} */
+    _soldiers;
+
+    /** @type {Status} */
+    _status;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Status} status
@@ -20,6 +28,7 @@ export default class Minesweeper {
         const me = this;
 
         me._scene = scene;
+        me._status = status;
 
         scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'minesweeper_background')
             .setDepth(Consts.Depth.Background);
@@ -31,6 +40,9 @@ export default class Minesweeper {
             (Consts.Viewport.Height - Consts.Unit * Config.Field.Height) / 2, 
             Config.Field.Width, 
             Config.Field.Height);
+        me._field.emitter.on('cellClick', me._onCellClick, me);
+
+        me._soldiers = [];
     }
 
     /** @type {Phaser.Geom.Point} */
@@ -38,5 +50,33 @@ export default class Minesweeper {
         const me = this;
 
         me._field.update(pointer);
+    }
+
+    _onCellClick(index) {
+        const me = this;
+
+        if (me._needSpawnSolder(index))
+            me._spawnSoldier(index);
+        else
+            me._moveSoldier(index);
+    }
+
+    _needSpawnSolder(index) {
+        const me = this;
+
+        return me._soldiers.length == 0;
+    }
+
+    _spawnSoldier(index) {
+        const me = this;
+
+        throw 'not implemented';
+    }
+
+    _moveSoldier(index) {
+        const me = this;
+
+        console.log(`move soldier to ${index}`);
+        me._status.free();
     }
 }
