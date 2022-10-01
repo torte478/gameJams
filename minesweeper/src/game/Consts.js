@@ -27,7 +27,8 @@ export default class Consts {
         Min: 0.05,
         Max: 1,
         DurationInc: 2000,
-        DurationDec: 250
+        DurationDec: 2000,
+        DurationDecForce: 250
     };
 
     static Eps = 0.01;

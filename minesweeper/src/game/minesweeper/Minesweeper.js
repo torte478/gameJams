@@ -201,6 +201,9 @@ export default class Minesweeper {
     _onClockAlarm() {
         const me = this;
 
+        if (me._soldiers.length == 0)
+            me._clock.stop();
+
         if (me._status.isBusy || me._soldiers.length == 0)
             return;
 

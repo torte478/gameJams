@@ -407,7 +407,7 @@ export default class Field {
         me._isIncreaseAlpha = false;
 
         const percentage = (me._container.alpha - Consts.FieldAlpha.Min) / (Consts.FieldAlpha.Max - Consts.FieldAlpha.Min);
-        const duration = Consts.FieldAlpha.DurationDec * percentage;
+        const duration = (force ? Consts.FieldAlpha.DurationDecForce : Consts.FieldAlpha.DurationDec) * percentage;
 
         me._alphaTween = me._scene.add.tween({
             targets: me._container,
