@@ -80,6 +80,19 @@ export default class Field {
         me._container.setAlpha(inside ? 1 : 0.05);
     }
 
+    /**
+     * @param {Number} index 
+     * @returns {Phaser.Geom.Point}
+     */
+    toPosition(index) {
+        const me = this;
+
+        const cell = Utils.toMatrixIndex(me._cells, index);
+        return Utils.buildPoint(
+            me._container.x + cell.j * Consts.Unit + Consts.Unit / 2,
+            me._container.y + cell.i * Consts.Unit + Consts.Unit / 2)
+    }
+
     _onCellClick(index) {
         const me = this;
 

@@ -5,6 +5,7 @@ import Consts from '../Consts.js';
 import Field from './Field.js';
 import Soldier from './Soldier.js';
 import Status from '../Status.js';
+import SoldierPool from './SoldierPool.js';
 
 export default class Minesweeper {
 
@@ -19,6 +20,9 @@ export default class Minesweeper {
 
     /** @type {Status} */
     _status;
+
+    /** @type {SoldierPool} */
+    _soldierPool;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -43,6 +47,7 @@ export default class Minesweeper {
         me._field.emitter.on('cellClick', me._onCellClick, me);
 
         me._soldiers = [];
+        me._soldierPool = new SoldierPool(scene);
     }
 
     /** @type {Phaser.Geom.Point} */
@@ -70,7 +75,20 @@ export default class Minesweeper {
     _spawnSoldier(index) {
         const me = this;
 
-        throw 'not implemented';
+        const soldier = me._soldierPool.getNext();
+        me._soldiers.push(soldier);
+
+        soldier.spawn(
+            me._field.toPosition(index),
+            me._onSoldierStep,
+            me);
+    }
+
+    _onSoldierStep() {
+        const me = this;
+
+        console.log('step complete');
+        me._status.free(); //TODO
     }
 
     _moveSoldier(index) {
