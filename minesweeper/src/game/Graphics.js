@@ -37,12 +37,6 @@ export default class Graphics {
         /** @type {Phaser.GameObjects.Sprite} */
         const smoke = me._pool.create(pos.x, pos.y, 'items');
         smoke.play('mine_smoke');
-
-        me._scene.time.delayedCall(
-            5000,
-            () => {
-                smoke.stop().setFrame(9);
-            });
     }
 
     createBloodSpot(pos, corpseDepth) {

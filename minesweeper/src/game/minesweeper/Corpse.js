@@ -69,4 +69,24 @@ export default class Corpse {
 
         return me._container.depth;
     }
+
+    dispose(pool) {
+        const me = this;
+
+        pool.killAndHide(me._sprite);
+        pool.killAndHide(me._shadow);
+        me._container.destroy();
+    }
+
+    hide() {
+        const me = this;
+
+        me._container.setVisible(false);
+    }
+
+    hideShadow() {
+        const me = this;
+
+        me._shadow.setVisible(false);
+    }
 }

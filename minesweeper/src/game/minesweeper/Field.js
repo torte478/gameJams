@@ -87,7 +87,7 @@ export default class Field {
             x - Consts.Unit,
             y - Consts.Unit,
             me._container.getBounds().width + 2 * Consts.Unit,
-            me._container.getBounds().height + 2 * Consts.Unit)
+            me._container.getBounds().height + 2 * Consts.Unit);
 
         me._isGenerated = false;
         me._status = status;
@@ -391,8 +391,9 @@ export default class Field {
     _decreaseAlpha(force) {
         const me = this;
 
-        const needStartTween = (me._isIncreaseAlpha || !me._alphaTween || force) 
-                               && Math.abs(me._container.alpha - Consts.FieldAlpha.Min) > Consts.Eps;
+        const needStartTween = force 
+                               || ((me._isIncreaseAlpha || !me._alphaTween) 
+                                    && Math.abs(me._container.alpha - Consts.FieldAlpha.Min) > Consts.Eps);
 
         if (!needStartTween)
             return;

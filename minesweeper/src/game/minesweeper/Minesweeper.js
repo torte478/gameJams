@@ -13,6 +13,7 @@ import Helper from '../Helper.js';
 import Graphics from '../Graphics.js';
 import Clock from './Clock.js';
 import Reserve from './Reserve.js';
+import Corpse from './Corpse.js';
 
 export default class Minesweeper {
 
@@ -42,6 +43,9 @@ export default class Minesweeper {
 
     /** @type {Reserve} */
     _reserve;
+
+    /** @type {Corpse[]} */
+    _corpses;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -83,6 +87,9 @@ export default class Minesweeper {
             Consts.Viewport.Height - Consts.Unit,
             Config.Levels[me._status.level].ReserveStartCount,
             Config.ReserveMaxSize);
+
+        me._reserve.emitter.on('coffinClick', me._onCoffinClick, me);
+        me._corpses = [];
     }
 
     /** @type {Phaser.Geom.Point} */
@@ -118,11 +125,16 @@ export default class Minesweeper {
     _trySpawnSoldier(index) {
         const me = this;
 
+        if (me._reserve.getSoilderCount() == 0)
+            return me._finishStep();
+
         const soldier = me._soldierPool.getNext();
         me._soldiers.push(soldier);
         const soldierIndex = me._soldiers.length - 1;
 
         me._field.decreaseAlpha();
+
+        me._reserve.spawn();
 
         soldier.spawn(
             soldierIndex,
@@ -259,6 +271,7 @@ export default class Minesweeper {
 
         const position = soldier.toPoint();
         const corpse = me._corpsePool.getNext(position, Enums.Corpse.Body);
+        me._corpses.push(corpse);
 
         if (type == Enums.Death.Mine)
             me._graphics.createExplosion(cellPosition);
@@ -287,5 +300,30 @@ export default class Minesweeper {
             onComplete: me._finishStep,
             onCompleteScope: me
         });
+    }
+
+    _onCoffinClick() {
+        const me = this;
+
+        if (me._status.isBusy)
+            return;
+
+        if (me._corpses.length == 0)
+            return;
+
+        me._status.busy();
+        me._field.decreaseAlpha();
+
+        const index = Utils.getRandom(0, me._corpses.length - 1);
+        const corpse = me._corpses[index];
+        me._corpses = Utils.removeAt(me._corpses, index);
+
+        me._reserve.fillCoffin(corpse, me._onCoffinFill, me);
+    }
+
+    _onCoffinFill(corpse) {
+        const me = this;
+        me._corpsePool.release(corpse);
+        me._finishStep();
     }
 }       

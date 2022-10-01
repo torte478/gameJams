@@ -9,7 +9,7 @@ export default class Config {
         Level: true,
         Restart: true,
         Mines: true,
-        TweenSpeed: true,
+        TweenSpeed: false,
         Timer: true,
     };
 

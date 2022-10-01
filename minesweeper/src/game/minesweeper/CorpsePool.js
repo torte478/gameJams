@@ -21,4 +21,10 @@ export default class CorpsePool {
 
         return new Corpse(me._scene, pos, me._pool, 7, 8);
     }
+
+    release(corpse) {
+        const me = this;
+
+        corpse.dispose(me._pool);
+    }
 }
