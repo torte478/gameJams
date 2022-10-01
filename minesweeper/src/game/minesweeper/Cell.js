@@ -59,7 +59,7 @@ export default class Cell {
     _select() {
         const me = this;
 
-        me._sprite.setTint(0xff0000);
+        me._sprite.setTint(0x00ff00);
         me._sprite.setAlpha(0.5);
     }
 

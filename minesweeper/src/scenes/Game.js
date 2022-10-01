@@ -21,7 +21,8 @@ export default class Game extends Phaser.Scene {
         Utils.loadImage(me, 'minesweeper_background');
 
         Utils.loadSpriteSheet(me, 'cells', Consts.Unit);
-        Utils.loadSpriteSheet(me, 'soldiers', Consts.Unit, Consts.Unit * 2);
+        Utils.loadSpriteSheet(me, 'soldiers', Consts.Unit);
+        Utils.loadSpriteSheet(me, 'items', Consts.Unit);
 
         Utils.loadWav(me, 'button_click');
     }
@@ -32,6 +33,7 @@ export default class Game extends Phaser.Scene {
         Animation.init(me);
 
         me._core = new Core(me);
+        me.input.keyboard.on('keydown', me._core.onKeyDown, me._core);
     }
 
     update() {

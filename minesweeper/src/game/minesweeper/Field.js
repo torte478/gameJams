@@ -12,6 +12,9 @@ export default class Field {
     /** @type {Phaser.GameObjects.Container} */
     _container;
 
+    /** @type {Phaser.Geom.Rectangle} */
+    _bounds;
+
     /** @type {Cell[][]} */
     _cells;
 
@@ -64,6 +67,12 @@ export default class Field {
         me._container = scene.add.container(x, y, children)
             .setSize(width * Consts.Unit, height * Consts.Unit);
 
+        me._bounds = new Phaser.Geom.Rectangle(
+            x - Consts.Unit,
+            y - Consts.Unit,
+            me._container.getBounds().width + 2 * Consts.Unit,
+            me._container.getBounds().height + 2 * Consts.Unit)
+
         me._isGenerated = false;
         me._status = status;
         me.emitter = new Phaser.Events.EventEmitter();
@@ -74,7 +83,7 @@ export default class Field {
         const me = this;
 
         const inside = Phaser.Geom.Rectangle.ContainsPoint(
-            me._container.getBounds(),
+            me._bounds,
             pointer);
 
         me._container.setAlpha(inside ? 1 : 0.05);
@@ -89,8 +98,8 @@ export default class Field {
 
         const cell = Utils.toMatrixIndex(me._cells, index);
         return Utils.buildPoint(
-            me._container.x + cell.j * Consts.Unit + Consts.Unit / 2,
-            me._container.y + cell.i * Consts.Unit + Consts.Unit / 2)
+            me._container.x + cell.j * Consts.Unit,
+            me._container.y + cell.i * Consts.Unit - Consts.UnitSmall)
     }
 
     _onCellClick(index) {

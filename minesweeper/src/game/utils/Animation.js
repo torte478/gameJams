@@ -6,12 +6,12 @@ export default class Animation {
      * @param {Phaser.Scene} scene 
      */
     static init(scene) {
-        // scene.anims.create({
-        //     key: 'ANIM_NAME',
-        //     frames: Animation.getFrames(scene, 'ASSET_NAME', [ 1, 2, 3 ]),
-        //     frameRate: 24,
-        //     repeat: -1
-        // });
+        scene.anims.create({
+            key: 'parachute',
+            frames: Animation.getFrames(scene, 'items', [ 0, 1 ]),
+            frameRate: 8,
+            repeat: -1
+        });
     }
 
     static getFrames(scene, texture, frames) {

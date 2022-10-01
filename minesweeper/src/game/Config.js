@@ -7,6 +7,7 @@ export default class Config {
         PlaySound: true,
         Random: false,
         Level: true,
+        Restart: true,
     };
 
     static Field = {

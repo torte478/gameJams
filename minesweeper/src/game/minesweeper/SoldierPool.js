@@ -14,7 +14,7 @@ export default class SoldierPool {
     getNext() {
         const me = this;
         
-        const soldier = new Soldier(me._scene); //TODO
+        const soldier = new Soldier(me._scene, 500, 500); //TODO
         return soldier;
     }
 }

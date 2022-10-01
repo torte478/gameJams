@@ -62,4 +62,16 @@ export default class Core {
             me._log.setText(text);
         });
     }
+
+    onKeyDown(event) {
+        const me = this;
+
+        Utils.ifDebug(Config.Debug.Restart, () => {
+            if (event.repeat || event.key != 'r') 
+                return;
+            
+            Utils.debugLog('restart');
+            me._scene.scene.start('game');
+        })
+    }
 }
