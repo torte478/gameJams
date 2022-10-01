@@ -32,6 +32,13 @@ export default class Animation {
             frameRate: 8,
             repeat: -1
         });
+
+        scene.anims.create({
+            key: 'clock_alarm',
+            frames: 'clock',
+            frameRate: 2,
+            repeat: -1
+        });
     }
 
     static getFrames(scene, texture, frames) {

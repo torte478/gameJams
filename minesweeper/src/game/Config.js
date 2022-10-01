@@ -3,7 +3,7 @@ export default class Config {
     static Debug = {
         Global: true,
         Log: true,
-        ShowSceneLog: true,
+        ShowSceneLog: false,
         PlaySound: true,
         Random: false,
         Level: true,
@@ -31,6 +31,8 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ];
+
+    static Timer = 3000;
 
     static Levels = [
         //0

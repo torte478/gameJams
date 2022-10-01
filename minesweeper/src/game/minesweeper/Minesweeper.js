@@ -11,6 +11,7 @@ import Enums from '../Enums.js';
 import CorpsePool from './CorpsePool.js';
 import Helper from '../Helper.js';
 import Graphics from '../Graphics.js';
+import Clock from './Clock.js';
 
 export default class Minesweeper {
 
@@ -34,6 +35,9 @@ export default class Minesweeper {
 
     /** @type {Graphics} */
     _graphics;
+
+    /** @type {Clock} */
+    _clock;
 
     /**
      * @param {Phaser.Scene} scene 
@@ -65,6 +69,9 @@ export default class Minesweeper {
         me._soldiers = [];
         me._soldierPool = new SoldierPool(scene);
         me._corpsePool = new CorpsePool(scene);
+
+        me._clock = new Clock(scene, Config.Timer);
+        me._clock.reset();
     }
 
     /** @type {Phaser.Geom.Point} */
@@ -72,6 +79,7 @@ export default class Minesweeper {
         const me = this;
 
         me._field.update(pointer);
+        me._clock.update();
     }
 
     _onCellClick(index) {
