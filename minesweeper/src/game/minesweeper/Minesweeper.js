@@ -13,6 +13,7 @@ import Graphics from '../Graphics.js';
 import Clock from './Clock.js';
 import Reserve from '../Reserve.js';
 import Corpse from './Corpse.js';
+import Audio from '../utils/Audio.js';
 
 export default class Minesweeper {
 
@@ -55,17 +56,21 @@ export default class Minesweeper {
     /** @type {Number} */
     _maxFlags;
 
+    /** @type {Audio} */
+    _audio;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Status} status
      * @param {Graphics} graphics
      */
-    constructor(scene, status, graphics, reserve) {
+    constructor(scene, status, graphics, reserve, audio) {
         const me = this;
 
         me._scene = scene;
         me._status = status;
         me._graphics = graphics;
+        me._audio = audio;
 
         scene.add.image(
                 Consts.Viewport.Width / 2, 
@@ -123,6 +128,8 @@ export default class Minesweeper {
 
     _onCellClick(index, button) {
         const me = this;
+
+        me._audio.play('action_start');
 
         if (button == 0) {
             me._status.busy();
@@ -194,7 +201,15 @@ export default class Minesweeper {
             me._explodeMine(soldierIndex, cellIndex);
         }
         else {
-            me._field.openCell(cellIndex);
+            const wasOpen = me._field.isOpen(cellIndex);
+
+            const content = me._field.openCell(cellIndex);
+
+            if (!wasOpen) {
+                if (content == Enums.Cell.Empty0)
+                    me._audio.play('empty_cell');
+            }
+
             me._finishStep();
         }
     }

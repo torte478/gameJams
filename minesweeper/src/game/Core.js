@@ -61,9 +61,9 @@ export default class Core {
         me._screenTransfer.emmiter.on('transfer', me._onTransferClick, me);
 
         const graphics = new Graphics(scene);
-        me._minesweeper = new Minesweeper(scene, me._status, graphics, me._reserve);
+        me._minesweeper = new Minesweeper(scene, me._status, graphics, me._reserve, me._audio);
 
-        me._city = new City(scene, me._status, me._reserve, graphics);
+        me._city = new City(scene, me._status, me._reserve, graphics, me._audio);
 
         if (Config.Levels[me._status.level].StartInCity) {
             me._city.resume();
@@ -73,6 +73,42 @@ export default class Core {
         }
 
         scene.input.mouse.disableContextMenu();
+
+        if (!Utils.isDebug(Config.Debug.LevelName)) {
+            me._status.busy();
+
+            const levelText = `Level ${me._status.level + 1}/${Config.Levels.length}`;
+            const levelTextObj = scene.add.text(-Consts.Viewport.Width, Consts.Viewport.Height / 2, levelText, { 
+                fontFamily: 'Arial Black',
+                fontSize: 84,
+                color: '#e3f0ff'})
+                .setStroke('#6a7798', 16)
+                .setShadow(2, 2, '#333333', 2)
+                .setScrollFactor(0)
+                .setOrigin(0.5, 0.5)
+                .setDepth(Consts.Depth.Max);
+
+            scene.tweens.timeline({
+                targets: levelTextObj,
+                tweens: [
+                    {
+                        x: Consts.Viewport.Width / 2,
+                        ease: 'Sine.easeOut',
+                        duration: 1000
+                    },
+                    {
+                        x: Consts.Viewport.Width + Consts.Viewport.Width / 2,
+                        ease: 'Sine.easeIn',
+                        duration: 1000,
+                        delay: 1000
+                    }
+                ],
+                onComplete: () => {
+                    levelTextObj.setVisible(false);
+                    me._status.free();
+                }
+            });
+        }
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })

@@ -73,6 +73,8 @@ export default class Cell {
         me._sprite.setFrame(me._content);
         me._isOpen = true;
         me.isFlag = false;
+
+        return me._content;
     }
 
     isOpen() {

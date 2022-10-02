@@ -159,7 +159,14 @@ export default class Field {
         const me = this;
 
         const cell = Utils.toMatrixIndex(me._cells, index);
-        me._cells[cell.i][cell.j].open();
+        return me._cells[cell.i][cell.j].open();
+    }
+
+    isOpen(index) {
+        const me = this;
+
+        const cell = Utils.toMatrixIndex(me._cells, index);
+        return me._cells[cell.i][cell.j].isOpen();
     }
 
     /**

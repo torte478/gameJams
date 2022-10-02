@@ -4,6 +4,7 @@ import Consts from '../Consts.js';
 import Graphics from '../Graphics.js';
 import Reserve from '../Reserve.js';
 import Status from '../Status.js';
+import Audio from '../utils/Audio.js';
 import Utils from '../utils/Utils.js';
 import Citizen from './Citizen.js';
 import CitizenPool from './CitizenPool.js';
@@ -31,19 +32,23 @@ export default class City {
     /** @type {Graphics} */
     _graphics;
 
+    /** @type {Audio} */
+    _audio;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Status} status
      * @param {Reserve} reserve
      * @param {Graphics} graphics
      */
-    constructor(scene, status, reserve, graphics) {
+    constructor(scene, status, reserve, graphics, audio) {
         const me = this;
 
         me._scene = scene;
         me._reserve = reserve;
         me._status = status;
         me._graphics = graphics;
+        me._audio = audio;
 
         scene.add.image(-Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'city_background')
             .setDepth(Consts.Depth.Background);
@@ -108,6 +113,7 @@ export default class City {
 
         me._status.busy();
         citizen.disableBody();
+        me._audio.play('action_start');
         me._reserve.addSoldier(citizen, me._onSoldierAdd, me);
     }
 
@@ -117,6 +123,7 @@ export default class City {
         me._citizenPool.killAndHide(citizen);
         me._status.avaialbeCitizens -= 1;
         me._hud.setText(me._status.avaialbeCitizens);
+        me._audio.play('action_end');
         me._status.free();
     }
 
