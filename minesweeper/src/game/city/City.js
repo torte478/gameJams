@@ -59,7 +59,7 @@ export default class City {
                 Utils.getRandom(Consts.Citizen.LeftX, Consts.Citizen.RightX),
                 Utils.getRandom(Consts.Citizen.UpY, Consts.Citizen.DownY));
 
-            me._citizenPool.getNext(position);
+            me._citizenPool.spawn(position);
         }
     }
 
@@ -81,11 +81,14 @@ export default class City {
         const me = this;
 
         me._citizenPool.killAndHide(citizen);
+        me._citizenCount -= 1;
         me._status.free();
     }
 
     _onWorldBounds(body) {
-        const container = body.gameobject;
-        console.log('banana');
+        /** @type {Phaser.Physics.Arcade.Sprite} */
+        const sprite = body.gameObject;
+
+        sprite.setFlipX(!sprite.flipX);
     }
 }

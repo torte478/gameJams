@@ -40,8 +40,8 @@ export default class Config {
         {
             Mines: 10,
             TimerDeathProbability: 25,
-            ReserveStartCount: 5,
-            StartInCity: false,
+            ReserveStartCount: 0,
+            StartInCity: true,
             CitizenCount: 20,
             MinCitizenSpeed: 50,
             MaxCitizenSpeed: 100,

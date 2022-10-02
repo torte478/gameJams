@@ -121,7 +121,6 @@ export default class Reserve {
         const target = Utils.buildPoint(
             me._container.x + me._reserve[index].sprite.x - Consts.Viewport.Width,
             me._container.y + me._reserve[index].sprite.y);
-        citizen.hideShadow();
 
         me._scene.add.tween({
             targets: citizen.toGameObject(),

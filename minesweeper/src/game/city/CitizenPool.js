@@ -20,19 +20,21 @@ export default class CitizenPool {
         const me = this;
    
         me._scene = scene;
-        me._pool = scene.add.group();
+        me._pool = scene.physics.add.group();
         me._skinIndex = 0;
         me._level = status.level;
         me._clickCallback = clickCallback;
         me._scope = scope;
     }
 
-    getNext(pos) {
+    spawn(pos) {
         const me = this;
 
         const skin = me._skinIndex % Consts.Citizen.SkinCount;
         me._skinIndex++;
-        return new Citizen(me._scene, me._pool, pos, skin, me._level, me._clickCallback, me._scope);
+        const citizen = new Citizen(me._scene, me._pool, pos, skin, me._level, me._clickCallback, me._scope);
+
+        Phaser.Actions.Call(me._pool.getChildren(), b => b.body.onWorldBounds = true);
     }
 
     killAndHide(citizen) {

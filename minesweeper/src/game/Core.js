@@ -82,7 +82,8 @@ export default class Core {
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             let text = 
-                `mse: ${pointer.x} ${pointer.y}`;
+                `mse: ${pointer.x} ${pointer.y}\n` +
+                `ctz: ${me._city._citizenCount}`;
 
             me._log.setText(text);
         });
