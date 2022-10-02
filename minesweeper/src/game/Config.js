@@ -8,7 +8,7 @@ export default class Config {
         Random: false,
         Level: true,
         Restart: true,
-        Mines: false,
+        Mines: true,
         TweenSpeed: false,
         Timer: false,
     };
@@ -40,7 +40,7 @@ export default class Config {
         {
             Mines: 10,
             TimerDeathProbability: 25,
-            ReserveStartCount: 0,
+            ReserveStartCount: 5,
             StartInCity: true,
             CitizenCount: 20,
             MinCitizenSpeed: 50,

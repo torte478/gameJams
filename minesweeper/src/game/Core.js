@@ -52,7 +52,8 @@ export default class Core {
             Consts.Viewport.Width - Consts.Unit, 
             Consts.Viewport.Height - Consts.Unit,
             Config.Levels[me._status.level].ReserveStartCount,
-            Consts.ReserveMaxSize);
+            Consts.ReserveMaxSize,
+            me._status);
 
         me._screenTransfer = new ScreenTransfer(scene, me._status);
         me._screenTransfer.emmiter.on('transfer', me._onTransferClick, me);
@@ -60,12 +61,13 @@ export default class Core {
         const graphics = new Graphics(scene);
         me._minesweeper = new Minesweeper(scene, me._status, graphics, me._reserve);
 
-        me._city = new City(scene, me._status, me._reserve);
+        me._city = new City(scene, me._status, me._reserve, graphics);
 
         if (Config.Levels[me._status.level].StartInCity) {
             me._city.resume();
             scene.cameras.main.setScroll(
                 -Consts.Viewport.Width, 0);
+            me._reserve.shift(true);
         }
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
@@ -87,7 +89,8 @@ export default class Core {
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             let text = 
                 `mse: ${pointer.x} ${pointer.y}\n` +
-                `ctz: ${me._city._citizenCount}`;
+                `ctz: ${me._city._citizenCount}\n` +
+                `cty: ${me._status.isCity}`;
 
             me._log.setText(text);
         });
@@ -124,6 +127,7 @@ export default class Core {
                 else 
                     me._city.pause();
 
+                me._reserve.shift(me._status.isCity);
                 me._screenTransfer.onTransferEnd();
                 me._status.free();
             }

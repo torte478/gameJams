@@ -1,3 +1,5 @@
+import Config from './Config.js';
+
 export default class Status {
 
     /** @type {Boolean} */
@@ -6,10 +8,14 @@ export default class Status {
     /** @type {Number} */
     level;
 
+    /** @type {Boolean} */
+    isCity;
+
     constructor(level) {
         const me = this;
 
         me.level = level;
+        me.isCity = Config.Levels[level].StartInCity;
     }
 
     busy() {

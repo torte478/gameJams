@@ -53,6 +53,18 @@ export default class Graphics {
         return me._pool.create(pos.x, pos.y, 'explosions', 6);
     }
 
+    createCoffin(pos) {
+        const me = this;
+
+        return me._pool.create(pos.x, pos.y, 'items', 16);
+    }
+
+    createGrave(pos) {
+        const me = this;
+
+        return me._pool.create(pos.x, pos.y, 'items', Utils.getRandom(20, 22));
+    }
+
     killAndHide(obj) {
         const me = this;
 

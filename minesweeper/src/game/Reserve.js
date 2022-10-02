@@ -18,21 +18,29 @@ export default class Reserve {
     /** @type {Number} */
     _maxSize;
 
+    /** @type {Status} */
+    _status;
+
     /** @type {Phaser.Events.EventEmitter} */
     emitter;
 
-    constructor(scene, x, y, startCount, maxSize) {
+    _x;
+
+    constructor(scene, x, y, startCount, maxSize, status) {
         const me = this;
 
         me._scene = scene;
         me._maxSize = maxSize;
+        me._status = status;
+
+        me._x = x;
 
         me._reserve = [];
         for (let i = 0; i < maxSize; ++i) {
 
             const content = i >= startCount
                 ? Enums.Reserve.Empty
-                : Enums.Reserve.Soilder;
+                : Enums.Reserve.ClosedCoffin;
 
             const sprite = scene.add.sprite(0, -Consts.Unit * i, 'items', 13 + content)
                 .setInteractive();
@@ -46,7 +54,6 @@ export default class Reserve {
         }
 
         me._container = scene.add.container(x, y, me._reserve.map(r => r.sprite))
-            .setScrollFactor(0)
             .setDepth(Consts.Depth.UI);
 
         me.emitter = new Phaser.Events.EventEmitter();
@@ -95,10 +102,7 @@ export default class Reserve {
             targets: corpse.toGameObject(),
             x: target.x,
             y: target.y,
-            duration: Utils.getTweenDuration(
-                corpse.toPoint(),
-                target,
-                Consts.Speed.FillReserve),
+            duration: Consts.Speed.Reserve,
             ease: 'Sine.easeInOut',
             onComplete: () => {
 
@@ -119,17 +123,14 @@ export default class Reserve {
             r => r.content == Enums.Reserve.Empty);
 
         const target = Utils.buildPoint(
-            me._container.x + me._reserve[index].sprite.x - Consts.Viewport.Width,
+            me._container.x + me._reserve[index].sprite.x,
             me._container.y + me._reserve[index].sprite.y);
 
         me._scene.add.tween({
             targets: citizen.toGameObject(),
             x: target.x,
             y: target.y,
-            duration: Utils.getTweenDuration(
-                citizen.toPoint(),
-                target,
-                Consts.Speed.FillReserve),
+            duration: Consts.Speed.Reserve,
             ease: 'Sine.easeInOut',
             onComplete: () => {
 
@@ -151,12 +152,41 @@ export default class Reserve {
         return index != null;
     }
 
-    _onReserveClick() {
+    removeCoffin() {
         const me = this;
 
         const index = Utils.lastIndexOrNull(
             me._reserve,
-            r => r.content == Enums.Reserve.OpenCoffin);
+            r => r.content == Enums.Reserve.ClosedCoffin);
+
+        me._reserve[index].content = Enums.Reserve.Empty;
+        me._reserve[index].sprite.setFrame(13 + Enums.Reserve.Empty);
+
+        return Utils.buildPoint(
+            me._container.x,
+            me._container.y - index * Consts.Unit
+        );
+    }
+
+    shift(isCity) {
+        const me = this;
+
+        if (isCity)
+            me._container.setX(-Consts.Viewport.Width + me._x);
+        else
+            me._container.setX(me._x);
+    }
+
+    _onReserveClick() {
+        const me = this;
+
+        const target = me._status.isCity
+            ? Enums.Reserve.ClosedCoffin
+            : Enums.Reserve.OpenCoffin;
+
+        const index = Utils.lastIndexOrNull(
+            me._reserve,
+            r => r.content == target);
 
         if (index == null)
             return;

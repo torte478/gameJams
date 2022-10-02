@@ -312,7 +312,7 @@ export default class Minesweeper {
     _onCoffinClick() {
         const me = this;
 
-        if (me._status.isBusy)
+        if (me._status.isBusy || me._status.isCity)
             return;
 
         if (me._corpses.length == 0)

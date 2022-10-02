@@ -51,6 +51,7 @@ export default class ScreenTransfer {
 
         me._status.busy();
         me._inCity = !me._inCity;
+        me._status.isCity = !me._status.isCity;
         
         me._button.setVisible(false);
 

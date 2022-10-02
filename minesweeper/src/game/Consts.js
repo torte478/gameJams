@@ -22,7 +22,7 @@ export default class Consts {
         Spawn: 200,
         SoilderMovement: 400,
         Shot: 7000,
-        FillReserve: 400,
+        Reserve: 750,
         Camera: 1000,
     };
 
