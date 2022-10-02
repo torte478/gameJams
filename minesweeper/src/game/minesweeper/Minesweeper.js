@@ -79,7 +79,8 @@ export default class Minesweeper {
             (Consts.Viewport.Width - Consts.Unit * Config.Field.Width) / 2, 
             (Consts.Viewport.Height - Consts.Unit * Config.Field.Height) / 2, 
             Config.Field.Width, 
-            Config.Field.Height);
+            Config.Field.Height,
+            reserve);
         me._field.emitter.on('cellClick', me._onCellClick, me);
 
         me._soldiers = [];
@@ -222,7 +223,6 @@ export default class Minesweeper {
         if (me._clock.isAlarm() && me._soldiers.length > 0)
             return me._tryKillByClock();
 
-        me._status.free();
         me._field.lockAlpha = false;
 
         if (me._soldiers.length == 0)
@@ -232,6 +232,16 @@ export default class Minesweeper {
             me._clock.reset();
 
         me._updateHud();
+
+        if (me._field.isWin())
+            throw 'WIN!';
+
+        if (me._soldiers.length == 0 
+            && me._reserve.getSoilderCount() == 0 
+            && me._status.avaialbeCitizens == 0)
+            throw 'LOSE!';
+
+        me._status.free();        
     }
 
     _explodeMine(soldierIndex, cellIndex) {

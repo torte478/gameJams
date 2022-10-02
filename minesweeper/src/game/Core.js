@@ -45,7 +45,7 @@ export default class Core {
 
         me._scene = scene;
         me._audio = new Audio(scene);
-
+        
         me._status = new Status(Config.StartLevelIndex); // TODO
         me._reserve = new Reserve(
             scene, 
@@ -91,7 +91,7 @@ export default class Core {
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             let text = 
                 `mse: ${pointer.x} ${pointer.y}\n` +
-                `ctz: ${me._city._citizenCount}\n` +
+                `ctz: ${me._status.avaialbeCitizens}\n` +
                 `cty: ${me._status.isCity}`;
 
             me._log.setText(text);

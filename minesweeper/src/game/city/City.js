@@ -16,8 +16,6 @@ export default class City {
     /** @type {CitizenPool} */
     _citizenPool;
 
-    _citizenCount;
-
     /** @type {Reserve} */
     _reserve;
 
@@ -59,7 +57,6 @@ export default class City {
         scene.physics.world.on('worldbounds', me._onWorldBounds);
 
         me._citizenPool = new CitizenPool(scene, status, me._onCitizenClick, me);
-        me._citizenCount = Config.Levels[status.level].CitizenCount;
 
         me._reserve.emitter.on('coffinClick', me._onReserveClick, me);
 
@@ -79,7 +76,7 @@ export default class City {
     resume() {
         const me = this;
 
-        const count = Math.min(me._citizenCount, Consts.Citizen.MaxCountPerScreen);
+        const count = Math.min(me._status.avaialbeCitizens, Consts.Citizen.MaxCountPerScreen);
         for (let i = 0; i < count; ++i) {
             const position = Utils.buildPoint(
                 Utils.getRandom(Consts.Citizen.LeftX, Consts.Citizen.RightX),
@@ -113,7 +110,7 @@ export default class City {
         const me = this;
 
         me._citizenPool.killAndHide(citizen);
-        me._citizenCount -= 1;
+        me._status.avaialbeCitizens -= 1;
         me._status.free();
     }
 

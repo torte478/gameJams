@@ -47,12 +47,13 @@ export default class Field {
      * @param {Number} width 
      * @param {Number} height 
      */
-    constructor(scene, status, x, y, width, height) {
+    constructor(scene, status, x, y, width, height, reserve) {
         const me = this
 
         me._scene = scene;
         me._isIncreaseAlpha = true;
         me.lockAlpha = false;
+        me._reserve = reserve;
 
         me._cells = [];
         for (let i = 0; i < height; ++i) {
@@ -258,6 +259,24 @@ export default class Field {
         return totalFlags;
     }
 
+    isWin() {
+        const me = this;
+
+        let closed = 0;
+        for (let i = 0; i < me._cells.length; ++i)
+            for (let j = 0; j < me._cells[i].length; ++j)
+                if (!me._cells[i][j].isOpen())
+                    ++closed;
+
+        let mines = 0;
+        for (let i = 0; i < me._cells.length; ++i)
+            for (let j = 0; j < me._cells[i].length; ++j)
+                if (me._cells[i][j].canExplode())
+                    ++mines;
+
+        return closed == mines;
+    }
+
     _getReachedSoldiers(targetIndex, soldierPositions) {
         const me = this;
 
@@ -316,7 +335,7 @@ export default class Field {
         if (me._status.isBusy)
             return;
 
-        if (!me._isGenerated && button == 0)
+        if (!me._isGenerated && button == 0 && me._reserve.getSoilderCount() > 0)
             me._generate();
             
         me._makeStep(index, button);
@@ -350,6 +369,11 @@ export default class Field {
                     .length;
 
                 me._cells[cur.i][cur.j].setContent(content);
+
+                Utils.ifDebug(Config.Debug.Mines, () => {
+                    if (Config.DebugMines[cur.i][cur.j] == 2)
+                        me._cells[cur.i][cur.j].open();
+                });
             }
 
         me._isGenerated = true;
@@ -362,7 +386,7 @@ export default class Field {
             const mines = [];
             for (let i = 0; i < Config.DebugMines.length; ++i)
                 for (let j = 0; j < Config.DebugMines[i].length; ++j)
-                    mines.push(!!Config.DebugMines[i][j]);
+                    mines.push(Config.DebugMines[i][j] == 1);
 
             return mines;
         }

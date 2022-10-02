@@ -11,11 +11,15 @@ export default class Status {
     /** @type {Boolean} */
     isCity;
 
+    /** @type {Number} */
+    avaialbeCitizens
+
     constructor(level) {
         const me = this;
 
         me.level = level;
         me.isCity = Config.Levels[level].StartInCity;
+        me.avaialbeCitizens = Config.Levels[level].CitizenCount;
     }
 
     busy() {
