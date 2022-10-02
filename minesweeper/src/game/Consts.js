@@ -27,10 +27,10 @@ export default class Consts {
     };
 
     static FieldAlpha = {
-        Min: 0.05,
+        Min: 0.01,
         Max: 1,
-        DurationInc: 2000,
-        DurationDec: 2000,
+        DurationInc: 1500,
+        DurationDec: 1500,
         DurationDecForce: 250
     };
 
