@@ -37,7 +37,7 @@ export default class Graphics {
 
         /** @type {Phaser.GameObjects.Sprite} */
         const smoke = me._pool.create(pos.x, pos.y, 'items')
-            .setDepth(Consts.Depth.Ground);
+            .setDepth(Consts.Depth.Smoke);
         smoke.play('mine_smoke');
 
         return smoke;
@@ -48,7 +48,7 @@ export default class Graphics {
 
         /** @type {Phaser.GameObjects.Sprite} */
         const bigSpot = me._pool.create(pos.x, pos.y + 12, 'explosions', Utils.getRandom(13, 15))
-        .setDepth(Consts.Depth.Ground);
+            .setDepth(Consts.Depth.Ground);
         
         bigSpot.setAngle(Utils.getRandom(0, 360));
     }

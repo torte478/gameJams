@@ -13,6 +13,7 @@ export default class Consts {
         Background: -1000,
         FieldBackground: -500,
         Ground: 100,
+        Smoke: 200,
         Corpse: 250,
         Soldier: 500,
         CitizenBottom: 500,
