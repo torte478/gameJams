@@ -60,6 +60,9 @@ export default class Core {
         me._screenTransfer = new ScreenTransfer(scene, me._status);
         me._screenTransfer.emmiter.on('transfer', me._onTransferClick, me);
 
+        me._cityTheme = scene.sound.add('city_theme', { volume: 0.25, loop: true });
+        me._mineTheme = scene.sound.add('mine_theme', { volume: 0.25, loop: true });
+
         const graphics = new Graphics(scene);
         me._minesweeper = new Minesweeper(scene, me._status, graphics, me._reserve, me._audio);
 
@@ -70,6 +73,10 @@ export default class Core {
             scene.cameras.main.setScroll(
                 -Consts.Viewport.Width, 0);
             me._reserve.shift(true);
+
+            me._cityTheme.play();
+        } else {
+            me._mineTheme.play();
         }
 
         scene.input.mouse.disableContextMenu();
@@ -151,10 +158,14 @@ export default class Core {
     _onTransferClick(toCity) {
         const me = this;
 
-        if (toCity)
+        if (toCity) {
             me._city.resume();
-        else
+            me._mineTheme.stop();
+        }
+        else {
+            me._cityTheme.stop();
             me._minesweeper.resume();
+        }
 
         me._audio.play('action_start');
 
@@ -164,10 +175,14 @@ export default class Core {
             duration: Consts.Speed.Camera,
             ease: 'Sine.easeInOut',
             onComplete: () => {
-                if (toCity)
+                if (toCity) {
                     me._minesweeper.pause();
-                else 
+                    me._cityTheme.play();
+                }
+                else  {
                     me._city.pause();
+                    me._mineTheme.play();
+                }
 
                 me._reserve.shift(me._status.isCity);
                 me._screenTransfer.onTransferEnd();
