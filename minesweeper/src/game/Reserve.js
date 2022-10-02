@@ -36,6 +36,7 @@ export default class Reserve {
         me._x = x;
 
         me._reserve = [];
+        const children =[];
         for (let i = 0; i < maxSize; ++i) {
 
             const content = i >= startCount
@@ -47,13 +48,21 @@ export default class Reserve {
 
             sprite.on('pointerdown', me._onReserveClick, me);
 
+            const arrow = scene.add.sprite(sprite.x - 55, sprite.y, 'items', 25)
+                .setVisible(false)
+                .play('arrow_reserve');
+
             me._reserve.push({
                 sprite: sprite,
-                content: content
+                content: content,
+                arrow: arrow
             });
+
+            children.push(sprite);
+            children.push(arrow);
         }
 
-        me._container = scene.add.container(x, y, me._reserve.map(r => r.sprite))
+        me._container = scene.add.container(x, y, children)
             .setDepth(Consts.Depth.UI);
 
         me.emitter = new Phaser.Events.EventEmitter();
@@ -192,5 +201,17 @@ export default class Reserve {
             return;
 
         me.emitter.emit('coffinClick');
+    }
+
+    updateHud(corpses) {
+        const me = this;
+
+        if (me._status.isCity) {
+            for (let i = 0; i < me._reserve.length; ++i)
+                me._reserve[i].arrow.setVisible(me._reserve[i].content == Enums.Reserve.ClosedCoffin);
+        } else {
+            for (let i = 0; i < me._reserve.length; ++i)
+                me._reserve[i].arrow.setVisible(me._reserve[i].content == Enums.Reserve.OpenCoffin && corpses > 0);
+        }
     }
 }

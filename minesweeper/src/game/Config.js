@@ -1,14 +1,14 @@
 export default class Config {
 
     static Debug = {
-        Global: true,
+        Global: false,
         Log: true,
         ShowSceneLog: false,
         PlaySound: true,
         Random: false,
         Level: true,
         Restart: true,
-        Mines: false,
+        Mines: true,
         TweenSpeed: false,
         Timer: false,
         LevelName: true
@@ -21,7 +21,7 @@ export default class Config {
         Height: 10
     };
 
-    static StartLevelIndex = 2;
+    static StartLevelIndex = 1;
 
     static DebugMines = [
         [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
@@ -60,7 +60,7 @@ export default class Config {
         },
         //1
         {
-            Mines: 20,
+            Mines: 21,
             TimerDeathProbability: 40,
             ReserveStartCount: 0,
             StartInCity: true,

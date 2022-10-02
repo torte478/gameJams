@@ -412,11 +412,24 @@ export default class Field {
             return mines;
         }
 
-        const mines = Utils.buildArray(me._cells.length * me._cells[0].length, false);
+        let mines = Utils.buildArray(me._cells.length * me._cells[0].length, false);
         for (let i = 0; i < Config.Levels[me._status.level].Mines; ++i)
             mines[i] = true;
 
-        return Utils.shuffle(mines);
+        mines = Utils.shuffle(mines);
+
+        if (me._status.level == Consts.FirstLevel && !mines[index]) {
+
+            for (let i = 0; i < mines.length; ++i) {
+                    if (mines[i]) {
+                        mines[i] = false;
+                        mines[index] = true;
+                        return mines;
+                    }
+                }
+        }
+
+        return mines;
     }
 
     _increaseAlpha(force) {

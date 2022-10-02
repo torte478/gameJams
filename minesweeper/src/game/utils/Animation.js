@@ -34,6 +34,14 @@ export default class Animation {
         });
 
         scene.anims.create({
+            key: 'arrow_reserve',
+            frames: Animation.getFrames(scene, 'items', [ 25, 26, 27 ]),
+            frameRate: 8,
+            yoyo: true,
+            repeat: -1
+        });
+
+        scene.anims.create({
             key: 'clock_alarm',
             frames: 'clock',
             frameRate: 2,

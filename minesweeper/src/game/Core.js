@@ -66,9 +66,9 @@ export default class Core {
         me._mineTheme = scene.sound.add('mine_theme', { volume: 0.25, loop: true });
 
         const graphics = new Graphics(scene);
-        me._minesweeper = new Minesweeper(scene, me._status, graphics, me._reserve, me._audio, me._mineTheme);
+        me._minesweeper = new Minesweeper(scene, me._status, graphics, me._reserve, me._audio, me._mineTheme, me._screenTransfer);
 
-        me._city = new City(scene, me._status, me._reserve, graphics, me._audio);
+        me._city = new City(scene, me._status, me._reserve, graphics, me._audio, me._screenTransfer);
 
         if (Config.Levels[me._status.level].StartInCity) {
             me._city.resume();
@@ -79,7 +79,14 @@ export default class Core {
             if (me._status.level != Consts.LastLevel)
                 me._cityTheme.play();
         } else {
-            me._mineTheme.play();
+            if (me._status.level != Consts.FirstLevel)
+                me._mineTheme.play();
+            else {
+                // first level!!!
+                me._cityTheme.play();
+                me._reserve._container.setVisible(false);
+                me._screenTransfer._button.setVisible(false);
+            }
         }
 
         scene.input.mouse.disableContextMenu();
@@ -195,6 +202,9 @@ export default class Core {
                 }
 
                 me._reserve.shift(me._status.isCity);
+                me._reserve._container.setVisible(true);
+                me._reserve.updateHud(0);
+
                 me._screenTransfer.onTransferEnd();
                 me._status.free();
             }

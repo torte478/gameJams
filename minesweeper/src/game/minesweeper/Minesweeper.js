@@ -66,7 +66,7 @@ export default class Minesweeper {
      * @param {Status} status
      * @param {Graphics} graphics
      */
-    constructor(scene, status, graphics, reserve, audio, mineTheme) {
+    constructor(scene, status, graphics, reserve, audio, mineTheme, transfer) {
         const me = this;
 
         me._scene = scene;
@@ -74,6 +74,8 @@ export default class Minesweeper {
         me._graphics = graphics;
         me._audio = audio;
         me._mineTheme = mineTheme;
+        me._needTutorial = status.level == Consts.FirstLevel;
+        me._transfer = transfer;
 
         scene.add.image(
                 Consts.Viewport.Width / 2, 
@@ -353,6 +355,22 @@ export default class Minesweeper {
                 return;
             }
 
+        if (me._needTutorial) {
+            me._transfer._button.setVisible(true);
+
+            me._scene.add.tween({
+                targets: me._transfer._button,
+                scale: { from: 1, to: 2 },
+                yoyo: true,
+                duration: 500,
+                onComplete: () => me._transfer._button.setScale(1),
+            });
+        }
+
+        me._reserve.updateHud(me._corpses.length);
+
+        me._needTutorial = false;
+
         me._field.lockAlpha = false;
         me._status.free();        
     }
@@ -402,6 +420,9 @@ export default class Minesweeper {
         me._field.explode(cellIndex);
         me._maxFlags -= 1;
         me._updateHud();
+
+        if (me._needTutorial)
+            me._scene.sound.stopByKey('city_theme');
         
         me._killSoldier(soldierIndex, cellIndex, Enums.Death.Mine);
     }
