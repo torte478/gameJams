@@ -64,7 +64,7 @@ export default class Core {
         me._mineTheme = scene.sound.add('mine_theme', { volume: 0.25, loop: true });
 
         const graphics = new Graphics(scene);
-        me._minesweeper = new Minesweeper(scene, me._status, graphics, me._reserve, me._audio);
+        me._minesweeper = new Minesweeper(scene, me._status, graphics, me._reserve, me._audio, me._mineTheme);
 
         me._city = new City(scene, me._status, me._reserve, graphics, me._audio);
 
@@ -85,7 +85,10 @@ export default class Core {
             me._status.busy();
 
             const levelText = `Level ${me._status.level + 1}/${Config.Levels.length}`;
-            const levelTextObj = scene.add.text(-Consts.Viewport.Width, Consts.Viewport.Height / 2, levelText, { 
+            const levelTextObj = scene.add.text(
+                    -Consts.Viewport.Width, 
+                    Consts.Viewport.Height / 2, 
+                    levelText, { 
                 fontFamily: 'Arial Black',
                 fontSize: 84,
                 color: '#e3f0ff'})

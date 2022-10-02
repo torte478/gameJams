@@ -36,6 +36,8 @@ export default class Game extends Phaser.Scene {
         Utils.loadWav(me, 'shot');
         Utils.loadWav(me, 'hurt');
 
+        Utils.loadMp3(me, 'win');
+        Utils.loadMp3(me, 'lose');
         Utils.loadMp3(me, 'city_theme');
         Utils.loadMp3(me, 'mine_theme');
 

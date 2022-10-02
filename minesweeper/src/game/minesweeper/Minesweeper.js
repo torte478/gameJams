@@ -14,6 +14,8 @@ import Clock from './Clock.js';
 import Reserve from '../Reserve.js';
 import Corpse from './Corpse.js';
 import Audio from '../utils/Audio.js';
+import ButtonConfig from '../utils/ButtonConfig.js';
+import Button from '../utils/Button.js';
 
 export default class Minesweeper {
 
@@ -64,13 +66,14 @@ export default class Minesweeper {
      * @param {Status} status
      * @param {Graphics} graphics
      */
-    constructor(scene, status, graphics, reserve, audio) {
+    constructor(scene, status, graphics, reserve, audio, mineTheme) {
         const me = this;
 
         me._scene = scene;
         me._status = status;
         me._graphics = graphics;
         me._audio = audio;
+        me._mineTheme = mineTheme;
 
         scene.add.image(
                 Consts.Viewport.Width / 2, 
@@ -106,6 +109,22 @@ export default class Minesweeper {
         me._hud = scene.add.text(70, 180, me._availableFlags, { fontFamily: "Arial Black", fontSize: 24, color: '#6a7798' })
             .setOrigin(0, 0.5)
             .setDepth(Consts.Depth.UI);
+
+        const ecb = new ButtonConfig();
+        ecb.x = Consts.Viewport.Width - 60;
+        ecb.y = 60;
+        ecb.texture = 'items';
+        ecb.frameIdle = 19;
+        ecb.frameSelected = 19;
+        ecb.callback = () => { 
+            me._scene.sound.stopAll();
+            me._scene.scene.start('start', {});
+        };
+        ecb.callbackScope = me;
+        ecb.sound = 'action_start';
+
+        const vvv = new Button(me._scene, me._audio, ecb);
+        vvv._container.setScrollFactor(0);
     }
 
     /** @type {Phaser.Geom.Point} */
@@ -251,13 +270,54 @@ export default class Minesweeper {
 
         me._updateHud();
 
-        if (me._field.isWin())
-            throw 'WIN!';
+        if (me._field.isWin()) {
+            me._mineTheme.stop();
+            me._audio.play('win', { volume: 0.5 });
+            me._clock.stop();
+
+            me._scene.add.text(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'YOU WIN', { 
+                fontFamily: 'Arial Black',
+                fontSize: 84,
+                color: '#e3f0ff'})
+                .setStroke('#6a7798', 16)
+                .setShadow(2, 2, '#333333', 2)
+                .setScrollFactor(0)
+                .setOrigin(0.5, 0.5)
+                .setDepth(Consts.Depth.Max);
+
+
+            me._scene.time.delayedCall(5000, () => {
+                me._scene.sound.stopAll();
+                me._scene.scene.start('game', { level: me._status.level + 1});
+            });
+            return;
+        }
 
         if (me._soldiers.length == 0 
             && me._reserve.getSoilderCount() == 0 
-            && me._status.avaialbeCitizens == 0)
-            throw 'LOSE!';
+            && me._status.avaialbeCitizens == 0) {
+
+                me._mineTheme.stop();
+                me._audio.play('lose', { volume: 0.5 });
+                me._clock.stop();
+
+                me._scene.add.text(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'YOU LOSE', { 
+                    fontFamily: 'Arial Black',
+                    fontSize: 84,
+                    color: '#e3f0ff'})
+                    .setStroke('#6a7798', 16)
+                    .setShadow(2, 2, '#333333', 2)
+                    .setScrollFactor(0)
+                    .setOrigin(0.5, 0.5)
+                    .setDepth(Consts.Depth.Max);
+
+
+                me._scene.time.delayedCall(5000, () => {
+                    me._scene.sound.stopAll();
+                    me._scene.scene.restart({ level: me._status.level});
+                });
+                return;
+            }
 
         me._status.free();        
     }
