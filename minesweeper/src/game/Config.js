@@ -8,10 +8,10 @@ export default class Config {
         Random: false,
         Level: true,
         Restart: true,
-        Mines: true,
+        Mines: false,
         TweenSpeed: false,
         Timer: false,
-        LevelName: false
+        LevelName: true
     };
 
     static Timer = 10000;
@@ -21,7 +21,7 @@ export default class Config {
         Height: 10
     };
 
-    static StartLevelIndex = 0;
+    static StartLevelIndex = 2;
 
     static DebugMines = [
         [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
@@ -54,9 +54,29 @@ export default class Config {
             TimerDeathProbability: 25,
             ReserveStartCount: 1,
             StartInCity: false,
-            CitizenCount: 0,
+            CitizenCount: 50,
             MinCitizenSpeed: 50,
             MaxCitizenSpeed: 100,
-        }
+        },
+        //1
+        {
+            Mines: 20,
+            TimerDeathProbability: 40,
+            ReserveStartCount: 0,
+            StartInCity: true,
+            CitizenCount: 20,
+            MinCitizenSpeed: 300,
+            MaxCitizenSpeed: 300,
+        },
+        //2
+        {
+            Mines: 8,
+            TimerDeathProbability: 100,
+            ReserveStartCount: 0,
+            StartInCity: true,
+            CitizenCount: 1,
+            MinCitizenSpeed: 500,
+            MaxCitizenSpeed: 500,
+        },
     ]
 }

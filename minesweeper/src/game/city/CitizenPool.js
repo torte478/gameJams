@@ -27,10 +27,13 @@ export default class CitizenPool {
         me._scope = scope;
     }
 
-    spawn(pos) {
+    spawn(pos, level) {
         const me = this;
 
-        const skin = me._skinIndex % Consts.Citizen.SkinCount;
+        let skin = me._skinIndex % Consts.Citizen.SkinCount;
+        if (level == Consts.LastLevel)
+            skin = 0;
+
         me._skinIndex++;
         const citizen = new Citizen(me._scene, me._pool, pos, skin, me._level, me._clickCallback, me._scope);
 

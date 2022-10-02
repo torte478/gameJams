@@ -27,6 +27,14 @@ export default class Start extends Phaser.Scene {
         Utils.loadWav(me, 'action_start');
     }
 
+    init(data) {
+        const me = this;
+
+        me._startTime = data.startTime != undefined ? data.startTime : new Date().getTime();
+
+        Utils.debugLog('time: ' + (new Date().getTime() - me._startTime));
+    }
+
     create() {
         const me = this;
 
@@ -69,6 +77,6 @@ export default class Start extends Phaser.Scene {
         const me = this;
 
         me._theme.stop();
-        me.scene.start('game', { level: i });
+        me.scene.start('game', { level: i, startTime: me._startTime });
     }
 }

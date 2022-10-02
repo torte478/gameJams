@@ -23,6 +23,9 @@ export default class Consts {
         Max: 100000
     };
 
+    static FirstLevel = 0;
+    static LastLevel = 2;
+
     static Speed = {
         Spawn: 200,
         SoilderMovement: 400,

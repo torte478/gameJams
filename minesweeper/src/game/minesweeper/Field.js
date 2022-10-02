@@ -344,7 +344,7 @@ export default class Field {
             return;
 
         if (!me._isGenerated && button == 0 && me._reserve.getSoilderCount() > 0)
-            me._generate();
+            me._generate(index);
             
         me._makeStep(index, button);
     }
@@ -355,10 +355,10 @@ export default class Field {
         me.emitter.emit('cellClick', index, button);
     }
 
-    _generate() {
+    _generate(index) {
         const me = this;
 
-        const mines = me._getMines();
+        const mines = me._getMines(index);
 
         for (let i = 0; i < mines.length; ++i)
             if (mines[i]) {
@@ -387,7 +387,7 @@ export default class Field {
         me._isGenerated = true;
     }
 
-    _getMines() {
+    _getMines(index) {
         const me = this;
 
         if (Utils.isDebug(Config.Debug.Mines)) {
@@ -395,6 +395,19 @@ export default class Field {
             for (let i = 0; i < Config.DebugMines.length; ++i)
                 for (let j = 0; j < Config.DebugMines[i].length; ++j)
                     mines.push(Config.DebugMines[i][j] == 1);
+
+            return mines;
+        }
+
+        if (me._status.level == Consts.LastLevel) {
+            
+            const cell = Utils.toMatrixIndex(me._cells, index);
+            const neighbours = Utils.getNeighbours(me._cells, cell.i, cell.j);
+
+            const mines = [];
+            for (let i = 0; i < Config.DebugMines.length; ++i)
+                for (let j = 0; j < Config.DebugMines[i].length; ++j)
+                    mines.push(Utils.any(neighbours, c => c.i == i || c.j == j) && (i != cell.i || j != cell.j));
 
             return mines;
         }

@@ -92,7 +92,7 @@ export default class City {
                 Utils.getRandom(Consts.Citizen.LeftX, Consts.Citizen.RightX),
                 Utils.getRandom(Consts.Citizen.UpY, Consts.Citizen.DownY));
 
-            me._citizenPool.spawn(position);
+            me._citizenPool.spawn(position, me._status.level);
         }
     }
 

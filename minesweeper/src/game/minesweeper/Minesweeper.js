@@ -118,13 +118,38 @@ export default class Minesweeper {
         ecb.frameSelected = 19;
         ecb.callback = () => { 
             me._scene.sound.stopAll();
-            me._scene.scene.start('start', {});
+            me._scene.scene.start('start', { startTime: me._status.startTime });
         };
         ecb.callbackScope = me;
         ecb.sound = 'action_start';
 
         const vvv = new Button(me._scene, me._audio, ecb);
         vvv._container.setScrollFactor(0);
+
+        me._timeText = me._scene.add.text(
+            300, 
+            220, 
+            '1.23',
+            { fontFamily: 'Arial Black', fontSize: 24, color: '#F2FCF2' })
+            .setDepth(Consts.Depth.Max + 100)
+            .setAlpha(0);
+
+
+        me._staticText = me._scene.add.text(
+            300, 
+            250, 
+            'people died during real wars\nwhile you are playing this game',
+            { fontFamily: 'Arial Black', fontSize: 24, color: '#F2FCF2' })
+            .setDepth(Consts.Depth.Max + 100)
+            .setAlpha(0);
+
+        me._stopWarText = me._scene.add.text(
+            300, 
+            400, 
+            'stop war',
+            { fontFamily: 'Arial Black', fontSize: 24, color: '#F2FCF2' })
+            .setDepth(Consts.Depth.Max + 100)
+            .setAlpha(0);
     }
 
     /** @type {Phaser.Geom.Point} */
@@ -133,6 +158,14 @@ export default class Minesweeper {
 
         me._field.update(pointer);
         me._clock.update();
+
+        const min = (new Date().getTime() - me._status.startTime) / (60 * 1000);
+        const result = min * 0.155;
+        const text = result.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        me._timeText.setText(text);
     }
 
     pause() {
@@ -260,8 +293,6 @@ export default class Minesweeper {
         if (me._clock.isAlarm() && me._soldiers.length > 0)
             return me._tryKillByClock();
 
-        me._field.lockAlpha = false;
-
         if (me._soldiers.length == 0)
             me._clock.stop();
 
@@ -288,7 +319,7 @@ export default class Minesweeper {
 
             me._scene.time.delayedCall(5000, () => {
                 me._scene.sound.stopAll();
-                me._scene.scene.start('game', { level: me._status.level + 1});
+                me._scene.scene.start('game', { level: me._status.level + 1, startTime: me._status.startTime});
             });
             return;
         }
@@ -296,6 +327,9 @@ export default class Minesweeper {
         if (me._soldiers.length == 0 
             && me._reserve.getSoilderCount() == 0 
             && me._status.avaialbeCitizens == 0) {
+
+                if (me._status.level == Consts.LastLevel)
+                    return me._endGame();
 
                 me._mineTheme.stop();
                 me._audio.play('lose', { volume: 0.5 });
@@ -314,12 +348,52 @@ export default class Minesweeper {
 
                 me._scene.time.delayedCall(5000, () => {
                     me._scene.sound.stopAll();
-                    me._scene.scene.restart({ level: me._status.level});
+                    me._scene.scene.restart({ level: me._status.level, startTime: me._status.startTime});
                 });
                 return;
             }
 
+        me._field.lockAlpha = false;
         me._status.free();        
+    }
+
+    _endGame() {
+        const me = this;
+
+        me._scene.sound.stopAll();
+        me._audio.play('ending', { volume: 0.75 });
+
+        me._scene.time.delayedCall(10000, 
+            () => {
+            const fade = me._scene.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'fade')
+                .setDepth(Consts.Depth.Max)
+                .setAlpha(0);
+
+            me._scene.add.tween({
+                targets: fade,
+                duration: 5000,
+                alpha: { from: 0, to: 1},
+                onComplete: () => {
+
+                    me._scene.add.tween({
+                        targets: [ me._timeText, me._staticText ],
+                        duration: 5000,
+                        alpha: { from: 0, to: 1},
+                        delay: 1000,
+                        onComplete: () => {
+                            console.log('complete');
+
+                            me._scene.add.tween({
+                                targets: me._stopWarText,
+                                duration: 5000,
+                                alpha: { from: 0, to: 1},
+                                delay: 10000
+                            })
+                        }
+                    })
+                }
+            });
+        })
     }
 
     _explodeMine(soldierIndex, cellIndex) {

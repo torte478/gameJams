@@ -5,6 +5,7 @@ import Utils from '../game/utils/Utils.js';
 
 import Core from '../game/Core.js';
 import Consts from '../game/Consts.js';
+import Config from '../game/Config.js';
 
 export default class Game extends Phaser.Scene {
 
@@ -15,11 +16,21 @@ export default class Game extends Phaser.Scene {
         super('game');
     }
 
+    init(data) {
+        const me = this;
+
+        me._levelIndex = data.level != undefined ? data.level : Config.StartLevelIndex;
+        me._startTime = data.startTime != undefined ? data.startTime : new Date().getTime();
+
+        Utils.debugLog('time: ' + (new Date().getTime() - me._startTime));
+    }
+
     preload() {
         const me = this;
 
         Utils.loadImage(me, 'minesweeper_background');
         Utils.loadImage(me, 'city_background');
+        Utils.loadImage(me, 'fade');
 
         Utils.loadSpriteSheet(me, 'cells', Consts.Unit);
         Utils.loadSpriteSheet(me, 'soldiers', Consts.Unit);
@@ -40,6 +51,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadMp3(me, 'lose');
         Utils.loadMp3(me, 'city_theme');
         Utils.loadMp3(me, 'mine_theme');
+        Utils.loadMp3(me, 'ending');
 
         for (let i = 1; i <= 8; ++i)
             Utils.loadWav(me, `mine_detect_${i}`);
@@ -50,7 +62,7 @@ export default class Game extends Phaser.Scene {
 
         Animation.init(me);
 
-        me._core = new Core(me);
+        me._core = new Core(me, me._levelIndex, me._startTime);
         me.input.keyboard.on('keydown', me._core.onKeyDown, me._core);
     }
 

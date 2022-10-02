@@ -40,7 +40,7 @@ export default class Core {
     /**
      * @param {Phaser.Scene} scene 
      */
-    constructor(scene) {
+    constructor(scene, levelIndex, startTime) {
         const me = this;
 
         scene.cameras.main.setRoundPixels(true);
@@ -48,7 +48,9 @@ export default class Core {
         me._scene = scene;
         me._audio = new Audio(scene);
 
-        me._status = new Status(Config.StartLevelIndex); // TODO
+        me._status = new Status(levelIndex);
+        me._status.startTime = startTime;
+
         me._reserve = new Reserve(
             scene, 
             Consts.Viewport.Width - Consts.Unit, 
@@ -74,7 +76,8 @@ export default class Core {
                 -Consts.Viewport.Width, 0);
             me._reserve.shift(true);
 
-            me._cityTheme.play();
+            if (me._status.level != Consts.LastLevel)
+                me._cityTheme.play();
         } else {
             me._mineTheme.play();
         }
@@ -154,7 +157,7 @@ export default class Core {
                 return;
             
             console.clear();
-            me._scene.scene.start('game');
+            me._scene.scene.start('game', { startTime: me._status.startTime });
         })
     }
 
@@ -180,11 +183,15 @@ export default class Core {
             onComplete: () => {
                 if (toCity) {
                     me._minesweeper.pause();
-                    me._cityTheme.play();
+
+                    if (me._status.level != Consts.LastLevel)
+                        me._cityTheme.play();   
                 }
                 else  {
                     me._city.pause();
-                    me._mineTheme.play();
+
+                    if (me._status.level != Consts.LastLevel)
+                        me._mineTheme.play();
                 }
 
                 me._reserve.shift(me._status.isCity);
