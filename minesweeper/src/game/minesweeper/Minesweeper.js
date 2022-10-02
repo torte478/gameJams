@@ -46,6 +46,15 @@ export default class Minesweeper {
     /** @type {Corpse[]} */
     _corpses;
 
+    /** @type {Phaser.GameObjects.Text} */
+    _hud;
+
+    /** @type {Number} */
+    _availableFlags;
+
+    /** @type {Number} */
+    _maxFlags;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Status} status
@@ -84,6 +93,13 @@ export default class Minesweeper {
 
         me._reserve.emitter.on('coffinClick', me._onCoffinClick, me);
         me._corpses = [];
+
+        me._maxFlags = Config.Levels[me._status.level].Mines;
+        me._availableFlags = me._maxFlags;
+        scene.add.image(40, 140, 'items', 19).setDepth(Consts.Depth.UI);
+        me._hud = scene.add.text(70, 140, me._availableFlags, { fontSize: 24 })
+            .setOrigin(0, 0.5)
+            .setDepth(Consts.Depth.UI);
     }
 
     /** @type {Phaser.Geom.Point} */
@@ -104,13 +120,35 @@ export default class Minesweeper {
         // ...
     }
 
-    _onCellClick(index) {
+    _onCellClick(index, button) {
         const me = this;
 
-        if (me._needSpawnSolder(index))
-            me._trySpawnSoldier(index);
+        if (button == 0) {
+            me._status.busy();
+            if (me._needSpawnSolder(index))
+                me._trySpawnSoldier(index);
+            else
+                me._moveSoldier(index);
+        } else if (button == 2) {
+            me._field.changeFlag(index);
+
+            me._updateHud();
+        }
+    }
+
+    _updateHud() {
+        const me = this;
+
+        me._availableFlags = me._maxFlags - me._field.getFlagCount();
+
+        me._hud.setText(me._availableFlags);
+
+        if (me._availableFlags == 0)
+            me._hud.setColor('#00FF00');
+        else if (me._availableFlags > 0)
+            me._hud.setColor('#FFFFFF');
         else
-            me._moveSoldier(index);
+            me._hud.setColor('#FF0000');
     }
 
     _needSpawnSolder(index) {
@@ -192,12 +230,16 @@ export default class Minesweeper {
 
         if (!me._clock.isAlarm() && !me._clock.isRunning() && me._soldiers.length > 0)
             me._clock.reset();
+
+        me._updateHud();
     }
 
     _explodeMine(soldierIndex, cellIndex) {
         const me = this;
 
         me._field.explode(cellIndex);
+        me._maxFlags -= 1;
+        me._updateHud();
         
         me._killSoldier(soldierIndex, cellIndex, Enums.Death.Mine);
     }

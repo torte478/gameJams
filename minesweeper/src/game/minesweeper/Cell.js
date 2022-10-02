@@ -18,6 +18,9 @@ export default class Cell {
     /** @type {Boolean} */
     _isExploded;
 
+    /** @type {Boolean} */
+    isFlag;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
@@ -26,20 +29,21 @@ export default class Cell {
      * @param {Number} index
      * @param {Boolean} isOpen 
      * @param {Function} callback 
-     * @param {Object} context 
+     * @param {Object} scope 
      */
-    constructor(scene, index, x, y, isOpen, frame, callback, context) {
+    constructor(scene, index, x, y, isOpen, frame, callback, scope) {
         const me = this;
 
         me._content = frame;
         me._isOpen = isOpen;
         me._isMine = false;
         me._isExploded = false;
+        me.isFlag = false;
 
         me._sprite = scene.add.sprite(x, y, 'cells', isOpen ? frame : Enums.Cell.Unknown)
             .setInteractive();
 
-        me._sprite.on('pointerdown', () => { callback.call(context, index) });
+        me._sprite.on('pointerdown', (context) => { callback.call(scope, index, context.button) });
         me._sprite.on('pointerover', me._select, me);
         me._sprite.on('pointerout', me._unselect, me);
     }
@@ -68,6 +72,7 @@ export default class Cell {
 
         me._sprite.setFrame(me._content);
         me._isOpen = true;
+        me.isFlag = false;
     }
 
     isOpen() {
@@ -93,7 +98,23 @@ export default class Cell {
 
         me._isExploded = true;
         me._content = Enums.Cell.Exploded;
+        me.isFlag = false;
         me.open();
+    }
+
+    changeFlag() {
+        const me = this;
+
+        if (me.isOpen())
+            return;
+
+        if (me.isFlag) {
+            me.isFlag = false;
+            me._sprite.setFrame(Enums.Cell.Unknown);
+        } else {
+            me.isFlag = true;
+            me._sprite.setFrame(Enums.Cell.Flag);
+        }
     }
 
     _select() {

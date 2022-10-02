@@ -70,6 +70,8 @@ export default class Core {
             me._reserve.shift(true);
         }
 
+        scene.input.mouse.disableContextMenu();
+
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)

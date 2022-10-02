@@ -238,6 +238,26 @@ export default class Field {
         };
     }
 
+    changeFlag(index) {
+        const me = this;
+
+        const cell = Utils.toMatrixIndex(me._cells, index);
+
+        me._cells[cell.i][cell.j].changeFlag();
+    }
+
+    getFlagCount() {
+        const me = this;
+
+        let totalFlags = 0;
+        for (let i = 0; i < me._cells.length; ++i)
+            for (let j = 0; j < me._cells.length; ++j)
+                if (me._cells[i][j].isFlag)
+                    ++totalFlags;
+
+        return totalFlags;
+    }
+
     _getReachedSoldiers(targetIndex, soldierPositions) {
         const me = this;
 
@@ -290,23 +310,22 @@ export default class Field {
         };
     }
 
-    _onCellClick(index) {
+    _onCellClick(index, button) {
         const me = this;
 
         if (me._status.isBusy)
             return;
 
-        if (!me._isGenerated)
+        if (!me._isGenerated && button == 0)
             me._generate();
             
-        me._makeStep(index);
+        me._makeStep(index, button);
     }
 
-    _makeStep(index) {
+    _makeStep(index, button) {
         const me = this;
 
-        me._status.busy();
-        me.emitter.emit('cellClick', index);
+        me.emitter.emit('cellClick', index, button);
     }
 
     _generate() {

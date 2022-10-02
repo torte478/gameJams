@@ -58,7 +58,7 @@ export default class Consts {
         MaxCountPerScreen: 10,
         LeftX: -850,
         RightX: -100,
-        UpY: 300,
+        UpY: 250,
         DownY: 450
     };
 }
