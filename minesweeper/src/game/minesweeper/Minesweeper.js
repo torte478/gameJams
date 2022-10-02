@@ -377,6 +377,16 @@ export default class Minesweeper {
 
         me._reserve.updateHud(me._corpses.length);
 
+        if (Utils.any(me._reserve._reserve, r => r.content == Enums.Reserve.ClosedCoffin)) {
+            me._scene.add.tween({
+                targets: me._transfer._button,
+                scale: { from: 1, to: 2 },
+                yoyo: true,
+                duration: 500,
+                onComplete: () => me._transfer._button.setScale(1),
+            });
+        }
+
         me._needTutorial = false;
 
         me._field.lockAlpha = false;
@@ -524,8 +534,9 @@ export default class Minesweeper {
 
             me._audio.play('explosion');
 
-            me._graphics.createBigSpot(cellPosition);
         }
+
+        me._graphics.createBigSpot(cellPosition);
 
         const upY = position.y - Consts.Explode.BodyHeight;
         const downY = position.y
