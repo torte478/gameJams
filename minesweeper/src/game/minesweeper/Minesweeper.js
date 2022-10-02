@@ -97,8 +97,8 @@ export default class Minesweeper {
 
         me._maxFlags = Config.Levels[me._status.level].Mines;
         me._availableFlags = me._maxFlags;
-        scene.add.image(40, 140, 'items', 19).setDepth(Consts.Depth.UI);
-        me._hud = scene.add.text(70, 140, me._availableFlags, { fontSize: 24 })
+        scene.add.image(60, 160, 'mine_hud').setDepth(Consts.Depth.UI);
+        me._hud = scene.add.text(70, 160, me._availableFlags, { fontFamily: "Arial Black", fontSize: 24, color: '#6a7798' })
             .setOrigin(0, 0.5)
             .setDepth(Consts.Depth.UI);
     }
@@ -145,11 +145,11 @@ export default class Minesweeper {
         me._hud.setText(me._availableFlags);
 
         if (me._availableFlags == 0)
-            me._hud.setColor('#00FF00');
+            me._hud.setColor('#40C35C');
         else if (me._availableFlags > 0)
-            me._hud.setColor('#FFFFFF');
+            me._hud.setColor('#6a7798');
         else
-            me._hud.setColor('#FF0000');
+            me._hud.setColor('#D16708');
     }
 
     _needSpawnSolder(index) {
@@ -350,7 +350,7 @@ export default class Minesweeper {
                     ease: 'Sine.easeIn',
                     onComplete: () => { 
                         corpse.idle();
-                        // me._graphics.createBloodSpot(cellPosition, corpse.getDepth())
+                        me._graphics.createBloodSpot(cellPosition, corpse.getDepth())
                      }
                 }
             ],
@@ -375,6 +375,7 @@ export default class Minesweeper {
         const index = Utils.getRandom(0, me._corpses.length - 1);
         const corpse = me._corpses[index];
         me._corpses = Utils.removeAt(me._corpses, index);
+        corpse.setDepth(Consts.Depth.UnderUI);
 
         me._reserve.fillCoffin(corpse, me._onCoffinFill, me);
     }

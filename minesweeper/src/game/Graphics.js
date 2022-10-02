@@ -21,7 +21,8 @@ export default class Graphics {
         const me = this;
 
         /** @type {Phaser.GameObjects.Sprite} */
-        const explosion = me._pool.create(pos.x, pos.y, 'explosions');
+        const explosion = me._pool.create(pos.x, pos.y, 'explosions')
+            .setDepth(Consts.Depth.Explosion);
         explosion.play('mine_explosion');
 
         me._scene.time.delayedCall(
@@ -46,8 +47,8 @@ export default class Graphics {
         const me = this;
 
         /** @type {Phaser.GameObjects.Sprite} */
-        const spot = me._pool.create(pos.x, pos.y, 'items', 12);
-        //spot.setDepth(corpseDepth - 1); // TODO
+        const spot = me._pool.create(pos.x, pos.y + 12, 'items', 12)
+            .setDepth(Consts.Depth.Ground);
     }
 
     createShot(pos) {

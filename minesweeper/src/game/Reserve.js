@@ -94,7 +94,7 @@ export default class Reserve {
 
         const target = Utils.buildPoint(
             me._container.x + me._reserve[index].sprite.x,
-            me._container.y + me._reserve[index].sprite.y);
+            me._container.y + me._reserve[index].sprite.y - 16);
             
         corpse.hideShadow();
 

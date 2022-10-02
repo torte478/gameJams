@@ -61,7 +61,7 @@ export default class Corpse {
             upY,
             Consts.Shadow.Middle,
             Consts.Shadow.Big,
-            Consts.Shadow.Offset
+            Consts.Shadow.OffsetBig
         );
     }
 
@@ -89,5 +89,11 @@ export default class Corpse {
         const me = this;
 
         me._shadow.setVisible(false);
+    }
+
+    setDepth(depth) {
+        const me = this;
+
+        me._container.setDepth(depth);
     }
 }

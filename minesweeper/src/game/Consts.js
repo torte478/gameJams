@@ -15,8 +15,10 @@ export default class Consts {
         Ground: 100,
         Corpse: 250,
         CitizenBottom: 500,
+        Explosion: 1000,
         Field: 50000,
         UI: 65000,
+        UnderUI: 70000,
         Max: 100000
     };
 
@@ -44,7 +46,8 @@ export default class Consts {
         Middle: 5,
         Big: 6,
         AnimFramesCount: 3,
-        Offset: 8 
+        Offset: 8 ,
+        OffsetBig: 6
     }
 
     static Explode = {

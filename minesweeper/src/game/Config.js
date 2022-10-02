@@ -13,7 +13,7 @@ export default class Config {
         Timer: false,
     };
 
-    static Timer = 10000;
+    static Timer = 1000;
 
     static Field = {
         Width: 10,
@@ -38,7 +38,7 @@ export default class Config {
     static Levels = [
         //0
         {
-            Mines: 10,
+            Mines: 3,
             TimerDeathProbability: 25,
             ReserveStartCount: 5,
             StartInCity: false,
