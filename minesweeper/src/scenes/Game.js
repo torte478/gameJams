@@ -20,7 +20,6 @@ export default class Game extends Phaser.Scene {
 
         Utils.loadImage(me, 'minesweeper_background');
         Utils.loadImage(me, 'city_background');
-        Utils.loadImage(me, 'mine_hud');
 
         Utils.loadSpriteSheet(me, 'cells', Consts.Unit);
         Utils.loadSpriteSheet(me, 'soldiers', Consts.Unit);
@@ -28,6 +27,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'explosions', Consts.UnitMiddle);
         Utils.loadSpriteSheet(me, 'clock', Consts.UnitMiddle);
         Utils.loadSpriteSheet(me, 'citizens', Consts.Unit);
+        Utils.loadSpriteSheet(me, 'mine_hud', 110, 55);
 
         Utils.loadWav(me, 'button_click');
     }

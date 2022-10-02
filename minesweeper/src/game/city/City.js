@@ -60,9 +60,9 @@ export default class City {
 
         me._reserve.emitter.on('coffinClick', me._onReserveClick, me);
 
-        me._cemetryPos = Utils.buildPoint(-900, 550);
+        me._cemetryPos = Utils.buildPoint(-900, 540);
         const width = Math.floor((-100 - (-900)) / Consts.Unit);
-        const height = Math.floor((720 - 550) / Consts.Unit);
+        const height = Math.floor((768 - 540) / Consts.Unit);
 
         me._cemetry = [];
         for (let i = 0; i < height; ++i) {
@@ -71,6 +71,11 @@ export default class City {
                 row.push(false);
             me._cemetry.push(row);
         }
+
+        scene.add.image(60 - Consts.Viewport.Width, 40, 'mine_hud', 1).setDepth(Consts.Depth.UI);
+        me._hud = scene.add.text(70 - Consts.Viewport.Width, 40, me._status.avaialbeCitizens, { fontFamily: "Arial Black", fontSize: 24, color: '#6a7798' })
+            .setOrigin(0, 0.5)
+            .setDepth(Consts.Depth.UI);
     }
 
     resume() {
@@ -111,6 +116,7 @@ export default class City {
 
         me._citizenPool.killAndHide(citizen);
         me._status.avaialbeCitizens -= 1;
+        me._hud.setText(me._status.avaialbeCitizens);
         me._status.free();
     }
 
