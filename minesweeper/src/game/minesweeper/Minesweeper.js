@@ -97,8 +97,8 @@ export default class Minesweeper {
 
         me._maxFlags = Config.Levels[me._status.level].Mines;
         me._availableFlags = me._maxFlags;
-        scene.add.image(60, 160, 'mine_hud').setDepth(Consts.Depth.UI);
-        me._hud = scene.add.text(70, 160, me._availableFlags, { fontFamily: "Arial Black", fontSize: 24, color: '#6a7798' })
+        scene.add.image(60, 180, 'mine_hud').setDepth(Consts.Depth.UI);
+        me._hud = scene.add.text(70, 180, me._availableFlags, { fontFamily: "Arial Black", fontSize: 24, color: '#6a7798' })
             .setOrigin(0, 0.5)
             .setDepth(Consts.Depth.UI);
     }

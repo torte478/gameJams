@@ -27,8 +27,8 @@ export default class Clock {
         me._isRunnging = false;
         me._isAlarm = false;
 
-        me._sprite = scene.add.sprite(Consts.UnitMiddle / 2, Consts.UnitMiddle / 2, 'clock', 1);
-        me._text = scene.add.text(60, 65, '10.0', { fontFamily: "Arial Black", fontSize: 24, color: '#000' }).setOrigin(0.5);
+        me._sprite = scene.add.sprite(Consts.UnitMiddle / 2, Consts.UnitMiddle / 2 + 15, 'clock', 1);
+        me._text = scene.add.text(60, 80, '10.0', { fontFamily: "Arial Black", fontSize: 24, color: '#000' }).setOrigin(0.5);
 
         me.emitter = new Phaser.Events.EventEmitter();
     }
