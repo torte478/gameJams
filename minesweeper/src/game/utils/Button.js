@@ -37,7 +37,8 @@ export default class Button {
         me._audio = audio;
         me._isClicked = false;
 
-        me._sprite = scene.add.sprite(0, 0, config.texture, config.frameIdle);
+        me._sprite = scene.add.sprite(0, 0, config.texture, config.frameIdle)
+            .setScale(1.5);
         const children = [ me._sprite ];
 
         if (!!config.text) {
@@ -84,6 +85,8 @@ export default class Button {
 
         if (me._config.frameSelected !== null)
             me._sprite.setFrame(me._config.frameSelected);
+
+        me._sprite.setScale(2);
     }
 
     _unselect() {
@@ -91,5 +94,7 @@ export default class Button {
 
         if (me._config.frameIdle !== null)
             me._sprite.setFrame(me._config.frameIdle);
+
+        me._sprite.setScale(1.5);
     }
 }

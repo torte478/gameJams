@@ -11,7 +11,7 @@ export default class Config {
         Mines: false,
         TweenSpeed: false,
         Timer: false,
-        LevelName: true
+        LevelName: false
     };
 
     static Timer = 10000;
@@ -51,7 +51,7 @@ export default class Config {
         //0
         {
             Mines: 10,
-            TimerDeathProbability: 50,
+            TimerDeathProbability: 25,
             ReserveStartCount: 0,
             StartInCity: true,
             CitizenCount: 50,
