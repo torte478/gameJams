@@ -43,7 +43,8 @@ export default class Soldier {
             me._parachute,
             me._shadow,
             me._sprite 
-        ]);
+        ])
+            .setDepth(Consts.Depth.Soldier);
 
         me._cellIndex = -1;
     }

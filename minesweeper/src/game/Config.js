@@ -8,7 +8,7 @@ export default class Config {
         Random: false,
         Level: true,
         Restart: true,
-        Mines: true,
+        Mines: false,
         TweenSpeed: false,
         Timer: false,
         LevelName: true
@@ -36,7 +36,7 @@ export default class Config {
         // [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],

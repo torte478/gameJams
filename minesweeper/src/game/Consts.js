@@ -14,6 +14,7 @@ export default class Consts {
         FieldBackground: -500,
         Ground: 100,
         Corpse: 250,
+        Soldier: 500,
         CitizenBottom: 500,
         Explosion: 1000,
         Field: 50000,

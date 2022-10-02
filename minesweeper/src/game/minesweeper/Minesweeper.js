@@ -206,8 +206,11 @@ export default class Minesweeper {
             const content = me._field.openCell(cellIndex);
 
             if (!wasOpen) {
-                if (content == Enums.Cell.Empty0)
-                    me._audio.play('empty_cell');
+                // if (content == Enums.Cell.Empty0)
+                //     me._audio.play('empty_cell');
+                    
+                if (content >= Enums.Cell.Empty1 && content <= Enums.Cell.Empty8)
+                    me._audio.play(`mine_detect_${content}`);
             }
 
             me._finishStep();

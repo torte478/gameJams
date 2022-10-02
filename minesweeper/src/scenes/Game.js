@@ -32,6 +32,9 @@ export default class Game extends Phaser.Scene {
         Utils.loadWav(me, 'action_start');
         Utils.loadWav(me, 'action_end');
         Utils.loadWav(me, 'empty_cell');
+
+        for (let i = 1; i <= 8; ++i)
+            Utils.loadWav(me, `mine_detect_${i}`);
     }
 
     create() {

@@ -16,12 +16,13 @@ export default class Audio {
 
     /**
      * @param {String} sound 
+     * @param {Phaser.Types.Sound.SoundConfig} config
      */
-    play(sound) {
+    play(sound, config) {
         const me = this;
 
         Utils.ifDebug(Config.Debug.PlaySound, () => {
-            me._scene.sound.play(sound);
+            me._scene.sound.play(sound, !!config ? config : null);
         });
     }
 }
