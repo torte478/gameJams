@@ -54,6 +54,12 @@ export default class Animation {
             frameRate: 8,
         });
 
+        scene.anims.create({
+            key: 'solder_cant',
+            frames: Animation.getFrames(scene, 'items', [ 19, 29, 19, 29 ]),
+            frameRate: 4
+        });
+
         for (let i = 0; i < 4; ++i) {
 
             const indicies = [];

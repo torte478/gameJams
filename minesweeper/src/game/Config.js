@@ -14,7 +14,7 @@ export default class Config {
         LevelName: true
     };
 
-    static Timer = 5000;
+    static Timer = 10000;
 
     static Field = {
         Width: 10,

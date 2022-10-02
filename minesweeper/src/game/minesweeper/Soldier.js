@@ -39,10 +39,14 @@ export default class Soldier {
         me._shadow = scene.add.sprite(0, Consts.Shadow.Offset, 'items', Consts.Shadow.Middle);
 
         me._sprite = scene.add.sprite(0, 0, 'soldiers', 0);
+
+        me._cross = scene.add.sprite(0, 0, 'items', 29);
+
         me._container = scene.add.container(x, y, [ 
             me._parachute,
             me._shadow,
-            me._sprite 
+            me._sprite,
+            me._cross
         ])
             .setDepth(Consts.Depth.Soldier);
 
