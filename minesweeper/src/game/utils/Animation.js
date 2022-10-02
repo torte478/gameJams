@@ -48,6 +48,12 @@ export default class Animation {
             repeat: -1
         });
 
+        scene.anims.create({
+            key: 'soldier_dodge',
+            frames: Animation.getFrames(scene, 'soldiers', [ 6, 7, 6, 7, 6, 7, 6, 7, 0 ]),
+            frameRate: 8,
+        });
+
         for (let i = 0; i < 4; ++i) {
 
             const indicies = [];

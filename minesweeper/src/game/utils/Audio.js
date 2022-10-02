@@ -21,8 +21,9 @@ export default class Audio {
     play(sound, config) {
         const me = this;
 
-        Utils.ifDebug(Config.Debug.PlaySound, () => {
-            me._scene.sound.play(sound, !!config ? config : null);
-        });
+        if (Utils.isDebug(Config.Debug.MuteSound))
+            return;
+
+        me._scene.sound.play(sound, !!config ? config : null);
     }
 }

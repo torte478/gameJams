@@ -75,6 +75,7 @@ export default class Minesweeper {
         me._audio = audio;
         me._mineTheme = mineTheme;
         me._needTutorial = status.level == Consts.FirstLevel;
+        me._needKillByShot = status.level == Consts.FirstLevel;
         me._transfer = transfer;
 
         scene.add.image(
@@ -452,7 +453,11 @@ export default class Minesweeper {
         const position = soldier.toPoint();
         const fromRight = position.x < Consts.Viewport.Width / 2;
 
-        const isDeath = Utils.getRandom(1, 100, 99) <= Config.Levels[me._status.level].TimerDeathProbability;
+        const isDeath = me._needKillByShot || Utils.getRandom(1, 100, 99) <= Config.Levels[me._status.level].TimerDeathProbability;
+        me._needKillByShot = false;
+
+        if (!isDeath)
+            me._soldiers[soldierIndex]._sprite.play('soldier_dodge');
 
         const shot = me._graphics.createShot(Utils.buildPoint(
             fromRight ? Consts.Viewport.Width + Consts.UnitMiddle : -Consts.UnitMiddle,
@@ -486,7 +491,7 @@ export default class Minesweeper {
                         soldier.getCellIndex(),
                         Enums.Death.Shot);
                 }
-                else
+                else 
                     me._finishStep();
             }
         });
