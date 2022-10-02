@@ -3,12 +3,12 @@ export default class Config {
     static Debug = {
         Global: true,
         Log: true,
-        ShowSceneLog: false,
+        ShowSceneLog: true,
         PlaySound: true,
         Random: false,
         Level: true,
         Restart: true,
-        Mines: false,
+        Mines: true,
         TweenSpeed: false,
         Timer: false,
     };

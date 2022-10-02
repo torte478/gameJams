@@ -29,6 +29,7 @@ export default class Citizen {
             Config.Levels[level].MaxCitizenSpeed);
 
         me._sprite = pool.create(pos.x, pos.y, 'citizens', skin * Consts.Citizen.SkinLength)
+            .play(`citizen_movement_${skin}`)
             .setInteractive()
             .setDepth(Consts.Depth.CitizenBottom - (Consts.Citizen.DownY - pos.y))
             .setBounce(1, 0)

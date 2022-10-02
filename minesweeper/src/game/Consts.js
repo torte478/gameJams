@@ -59,11 +59,11 @@ export default class Consts {
     
     static Citizen = {
         SkinCount: 4,
-        SkinLength: 4,
+        SkinLength: 6,
         MaxCountPerScreen: 10,
         LeftX: -850,
         RightX: -100,
-        UpY: 250,
-        DownY: 450
+        UpY: 300,
+        DownY: 475
     };
 }

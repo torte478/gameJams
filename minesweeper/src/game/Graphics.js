@@ -66,7 +66,7 @@ export default class Graphics {
     createGrave(pos) {
         const me = this;
 
-        return me._pool.create(pos.x, pos.y, 'items', Utils.getRandom(20, 22));
+        return me._pool.create(pos.x, pos.y, 'items', Utils.getRandom(20, 24));
     }
 
     killAndHide(obj) {

@@ -39,6 +39,22 @@ export default class Animation {
             frameRate: 2,
             repeat: -1
         });
+
+        for (let i = 0; i < 4; ++i) {
+
+            const indicies = [];
+            for (let j = 0; j < 6; ++j)
+                indicies.push(6 * i + j);
+            for (let j = 4; j > 0; --j)
+                indicies.push(6 * i + j);
+
+            scene.anims.create({
+                key: `citizen_movement_${i}`,
+                frames: Animation.getFrames(scene, 'citizens', indicies),
+                frameRate: 8,
+                repeat: -1
+            });
+        }
     }
 
     static getFrames(scene, texture, frames) {

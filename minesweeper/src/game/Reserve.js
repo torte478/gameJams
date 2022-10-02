@@ -40,7 +40,7 @@ export default class Reserve {
 
             const content = i >= startCount
                 ? Enums.Reserve.Empty
-                : Enums.Reserve.Soilder;
+                : Enums.Reserve.ClosedCoffin;
 
             const sprite = scene.add.sprite(0, -Consts.Unit * i, 'items', 13 + content)
                 .setInteractive();
