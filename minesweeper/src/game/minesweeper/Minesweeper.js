@@ -523,6 +523,8 @@ export default class Minesweeper {
             me._graphics.createSmoke(cellPosition);
 
             me._audio.play('explosion');
+
+            me._graphics.createBigSpot(cellPosition);
         }
 
         const upY = position.y - Consts.Explode.BodyHeight;

@@ -43,10 +43,21 @@ export default class Graphics {
         return smoke;
     }
 
-    createBloodSpot(pos, corpseDepth) {
+    createBigSpot(pos) {
         const me = this;
 
         /** @type {Phaser.GameObjects.Sprite} */
+        const bigSpot = me._pool.create(pos.x, pos.y + 12, 'explosions', Utils.getRandom(13, 15))
+        .setDepth(Consts.Depth.Ground);
+        
+        bigSpot.setAngle(Utils.getRandom(0, 360));
+    }
+
+    createBloodSpot(pos, corpseDepth) {
+        const me = this;
+
+        
+    
         const spot = me._pool.create(pos.x, pos.y + 12, 'items', 12)
             .setDepth(Consts.Depth.Ground);
     }
