@@ -50,7 +50,7 @@ export default class City {
         me._citizenCount = Config.Levels[status.level].CitizenCount;
     }
 
-    spawnCitizens() {
+    resume() {
         const me = this;
 
         const count = Math.min(me._citizenCount, Consts.Citizen.MaxCountPerScreen);
@@ -61,6 +61,12 @@ export default class City {
 
             me._citizenPool.spawn(position);
         }
+    }
+
+    pause() {
+        const me = this;
+
+        me._citizenPool.destroyAll();
     }
 
     _onCitizenClick(citizen) {

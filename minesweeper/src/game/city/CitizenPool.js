@@ -42,4 +42,10 @@ export default class CitizenPool {
 
         citizen.dispose(me._pool);
     }
+
+    destroyAll() {
+        const me = this;
+
+        me._pool.getChildren().map(c => me.killAndHide(c.father));
+    }
 }

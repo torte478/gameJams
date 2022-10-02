@@ -37,6 +37,7 @@ export default class Citizen {
             .setFlipX(direction < 0);
 
         me._sprite.on('pointerdown', () => { clickCallback.call(scope, me) });
+        me._sprite.father = me;
     }
 
     toGameObject() {

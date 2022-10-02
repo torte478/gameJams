@@ -94,6 +94,16 @@ export default class Minesweeper {
         me._clock.update();
     }
 
+    pause() {
+        const me = this;
+
+        me._clock.stop();
+    }
+
+    resume() {
+        // ...
+    }
+
     _onCellClick(index) {
         const me = this;
 

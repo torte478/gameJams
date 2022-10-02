@@ -12,6 +12,7 @@ import Status from './Status.js';
 import Graphics from './Graphics.js';
 import City from './city/City.js';
 import Reserve from './Reserve.js';
+import ScreenTransfer from './ScreenTransfer.js';
 
 export default class Core {
 
@@ -53,13 +54,16 @@ export default class Core {
             Config.Levels[me._status.level].ReserveStartCount,
             Consts.ReserveMaxSize);
 
+        me._screenTransfer = new ScreenTransfer(scene, me._status);
+        me._screenTransfer.emmiter.on('transfer', me._onTransferClick, me);
+
         const graphics = new Graphics(scene);
         me._minesweeper = new Minesweeper(scene, me._status, graphics, me._reserve);
 
         me._city = new City(scene, me._status, me._reserve);
 
         if (Config.Levels[me._status.level].StartInCity) {
-            me._city.spawnCitizens();
+            me._city.resume();
             scene.cameras.main.setScroll(
                 -Consts.Viewport.Width, 0);
         }
@@ -98,6 +102,31 @@ export default class Core {
             
             console.clear();
             me._scene.scene.start('game');
+        })
+    }
+
+    _onTransferClick(toCity) {
+        const me = this;
+
+        if (toCity)
+            me._city.resume();
+        else
+            me._minesweeper.resume();
+
+        me._scene.add.tween({
+            targets: me._scene.cameras.main,
+            scrollX: toCity ? -Consts.Viewport.Width : 0,
+            duration: Consts.Speed.Camera,
+            ease: 'Sine.easeInOut',
+            onComplete: () => {
+                if (toCity)
+                    me._minesweeper.pause();
+                else 
+                    me._city.pause();
+
+                me._screenTransfer.onTransferEnd();
+                me._status.free();
+            }
         })
     }
 }

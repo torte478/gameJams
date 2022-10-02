@@ -23,6 +23,7 @@ export default class Consts {
         SoilderMovement: 400,
         Shot: 7000,
         FillReserve: 400,
+        Camera: 1000,
     };
 
     static FieldAlpha = {
