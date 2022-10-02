@@ -33,7 +33,7 @@ export default class Soldier {
 
         me._scene = scene;
 
-        me._parachute = scene.add.sprite(-Consts.UnitSmall, -Consts.UnitSmall, 'items', 0)
+        me._parachute = scene.add.sprite(-5, -1.5 * Consts.UnitSmall, 'items', 0)
             .setVisible(false);
 
         me._shadow = scene.add.sprite(0, Consts.Shadow.Offset, 'items', Consts.Shadow.Middle);

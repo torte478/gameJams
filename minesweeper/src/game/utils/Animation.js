@@ -15,21 +15,21 @@ export default class Animation {
 
         scene.anims.create({
             key: 'mine_explosion',
-            frames: Animation.getFrames(scene, 'explosions', [0, 1, 2, 3, 2, 3, 2, 3, 4, 5]),
-            frameRate: 16,
+            frames: Animation.getFrames(scene, 'explosions', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13]),
+            frameRate: 24,
         });
 
         scene.anims.create({
             key: 'mine_smoke',
-            frames: Animation.getFrames(scene, 'items', [ 10, 11 ]),
+            frames: Animation.getFrames(scene, 'items', [ 9, 10, 11 ]),
             frameRate: 1,
             repeat: -1
         });
 
         scene.anims.create({
             key: 'soldier_movement',
-            frames: Animation.getFrames(scene, 'soldiers', [ 1, 2, 3, 2 ]),
-            frameRate: 8,
+            frames: Animation.getFrames(scene, 'soldiers', [ 1, 2, 3, 4, 5, 4, 3, 2 ]),
+            frameRate: 16,
             repeat: -1
         });
 

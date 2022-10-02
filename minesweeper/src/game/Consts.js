@@ -12,6 +12,8 @@ export default class Consts {
     static Depth = {
         Background: -1000,
         FieldBackground: -500,
+        Ground: 100,
+        Corpse: 250,
         CitizenBottom: 500,
         Field: 50000,
         UI: 65000,

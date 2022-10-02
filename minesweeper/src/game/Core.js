@@ -43,9 +43,11 @@ export default class Core {
     constructor(scene) {
         const me = this;
 
+        scene.cameras.main.setRoundPixels(true);
+
         me._scene = scene;
         me._audio = new Audio(scene);
-        
+
         me._status = new Status(Config.StartLevelIndex); // TODO
         me._reserve = new Reserve(
             scene, 

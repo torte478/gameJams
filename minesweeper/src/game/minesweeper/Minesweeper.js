@@ -325,15 +325,14 @@ export default class Minesweeper {
 
         const cellPosition = me._field.toPosition(cellIndex);
 
-        if (type == Enums.Death.Mine)
-            me._graphics.createSmoke(cellPosition)
-
         const position = soldier.toPoint();
         const corpse = me._corpsePool.getNext(position, Enums.Corpse.Body);
         me._corpses.push(corpse);
 
-        if (type == Enums.Death.Mine)
+        if (type == Enums.Death.Mine)  {
             me._graphics.createExplosion(cellPosition);
+            me._graphics.createSmoke(cellPosition);
+        }
 
         const upY = position.y - Consts.Explode.BodyHeight;
         const downY = position.y
@@ -351,7 +350,7 @@ export default class Minesweeper {
                     ease: 'Sine.easeIn',
                     onComplete: () => { 
                         corpse.idle();
-                        me._graphics.createBloodSpot(cellPosition, corpse.getDepth())
+                        // me._graphics.createBloodSpot(cellPosition, corpse.getDepth())
                      }
                 }
             ],

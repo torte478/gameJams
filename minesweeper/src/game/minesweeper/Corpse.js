@@ -29,7 +29,8 @@ export default class Corpse {
         me._sprite = pool.create(0, 0, 'items', startFrame);
         me._shadow = pool.create(0, Consts.Shadow.Offset, 'items', Consts.Shadow.Big);
 
-        me._container = scene.add.container(pos.x, pos.y, [ me._shadow, me._sprite ]);
+        me._container = scene.add.container(pos.x, pos.y, [ me._shadow, me._sprite ])
+            .setDepth(Consts.Depth.Corpse);
     }
 
     toGameObject() {

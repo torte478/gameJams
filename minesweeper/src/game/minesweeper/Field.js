@@ -220,10 +220,11 @@ export default class Field {
         let expectedDist = matrix[start.i][start.j].dist - 1;
         do {
 
-            const nextCell = Utils
+            const nextCells = Utils
                 .getNeighbours(matrix, currentPathCell.i, currentPathCell.j)
-                .filter(n => matrix[n.i][n.j].dist == expectedDist)
-                [0];
+                .filter(n => matrix[n.i][n.j].dist == expectedDist);
+
+            const nextCell = Utils.getRandomEl(nextCells);
 
             const nextCellIndex = Utils.fromMatrix(matrix, nextCell.i, nextCell.j);
             cells.push(me.toPosition(nextCellIndex));

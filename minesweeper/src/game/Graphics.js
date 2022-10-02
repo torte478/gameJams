@@ -35,8 +35,11 @@ export default class Graphics {
         const me = this;
 
         /** @type {Phaser.GameObjects.Sprite} */
-        const smoke = me._pool.create(pos.x, pos.y, 'items');
+        const smoke = me._pool.create(pos.x, pos.y, 'items')
+            .setDepth(Consts.Depth.Ground);
         smoke.play('mine_smoke');
+
+        return smoke;
     }
 
     createBloodSpot(pos, corpseDepth) {
@@ -50,7 +53,7 @@ export default class Graphics {
     createShot(pos) {
         const me = this;
 
-        return me._pool.create(pos.x, pos.y, 'explosions', 6);
+        return me._pool.create(pos.x, pos.y, 'explosions', 12);
     }
 
     createCoffin(pos) {
