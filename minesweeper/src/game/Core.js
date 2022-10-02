@@ -156,6 +156,8 @@ export default class Core {
         else
             me._minesweeper.resume();
 
+        me._audio.play('action_start');
+
         me._scene.add.tween({
             targets: me._scene.cameras.main,
             scrollX: toCity ? -Consts.Viewport.Width : 0,

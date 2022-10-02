@@ -142,6 +142,8 @@ export default class City {
 
         me._status.busy();
 
+        me._audio.play('action_start');
+
         const available = [];
         for (let i = 0; i < me._cemetry.length; ++i)
             for (let j = 0; j < me._cemetry[i].length; ++j)
@@ -166,6 +168,9 @@ export default class City {
                 me._graphics.createGrave(target);
                 me._graphics.killAndHide(coffin);
                 me._cemetry[index.i][index.j] = true;
+
+                me._audio.play('action_end');
+
                 me._status.free();
             }
         })

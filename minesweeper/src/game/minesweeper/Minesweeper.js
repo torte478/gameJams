@@ -206,8 +206,8 @@ export default class Minesweeper {
             const content = me._field.openCell(cellIndex);
 
             if (!wasOpen) {
-                // if (content == Enums.Cell.Empty0)
-                //     me._audio.play('empty_cell');
+                if (content == Enums.Cell.Empty0)
+                    me._audio.play('empty_cell');
                     
                 if (content >= Enums.Cell.Empty1 && content <= Enums.Cell.Empty8)
                     me._audio.play(`mine_detect_${content}`);
@@ -309,6 +309,8 @@ export default class Minesweeper {
                 : (fromRight ? -Consts.UnitMiddle : Consts.Viewport.Width + Consts.UnitMiddle),
             position.y);
 
+        me._audio.play('shot');
+
         me._scene.add.tween({
             targets: shot,
             x: target.x,
@@ -322,11 +324,13 @@ export default class Minesweeper {
                 me._graphics.killAndHide(shot);
                 me._clock.stop();
                 
-                if (isDeath)
+                if (isDeath) {
+                    me._audio.play('hurt');
                     me._killSoldier(
                         soldierIndex, 
                         soldier.getCellIndex(),
                         Enums.Death.Shot);
+                }
                 else
                     me._finishStep();
             }
@@ -350,6 +354,8 @@ export default class Minesweeper {
         if (type == Enums.Death.Mine)  {
             me._graphics.createExplosion(cellPosition);
             me._graphics.createSmoke(cellPosition);
+
+            me._audio.play('explosion');
         }
 
         const upY = position.y - Consts.Explode.BodyHeight;
@@ -390,6 +396,8 @@ export default class Minesweeper {
         me._status.busy();
         me._field.decreaseAlpha();
 
+        me._audio.play('action_start');
+
         const index = Utils.getRandom(0, me._corpses.length - 1);
         const corpse = me._corpses[index];
         me._corpses = Utils.removeAt(me._corpses, index);
@@ -401,6 +409,7 @@ export default class Minesweeper {
     _onCoffinFill(corpse) {
         const me = this;
         me._corpsePool.release(corpse);
+        me._audio.play('action_end');
         me._finishStep();
     }
 }       
