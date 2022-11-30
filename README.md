@@ -1,4 +1,12 @@
 # gameJams
+
+## Happy Minesweeper
+Game: https://torte478.itch.io/happy-minesweeper
+
+Submission for https://ldjam.com/events/ludum-dare/51
+
+01.10.22 - 03.10.22
+
 ## Weird Dice Game
 Game: https://torte478.itch.io/weird-dice-game
 
