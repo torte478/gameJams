@@ -1,3 +1,4 @@
+import Consts from '../game/Consts.js';
 import Phaser from '../lib/phaser.js';
 
 export default class Start extends Phaser.Scene {
@@ -36,7 +37,8 @@ export default class Start extends Phaser.Scene {
             backgroundColor: '#000'
         });
 
-        me.sound.play('idle', { volume: 0.4, loop: true });
+        if (!!Consts.playMusic)
+            me.sound.play('idle', { volume: 0.4, loop: true });
 
         me.input.keyboard.on('keydown', () => {
             me.sound.stopAll();
