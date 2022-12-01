@@ -17,6 +17,8 @@ export default class Game extends Phaser.Scene {
     preload() {
         const me = this;
 
+        Utils.runLoadingBar(this);
+
         Utils.loadWav(me, 'button_click');
     }
 

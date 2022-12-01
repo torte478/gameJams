@@ -1,11 +1,29 @@
 <html>
     <head>
+        <style>
+            body {
+                background-color: #a8a8a8;
+            }
+            .loading {
+                font-size: 72px;
+                position: absolute;
+                text-align: center;
+                color: beige;
+                left: 50%;
+                top: 50%;
+                transform: translateX(-50%) translateY(-50%);
+                z-index: -100;
+            }
+        </style>
+
         <title>TODO</title>
+
         <script
             src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js">
         </script>
     </head>
     <body>
+        <div class="loading">Loading...</div>
         <script type="module" src="src/Main.js"></script>
     </body>
 </html>
