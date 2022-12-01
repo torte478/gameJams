@@ -4,6 +4,16 @@
             body {
                 background-color: #2b1e55;
             }
+            .loading {
+                font-size: 72px;
+                position: absolute;
+                text-align: center;
+                color: beige;
+                left: 50%;
+                top: 50%;
+                transform: translateX(-50%) translateY(-50%);
+                z-index: -100;
+            }
         </style>
         <title>Last flake of snow</title>
         <script
@@ -11,6 +21,7 @@
         </script>
     </head>
     <body>
+        <div class="loading">Loading...</div>
         <script type="module" src="src/Main.js"></script>
     </body>
 </html>
