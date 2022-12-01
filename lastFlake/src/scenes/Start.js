@@ -1,4 +1,5 @@
 import Consts from '../game/Consts.js';
+import Utils from '../game/Utils.js';
 import Phaser from '../lib/phaser.js';
 
 export default class Start extends Phaser.Scene {
@@ -9,6 +10,8 @@ export default class Start extends Phaser.Scene {
 
     preload() {
         const me = this;
+
+        Utils.runLoadingBar(this);
 
         me.load.image('start_screen', 'assets/start_screen.png');
         me.load.spritesheet('cat', 'assets/cat.png', {

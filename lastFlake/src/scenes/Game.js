@@ -82,6 +82,8 @@ export default class Game extends Phaser.Scene {
     preload() {
         const me = this;
 
+        Utils.runLoadingBar(this);
+
         me.loadImage('background')
         me.loadImage('sky');
         me.loadImage('wall');
