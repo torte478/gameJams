@@ -45,10 +45,8 @@ export default class Core {
         me._audio = new Audio(scene);
         me._gun = new Gun(scene);
 
-        scene.cameras.main.setRoundPixels(true);
-
         me._controls = new Controls(scene.input);
-        me._player = new Player(scene, 80, 500, me._controls);
+        me._player = new Player(scene, Config.Player.StartX, Config.Player.StartY, me._controls);
 
         me._toUpdate = [];
 
@@ -60,6 +58,11 @@ export default class Core {
         const tileset = me._level.addTilesetImage('tilemap');
         const tiles = me._level.createLayer(0, tileset)
             .setDepth(Consts.Depth.Tiles);
+
+        scene.cameras.main
+            .setRoundPixels(true)
+            .startFollow(me._player.toGameObject(), true, 1, 1)
+            .setBounds(0, 0, me._level.widthInPixels, me._level.heightInPixels);
 
         for (let i = 0; i < Consts.CollideTiles.length; ++i) {
             const tileIndex = Consts.CollideTiles[i];
@@ -147,7 +150,8 @@ export default class Core {
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             let text =
-                `mse: ${me._scene.input.activePointer.worldX | 0} ${me._scene.input.activePointer.worldY | 0}`;
+                `mse: ${me._scene.input.activePointer.worldX | 0} ${me._scene.input.activePointer.worldY | 0}\n` +
+                `plr: ${me._player.toGameObject().x | 0} ${me._player.toGameObject().y | 0}`;
 
             me._log.setText(text);
         });

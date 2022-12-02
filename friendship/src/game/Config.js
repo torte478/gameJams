@@ -8,13 +8,18 @@ export default class Config {
         Random: false
     };
 
+    static Player = {
+        StartX: 6500,
+        StartY: 1000
+    };
+
     static Physics = {
         ConnectionStep: 200,
         ConnectionMax: 400,
         ConnectionFriction: 150,
 
         Gravity: 600,
-        PlayerSpeed: 200,
+        PlayerSpeed: 400,
         PlayerJump: -700,
     }
 

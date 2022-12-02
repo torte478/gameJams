@@ -15,6 +15,7 @@ export default class Consts {
     };
 
     static CollideTiles = [
-        1
+        1,
+        2
     ];
 }
