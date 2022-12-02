@@ -6,9 +6,12 @@ export default class Movable {
 
     /** @type {Phaser.Scene} */
     _scene;
+    
+    /** @type {Phaser.Physics.Arcade.Group} */
+    _group;
 
     /** @type {Phaser.Physics.Arcade.Sprite} */
-    _sprite;
+    _bodyContainer;
 
     /** @type {Phaser.Geom.Point} */
     _target;
@@ -20,25 +23,21 @@ export default class Movable {
     _isStopping;
 
     /**
-     * 
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Physics.Arcade.Group} group
-     * @param {Number} x 
-     * @param {Number} y 
+     * @param {Phaser.Physics.Arcade.Sprite} bodyContainer
      */
-    constructor(scene, group, x, y) {
+    constructor(scene, group, bodyContainer) {
         const me = this;
 
         me._scene = scene;
+        me._group = group;
         me._needUpdate = false;
         me._isStopping = false;
+        me._bodyContainer = bodyContainer;
 
-        me._sprite = group.create(x, y, 'main', 2)
-            .setCollideWorldBounds(true)
-            .setBounce(0.5)
-
-        me._sprite.isMovable = true;
-        me._sprite.owner = me;
+        me._bodyContainer.isMovable = true;
+        me._bodyContainer.owner = me;
     }
 
     update(delta) {
@@ -49,7 +48,7 @@ export default class Movable {
 
         if (!!me._target) {
             const dist = Phaser.Math.Distance.BetweenPoints(
-                me._sprite,
+                me._bodyContainer,
                 me._target);
     
             if (!me._isStopping && dist < 10) {
@@ -59,17 +58,17 @@ export default class Movable {
         }
 
         if (me._isStopping) {
-            me._sprite.setAcceleration(
-                -Math.sign(me._sprite.body.velocity.x) * Config.Speed.ConnectionFriction,
-                -Math.sign(me._sprite.body.velocity.y) * Config.Speed.ConnectionFriction);
+            me._bodyContainer.setAcceleration(
+                -Math.sign(me._bodyContainer.body.velocity.x) * Config.Speed.ConnectionFriction,
+                -Math.sign(me._bodyContainer.body.velocity.y) * Config.Speed.ConnectionFriction);
 
-            const isStop = Math.abs(me._sprite.body.velocity.x) < 10
-                           && Math.abs(me._sprite.body.velocity.y) < 10;
+            const isStop = Math.abs(me._bodyContainer.body.velocity.x) < 10
+                           && Math.abs(me._bodyContainer.body.velocity.y) < 10;
             if (isStop) {
                 me._isStopping = false;
                 me._needUpdate = false;
-                me._sprite.setAcceleration(0);
-                me._sprite.setVelocity(0);
+                me._bodyContainer.setAcceleration(0);
+                me._bodyContainer.setVelocity(0);
             }
         }
     }
@@ -80,7 +79,7 @@ export default class Movable {
     toGameObject() {
         const me = this;
 
-        return me._sprite;
+        return me._bodyContainer;
     }
 
     /**
@@ -92,7 +91,7 @@ export default class Movable {
         me._target = point;
 
         me._scene.physics.accelerateTo(
-            me._sprite,
+            me._bodyContainer,
             me._target.x, 
             me._target.y, 
             Config.Speed.ConnectionStep, 
@@ -108,8 +107,20 @@ export default class Movable {
         if (me._isStopping)
             return;
 
-        me._sprite.setAcceleration(0);
+        me._bodyContainer.setAcceleration(0);
         me._isStopping = true;
         me._needUpdate = true;
+    }
+
+    backToPool() {
+        const me = this;
+
+        me._bodyContainer.setVelocity(0);
+        me._bodyContainer.setAcceleration(0);
+        me._needUpdate = false;
+        me._isStopping = false;
+        me._bodyContainer.setPosition(Config.TrashPosition.x, Config.TrashPosition.y);
+        me._bodyContainer.body.setEnable(false);
+        me._group.killAndHide(me._bodyContainer);       
     }
 }

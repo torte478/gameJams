@@ -9,8 +9,13 @@ export default class Config {
     };
 
     static Speed = {
-        ConnectionStep: 100,
-        ConnectionMax: 300,
-        ConnectionFriction: 100
+        ConnectionStep: 200,
+        ConnectionMax: 400,
+        ConnectionFriction: 150
     }
+
+    static TrashPosition = {
+        x: -1000,
+        y: -1000
+    };
 }

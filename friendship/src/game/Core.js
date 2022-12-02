@@ -7,6 +7,8 @@ import Config from './Config.js';
 import Consts from './Consts.js';
 import Gun from './Gun.js';
 import Movable from './Movable.js';
+import Enemy from './Enemy.js';
+import Container from './Container.js';
 
 export default class Core {
 
@@ -53,43 +55,62 @@ export default class Core {
             me._level.setCollision(tileIndex);
         }
 
-        const movableGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
+        const enemyGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
+        const containerGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
 
-        const firstObj = new Movable(scene, movableGroup, 230, 600);
-        const secondObj = new Movable(scene, movableGroup, 755, 700);
+        const firstEnemy = new Enemy(scene, enemyGroup, 230, 600);
+        const secondEnemy = new Enemy(scene, enemyGroup, 755, 700);
 
-        me._toUpdate.push(firstObj);
-        me._toUpdate.push(secondObj);
+        const container = new Container(scene, containerGroup, 740, 400);
 
-        scene.physics.add.collider(movableGroup, movableGroup,
-            // firstObj.toGameObject(),
-            // secondObj.toGameObject(),
+        me._toUpdate.push(firstEnemy);
+        me._toUpdate.push(secondEnemy);
+        me._toUpdate.push(container);
+
+        scene.physics.add.collider(
+            enemyGroup, 
+            enemyGroup,
             (first, second) => {
                 first.owner.stopAccelerate();
                 second.owner.stopAccelerate();
             });
 
         scene.physics.add.collider(
-            movableGroup,
+            enemyGroup,
             tiles,
-            (first, second) => {
-                if (!!first.owner)
-                    first.owner.stopAccelerate();
-                if (!!second.owner)
-                    second.owner.stopAccelerate();
+            (m, t) => {
+                m.owner.stopAccelerate();
             }
         );
 
         scene.physics.add.collider(
-            secondObj.toGameObject(),
-            tiles,
+            containerGroup, 
+            containerGroup,
             (first, second) => {
-                if (!!first.owner)
-                    first.owner.stopAccelerate();
-                if (!!second.owner)
-                    second.owner.stopAccelerate();
+                first.owner.stopAccelerate();
+                second.owner.stopAccelerate();
+            });
+
+        scene.physics.add.collider(
+            containerGroup,
+            tiles,
+            (m, t) => {
+                m.owner.stopAccelerate();
             }
         );
+
+        scene.physics.add.collider(
+            enemyGroup, 
+            containerGroup,
+            (e, c) => {
+                if (c.owner.isFree()) {
+                    e.owner.backToPool();
+                    c.owner.catch();
+                } else {
+                    e.owner.stopAccelerate();
+                    c.owner.stopAccelerate();
+                }
+            });
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
