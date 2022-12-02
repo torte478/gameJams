@@ -12,6 +12,9 @@ export default class Player {
     /** @type {Phaser.GameObjects.Sprite} */
     _sprite;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    _gun;
+
     /** @type {Controls} */
     _controls;
 
@@ -27,8 +30,12 @@ export default class Player {
 
         me._controls = controls;
         me._sprite = scene.add.sprite(0, 0, 'player', 0);
+        me._gun = scene.add.sprite(0, 0, 'gun', 0);
 
-        me._container = scene.add.container(x, y, [ me._sprite ])
+        me._container = scene.add.container(x, y, [ 
+            me._sprite,
+            me._gun
+            ])
             .setDepth(Consts.Depth.Player)
             .setSize(Consts.Unit, Consts.Unit * 2);
 
@@ -53,11 +60,26 @@ export default class Player {
         if (me._controls.isDown(Enums.Keyboard.LEFT)) {
             body.setVelocityX(-Config.Physics.PlayerSpeed);
             me._sprite.setFlipX(true);
+            me._gun.setFlipX(true);
         } else if (me._controls.isDown(Enums.Keyboard.RIGHT)) {
             body.setVelocityX(Config.Physics.PlayerSpeed)
             me._sprite.setFlipX(false);
+            me._gun.setFlipX(false);
         } else {
             body.setVelocityX(0);
+        }
+
+        let lookDirection;
+        if (me._controls.isDown(Enums.Keyboard.UP)) {
+            me._gun.setAngle(me._gun.flipX ? 90 : 270);
+            lookDirection = -1;
+        } else if (me._controls.isDown(Enums.Keyboard.DOWN)) {
+            me._gun.setAngle(me._gun.flipX ? 270 : 90);
+            lookDirection = 1;
+        }
+        else {
+            me._gun.setAngle(0);
+            lookDirection = 0;
         }
 
         if (me._controls.isDownOnce(Enums.Keyboard.JUMP) && body.blocked.down) {

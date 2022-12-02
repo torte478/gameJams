@@ -23,9 +23,9 @@ export default class Controls {
         },
         jump: {
             key: null,
-            once: false
+            once: false,
         },
-        action: {
+        fire: {
             key: null,
             once: false,
             isDown: false,
@@ -43,7 +43,7 @@ export default class Controls {
         me._keys.up.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         me._keys.down.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         me._keys.jump.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
-        me._keys.action.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
+        me._keys.fire.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
     }
 
     isDown(key) {
@@ -71,8 +71,8 @@ export default class Controls {
         const me = this;
 
         switch (key) {
-            case Enums.Keyboard.ACTION: 
-                return me._keys.action.once;
+            case Enums.Keyboard.FIRE: 
+                return me._keys.fire.once;
 
             case Enums.Keyboard.JUMP: 
                 return me._keys.jump.once;
