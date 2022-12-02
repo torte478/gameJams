@@ -4,6 +4,7 @@ import Animation from '../game/utils/Animation.js';
 import Utils from '../game/utils/Utils.js';
 
 import Core from '../game/Core.js';
+import Consts from '../game/Consts.js';
 
 export default class Game extends Phaser.Scene {
 
@@ -19,7 +20,10 @@ export default class Game extends Phaser.Scene {
 
         Utils.runLoadingBar(this);
 
-        Utils.loadImage(me, 'shot_sphere');
+        me.load.tilemapCSV('level', `assets/level.csv`);
+
+        Utils.loadSpriteSheet(me, 'main', Consts.Unit);
+        Utils.loadSpriteSheet(me, 'tilemap', Consts.Unit);
         Utils.loadWav(me, 'button_click');
     }
 
@@ -31,9 +35,9 @@ export default class Game extends Phaser.Scene {
         me._core = new Core(me);
     }
 
-    update() {
+    update(time, delta) {
         const me = this;
 
-        me._core.update();
+        me._core.update(delta);
     }
 }

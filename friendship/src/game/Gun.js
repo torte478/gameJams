@@ -1,6 +1,13 @@
 import Phaser from '../lib/phaser.js';
+import Config from './Config.js';
+import Consts from './Consts.js';
+import Movable from './Movable.js';
+import Utils from './utils/Utils.js';
 
 export default class Gun {
+
+    /** @type {Phaser.Scene} */
+    _scene;
 
     /** @type {Number} */
     _shots;
@@ -18,12 +25,15 @@ export default class Gun {
     constructor(scene) {
         const me = this;
 
+        me._scene = scene;
         me._shots = 0;
 
-        me._first = scene.add.sprite(0, 0, 'shot_sphere')
+        me._first = scene.add.sprite(0, 0, 'main', 1)
+            .setDepth(Consts.Depth.Laser)
             .setVisible(false);
 
-        me._second = scene.add.sprite(0, 0, 'shot_sphere')
+        me._second = scene.add.sprite(0, 0, 'main', 1)
+            .setDepth(Consts.Depth.Laser)
             .setVisible(false);
 
         scene.input.on('pointerdown', (pointer) => me._shot(pointer.x, pointer.y), me);
@@ -42,6 +52,28 @@ export default class Gun {
             me._second
                 .setPosition(x, y)
                 .setVisible(true);
+
+            const middle = Utils.buildPoint(
+                (me._first.x + me._second.x) / 2,
+                (me._first.y + me._second.y) / 2);
+
+            const firstCircleBodies = me._scene.physics.overlapCirc(me._first.x, me._first.y, Consts.Unit / 2, true, true);
+            const firstBody = Utils.firstOrNull(firstCircleBodies, b => !!b.gameObject.isMovable);
+
+            if (!!firstBody) {
+                /** @type {Movable} */
+                const movable = firstBody.gameObject.owner;
+                movable.moveTo(middle);
+            }
+
+            const secondCircleBodies = me._scene.physics.overlapCirc(me._second.x, me._second.y, Consts.Unit / 2, true, true);
+            const secondBody = Utils.firstOrNull(secondCircleBodies, b => b => !!b.gameObject.isMovable);
+
+            if (!!secondBody) {
+                /** @type {Movable} */
+                const movable = secondBody.gameObject.owner;
+                movable.moveTo(middle);
+            }
         }
         else {
             me._first.setVisible(false);
