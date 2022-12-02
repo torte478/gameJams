@@ -9,15 +9,17 @@ export default class Config {
     };
 
     static Start = {
-        PlayerX: 4000,
-        PlayerY: 1800,
+        Player: { x: 3100, y: 1800 },
+        ContainerSpawn: { x: 2850, y: 1800 },
         Containers: [
-            { x: 2800, y: 1800 }
+            // { x: 3000, y: 1800 }
         ],
         Squares: [
             { x: 4200, y: 1850 }
         ]
     };
+
+    static ContainerLimit = 20;
 
     static Physics = {
         ConnectionStep: 200,

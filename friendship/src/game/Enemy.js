@@ -56,6 +56,6 @@ export default class Enemy {
         me._needUpdate = false;
         me._sprite.setPosition(Config.TrashPosition.x, Config.TrashPosition.y);
         me._sprite.body.setEnable(false);
-        me._group.killAndHide(me._bodyContainer);       
+        me._group.killAndHide(me._sprite);       
     }
 }

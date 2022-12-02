@@ -12,6 +12,7 @@ import Container from './Container.js';
 import Controls from './Controls.js';
 import Player from './Player.js';
 import EnemyBehaviour from './EnemyBehaviour.js';
+import ContainerSpawn from './ContainerSpawn.js';
 
 export default class Core {
 
@@ -47,7 +48,7 @@ export default class Core {
         me._gun = new Gun(scene);
 
         me._controls = new Controls(scene.input);
-        me._player = new Player(scene, Config.Start.PlayerX, Config.Start.PlayerY, me._controls);
+        me._player = new Player(scene, Config.Start.Player.x, Config.Start.Player.y, me._controls);
 
         me._toUpdate = [];
 
@@ -75,10 +76,14 @@ export default class Core {
         const enemyGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
         const containerGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
 
+        const containerSpawn = new ContainerSpawn(scene, containerGroup, Utils.buildPoint(
+            Config.Start.ContainerSpawn.x,
+            Config.Start.ContainerSpawn.y));
+        me._toUpdate.push(containerSpawn);
+
         for (let i = 0; i < Config.Start.Containers.length; ++i) {
             const pos = Config.Start.Containers[i];
-            const container = new Container(scene, containerGroup, pos.x, pos.y);
-            me._toUpdate.push(container);
+            containerSpawn.spawn(pos.x, pos.y);
         }
 
         for (let i = 0; i < Config.Start.Squares.length; ++i) {
