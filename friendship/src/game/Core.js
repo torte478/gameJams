@@ -9,6 +9,8 @@ import Gun from './Gun.js';
 import Movable from './Movable.js';
 import Enemy from './Enemy.js';
 import Container from './Container.js';
+import Controls from './Controls.js';
+import Player from './Player.js';
 
 export default class Core {
 
@@ -27,6 +29,12 @@ export default class Core {
     /** @type {Object[]} */
     _toUpdate;
 
+    /** @type {Controls} */
+    _controls;
+
+    /** @type {Player} */
+    _player;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -38,6 +46,9 @@ export default class Core {
         me._gun = new Gun(scene);
 
         scene.cameras.main.setRoundPixels(true);
+
+        me._controls = new Controls(scene.input);
+        me._player = new Player(scene, 80, 500, me._controls);
 
         me._toUpdate = [];
 
@@ -58,10 +69,10 @@ export default class Core {
         const enemyGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
         const containerGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
 
-        const firstEnemy = new Enemy(scene, enemyGroup, 230, 600);
-        const secondEnemy = new Enemy(scene, enemyGroup, 755, 700);
+        const firstEnemy = new Enemy(scene, enemyGroup, 200, 110);
+        const secondEnemy = new Enemy(scene, enemyGroup, 800, 210);
 
-        const container = new Container(scene, containerGroup, 740, 400);
+        const container = new Container(scene, containerGroup, 520, 400);
 
         me._toUpdate.push(firstEnemy);
         me._toUpdate.push(secondEnemy);
@@ -112,6 +123,11 @@ export default class Core {
                 }
             });
 
+        scene.physics.add.collider(
+            me._player.toGameObject(),
+            tiles
+        );
+
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
                 .setScrollFactor(0)
@@ -121,6 +137,10 @@ export default class Core {
 
     update(delta) {
         const me = this;
+        
+        me._controls.update();
+
+        me._player.update();
 
         for (let i = 0; i < me._toUpdate.length; ++i)
             me._toUpdate[i].update(delta);

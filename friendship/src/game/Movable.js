@@ -59,8 +59,8 @@ export default class Movable {
 
         if (me._isStopping) {
             me._bodyContainer.setAcceleration(
-                -Math.sign(me._bodyContainer.body.velocity.x) * Config.Speed.ConnectionFriction,
-                -Math.sign(me._bodyContainer.body.velocity.y) * Config.Speed.ConnectionFriction);
+                -Math.sign(me._bodyContainer.body.velocity.x) * Config.Physics.ConnectionFriction,
+                -Math.sign(me._bodyContainer.body.velocity.y) * Config.Physics.ConnectionFriction);
 
             const isStop = Math.abs(me._bodyContainer.body.velocity.x) < 10
                            && Math.abs(me._bodyContainer.body.velocity.y) < 10;
@@ -94,9 +94,9 @@ export default class Movable {
             me._bodyContainer,
             me._target.x, 
             me._target.y, 
-            Config.Speed.ConnectionStep, 
-            Config.Speed.ConnectionMax, 
-            Config.Speed.ConnectionMax)
+            Config.Physics.ConnectionStep, 
+            Config.Physics.ConnectionMax, 
+            Config.Physics.ConnectionMax)
 
         me._needUpdate = true;
     }

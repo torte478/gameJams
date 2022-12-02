@@ -8,10 +8,14 @@ export default class Config {
         Random: false
     };
 
-    static Speed = {
+    static Physics = {
         ConnectionStep: 200,
         ConnectionMax: 400,
-        ConnectionFriction: 150
+        ConnectionFriction: 150,
+
+        Gravity: 600,
+        PlayerSpeed: 200,
+        PlayerJump: -700,
     }
 
     static TrashPosition = {

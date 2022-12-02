@@ -24,7 +24,8 @@ export default class Game extends Phaser.Scene {
 
         Utils.loadSpriteSheet(me, 'main', Consts.Unit);
         Utils.loadSpriteSheet(me, 'tilemap', Consts.Unit);
-        Utils.loadSpriteSheet(me, 'big', 100);
+        Utils.loadSpriteSheet(me, 'big', Consts.Unit * 2);
+        Utils.loadSpriteSheet(me, 'player', Consts.Unit, Consts.Unit * 2);
 
         Utils.loadWav(me, 'button_click');
     }
