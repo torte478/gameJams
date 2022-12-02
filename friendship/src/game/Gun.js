@@ -36,7 +36,7 @@ export default class Gun {
             .setDepth(Consts.Depth.Laser)
             .setVisible(false);
 
-        scene.input.on('pointerdown', (pointer) => me._shot(pointer.x, pointer.y), me);
+        scene.input.on('pointerdown', (pointer) => me._shot(pointer.worldX, pointer.worldY), me);
     }
 
     _shot(x, y) {
@@ -67,7 +67,7 @@ export default class Gun {
             }
 
             const secondCircleBodies = me._scene.physics.overlapCirc(me._second.x, me._second.y, Consts.Unit / 2, true, true);
-            const secondBody = Utils.firstOrNull(secondCircleBodies, b => b => !!b.gameObject.isMovable);
+            const secondBody = Utils.firstOrNull(secondCircleBodies, b => !!b.gameObject.isMovable);
 
             if (!!secondBody) {
                 /** @type {Movable} */

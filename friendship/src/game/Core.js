@@ -11,6 +11,7 @@ import Enemy from './Enemy.js';
 import Container from './Container.js';
 import Controls from './Controls.js';
 import Player from './Player.js';
+import EnemyBehaviour from './EnemyBehaviour.js';
 
 export default class Core {
 
@@ -46,7 +47,7 @@ export default class Core {
         me._gun = new Gun(scene);
 
         me._controls = new Controls(scene.input);
-        me._player = new Player(scene, Config.Player.StartX, Config.Player.StartY, me._controls);
+        me._player = new Player(scene, Config.Start.PlayerX, Config.Start.PlayerY, me._controls);
 
         me._toUpdate = [];
 
@@ -64,6 +65,8 @@ export default class Core {
             .startFollow(me._player.toGameObject(), true, 1, 1)
             .setBounds(0, 0, me._level.widthInPixels, me._level.heightInPixels);
 
+        scene.physics.world.setBounds(0, 0, me._level.widthInPixels, me._level.heightInPixels);
+
         for (let i = 0; i < Consts.CollideTiles.length; ++i) {
             const tileIndex = Consts.CollideTiles[i];
             me._level.setCollision(tileIndex);
@@ -72,14 +75,17 @@ export default class Core {
         const enemyGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
         const containerGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
 
-        const firstEnemy = new Enemy(scene, enemyGroup, 200, 110);
-        const secondEnemy = new Enemy(scene, enemyGroup, 800, 210);
+        for (let i = 0; i < Config.Start.Containers.length; ++i) {
+            const pos = Config.Start.Containers[i];
+            const container = new Container(scene, containerGroup, pos.x, pos.y);
+            me._toUpdate.push(container);
+        }
 
-        const container = new Container(scene, containerGroup, 520, 400);
-
-        me._toUpdate.push(firstEnemy);
-        me._toUpdate.push(secondEnemy);
-        me._toUpdate.push(container);
+        for (let i = 0; i < Config.Start.Squares.length; ++i) {
+            const pos = Config.Start.Squares[i];
+            const square = new Enemy(scene, enemyGroup, pos.x, pos.y, new EnemyBehaviour());
+            me._toUpdate.push(square);
+        }
 
         scene.physics.add.collider(
             enemyGroup, 
@@ -91,11 +97,7 @@ export default class Core {
 
         scene.physics.add.collider(
             enemyGroup,
-            tiles,
-            (m, t) => {
-                m.owner.stopAccelerate();
-            }
-        );
+            tiles);
 
         scene.physics.add.collider(
             containerGroup, 

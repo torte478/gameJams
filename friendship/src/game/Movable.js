@@ -111,16 +111,4 @@ export default class Movable {
         me._isStopping = true;
         me._needUpdate = true;
     }
-
-    backToPool() {
-        const me = this;
-
-        me._bodyContainer.setVelocity(0);
-        me._bodyContainer.setAcceleration(0);
-        me._needUpdate = false;
-        me._isStopping = false;
-        me._bodyContainer.setPosition(Config.TrashPosition.x, Config.TrashPosition.y);
-        me._bodyContainer.body.setEnable(false);
-        me._group.killAndHide(me._bodyContainer);       
-    }
 }

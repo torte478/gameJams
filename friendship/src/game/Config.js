@@ -8,9 +8,15 @@ export default class Config {
         Random: false
     };
 
-    static Player = {
-        StartX: 6500,
-        StartY: 1000
+    static Start = {
+        PlayerX: 4000,
+        PlayerY: 1800,
+        Containers: [
+            { x: 2800, y: 1800 }
+        ],
+        Squares: [
+            { x: 4200, y: 1850 }
+        ]
     };
 
     static Physics = {
@@ -21,6 +27,8 @@ export default class Config {
         Gravity: 600,
         PlayerSpeed: 400,
         PlayerJump: -700,
+
+        SquareSpeed: 100
     }
 
     static TrashPosition = {
