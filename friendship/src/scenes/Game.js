@@ -19,6 +19,7 @@ export default class Game extends Phaser.Scene {
 
         Utils.runLoadingBar(this);
 
+        Utils.loadImage(me, 'shot_sphere');
         Utils.loadWav(me, 'button_click');
     }
 

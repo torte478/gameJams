@@ -1,12 +1,11 @@
 import Phaser from '../lib/phaser.js';
 
 import Audio from './utils/Audio.js';
-import Button from './utils/Button.js';
-import ButtonConfig from './utils/ButtonConfig.js';
 import Utils from './utils/Utils.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
+import Gun from './Gun.js';
 
 export default class Core {
 
@@ -19,6 +18,9 @@ export default class Core {
     /** @type {Phaser.GameObjects.Text} */
     _log;
 
+    /** @type {Gun} */
+    _gun;
+
     /**
      * @param {Phaser.Scene} scene 
      */
@@ -28,7 +30,7 @@ export default class Core {
         me._scene = scene;
         me._audio = new Audio(scene);
 
-        Utils.debugLog('PAST YOUR CODE HERE!');
+        me._gun = new Gun(scene);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
