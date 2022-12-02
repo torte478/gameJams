@@ -3,6 +3,8 @@ import Config from './Config.js';
 import Consts from './Consts.js';
 import Controls from './Controls.js';
 import Enums from './Enums.js';
+import Gun from './Gun.js';
+import Utils from './utils/Utils.js';
 
 export default class Player {
 
@@ -18,19 +20,24 @@ export default class Player {
     /** @type {Controls} */
     _controls;
 
+    /** @type {Gun} */
+    _gunLogic;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
      * @param {Number} x
      * @param {Number} y
      * @param {Controls} controls
+     * @param {Gun} gunLogic
      */
-    constructor(scene, x, y, controls) {
+    constructor(scene, x, y, controls, gunLogic) {
         const me = this;
 
         me._controls = controls;
         me._sprite = scene.add.sprite(0, 0, 'player', 0);
         me._gun = scene.add.sprite(0, 0, 'gun', 0);
+        me._gunLogic = gunLogic;
 
         me._container = scene.add.container(x, y, [ 
             me._sprite,
@@ -54,6 +61,18 @@ export default class Player {
     }
 
     update() {
+        const me = this;
+
+        const lookDirection = me._updateMovement();
+
+        if (me._controls.isDownOnce(Enums.Keyboard.FIRE))
+            me._gunLogic.tryShot(
+                Utils.toPoint(me.toGameObject()),
+                lookDirection,
+                me._sprite.flipX);
+    }
+
+    _updateMovement() {
         const me = this,
               body = me._getBody();
 
@@ -85,6 +104,8 @@ export default class Player {
         if (me._controls.isDownOnce(Enums.Keyboard.JUMP) && body.blocked.down) {
             body.setVelocityY(Config.Physics.PlayerJump);
         }
+
+        return lookDirection;
     }
 
     /**

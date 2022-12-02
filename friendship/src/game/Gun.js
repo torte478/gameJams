@@ -39,6 +39,18 @@ export default class Gun {
         scene.input.on('pointerdown', (pointer) => me._shot(pointer.worldX, pointer.worldY), me);
     }
 
+
+    /**
+     * @param {Phaser.Geom.Point} from 
+     * @param {Number} look 
+     * @param {Boolean} flipX 
+     */
+    tryShot(from, look, flipX) {
+        const me = this;
+
+        <== there
+    };
+
     _shot(x, y) {
         const me = this;
 
