@@ -29,6 +29,7 @@ export default class Config {
         Gravity: 600,
         PlayerSpeed: 400,
         PlayerJump: -700,
+        BulletSpeed: 600,
 
         SquareSpeed: 100
     }

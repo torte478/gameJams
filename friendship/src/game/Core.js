@@ -5,7 +5,7 @@ import Utils from './utils/Utils.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
-import Gun from './Gun.js';
+import GunLogic from './GunLogic.js';
 import Movable from './Movable.js';
 import Enemy from './Enemy.js';
 import Container from './Container.js';
@@ -25,9 +25,6 @@ export default class Core {
     /** @type {Phaser.GameObjects.Text} */
     _log;
 
-    /** @type {Gun} */
-    _gun;
-
     /** @type {Object[]} */
     _toUpdate;
 
@@ -45,10 +42,17 @@ export default class Core {
 
         me._scene = scene;
         me._audio = new Audio(scene);
-        me._gun = new Gun(scene);
+
+        const bulletGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
+        const gunLogic = new GunLogic(scene, bulletGroup);
 
         me._controls = new Controls(scene.input);
-        me._player = new Player(scene, Config.Start.Player.x, Config.Start.Player.y, me._controls);
+        me._player = new Player(
+            scene, 
+            Config.Start.Player.x, 
+            Config.Start.Player.y, 
+            me._controls,
+            gunLogic);
 
         me._toUpdate = [];
 
@@ -137,6 +141,21 @@ export default class Core {
             me._player.toGameObject(),
             tiles
         );
+
+        scene.physics.add.collider(
+            bulletGroup,
+            tiles,
+            (b, e) => {
+                gunLogic.onWallCollide(b);
+            });
+
+        scene.physics.add.overlap(
+            bulletGroup,
+            containerGroup,
+            (b, c) => {
+                gunLogic.onContainerCollide(b, c);
+            }
+        )
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })

@@ -3,7 +3,7 @@ import Config from './Config.js';
 import Consts from './Consts.js';
 import Controls from './Controls.js';
 import Enums from './Enums.js';
-import Gun from './Gun.js';
+import GunLogic from './GunLogic.js';
 import Utils from './utils/Utils.js';
 
 export default class Player {
@@ -20,7 +20,7 @@ export default class Player {
     /** @type {Controls} */
     _controls;
 
-    /** @type {Gun} */
+    /** @type {GunLogic} */
     _gunLogic;
 
     /**
@@ -29,7 +29,7 @@ export default class Player {
      * @param {Number} x
      * @param {Number} y
      * @param {Controls} controls
-     * @param {Gun} gunLogic
+     * @param {GunLogic} gunLogic
      */
     constructor(scene, x, y, controls, gunLogic) {
         const me = this;
@@ -69,7 +69,7 @@ export default class Player {
             me._gunLogic.tryShot(
                 Utils.toPoint(me.toGameObject()),
                 lookDirection,
-                me._sprite.flipX);
+                me._sprite.flipX ? -1 : 1);
     }
 
     _updateMovement() {

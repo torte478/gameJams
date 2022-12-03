@@ -7,4 +7,11 @@ export default class Enums {
         FIRE: 4,
         JUMP: 5
     };
+
+    static BulletState = {
+        NONE: 0,
+        FLY: 1,
+        ON_WALL: 2,
+        ON_TARGET: 3
+    };
 }
