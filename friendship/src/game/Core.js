@@ -13,6 +13,7 @@ import Controls from './Controls.js';
 import Player from './Player.js';
 import EnemyBehaviour from './EnemyBehaviour.js';
 import ContainerSpawn from './ContainerSpawn.js';
+import EnemyCatcher from './EnemyCatcher.js';
 
 export default class Core {
 
@@ -77,6 +78,13 @@ export default class Core {
             me._level.setCollision(tileIndex);
         }
 
+        const enemyCatcher = new EnemyCatcher(
+            scene, 
+            Config.Start.EnemyCatcher.x,
+            Config.Start.EnemyCatcher.y,
+            Config.Start.EnemyCatcher.zone);
+        me._toUpdate.push(enemyCatcher);
+
         const enemyGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
         const containerGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
 
@@ -130,7 +138,7 @@ export default class Core {
             (e, c) => {
                 if (c.owner.isFree()) {
                     e.owner.backToPool();
-                    c.owner.catch();
+                    c.owner.catchEnemy();
                 } else {
                     e.owner.stopAccelerate();
                     c.owner.stopAccelerate();

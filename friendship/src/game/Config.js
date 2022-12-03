@@ -11,8 +11,18 @@ export default class Config {
     static Start = {
         Player: { x: 3100, y: 1800 },
         ContainerSpawn: { x: 2850, y: 1800 },
+        EnemyCatcher: {
+            x: 2750,
+            y: 1400,
+            zone: new Phaser.Geom.Rectangle(
+                2700,
+                1300,
+                650,
+                600
+            )
+        },
         Containers: [
-            // { x: 3000, y: 1800 }
+            { x: 3620, y: 1600 }
         ],
         Squares: [
             { x: 4200, y: 1850 }
@@ -25,13 +35,14 @@ export default class Config {
         ConnectionStep: 200,
         ConnectionMax: 400,
         ConnectionFriction: 150,
+        CatcherSpeed: 500,
 
         Gravity: 600,
         PlayerSpeed: 400,
         PlayerJump: -700,
         BulletSpeed: 600,
 
-        SquareSpeed: 100
+        SquareSpeed: 100,
     }
 
     static TrashPosition = {
