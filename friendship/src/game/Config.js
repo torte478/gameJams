@@ -109,8 +109,8 @@ export default class Config {
     static GunChargeSpeed = 2;
 
     static Physics = {
-        ConnectionStep: 200,
-        ConnectionMax: 400,
+        ConnectionStep: 400,
+        ConnectionMax: 600,
         ConnectionFriction: 150,
         CatcherSpeed: 500,
 

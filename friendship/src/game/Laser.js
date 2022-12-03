@@ -16,6 +16,21 @@ export default class Laser {
     /** @type {Phaser.Physics.Arcade.Sprite[]} */
     _targets;
 
+    _firstColor = {
+        r: 0,
+        g: 196,
+        b: 233
+    };
+
+    _secondColor = {
+        r: 249,
+        g: 248,
+        b: 113
+    };
+
+    /** @type {Number} */
+    _time;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Physics.Arcade.Sprite} firstShot 
@@ -26,9 +41,12 @@ export default class Laser {
 
         me._shots = [ firstShot, secondShot ];
         me._nodes = [];
+        me._time = 0;
+
+        const color = Phaser.Display.Color.GetColor(me._firstColor.r, me._firstColor.g, me._firstColor.b);
+        
         for (let i = 0; i < 2; ++i) {
-            // const node = scene.add.pointlight(3245, 1610, '0x00C4E9', 50, 0.50);
-            const node = scene.add.pointlight(0, 0, '0x00C4E9', 50, 0.50)
+            const node = scene.add.pointlight(0, 0, color, 50, 0.50)
                 .setVisible(false)
                 .setDepth(Consts.Depth.Laser);
 
@@ -37,7 +55,7 @@ export default class Laser {
 
         me._points = [];
         for (let i = 0; i < 40; ++i) {
-            const point = scene.add.pointlight(0, 0, '0x00C4E9', 25, 0.25)
+            const point = scene.add.pointlight(0, 0, color, 25, 0.25)
                 .setVisible(false)
                 .setDepth(Consts.Depth.Laser);
 
@@ -62,6 +80,23 @@ export default class Laser {
             Phaser.Geom.Point.Interpolate(start, end, t, point);
             me._points[i].setPosition(point.x, point.y);
         }
+
+        let t = delta;
+        if (me._points[0].visible)
+            t *= 4;
+
+        me._time = (me._time + t / 1000) % 2;
+        const r = me._interpolate(me._firstColor.r, me._secondColor.r, me._time);
+        const g = me._interpolate(me._firstColor.g, me._secondColor.g, me._time);
+        const b = me._interpolate(me._firstColor.b, me._secondColor.b, me._time);
+
+        me._nodes.forEach(n => n.color.setTo(r, g, b));
+        me._points.forEach(n => n.color.setTo(r, g, b));
+    }
+
+    _interpolate(x, y, t) {
+        let t1 = t > 1 ? 2 - t : t;
+        return (1 - t1) * x + t1 * y;
     }
 
     setVisibleNode(i, visible) {
