@@ -55,7 +55,7 @@ export default class GUI {
 
         me._enemies = [];
         for (let i = 0; i < 3; ++i) {
-            const enemySprite = scene.add.image(0, 0, 'big', 3 + i);
+            const enemySprite = scene.add.image(0, 0, 'big', 6 + i);
 
             const complete = scene.add.image(25, 25, 'main', 3)
                 .setVisible(false);
