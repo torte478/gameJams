@@ -6,9 +6,7 @@ import Utils from './utils/Utils.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import GunLogic from './GunLogic.js';
-import Movable from './Movable.js';
 import Enemy from './Enemy.js';
-import Container from './Container.js';
 import Controls from './Controls.js';
 import Player from './Player.js';
 import EnemyBehaviour from './EnemyBehaviour.js';
@@ -35,6 +33,9 @@ export default class Core {
     /** @type {Player} */
     _player;
 
+    /** @type {GunLogic} */
+    _gunLogic;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -45,7 +46,8 @@ export default class Core {
         me._audio = new Audio(scene);
 
         const bulletGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
-        const gunLogic = new GunLogic(scene, bulletGroup);
+        const gunLogic = new GunLogic(scene, bulletGroup, Config.Start.GunCharge);
+        me._gunLogic = gunLogic;
 
         me._controls = new Controls(scene.input);
         me._player = new Player(
@@ -185,7 +187,8 @@ export default class Core {
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             let text =
                 `mse: ${me._scene.input.activePointer.worldX | 0} ${me._scene.input.activePointer.worldY | 0}\n` +
-                `plr: ${me._player.toGameObject().x | 0} ${me._player.toGameObject().y | 0}`;
+                `plr: ${me._player.toGameObject().x | 0} ${me._player.toGameObject().y | 0}\n` +
+                `gun: ${me._gunLogic._charge}`;
 
             me._log.setText(text);
         });

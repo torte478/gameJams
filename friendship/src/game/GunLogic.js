@@ -22,16 +22,21 @@ export default class GunLogic {
     /** @type {Phaser.GameObjects.Sprite} */
     _second;
 
+    /** @type {Number} */
+    _charge;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Physics.Arcade.Group} bulletGroup
+     * @param {Number} charge
      */
-    constructor(scene, bulletGroup) {
+    constructor(scene, bulletGroup, charge) {
         const me = this;
 
         me._scene = scene;
         me._shotCount = 0;
+        me._charge = charge;
 
         /** @type {Phaser.Physics.Arcade.Sprite} */
         const firstBullet = bulletGroup.create(0, 0, 'main', 1);
@@ -64,9 +69,14 @@ export default class GunLogic {
     tryShot(from, look, flipX) {
         const me = this;
 
+        if (me._shotCount < 3 && me._charge <= 0)
+                return;
+
         me._shotCount += 1;
 
         if (me._shotCount < 3) {
+            me._charge = Math.max(0, me._charge - Config.GunShotCost);
+
             const bullet = me._bullets[me._shotCount - 1].sprite;
             bullet.body.setEnable(true);
 

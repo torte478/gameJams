@@ -10,6 +10,7 @@ export default class Config {
 
     static Start = {
         Player: { x: 3100, y: 1800 },
+        GunCharge: 10,
         ContainerSpawn: { x: 2850, y: 1800 },
         EnemyCatcher: {
             x: 2750,
@@ -30,6 +31,7 @@ export default class Config {
     };
 
     static ContainerLimit = 20;
+    static GunShotCost = 9;
 
     static Physics = {
         ConnectionStep: 200,
