@@ -25,13 +25,14 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'main', Consts.Unit);
         Utils.loadSpriteSheet(me, 'tilemap', Consts.Unit);
         Utils.loadSpriteSheet(me, 'big', Consts.Unit * 2);
-        Utils.loadSpriteSheet(me, 'player', Consts.Unit, Consts.Unit * 2);
-        Utils.loadSpriteSheet(me, 'gun', Consts.Unit * 2, Consts.Unit);
+        Utils.loadSpriteSheet(me, 'player', Consts.Unit * 2);
+        Utils.loadSpriteSheet(me, 'gun', Consts.Unit * 2);
         Utils.loadSpriteSheet(me, 'square', Consts.Unit * 2);
         Utils.loadSpriteSheet(me, 'charge_bar', 600, 50);
         Utils.loadSpriteSheet(me, 'triangle', Consts.Unit * 4, Consts.Unit * 3);
         Utils.loadSpriteSheet(me, 'circle', Consts.Unit * 2);
 
+        Utils.loadImage(me, 'background');
         Utils.loadImage(me, 'enemy_catcher');
         Utils.loadImage(me, 'hub');
 

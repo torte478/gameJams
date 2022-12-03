@@ -43,6 +43,9 @@ export default class Core {
     /** @type {GunLogic} */
     _gunLogic;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _background;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -51,6 +54,10 @@ export default class Core {
 
         me._scene = scene;
         me._audio = new Audio(scene);
+
+        me._background = scene.add.image(scene.cameras.main.width / 2, scene.cameras.main.height / 2, 'background')
+            .setDepth(Consts.Depth.Background)
+            .setScrollFactor(0);
 
         const bulletGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
         const gunLogic = new GunLogic(scene, bulletGroup, Config.Start.GunCharge, me._audio);
