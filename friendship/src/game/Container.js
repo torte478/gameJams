@@ -12,6 +12,9 @@ export default class Container extends Movable {
     /** @type {Number} */
     _size; 
 
+    /** @type {Number} */
+    _type;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Physics.Arcade.Group} group
@@ -32,21 +35,29 @@ export default class Container extends Movable {
         const me = this;
         me._isCatchedByCatcher = false;
         me._size = 0;
+        me._type = -1;
     }
 
-    catchEnemy(size) {
+    catchEnemy(size, type) {
         const me = this;
 
         me.stopAccelerate();
         me._bodyContainer.setFrame(2);
 
         me._size += size;
+        me._type = type;
     }
 
     isFree(size) {
         const me = this;
 
         return me._size === 0 || (me._size + size < Config.ContainerCapacity);
+    }
+
+    getType() {
+        const me = this;
+
+        return me._type;
     }
 
     /**

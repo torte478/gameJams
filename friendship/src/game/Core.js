@@ -64,11 +64,7 @@ export default class Core {
             gunLogic,
             me._audio);
 
-        const gui = new GUI(scene, gunLogic);
-
         me._toUpdate = [];
-
-        me._toUpdate.push(gui);
 
         const hubEnterTrigger = new PlayerTrigger(
             scene,
@@ -118,6 +114,9 @@ export default class Core {
             Config.Start.EnemyCatcher.y,
             Config.Start.EnemyCatcher.zone);
         me._toUpdate.push(enemyCatcher);
+
+        const gui = new GUI(scene, gunLogic, enemyCatcher);
+        me._toUpdate.push(gui);
 
         const enemyGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
         const containerGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
@@ -190,7 +189,7 @@ export default class Core {
                 const size = e.owner.getSize();
                 if (c.owner.isFree(size)) {
                     e.owner.backToPool();
-                    c.owner.catchEnemy(size);
+                    c.owner.catchEnemy(size, e.owner.getType());
                 }
             });
 

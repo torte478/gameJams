@@ -69,4 +69,8 @@ export default class CircleBehaviour extends EnemyBehaviour {
     getSize() {
         return Config.EnemySize[Enums.EnemyType.CIRCLE];
     }
+
+    getType() {
+        return Enums.EnemyType.CIRCLE;
+    }
 }

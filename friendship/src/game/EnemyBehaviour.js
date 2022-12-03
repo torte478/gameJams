@@ -23,4 +23,8 @@ export default class EnemyBehaviour {
     getSize() {
         throw 'not implemented';
     }
+
+    getType() {
+        throw 'not implemented';
+    }
 }

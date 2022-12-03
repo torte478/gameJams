@@ -35,4 +35,8 @@ export default class SquareBehabiour extends EnemyBehaviour {
     getSize() {
         return Config.EnemySize[Enums.EnemyType.SQUARE];
     }
+
+    getType() {
+        return Enums.EnemyType.SQUARE;
+    }
 }

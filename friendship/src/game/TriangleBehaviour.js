@@ -69,6 +69,10 @@ export default class TriangleBehaviour extends EnemyBehaviour {
         return Config.EnemySize[Enums.EnemyType.TRIANGLE];
     }
 
+    getType() {
+        return Enums.EnemyType.TRIANGLE;
+    }
+
     /**
      * @param {Phaser.Physics.Arcade.Body} body
      */

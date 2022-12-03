@@ -12,6 +12,9 @@ export default class EnemyCatcher {
     /** @type {Phaser.Geom.Point} */
     _pos;
 
+    /** @type {Number[]} */
+    _stat;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} x 
@@ -24,6 +27,8 @@ export default class EnemyCatcher {
         me._scene = scene;
         me._zone = zone;
         me._pos = Utils.buildPoint(x, y);
+
+        me._stat = [0, 0, 0];
 
         scene.add.image(x, y, 'enemy_catcher');
 
@@ -46,13 +51,20 @@ export default class EnemyCatcher {
         for (let i = 0; i < colliders.length; ++i) {
             /** @type {Phaser.Physics.Arcade.Body} */
             const body = colliders[i];
-            body.gameObject.owner.startCatchByCatcher(me._pos.x, me._pos.y, me._onCatch, me);
+            const type = body.gameObject.owner.getType();
+            body.gameObject.owner.startCatchByCatcher(me._pos.x, me._pos.y, () => me._onCatch(type), me);
         }
     }
 
-    _onCatch() {
+    getStat() {
         const me = this;
 
-        console.log('catched');
+        return me._stat;
+    }
+
+    _onCatch(type) {
+        const me = this;
+
+        me._stat[type] += 1;
     }
 }

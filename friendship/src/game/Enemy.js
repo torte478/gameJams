@@ -60,4 +60,10 @@ export default class Enemy {
 
         return me._behaviour.getSize();
     }
+
+    getType() {
+        const me = this;
+
+        return me._behaviour.getType();
+    }
 }
