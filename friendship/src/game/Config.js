@@ -9,7 +9,7 @@ export default class Config {
     };
 
     static Start = {
-        Player: { x: 4448, y: 1600 },
+        Player: { x: 6000, y: 1800 },
         InsideHub: false,
         GunCharge: 1000,
         ContainerSpawn: { x: 2850, y: 1800 },
@@ -110,7 +110,7 @@ export default class Config {
         PlayerJump: -700,
         BulletSpeed: 600,
 
-        SquareSpeed: 100,
+        SquareSpeed: 75,
 
         TriangleActionDurationMin: 1000,
         TriangleActionDurationMax: 3000,

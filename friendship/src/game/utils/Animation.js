@@ -27,6 +27,14 @@ export default class Animation {
             frameRate: 1,
             repeat: -1
         });
+
+        scene.anims.create({
+            key: 'square_walk',
+            frames: Animation.getFrames(scene, 'square', [ 0, 1, 2, 3, 4 ]),
+            frameRate: 4,
+            yoyo: true,
+            repeat: -1
+        });
     }
 
     static getFrames(scene, texture, frames) {

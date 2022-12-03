@@ -14,6 +14,8 @@ export default class SquareBehabiour extends EnemyBehaviour {
             body.setVelocityX(-Config.Physics.SquareSpeed);
         else if (body.blocked.left)
             body.setVelocityX(Config.Physics.SquareSpeed);
+
+        body.gameObject.setFlipX(body.velocity.x < 0);
     }
 
     /**
@@ -23,9 +25,12 @@ export default class SquareBehabiour extends EnemyBehaviour {
      */
      create(group, x, y) {
 
+        /** @type {Phaser.Physics.Arcade.Sprite} */
         const sprite = group.create(x, y, 'square', 0)
             .setCollideWorldBounds(true)
             .setBounce(0.5);
+
+        sprite.play('square_walk');
 
         sprite.setVelocityX(-Config.Physics.SquareSpeed);
 
