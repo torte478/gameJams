@@ -28,18 +28,14 @@ export default class Enemy {
     constructor(scene, group, x, y, behaviour) {
         const me = this;
 
-        me._sprite = group.create(x, y, 'square', 0)
-            .setCollideWorldBounds(true)
-            .setBounce(0.5)
+        me._behaviour = behaviour;
+        me._sprite = me._behaviour.create(group, x, y);
 
         me._group = group;
 
         me._sprite.owner = me;
 
-        me._behaviour = behaviour;
         me._needUpdate = true;
-
-        me._behaviour.onStart(me._sprite.body);
     }
 
     update(delta) {

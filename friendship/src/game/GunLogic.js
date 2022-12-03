@@ -70,7 +70,7 @@ export default class GunLogic {
         const me = this;
 
         if (me._shotCount < 3 && me._charge <= 0)
-                return;
+            return;
 
         me._shotCount += 1;
 

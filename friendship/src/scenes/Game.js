@@ -29,6 +29,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'gun', Consts.Unit * 2, Consts.Unit);
         Utils.loadSpriteSheet(me, 'square', Consts.Unit * 2);
         Utils.loadSpriteSheet(me, 'charge_bar', 700, 50);
+        Utils.loadSpriteSheet(me, 'triangle', Consts.Unit * 4, Consts.Unit * 3);
 
         Utils.loadImage(me, 'enemy_catcher');
         Utils.loadImage(me, 'hub');

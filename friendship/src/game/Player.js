@@ -74,7 +74,7 @@ export default class Player {
         if (me._charging)
             me._gunLogic.charge(delta);
         else
-            if (me._container.x >= 2400 && me._controls.isDownOnce(Enums.Keyboard.FIRE))
+            if (/*me._container.x >= 2100 &&*/ me._controls.isDownOnce(Enums.Keyboard.FIRE))
                 me._gunLogic.tryShot(
                     Utils.toPoint(me.toGameObject()),
                     lookDirection,

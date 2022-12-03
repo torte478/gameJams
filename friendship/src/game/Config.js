@@ -9,7 +9,7 @@ export default class Config {
     };
 
     static Start = {
-        Player: { x: 2425, y: 1840 },
+        Player: { x: 2500, y: 800 },
         InsideHub: false,
         GunCharge: 100,
         ContainerSpawn: { x: 2850, y: 1800 },
@@ -25,10 +25,27 @@ export default class Config {
         },
         HubEnterTrigger: new Phaser.Geom.Rectangle(2075, 1685, 200, 200),
         Containers: [
-            { x: 3620, y: 1600 }
+            { x: 5722, y: 1550 }
         ],
         Squares: [
             { x: 4200, y: 1850 }
+        ],
+        Triangles: [
+            { 
+                pos: { x: 6125, y: 1825 },
+                left: 5510,
+                right: 6290
+            },
+            { 
+                pos: { x: 7710, y: 1225 },
+                left: 7460,
+                right: 7610
+            },
+            { 
+                pos: { x: 2445, y: 775 },
+                left: 2110,
+                right: 2590
+            },
         ]
     };
 
@@ -53,7 +70,11 @@ export default class Config {
         BulletSpeed: 600,
 
         SquareSpeed: 100,
-    }
+
+        TriangleActionDurationMin: 1000,
+        TriangleActionDurationMax: 3000,
+        TriangleSpeed: 900,
+    };
 
     static TrashPosition = {
         x: -1000,

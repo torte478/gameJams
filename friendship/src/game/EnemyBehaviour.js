@@ -1,5 +1,4 @@
 import Phaser from '../lib/phaser.js';
-import Config from './Config.js';
 
 export default class EnemyBehaviour {
     
@@ -7,20 +6,17 @@ export default class EnemyBehaviour {
      * @param {Phaser.Physics.Arcade.Body} body 
      */
     update(body) {
-        const me = this;
-
-        if (body.blocked.right)
-            body.setVelocityX(-Config.Physics.SquareSpeed);
-        else if (body.blocked.left)
-            body.setVelocityX(Config.Physics.SquareSpeed);
+        throw 'not implemented';
     }
 
+    
     /**
-     * @param {Phaser.Physics.Arcade.Body} body 
+     * @param {Phaser.Physics.Arcade.Group} group
+     * @param {Number} x 
+     * @param {Number} y 
+     * @returns {Phaser.Physics.Arcade.Sprite}
      */
-    onStart(body) {
-        const me = this;
-
-        body.setVelocityX(-Config.Physics.SquareSpeed);
+    create(group, x, y) {
+        throw 'not implemented';
     }
 }

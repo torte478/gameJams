@@ -9,13 +9,14 @@ import GunLogic from './GunLogic.js';
 import Enemy from './Enemy.js';
 import Controls from './Controls.js';
 import Player from './Player.js';
-import EnemyBehaviour from './EnemyBehaviour.js';
 import ContainerSpawn from './ContainerSpawn.js';
 import EnemyCatcher from './EnemyCatcher.js';
 import GUI from './GUI.js';
 import PlayerTrigger from './PlayerTrigger.js';
 import Callback from './Callback.js';
 import Hub from './Hub.js';
+import SquareBehabiour from './SquareBehabiour.js';
+import TriangleBehaviour from './TriangleBehaviour.js';
 
 export default class Core {
 
@@ -131,9 +132,22 @@ export default class Core {
 
         for (let i = 0; i < Config.Start.Squares.length; ++i) {
             const pos = Config.Start.Squares[i];
-            const square = new Enemy(scene, enemyGroup, pos.x, pos.y, new EnemyBehaviour());
+            const square = new Enemy(scene, enemyGroup, pos.x, pos.y, new SquareBehabiour());
             me._toUpdate.push(square);
         }
+
+        for (let i = 0; i < Config.Start.Triangles.length; ++i) {
+            const config = Config.Start.Triangles[i];
+            const pos = config.pos;
+            const triangle = new Enemy(
+                scene,
+                enemyGroup,
+                pos.x,
+                pos.y,
+                new TriangleBehaviour(config.left, config.right)
+            );
+            me._toUpdate.push(triangle);
+        };
 
         scene.physics.add.collider(
             enemyGroup, 
