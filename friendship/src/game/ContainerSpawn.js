@@ -37,8 +37,8 @@ export default class ContainerSpawn {
         const me = this;
 
         const colliders = me._scene.physics.overlapCirc(me._pos.x, me._pos.y, Consts.Unit * 1.5, true);
-        const isFree = Utils.all(colliders, c => !c.gameObject.isMovable);
-        if (isFree) {
+        const isFreeSpace = Utils.all(colliders, c => !c.gameObject.isMovable);
+        if (isFreeSpace) {
             me._tryDeleteRedundant();
             me.spawn(me._pos.x, me._pos.y);
         }

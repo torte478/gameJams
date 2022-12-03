@@ -14,4 +14,10 @@ export default class Enums {
         ON_WALL: 2,
         ON_TARGET: 3
     };
+
+    static EnemyType = {
+        SQUARE: 0,
+        TRIANGLE: 1,
+        CIRCLE: 2
+    };
 }

@@ -19,4 +19,8 @@ export default class EnemyBehaviour {
     create(group, x, y) {
         throw 'not implemented';
     }
+
+    getSize() {
+        throw 'not implemented';
+    }
 }

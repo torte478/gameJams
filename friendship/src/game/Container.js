@@ -7,10 +7,10 @@ import Utils from './utils/Utils.js';
 export default class Container extends Movable {
 
     /** @type {Boolean} */
-    _isFree;
-
-    /** @type {Boolean} */
     _isCatchedByCatcher;
+
+    /** @type {Number} */
+    _size; 
 
     /**
      * @param {Phaser.Scene} scene 
@@ -30,25 +30,23 @@ export default class Container extends Movable {
         super(scene, group, sprite);
 
         const me = this;
-        me._isFree = true;
         me._isCatchedByCatcher = false;
+        me._size = 0;
     }
 
-    catchEnemy() {
+    catchEnemy(size) {
         const me = this;
-
-        if (!me._isFree)
-            throw 'container is not free';
 
         me.stopAccelerate();
         me._bodyContainer.setFrame(2);
-        me._isFree = false;
+
+        me._size += size;
     }
 
-    isFree() {
+    isFree(size) {
         const me = this;
 
-        return me._isFree;
+        return me._size === 0 || (me._size + size < Config.ContainerCapacity);
     }
 
     /**
@@ -67,7 +65,6 @@ export default class Container extends Movable {
         me._needUpdate = true;
         me._bodyContainer.setVelocity(0);
         me._bodyContainer.body.setEnable(false);
-        me._isCatcherBy
 
         me._scene.tweens.timeline({
             targets: me._bodyContainer,

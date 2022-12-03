@@ -54,4 +54,10 @@ export default class Enemy {
         me._sprite.body.setEnable(false);
         me._group.killAndHide(me._sprite);       
     }
+
+    getSize() {
+        const me = this;
+
+        return me._behaviour.getSize();
+    }
 }

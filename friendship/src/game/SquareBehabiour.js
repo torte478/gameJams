@@ -1,5 +1,6 @@
 import Config from './Config.js';
 import EnemyBehaviour from './EnemyBehaviour.js';
+import Enums from './Enums.js';
 
 export default class SquareBehabiour extends EnemyBehaviour {
 
@@ -29,5 +30,9 @@ export default class SquareBehabiour extends EnemyBehaviour {
         sprite.setVelocityX(-Config.Physics.SquareSpeed);
 
         return sprite;
+    }
+
+    getSize() {
+        return Config.EnemySize[Enums.EnemyType.SQUARE];
     }
 }

@@ -17,6 +17,7 @@ import Callback from './Callback.js';
 import Hub from './Hub.js';
 import SquareBehabiour from './SquareBehabiour.js';
 import TriangleBehaviour from './TriangleBehaviour.js';
+import CircleBehaviour from './CircleBehaviour.js';
 
 export default class Core {
 
@@ -149,13 +150,17 @@ export default class Core {
             me._toUpdate.push(triangle);
         };
 
-        scene.physics.add.collider(
-            enemyGroup, 
-            enemyGroup,
-            (first, second) => {
-                first.owner.stopAccelerate();
-                second.owner.stopAccelerate();
-            });
+        for (let i = 0; i < Config.Start.Circles.length; ++i) {
+            const config = Config.Start.Circles[i];
+            const circle = new Enemy(
+                scene,
+                enemyGroup,
+                config.x,
+                config.y,
+                new CircleBehaviour(scene, config.x, config.y, config.r)
+            );
+            me._toUpdate.push(circle);
+        }
 
         scene.physics.add.collider(
             enemyGroup,
@@ -177,16 +182,14 @@ export default class Core {
             }
         );
 
-        scene.physics.add.collider(
+        scene.physics.add.overlap(
             enemyGroup, 
             containerGroup,
             (e, c) => {
-                if (c.owner.isFree()) {
+                const size = e.owner.getSize();
+                if (c.owner.isFree(size)) {
                     e.owner.backToPool();
-                    c.owner.catchEnemy();
-                } else {
-                    e.owner.stopAccelerate();
-                    c.owner.stopAccelerate();
+                    c.owner.catchEnemy(size);
                 }
             });
 

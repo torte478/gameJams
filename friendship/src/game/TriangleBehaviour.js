@@ -1,5 +1,6 @@
 import Config from './Config.js';
 import EnemyBehaviour from './EnemyBehaviour.js';
+import Enums from './Enums.js';
 import Utils from './utils/Utils.js';
 
 export default class TriangleBehaviour extends EnemyBehaviour {
@@ -62,6 +63,10 @@ export default class TriangleBehaviour extends EnemyBehaviour {
         me._setNextTime();
 
         return sprite;
+    }
+
+    getSize() {
+        return Config.EnemySize[Enums.EnemyType.TRIANGLE];
     }
 
     /**

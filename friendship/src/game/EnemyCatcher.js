@@ -40,7 +40,7 @@ export default class EnemyCatcher {
 
         const colliders = me._scene.physics.overlapRect(me._zone.x, me._zone.y, me._zone.width, me._zone.height, true)
             .filter(c => !!c.gameObject.isMovable 
-                         && !c.gameObject.owner.isFree() 
+                         && !c.gameObject.owner.isFree(0) 
                          && !c.gameObject.owner._isCatchedByCatcher);
 
         for (let i = 0; i < colliders.length; ++i) {
