@@ -33,7 +33,7 @@ export default class GUI {
         me._gunLogic = gunLogic;
         me._enemyCatcher = enemyCatcher;
 
-        const offset = 325;
+        const offset = 340;
 
         scene.add.image(offset, 50, 'charge_bar', 0)
             .setDepth(Consts.Depth.GUI)

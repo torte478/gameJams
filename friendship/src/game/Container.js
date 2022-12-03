@@ -23,7 +23,7 @@ export default class Container extends Movable {
      */
     constructor(scene, group, x, y) {
         /** @type {Phaser.Physics.Arcade.Sprite} */
-        const sprite = group.create(x, y, 'big', 1);
+        const sprite = group.create(x, y, 'big', 0);
 
         sprite
             .setCircle(Consts.Unit)
@@ -42,7 +42,10 @@ export default class Container extends Movable {
         const me = this;
 
         me.stopAccelerate();
-        me._bodyContainer.setFrame(2);
+        let frame = 1 + type;
+        if (type == 2)
+            frame += me._size;
+        me._bodyContainer.setFrame(frame);
 
         me._size += size;
         me._type = type;
@@ -51,7 +54,7 @@ export default class Container extends Movable {
     isFree(size) {
         const me = this;
 
-        return me._size === 0 || (me._size + size < Config.ContainerCapacity);
+        return me._size === 0 || (me._size + size <= Config.ContainerCapacity);
     }
 
     getType() {

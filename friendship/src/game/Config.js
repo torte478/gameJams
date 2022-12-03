@@ -5,13 +5,13 @@ export default class Config {
     static Debug = {
         Global: true,
         Log: true,
-        ShowSceneLog: true,
+        ShowSceneLog: false,
         PlaySound: true,
         Random: false
     };
 
     static Start = {
-        Player: { x: 3130, y: 1850 },
+        Player: { x: 7620, y: 1850 },
         InsideHub: false,
         GunCharge: 1000,
         ContainerSpawn: { x: 2850, y: 1800 },
@@ -96,7 +96,7 @@ export default class Config {
     };
 
     static EnemySize = [ 100, 100, 1 ];
-    static ContainerCapacity = 1;
+    static ContainerCapacity = 3;
 
     static Hub = {
         Pos: new Phaser.Geom.Point(0, 3000),

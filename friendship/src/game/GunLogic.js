@@ -57,8 +57,11 @@ export default class GunLogic {
     tryShot(from, look, flipX) {
         const me = this;
 
-        if (me._shotCount < 3 && me._charge <= 0)
+        if (me._shotCount < 3 && me._charge <= 0) {
+            me._laser.hide();
             return;
+        }
+            
 
         me._shotCount += 1;
 
