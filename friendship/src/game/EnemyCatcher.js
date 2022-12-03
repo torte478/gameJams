@@ -21,12 +21,13 @@ export default class EnemyCatcher {
      * @param {Number} y 
      * @param {Phaser.Geom.Rectangle} zone
      */
-    constructor(scene, x, y, zone) {
+    constructor(scene, x, y, zone, laser) {
         const me = this;
 
         me._scene = scene;
         me._zone = zone;
         me._pos = Utils.buildPoint(x, y);
+        me._laser = laser;
 
         me._stat = [0, 0, 0];
 

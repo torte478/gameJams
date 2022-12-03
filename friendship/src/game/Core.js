@@ -19,6 +19,7 @@ import SquareBehabiour from './SquareBehabiour.js';
 import TriangleBehaviour from './TriangleBehaviour.js';
 import CircleBehaviour from './CircleBehaviour.js';
 import Enums from './Enums.js';
+import Laser from './Laser.js';
 
 export default class Core {
 
@@ -126,11 +127,15 @@ export default class Core {
             me._level.setCollision(tileIndex);
         }
 
+        const laser = gunLogic.getLaser();
+        me._toUpdate.push(laser);
+
         const enemyCatcher = new EnemyCatcher(
             scene, 
             Config.Start.EnemyCatcher.x,
             Config.Start.EnemyCatcher.y,
-            Config.Start.EnemyCatcher.zone);
+            Config.Start.EnemyCatcher.zone,
+            laser);
         me._toUpdate.push(enemyCatcher);
 
         const gui = new GUI(scene, gunLogic, enemyCatcher);
@@ -180,6 +185,7 @@ export default class Core {
             me._toUpdate.push(circle);
         }
 
+
         scene.physics.add.collider(
             enemyGroup,
             tiles);
@@ -190,6 +196,8 @@ export default class Core {
             (first, second) => {
                 first.owner.stopAccelerate();
                 second.owner.stopAccelerate();
+                laser.checkHide(first);
+                laser.checkHide(second);
             });
 
         scene.physics.add.collider(
@@ -197,6 +205,7 @@ export default class Core {
             tiles,
             (m, t) => {
                 m.owner.stopAccelerate();
+                laser.checkHide(m)
             }
         );
 
@@ -208,6 +217,7 @@ export default class Core {
                 if (c.owner.isFree(size)) {
                     e.owner.backToPool();
                     c.owner.catchEnemy(size, e.owner.getType());
+                    laser.checkHide(c);
                 }
             });
 

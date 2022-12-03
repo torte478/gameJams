@@ -2,6 +2,7 @@ import Phaser from '../lib/phaser.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
+import Laser from './Laser.js';
 import Movable from './Movable.js';
 import Audio from './utils/Audio.js';
 import Utils from './utils/Utils.js';
@@ -17,17 +18,14 @@ export default class GunLogic {
     /** @type {Object[]} */
     _bullets;
 
-    /** @type {Phaser.GameObjects.Sprite} */
-    _first;
-
-    /** @type {Phaser.GameObjects.Sprite} */
-    _second;
-
     /** @type {Number} */
     _charge;
 
     /** @type {Audio} */
     _audio;
+
+    /** @type {Laser} */
+    _laser;
 
     /**
      * 
@@ -44,27 +42,11 @@ export default class GunLogic {
         me._charge = charge;
         me._audio = audio;
 
-        /** @type {Phaser.Physics.Arcade.Sprite} */
-        const firstBullet = bulletGroup.create(0, 0, 'main', 1);
-        firstBullet
-            .setDepth(Consts.Depth.Laser)
-            .setVisible(false)
-            .body.setEnable(false);
+        me._bullets = [];
+        me._createBullet(scene, bulletGroup);
+        me._createBullet(scene, bulletGroup);
 
-        firstBullet.ownerIndex = 0;
-
-        const secondBullet = bulletGroup.create(0, 0, 'main', 1);
-        secondBullet
-            .setDepth(Consts.Depth.Laser)
-            .setVisible(false)
-            .body.setEnable(false);
-
-        secondBullet.ownerIndex = 1;
-
-        me._bullets = [ 
-            { sprite: firstBullet, state: Enums.BulletState.NONE, target: null }, 
-            { sprite: secondBullet, state: Enums.BulletState.NONE, target: null },
-        ];
+        me._laser = new Laser(scene, me._bullets[0].sprite, me._bullets[1].sprite);
     }
 
     /**
@@ -82,6 +64,8 @@ export default class GunLogic {
 
         if (me._shotCount < 3) {
             me._charge = Math.max(0, me._charge - Config.GunShotCost);
+            if (me._shotCount == 1)
+                me._laser.hide();
 
             const bullet = me._bullets[me._shotCount - 1].sprite;
             bullet.body.setEnable(true);
@@ -91,7 +75,7 @@ export default class GunLogic {
 
             bullet
                 .setPosition(from.x, from.y)
-                .setVisible(true)
+                // .setVisible(true)
                 .setVelocity(
                     velocityXSign * Config.Physics.BulletSpeed,
                     velocityYSign * Config.Physics.BulletSpeed
@@ -99,9 +83,11 @@ export default class GunLogic {
 
             me._bullets[me._shotCount - 1].state = Enums.BulletState.FLY;
 
+            me._laser.setVisibleNode(me._shotCount - 1, true);
             me._audio.play('laserShoot');
         } else {
             me._destroyBullets();
+            me._laser.hide();
         }
     };
 
@@ -128,6 +114,7 @@ export default class GunLogic {
         bullet.body.setEnable(false);
         me._bullets[index].state = Enums.BulletState.ON_TARGET;
         me._bullets[index].target = container;
+        me._laser.setTarget(index, container);
 
         me._checkShotResult();
     }
@@ -138,6 +125,12 @@ export default class GunLogic {
         me._charge = Math.min(
             Config.Start.GunCharge, 
             me._charge + Config.GunChargeSpeed * delta / 1000);
+    }
+
+    getLaser() {
+        const me = this;
+
+        return me._laser;
     }
 
     _checkShotResult() {
@@ -178,6 +171,11 @@ export default class GunLogic {
             movable.moveTo(middle);
         }
 
+        const isLaser = !!firstBody || !!secondBody;
+        if (isLaser)
+            me._laser.setVisiblePoints(true);
+        else
+            me._laser.hide();
         me._destroyBullets();
     }
 
@@ -195,5 +193,28 @@ export default class GunLogic {
         }
 
         me._shotCount = 0;
+    }
+
+    /**
+     * 
+     * @param {Phaser.Scene} scene 
+      @param {Phaser.Physics.Arcade.Group} bulletGroup
+     */
+      _createBullet(scene, bulletGroup) {
+        const me = this;
+
+        const bullet = bulletGroup.create(0, 0, 'main', 1);
+        bullet
+            .setDepth(Consts.Depth.Laser)
+            .setVisible(false)
+            .body.setEnable(false);
+
+        bullet.ownerIndex = me._bullets.length;
+
+        me._bullets.push({
+            sprite: bullet,
+            state: Enums.BulletState.NONE,
+            target: null
+        });
     }
 }
