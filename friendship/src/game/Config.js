@@ -10,7 +10,7 @@ export default class Config {
 
     static Start = {
         Player: { x: 3100, y: 1800 },
-        GunCharge: 10,
+        GunCharge: 100,
         ContainerSpawn: { x: 2850, y: 1800 },
         EnemyCatcher: {
             x: 2750,

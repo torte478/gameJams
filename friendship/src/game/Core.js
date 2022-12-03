@@ -12,6 +12,7 @@ import Player from './Player.js';
 import EnemyBehaviour from './EnemyBehaviour.js';
 import ContainerSpawn from './ContainerSpawn.js';
 import EnemyCatcher from './EnemyCatcher.js';
+import GUI from './GUI.js';
 
 export default class Core {
 
@@ -57,7 +58,11 @@ export default class Core {
             me._controls,
             gunLogic);
 
+        const gui = new GUI(scene, gunLogic);
+
         me._toUpdate = [];
+
+        me._toUpdate.push(gui);
 
         me._level = scene.make.tilemap({
             key: 'level',

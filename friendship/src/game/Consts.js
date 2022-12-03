@@ -11,6 +11,7 @@ export default class Consts {
         Tiles: -1000,
         Player: 1000,
         Laser: 2000,
+        GUI: 10000,
         Max: 100000
     };
 
