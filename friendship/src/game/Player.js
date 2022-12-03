@@ -33,6 +33,9 @@ export default class Player {
     /** @type {Boolean} */
     _isWalkAudioPlaying;
 
+    /** @type {Number} */
+    _jumpCount;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
@@ -53,6 +56,7 @@ export default class Player {
         me._charging = false;
         me._audio = audio;
         me._isWalkAudioPlaying = false;
+        me._jumpCount = 0;
 
         me._container = scene.add.container(x, y, [ 
             me._sprite,
@@ -153,10 +157,16 @@ export default class Player {
             lookDirection = 0;
         }
 
-        if (me._controls.isDownOnce(Enums.Keyboard.JUMP) && body.blocked.down) {
+        if (body.blocked.down)
+            me._jumpCount = 0;
+        else if (me._jumpCount == 0)
+            me._jumpCount = 1;
+
+        if (me._controls.isDownOnce(Enums.Keyboard.JUMP) && me._jumpCount < 2) {
             body.setVelocityY(Config.Physics.PlayerJump);
             me._audio.play('jump');
             me._sprite.play('player_jump');
+            me._jumpCount += 1;
         }
 
         if (body.velocity.x == 0 && body.blocked.down)

@@ -106,7 +106,7 @@ export default class Config {
 
     static ContainerLimit = 20;
     static GunShotCost = 9;
-    static GunChargeSpeed = 2;
+    static GunChargeSpeed = 32;
 
     static Physics = {
         ConnectionStep: 400,

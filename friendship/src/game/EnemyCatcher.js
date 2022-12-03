@@ -1,4 +1,5 @@
 import Phaser from '../lib/phaser.js';
+import Enums from './Enums.js';
 import Utils from './utils/Utils.js';
 
 export default class EnemyCatcher {
@@ -46,14 +47,15 @@ export default class EnemyCatcher {
 
         const colliders = me._scene.physics.overlapRect(me._zone.x, me._zone.y, me._zone.width, me._zone.height, true)
             .filter(c => !!c.gameObject.isMovable 
-                         && !c.gameObject.owner.isFree(0) 
+                         && c.gameObject.owner._size > 0
                          && !c.gameObject.owner._isCatchedByCatcher);
 
         for (let i = 0; i < colliders.length; ++i) {
             /** @type {Phaser.Physics.Arcade.Body} */
             const body = colliders[i];
             const type = body.gameObject.owner.getType();
-            body.gameObject.owner.startCatchByCatcher(me._pos.x, me._pos.y, () => me._onCatch(type), me);
+            const size = body.gameObject.owner._size;
+            body.gameObject.owner.startCatchByCatcher(me._pos.x, me._pos.y, () => me._onCatch(type, size), me);
             me._laser.checkHide(body.gameObject);
         }
     }
@@ -64,9 +66,10 @@ export default class EnemyCatcher {
         return me._stat;
     }
 
-    _onCatch(type) {
+    _onCatch(type, size) {
         const me = this;
 
-        me._stat[type] += 1;
+        const value = type == Enums.EnemyType.CIRCLE ? size : 1;
+        me._stat[type] += value;
     }
 }

@@ -39,7 +39,7 @@ export default class GunLogic {
 
         me._scene = scene;
         me._shotCount = 0;
-        me._charge = charge;
+        me._charge = 0;//charge;
         me._audio = audio;
 
         me._bullets = [];

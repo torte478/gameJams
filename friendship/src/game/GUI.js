@@ -61,8 +61,7 @@ export default class GUI {
                 .setVisible(false);
 
             const text = scene.add.text(0, 25, '0/0', { fontSize: 30})
-                .setStroke('#6a7798', 8)
-                .setShadow(2, 2, '#333333', 2);
+                .setStroke('#6a7798', 8);
 
             const container = scene.add.container(700 + 115 * i, 50, [ enemySprite, complete, text ])
                 .setDepth(Consts.Depth.GUI)
