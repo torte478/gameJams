@@ -47,7 +47,8 @@ export default class Player {
 
         me._controls = controls;
         me._sprite = scene.add.sprite(0, 0, 'player', 0);
-        me._gun = scene.add.sprite(0, 0, 'gun', 0);
+        me._sprite.play('player_idle');
+        me._gun = scene.add.sprite(0, 0, 'gun', 1);
         me._gunLogic = gunLogic;
         me._charging = false;
         me._audio = audio;
@@ -129,6 +130,7 @@ export default class Player {
         }
 
         if (movementKeyPress && body.blocked.down) {
+            me._sprite.play('player_walk', true);
             if (!me._isWalkAudioPlaying) {
                 me._audio.play('walk_snow', { loop: true, volume: 0.5 });
                 me._isWalkAudioPlaying = true;
@@ -140,21 +142,27 @@ export default class Player {
 
         let lookDirection;
         if (me._controls.isDown(Enums.Keyboard.UP)) {
-            me._gun.setAngle(me._gun.flipX ? 90 : 270);
+            me._gun.setFrame(2);
             lookDirection = -1;
         } else if (me._controls.isDown(Enums.Keyboard.DOWN)) {
-            me._gun.setAngle(me._gun.flipX ? 270 : 90);
+            me._gun.setFrame(3);
             lookDirection = 1;
         }
         else {
-            me._gun.setAngle(0);
+            me._gun.setFrame(1);
             lookDirection = 0;
         }
 
         if (me._controls.isDownOnce(Enums.Keyboard.JUMP) && body.blocked.down) {
             body.setVelocityY(Config.Physics.PlayerJump);
             me._audio.play('jump');
+            me._sprite.play('player_jump');
         }
+
+        if (body.velocity.x == 0 && body.blocked.down)
+            me._sprite.play('player_idle');
+        if (body.velocity.y != 0)
+            me._sprite.play('player_jump');
 
         return lookDirection;
     }

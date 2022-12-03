@@ -9,7 +9,7 @@ export default class Config {
     };
 
     static Start = {
-        Player: { x: 1400, y: 1850 },
+        Player: { x: 4448, y: 1600 },
         InsideHub: false,
         GunCharge: 1000,
         ContainerSpawn: { x: 2850, y: 1800 },
