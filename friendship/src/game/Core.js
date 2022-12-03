@@ -18,6 +18,7 @@ import Hub from './Hub.js';
 import SquareBehabiour from './SquareBehabiour.js';
 import TriangleBehaviour from './TriangleBehaviour.js';
 import CircleBehaviour from './CircleBehaviour.js';
+import Enums from './Enums.js';
 
 export default class Core {
 
@@ -85,6 +86,16 @@ export default class Core {
             new Callback(() => { console.log('exit')}, me));
 
         me._toUpdate.push(hubExitTrigger);
+
+        const hubFireTrigger = new PlayerTrigger(
+            scene,
+            Config.Hub.FireTrigger,
+            me._controls,
+            new Callback(() => { console.log('enter')}, me),
+            new Callback(() => { me._player.runAnimation(Enums.PlayerAnimation.FIRE) }, me),
+            new Callback(() => { console.log('exit')}, me));
+
+        me._toUpdate.push(hubFireTrigger);
 
         me._level = scene.make.tilemap({
             key: 'level',

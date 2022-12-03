@@ -20,4 +20,8 @@ export default class Enums {
         TRIANGLE: 1,
         CIRCLE: 2
     };
+
+    static PlayerAnimation = {
+        FIRE: 0
+    };
 }

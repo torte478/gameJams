@@ -10,7 +10,7 @@ export default class Config {
 
     static Start = {
         Player: { x: 2550, y: 1850 },
-        InsideHub: false,
+        InsideHub: true,
         GunCharge: 1000,
         ContainerSpawn: { x: 2850, y: 1800 },
         EnemyCatcher: {
@@ -92,6 +92,7 @@ export default class Config {
     static Hub = {
         Pos: new Phaser.Geom.Point(0, 3000),
         ExitTrigger: new Phaser.Geom.Rectangle(50, 3250, 100, 100),
+        FireTrigger: new Phaser.Geom.Rectangle(400, 3175, 150, 200)
     }
 
     static ContainerLimit = 20;

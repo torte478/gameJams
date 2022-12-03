@@ -103,6 +103,12 @@ export default class Player {
         me._charging = false;
     }
 
+    runAnimation(type) {
+        const me = this;
+
+        console.log(type);
+    }
+
     _updateMovement() {
         const me = this,
               body = me._getBody();
