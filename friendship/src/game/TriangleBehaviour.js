@@ -57,8 +57,11 @@ export default class TriangleBehaviour extends EnemyBehaviour {
      create(group, x, y) {
         const me = this;
 
+        /** @type {Phaser.Physics.Arcade.Sprite} */
         const sprite = group.create(x, y, 'triangle', 0)
             .setCollideWorldBounds(true);
+
+        sprite.play('triangle_idle'); 
 
         me._setNextTime();
 
@@ -85,6 +88,13 @@ export default class TriangleBehaviour extends EnemyBehaviour {
         me._isRest = false;
         const sign = me._isMovingLeft ? -1 : 1;
         body.setVelocityX(sign * Config.Physics.TriangleSpeed);
+
+        /** @type {Phaser.Physics.Arcade.Sprite} */
+        const sprite = body.gameObject;
+        sprite
+            .play('triangle_walk')
+            .setFlipX(sign < 0);
+
     }
 
     /**
@@ -102,6 +112,10 @@ export default class TriangleBehaviour extends EnemyBehaviour {
         me._isMovingLeft = !me._isMovingLeft;
 
         me._setNextTime();
+
+        /** @type {Phaser.Physics.Arcade.Sprite} */
+        const sprite = body.gameObject;
+        sprite.play('triangle_idle'); 
     }
 
     _setNextTime() {

@@ -1,3 +1,5 @@
+import Enums from './Enums.js';
+
 export default class Config {
 
     static Debug = {
@@ -9,7 +11,7 @@ export default class Config {
     };
 
     static Start = {
-        Player: { x: 6000, y: 1800 },
+        Player: { x: 3790, y: 1250 },
         InsideHub: false,
         GunCharge: 1000,
         ContainerSpawn: { x: 2850, y: 1800 },
@@ -51,37 +53,44 @@ export default class Config {
             {
                 x: 3825,
                 y: 1125,
-                r: 150
+                r: 150,
+                color: Enums.CIRCLE_COLOR.BLUE
             },
             {
                 x: 4750,
                 y: 900,
-                r: 225
+                r: 225,
+                color: Enums.CIRCLE_COLOR.YELLOW
             },
             {
                 x: 7285,
                 y: 1650,
-                r: 200
+                r: 200,
+                color: Enums.CIRCLE_COLOR.RED
             },
             {
                 x: 7600,
                 y: 1650,
-                r: 200
+                r: 200,
+                color: Enums.CIRCLE_COLOR.BLUE
             },
             {
                 x: 6100,
                 y: 400,
-                r: 275
+                r: 275,
+                color: Enums.CIRCLE_COLOR.YELLOW
             },
             {
                 x: 7620,
                 y: 225,
-                r: 100
+                r: 100,
+                color: Enums.CIRCLE_COLOR.RED
             },
             {
                 x: 3450,
                 y: 300,
-                r: 175
+                r: 175,
+                color: Enums.CIRCLE_COLOR.BLUE
             }
         ]
     };

@@ -175,7 +175,7 @@ export default class Core {
                 enemyGroup,
                 config.x,
                 config.y,
-                new CircleBehaviour(scene, config.x, config.y, config.r)
+                new CircleBehaviour(scene, config.x, config.y, config.r, config.color)
             );
             me._toUpdate.push(circle);
         }

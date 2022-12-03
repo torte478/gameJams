@@ -24,4 +24,10 @@ export default class Enums {
     static PlayerAnimation = {
         FIRE: 0
     };
+
+    static CIRCLE_COLOR = {
+        BLUE: 0,
+        YELLOW: 1,
+        RED: 2
+    };
 }

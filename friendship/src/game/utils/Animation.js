@@ -30,9 +30,45 @@ export default class Animation {
 
         scene.anims.create({
             key: 'square_walk',
-            frames: Animation.getFrames(scene, 'square', [ 0, 1, 2, 3, 4 ]),
+            frames: Animation.getFrames(scene, 'square', [ 0, 1, 2, 3, 4, 5 ]),
             frameRate: 4,
             yoyo: true,
+            repeat: -1
+        });
+
+        scene.anims.create({
+            key: 'triangle_walk',
+            frames: Animation.getFrames(scene, 'triangle', [ 0, 1, 2, 3, 4, 5 ]),
+            frameRate: 16,
+            yoyo: true,
+            repeat: -1
+        });
+
+        scene.anims.create({
+            key: 'triangle_idle',
+            frames: Animation.getFrames(scene, 'triangle', [ 6 ]),
+            frameRate: 1,
+            repeat: -1
+        });
+
+        scene.anims.create({
+            key: 'circle_blue_fly',
+            frames: Animation.getFrames(scene, 'circle', [ 0, 1 ]),
+            frameRate: 12,
+            repeat: -1
+        });
+
+        scene.anims.create({
+            key: 'circle_yellow_fly',
+            frames: Animation.getFrames(scene, 'circle', [ 2, 3 ]),
+            frameRate: 12,
+            repeat: -1
+        });
+
+        scene.anims.create({
+            key: 'circle_red_fly',
+            frames: Animation.getFrames(scene, 'circle', [ 4, 5 ]),
+            frameRate: 12,
             repeat: -1
         });
     }

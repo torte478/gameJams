@@ -18,14 +18,18 @@ export default class CircleBehaviour extends EnemyBehaviour {
     /** @type {Phaser.GameObjects.Graphics} */
     _graphics;
 
-    constructor(scene, x, y, r) {
+    /** @type {Number} */
+    _color;
+
+    constructor(scene, x, y, r, color) {
         super();
         const me = this;
+        me._color = color;
 
         me._scene = scene;
         me._circle = new Phaser.Geom.Circle(x, y, r);
 
-        me._graphics = scene.add.graphics({ lineStyle: { width: 2, color: 0x00ff00 }});
+        // me._graphics = scene.add.graphics({ lineStyle: { width: 2, color: 0x00ff00 }});
     }
 
     /**
@@ -33,11 +37,14 @@ export default class CircleBehaviour extends EnemyBehaviour {
      */
     update(body) {
         const me = this;
-
         
         const distance = Phaser.Math.Distance.BetweenPoints(
             Utils.toPoint(body.gameObject),
             me._target);
+
+        /** @type {Phaser.Physics.Arcade.Sprite} */
+        const sprite = body.gameObject;
+        sprite.setFlipX(body.velocity.x < 0);
 
         if (distance < 10) {
             me._target = me._circle.getRandomPoint();
@@ -57,11 +64,19 @@ export default class CircleBehaviour extends EnemyBehaviour {
         /** @type {Phaser.Physics.Arcade.Sprite} */
         const sprite = group.create(x, y, 'circle', 0)
             .setCircle(Consts.Unit / 2, 25, 25)
-            .setCollideWorldBounds(true)
+            .setCollideWorldBounds(true);
+        
+        const anim = me._color == Enums.CIRCLE_COLOR.BLUE
+            ? 'circle_blue_fly'
+            : me._color == Enums.CIRCLE_COLOR.RED
+                ? 'circle_red_fly'
+                : 'circle_yellow_fly';
+
+        sprite.play(anim);
 
         me._target = me._circle.getRandomPoint();
         me._scene.physics.moveTo(sprite, me._target.x, me._target.y, Config.Physics.CircleSpeed);
-        me._graphics.strokeCircleShape(me._circle);
+        // me._graphics.strokeCircleShape(me._circle);
 
         return sprite;
     }
