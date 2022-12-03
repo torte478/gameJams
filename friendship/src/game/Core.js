@@ -52,7 +52,7 @@ export default class Core {
         me._audio = new Audio(scene);
 
         const bulletGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
-        const gunLogic = new GunLogic(scene, bulletGroup, Config.Start.GunCharge);
+        const gunLogic = new GunLogic(scene, bulletGroup, Config.Start.GunCharge, me._audio);
         me._gunLogic = gunLogic;
 
         me._controls = new Controls(scene.input);
@@ -61,7 +61,8 @@ export default class Core {
             Config.Start.Player.x, 
             Config.Start.Player.y, 
             me._controls,
-            gunLogic);
+            gunLogic,
+            me._audio);
 
         const gui = new GUI(scene, gunLogic);
 

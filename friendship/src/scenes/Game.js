@@ -36,6 +36,9 @@ export default class Game extends Phaser.Scene {
         Utils.loadImage(me, 'hub');
 
         Utils.loadWav(me, 'button_click');
+        Utils.loadWav(me, 'laserShoot');
+        Utils.loadMp3(me, 'jump');
+        Utils.loadMp3(me, 'walk_snow');
     }
 
     create() {

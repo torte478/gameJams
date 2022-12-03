@@ -16,12 +16,20 @@ export default class Audio {
 
     /**
      * @param {String} sound 
+     * @param {Phaser.Types.Sound.SoundConfig} config
      */
-    play(sound) {
+     play(sound, config) {
         const me = this;
 
-        Utils.ifDebug(Config.Debug.PlaySound, () => {
-            me._scene.sound.play(sound);
-        });
+        if (Utils.isDebug(Config.Debug.MuteSound))
+            return;
+
+        me._scene.sound.play(sound,  !!config ? config : null);
+    }
+
+    stop(key) {
+        const me = this;
+
+        me._scene.sound.stopByKey(key);
     }
 }

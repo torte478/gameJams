@@ -3,6 +3,7 @@ import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Movable from './Movable.js';
+import Audio from './utils/Audio.js';
 import Utils from './utils/Utils.js';
 
 export default class GunLogic {
@@ -25,18 +26,23 @@ export default class GunLogic {
     /** @type {Number} */
     _charge;
 
+    /** @type {Audio} */
+    _audio;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Physics.Arcade.Group} bulletGroup
      * @param {Number} charge
+     * @param {Audio} audio
      */
-    constructor(scene, bulletGroup, charge) {
+    constructor(scene, bulletGroup, charge, audio) {
         const me = this;
 
         me._scene = scene;
         me._shotCount = 0;
         me._charge = charge;
+        me._audio = audio;
 
         /** @type {Phaser.Physics.Arcade.Sprite} */
         const firstBullet = bulletGroup.create(0, 0, 'main', 1);
@@ -92,6 +98,8 @@ export default class GunLogic {
                 );
 
             me._bullets[me._shotCount - 1].state = Enums.BulletState.FLY;
+
+            me._audio.play('laserShoot');
         } else {
             me._destroyBullets();
         }
