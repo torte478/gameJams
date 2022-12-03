@@ -124,6 +124,14 @@ export default class GunLogic {
         me._checkShotResult();
     }
 
+    charge(delta) {
+        const me = this;
+
+        me._charge = Math.min(
+            Config.Start.GunCharge, 
+            me._charge + Config.GunChargeSpeed * delta / 1000);
+    }
+
     _checkShotResult() {
         const me = this;
 

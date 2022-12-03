@@ -9,7 +9,8 @@ export default class Config {
     };
 
     static Start = {
-        Player: { x: 3100, y: 1800 },
+        Player: { x: 2425, y: 1840 },
+        InsideHub: false,
         GunCharge: 100,
         ContainerSpawn: { x: 2850, y: 1800 },
         EnemyCatcher: {
@@ -22,6 +23,7 @@ export default class Config {
                 600
             )
         },
+        HubEnterTrigger: new Phaser.Geom.Rectangle(2075, 1685, 200, 200),
         Containers: [
             { x: 3620, y: 1600 }
         ],
@@ -30,8 +32,14 @@ export default class Config {
         ]
     };
 
+    static Hub = {
+        Pos: new Phaser.Geom.Point(0, 3000),
+        ExitTrigger: new Phaser.Geom.Rectangle(50, 3250, 100, 100),
+    }
+
     static ContainerLimit = 20;
     static GunShotCost = 9;
+    static GunChargeSpeed = 2;
 
     static Physics = {
         ConnectionStep: 200,

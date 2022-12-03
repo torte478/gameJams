@@ -22,6 +22,9 @@ export default class Player {
 
     /** @type {GunLogic} */
     _gunLogic;
+    
+    /** @type {Boolean} */
+    _charging;
 
     /**
      * 
@@ -38,6 +41,7 @@ export default class Player {
         me._sprite = scene.add.sprite(0, 0, 'player', 0);
         me._gun = scene.add.sprite(0, 0, 'gun', 0);
         me._gunLogic = gunLogic;
+        me._charging = false;
 
         me._container = scene.add.container(x, y, [ 
             me._sprite,
@@ -52,6 +56,8 @@ export default class Player {
         /** @type {Phaser.Physics.Arcade.Body} */
         const body = me._container.body;
         body.setGravityY(Config.Physics.Gravity);
+
+        me._container.isPlayer = true;
     }
 
     toGameObject() {
@@ -60,16 +66,31 @@ export default class Player {
         return me._container;
     }
 
-    update() {
+    update(delta) {
         const me = this;
 
         const lookDirection = me._updateMovement();
 
-        if (me._controls.isDownOnce(Enums.Keyboard.FIRE))
-            me._gunLogic.tryShot(
-                Utils.toPoint(me.toGameObject()),
-                lookDirection,
-                me._sprite.flipX ? -1 : 1);
+        if (me._charging)
+            me._gunLogic.charge(delta);
+        else
+            if (me._container.x >= 2400 && me._controls.isDownOnce(Enums.Keyboard.FIRE))
+                me._gunLogic.tryShot(
+                    Utils.toPoint(me.toGameObject()),
+                    lookDirection,
+                    me._sprite.flipX ? -1 : 1);
+    }
+
+    startCharge() {
+        const me = this;
+
+        me._charging = true;
+    }
+
+    stopCharge() {
+        const me = this;
+
+        me._charging = false;
     }
 
     _updateMovement() {

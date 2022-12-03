@@ -26,12 +26,13 @@ export default class EnemyCatcher {
         me._pos = Utils.buildPoint(x, y);
 
         scene.add.image(x, y, 'enemy_catcher');
-        scene.add.rectangle(
-            zone.x + (zone.width / 2), 
-            zone.y + (zone.height / 2), 
-            zone.width, 
-            zone.height)
-            .setStrokeStyle(2, 0xffff00);
+
+        // scene.add.rectangle(
+        //     zone.x + (zone.width / 2), 
+        //     zone.y + (zone.height / 2), 
+        //     zone.width, 
+        //     zone.height)
+        //     .setStrokeStyle(2, 0xffff00);
     }
 
     update() {

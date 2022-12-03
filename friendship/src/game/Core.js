@@ -13,6 +13,9 @@ import EnemyBehaviour from './EnemyBehaviour.js';
 import ContainerSpawn from './ContainerSpawn.js';
 import EnemyCatcher from './EnemyCatcher.js';
 import GUI from './GUI.js';
+import PlayerTrigger from './PlayerTrigger.js';
+import Callback from './Callback.js';
+import Hub from './Hub.js';
 
 export default class Core {
 
@@ -64,6 +67,26 @@ export default class Core {
 
         me._toUpdate.push(gui);
 
+        const hubEnterTrigger = new PlayerTrigger(
+            scene,
+            Config.Start.HubEnterTrigger,
+            me._controls,
+            new Callback(() => { console.log('enter')}, me),
+            new Callback(() => { hub.enter(me._player) }, me),
+            new Callback(() => { console.log('exit')}, me));
+
+        me._toUpdate.push(hubEnterTrigger);
+
+        const hubExitTrigger = new PlayerTrigger(
+            scene,
+            Config.Hub.ExitTrigger,
+            me._controls,
+            new Callback(() => { console.log('enter')}, me),
+            new Callback(() => { hub.exit(me._player) }, me),
+            new Callback(() => { console.log('exit')}, me));
+
+        me._toUpdate.push(hubExitTrigger);
+
         me._level = scene.make.tilemap({
             key: 'level',
             tileWidth: Consts.Unit,
@@ -79,6 +102,7 @@ export default class Core {
             .setBounds(0, 0, me._level.widthInPixels, me._level.heightInPixels);
 
         scene.physics.world.setBounds(0, 0, me._level.widthInPixels, me._level.heightInPixels);
+        const hub = new Hub(scene, scene.cameras.main.getBounds());
 
         for (let i = 0; i < Consts.CollideTiles.length; ++i) {
             const tileIndex = Consts.CollideTiles[i];
@@ -158,6 +182,11 @@ export default class Core {
         );
 
         scene.physics.add.collider(
+            me._player.toGameObject(),
+            hub.getTiles()
+        );
+
+        scene.physics.add.collider(
             bulletGroup,
             tiles,
             (b, e) => {
@@ -170,7 +199,10 @@ export default class Core {
             (b, c) => {
                 gunLogic.onContainerCollide(b, c);
             }
-        )
+        );
+
+        if (Config.Start.InsideHub)
+            hub.enter(me._player);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
@@ -184,16 +216,16 @@ export default class Core {
         
         me._controls.update();
 
-        me._player.update();
-
         for (let i = 0; i < me._toUpdate.length; ++i)
             me._toUpdate[i].update(delta);
+
+        me._player.update(delta);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             let text =
                 `mse: ${me._scene.input.activePointer.worldX | 0} ${me._scene.input.activePointer.worldY | 0}\n` +
                 `plr: ${me._player.toGameObject().x | 0} ${me._player.toGameObject().y | 0}\n` +
-                `gun: ${me._gunLogic._charge}`;
+                `gun: ${me._gunLogic._charge | 0}`;
 
             me._log.setText(text);
         });

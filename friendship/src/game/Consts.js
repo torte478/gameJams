@@ -8,6 +8,7 @@ export default class Consts {
     static Unit = 50;
 
     static Depth = {
+        Background: -10000,
         Tiles: -1000,
         Player: 1000,
         Laser: 2000,
