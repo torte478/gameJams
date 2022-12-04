@@ -309,19 +309,19 @@ export default class Core {
     _exitHub() {
         const me = this;
 
-        // me._player.isBusy = true;
+        me._player.isBusy = true;
+        me._player._container.body.setVelocity(0);
+        me._player._insideSprite.play('player_idle_inside');
+        me._audio.play('action');
 
-        // me._graphics.runFade(
-        //     new Callback(() => {
-        //         me._background.setVisible(trie);
-        //         me._hub.exit(me._player);
-        //     }, me),
-        //     new Callback(() => {
-        //         me._hub.startCharge(me._player);
-        //     }, me)
-        // );
-
-        me._background.setVisible(true);
-        me._hub.exit(me._player);
+        me._graphics.runFade(
+            new Callback(() => {
+                me._background.setVisible(true);
+                me._hub.exit(me._player);
+            }, me),
+            new Callback(() => {
+                me._player.isBusy = false;
+            }, me)
+        );
     }
 }

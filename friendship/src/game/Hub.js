@@ -132,6 +132,11 @@ export default class Hub {
             me._originBounds.width, 
             me._originBounds.height);
 
+        player._insideSprite.setVisible(false);
+        player._sprite.setVisible(true);
+        player._gun.setVisible(true);
+        player._isInside = false;
+
         player.toGameObject().setPosition(
             Config.Start.HubEnterTrigger.x + 100,
             Config.Start.HubEnterTrigger.y + 150);
