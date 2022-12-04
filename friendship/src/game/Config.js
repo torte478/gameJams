@@ -3,20 +3,21 @@ import Enums from './Enums.js';
 export default class Config {
 
     static Debug = {
-        Global: true,
+        Global: false,
         Log: true,
         ShowSceneLog: true,
-        PlaySound: true,
+        MuteSound: false,
         Random: false,
-        ShowTrigger: true,
+        ShowTrigger: false,
     };
 
     static WasTriggerAction = false;
 
     static Start = {
-        Player: { x: 1300, y: 1850 },
+        // Player: { x: 3000, y: 1850 },
+        Player: { x: 600, y: 500 },
         InsideHub: false,
-        StartGunCharge: 20,
+        StartGunCharge: 250,
         MaxGunCharge: 1000,
         ContainerSpawn: { x: 3100, y: 1825 },
         EnemyCatcher: {
@@ -112,7 +113,7 @@ export default class Config {
 
     static ContainerLimit = 20;
     static GunShotCost = 9;
-    static GunChargeSpeed = 32;
+    static GunChargeSpeed = 64;
 
     static Physics = {
         ConnectionStep: 400,

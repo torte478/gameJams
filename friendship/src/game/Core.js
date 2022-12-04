@@ -211,8 +211,10 @@ export default class Core {
             laser,
             me._audio);
         me._toUpdate.push(enemyCatcher);
+        me._enemyCatcher = enemyCatcher;
 
         const gui = new GUI(scene, gunLogic, enemyCatcher);
+        me._gui = gui;
         me._toUpdate.push(gui);
 
         const enemyGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
@@ -340,7 +342,7 @@ export default class Core {
         if (Config.Start.InsideHub)
             me._enterHub();
 
-        me._audio.play('music1', { volume: 0.5, loop: true });
+        me._audio.play('music1', { volume: 0.3, loop: true });
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
@@ -349,17 +351,10 @@ export default class Core {
         });
     }
 
+    _runEnding = false;
+
     update(delta) {
         const me = this;
-
-        Config.WasTriggerAction = false;
-        
-        me._controls.update();
-
-        for (let i = 0; i < me._toUpdate.length; ++i)
-            me._toUpdate[i].update(delta);
-
-        me._player.update(delta);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             let text =
@@ -369,6 +364,23 @@ export default class Core {
 
             me._log.setText(text);
         });
+
+        if (me._runEnding)
+            return;
+
+        if (me._enemyCatcher._stat[0] >= 1 
+            && me._enemyCatcher._stat[1] >= 3 
+            && me._enemyCatcher._stat[2] >= 7)
+            me.runGameOver();
+
+        Config.WasTriggerAction = false;
+        
+        me._controls.update();
+
+        for (let i = 0; i < me._toUpdate.length; ++i)
+            me._toUpdate[i].update(delta);
+
+        me._player.update(delta);
     }
 
     _enterHub() {
@@ -408,5 +420,121 @@ export default class Core {
                 me._player.isBusy = false;
             }, me)
         );
+    }
+
+    runGameOver() {
+        const me = this;
+
+        me._runEnding = true;
+        
+        me._graphics.runFade(
+            new Callback(() => {
+                me._audio.stop('music1');
+
+                me._player.isBusy = true;
+                me._player.toGameObject().body.setVelocity(0);
+                me._player._sprite.play('player_idle').setFlipX(true);
+                me._player._gun.setFlipX(true);
+                me._player._container.setPosition(1800, 1850);
+
+                me._scene.cameras.main.stopFollow().setScroll(900, 1200);
+                me._gui.hide();
+            }, me),
+            new Callback(() => {
+                me.runGameOver1();
+            }, me));
+    }
+
+    runGameOver1() {
+        const me = this;
+
+        me._audio.play('music3', { loop: -1, volume: 0.25 });
+
+        me._boss.setPosition(600, me._boss.y);
+
+        const tweens = [];
+        tweens.push({
+            targets: me._boss,
+            x: 1150,
+            duration: 2000,
+            ease: 'Sine.easeInOut'
+        });
+
+        const spawn = new Phaser.Geom.Point(2600, 1600);
+        const square = me._scene.add.image(spawn.x, spawn.y, 'square', 3)
+            .setFlipX(true);
+
+        const treeX = 1530;
+
+        tweens.push({
+            targets: square,
+            x: treeX,
+            y: 1850,
+            duration: 1000,
+            ease: 'Sine.easeOut'
+        });
+
+        const triangles = [
+            { y: 1700, scale: 1.5 },
+            { y: 1610, scale: 1.2 },
+            { y: 1550, scale: 1}
+        ];
+
+        for (let i = 0; i < triangles.length; ++i) {
+            const triangle = me._scene.add.image(spawn.x, spawn.y, 'triangle', 6)
+                .setFlipX(true)
+                .setScale(triangles[i].scale);
+
+            tweens.push({
+                targets: triangle,
+                x: treeX,
+                y: triangles[i].y,
+                duration: 1000,
+                ease: 'Sine.easeOut'
+            });
+        }
+
+        const circles = [
+            { x: 1615, y: 1710 },
+            { x: 1425, y: 1795 },
+            { x: 1627, y: 1780 },
+            { x: 1532, y: 1739 },
+            { x: 1441, y: 1700 },
+            { x: 1525, y: 1616 }
+        ];
+
+        for (let i = 0; i < circles.length; ++i) {
+            const circle = me._scene.add.image(spawn.x, spawn.y, 'circle', 6 + ((i + 1) % 3))
+                .setFlipX(true);
+
+            tweens.push({
+                targets: circle,
+                x: circles[i].x,
+                y: circles[i].y,
+                duration: 400,
+                ease: 'Sine.easeOut'
+            });
+        }
+
+        const bossY = me._boss.y;
+
+        me._scene.tweens.timeline({
+            tweens: tweens,
+            onComplete: () => {
+                me._boss.setFrame(1);
+
+                me._scene.add.text(1550, 1300, 'Merry Christmas', { fontSize: 72})
+                    .setOrigin(0.5)
+                    .setStroke('#6a7798', 8);
+
+                me._scene.tweens.add({
+                    targets: me._boss,
+                    y: bossY + 10,
+                    duration: 500,
+                    yoyo: true,
+                    repeat: -1
+                });
+            }
+        });
     }
 }

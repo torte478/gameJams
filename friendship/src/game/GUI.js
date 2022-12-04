@@ -22,6 +22,8 @@ export default class GUI {
     /** @type {EnemyCatcher} */
     _enemyCatcher;
 
+    _toHide = [];
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {GunLogic} gunLogic
@@ -35,13 +37,17 @@ export default class GUI {
 
         const offset = 340;
 
-        scene.add.image(offset, 50, 'charge_bar', 0)
+        const c = scene.add.image(offset, 50, 'charge_bar', 0)
             .setDepth(Consts.Depth.GUI)
             .setScrollFactor(0);
+
+        me._toHide.push(c);
 
         const bar = scene.add.image(offset, 50, 'charge_bar', 1)
             .setDepth(Consts.Depth.GUI)
             .setScrollFactor(0);
+
+        me._toHide.push(bar);
 
         me._chargeBarMask = scene.make.graphics();
         me._chargeBarMask.setScrollFactor(0);
@@ -72,7 +78,16 @@ export default class GUI {
                 complete: complete,
                 text: text
             });
+
+            me._toHide.push(container);
         }
+    }
+
+    hide() {
+        const me = this;
+
+        for (let i =0; i < me._toHide.length; ++i)
+            me._toHide[i].setVisible(false);
     }
 
     update() {

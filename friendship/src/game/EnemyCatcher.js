@@ -37,6 +37,7 @@ export default class EnemyCatcher {
         me._laser = laser;
 
         me._stat = [0, 0, 0];
+        // me._stat = [1, 3, 7];
 
         me._audio = audio;
 
