@@ -63,9 +63,9 @@ export default class ContainerSpawn {
                 150
             ),
             controls,
-            new Callback(() => console.log('enter'), me),
+            new Callback(null, me),
             new Callback(me.spawn, me),
-            new Callback(() => console.log('exit'), me)
+            new Callback(null, me)
             );
     }
 

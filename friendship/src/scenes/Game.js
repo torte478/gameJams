@@ -54,6 +54,8 @@ export default class Game extends Phaser.Scene {
         Utils.loadMp3(me, 'laserShoot');
         Utils.loadMp3(me, 'jump');
         Utils.loadMp3(me, 'walk_snow');
+        Utils.loadMp3(me, 'music1');
+        Utils.loadMp3(me, 'music3');
     }
 
     create() {

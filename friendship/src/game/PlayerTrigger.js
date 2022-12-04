@@ -30,6 +30,11 @@ export default class PlayerTrigger {
     /** @type {Boolean} */
     _isPlayerInside;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _hint;
+
+    _ignoreHint;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Geom.Rectangle} zone
@@ -38,7 +43,7 @@ export default class PlayerTrigger {
      * @param {Callback} onAction 
      * @param {Callback} onExit 
      */
-    constructor(scene, zone, controls, onEnter, onAction, onExit) {
+    constructor(scene, zone, controls, onEnter, onAction, onExit, ignoreHint) {
         const me = this;
 
         me._scene = scene;
@@ -48,6 +53,11 @@ export default class PlayerTrigger {
         me._onAction = onAction;
         me._onExit = onExit;
         me._isPlayerInside = false;
+        me._ignoreHint = !!ignoreHint;
+
+        me._hint = scene.add.image(zone.centerX, zone.centerY, 'big', 9)
+            .setDepth(Consts.Depth.GUI)
+            .setVisible(false);
         
         Utils.ifDebug(Config.Debug.ShowTrigger, () => {
             scene.add.rectangle(
@@ -64,8 +74,16 @@ export default class PlayerTrigger {
         const me = this;
 
         const colliders = me._scene.physics.overlapRect(me._zone.x, me._zone.y, me._zone.width, me._zone.height, true);
-        const isPlayer = Utils.any(colliders, c => !!c.gameObject.isPlayer);
+        const player = Utils.firstOrNull(colliders, c => !!c.gameObject.isPlayer);
+        const isPlayer = player != null;
         
+        if (!me._ignoreHint) {
+            me._hint.setVisible(isPlayer);
+        
+            if (isPlayer)
+                me._hint.setPosition(player.gameObject.x, player.gameObject.y + 75);
+        }
+
         if (isPlayer && !me._isPlayerInside) {
             me._isPlayerInside = true;
             me._onEnter.call();

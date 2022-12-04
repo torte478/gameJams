@@ -76,7 +76,7 @@ export default class Player {
         me._container = scene.add.container(x, y, [ 
             me._sprite,
             me._gun,
-            me._insideSprite
+            me._insideSprite,
             ])
             .setDepth(Consts.Depth.Player)
             .setSize(Consts.Unit, Consts.Unit * 2);

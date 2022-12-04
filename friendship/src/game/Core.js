@@ -104,9 +104,9 @@ export default class Core {
             scene,
             Config.Start.HubEnterTrigger,
             me._controls,
-            new Callback(() => { console.log('enter')}, me),
+            new Callback(null, me),
             new Callback(me._enterHub, me),
-            new Callback(() => { console.log('exit')}, me));
+            new Callback(null, me));
 
         me._toUpdate.push(hubEnterTrigger);
 
@@ -114,9 +114,9 @@ export default class Core {
             scene,
             Config.Hub.ExitTrigger,
             me._controls,
-            new Callback(() => { console.log('enter')}, me),
+            new Callback(null, me),
             new Callback(me._exitHub, me),
-            new Callback(() => { console.log('exit')}, me));
+            new Callback(null, me));
 
         me._toUpdate.push(hubExitTrigger);
 
@@ -151,7 +151,8 @@ export default class Core {
                     onComplete: () => { bossTween = null; }
                 });
                 
-            }, me));
+            }, me),
+            true);
 
         me._toUpdate.push(bossTrigger);
 
@@ -159,9 +160,9 @@ export default class Core {
             scene,
             Config.Hub.FireTrigger,
             me._controls,
-            new Callback(() => { console.log('enter')}, me),
+            new Callback(null, me),
             new Callback(() => { me._player.toggleAnimation(Enums.PlayerAnimation.FIRE) }, me),
-            new Callback(() => { console.log('exit')}, me));
+            new Callback(null, me));
 
         me._toUpdate.push(hubFireTrigger);
 
@@ -338,6 +339,8 @@ export default class Core {
 
         if (Config.Start.InsideHub)
             me._enterHub();
+
+        me._audio.play('music1', { volume: 0.5, loop: true });
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
