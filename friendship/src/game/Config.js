@@ -6,7 +6,7 @@ export default class Config {
         Global: false,
         Log: true,
         ShowSceneLog: true,
-        MuteSound: false,
+        MuteSound: true,
         Random: false,
         ShowTrigger: false,
     };
@@ -14,7 +14,7 @@ export default class Config {
     static WasTriggerAction = false;
 
     static Start = {
-        // Player: { x: 3000, y: 1850 },
+        // Player: { x: 1800, y: 1850 },
         Player: { x: 600, y: 500 },
         InsideHub: false,
         StartGunCharge: 250,

@@ -264,6 +264,17 @@ export default class Core {
             me._toUpdate.push(circle);
         }
 
+        const invisibleGroup = new Phaser.Physics.Arcade.StaticGroup(scene.physics.world, scene);
+        /** @type {Phaser.Physics.Arcade.Sprite} */
+        var wall1 = invisibleGroup.create(2500, 1250, 'collider');
+        wall1.setVisible(false);
+
+        /** @type {Phaser.Physics.Arcade.Sprite} */
+        var wall2 = invisibleGroup.create(2000, 1600, 'collider');
+        wall2.setVisible(false);
+        wall2.body.setSize(100, 1000);
+            
+
         scene.physics.add.collider(
             enemyGroup,
             tiles);
@@ -282,6 +293,16 @@ export default class Core {
         scene.physics.add.collider(
             containerGroup,
             tiles,
+            (m, t) => {
+                m.owner.stopAccelerate();
+                laser.checkHide(m)
+                me._audio.play('hit');
+            }
+        );
+
+        scene.physics.add.collider(
+            containerGroup,
+            invisibleGroup,
             (m, t) => {
                 m.owner.stopAccelerate();
                 laser.checkHide(m)
@@ -331,6 +352,13 @@ export default class Core {
                 gunLogic.onWallCollide(b);
             });
 
+        scene.physics.add.collider(
+            bulletGroup,
+            invisibleGroup,
+            (b, e) => {
+                gunLogic.onWallCollide(b);
+            });
+
         scene.physics.add.overlap(
             bulletGroup,
             containerGroup,
@@ -368,9 +396,9 @@ export default class Core {
         if (me._runEnding)
             return;
 
-        if (me._enemyCatcher._stat[0] >= 1 
-            && me._enemyCatcher._stat[1] >= 3 
-            && me._enemyCatcher._stat[2] >= 7)
+        if (me._enemyCatcher._stat[0] > 0 
+            && me._enemyCatcher._stat[1] > 0 
+            && me._enemyCatcher._stat[2] > 0)
             me.runGameOver();
 
         Config.WasTriggerAction = false;
@@ -426,6 +454,11 @@ export default class Core {
         const me = this;
 
         me._runEnding = true;
+
+        me._player.isBusy = true;
+        me._audio.stop('walk_snow');
+        me._audio.ignoreShit = true;
+        me._player.toGameObject().body.setVelocity(0);
         
         me._graphics.runFade(
             new Callback(() => {
@@ -436,6 +469,8 @@ export default class Core {
                 me._player._sprite.play('player_idle').setFlipX(true);
                 me._player._gun.setFlipX(true);
                 me._player._container.setPosition(1800, 1850);
+
+                me._audio.stop('walk_snow');
 
                 me._scene.cameras.main.stopFollow().setScroll(900, 1200);
                 me._gui.hide();

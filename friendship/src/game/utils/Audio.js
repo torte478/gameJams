@@ -11,6 +11,10 @@ export default class Audio {
     /** @type {Set} */
     _set;
 
+    _lastHitPlay = new Date().getTime();
+
+    ignoreShit = false;
+
     constructor(scene) {
         const me = this;
 
@@ -27,6 +31,17 @@ export default class Audio {
 
         if (Utils.isDebug(Config.Debug.MuteSound))
             return;
+
+        if (sound == 'hit') {
+            if (me.ignoreShit)
+                return;
+                
+            const now = new Date().getTime();
+            if ((now - me._lastHitPlay) < 1000)
+                return;
+
+            me._lastHitPlay = now;
+        }
 
         me._scene.sound.play(sound,  !!config ? config : null);
     }

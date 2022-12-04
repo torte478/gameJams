@@ -136,6 +136,8 @@ export default class Hub {
         player._sprite.setVisible(true);
         player._gun.setVisible(true);
         player._isInside = false;
+        me._charger.stop();
+        me._charger.setFrame(0);
 
         player.toGameObject().setPosition(
             Config.Start.HubEnterTrigger.x + 100,

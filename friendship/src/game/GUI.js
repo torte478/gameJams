@@ -67,7 +67,8 @@ export default class GUI {
                 .setVisible(false);
 
             const text = scene.add.text(0, 25, '0/0', { fontSize: 30})
-                .setStroke('#6a7798', 8);
+                .setStroke('#6a7798', 8)
+                .setVisible(false);
 
             const container = scene.add.container(700 + 115 * i, 50, [ enemySprite, complete, text ])
                 .setDepth(Consts.Depth.GUI)
@@ -106,7 +107,7 @@ export default class GUI {
                         ? Config.Start.Circles.length
                         : Config.Start.Triangles.length;
 
-            if (stats[i] >= total) {
+            if (stats[i] > 0) {
                 item.text.setVisible(false);
                 item.complete.setVisible(true);
             } else {

@@ -145,6 +145,7 @@ export default class Player {
         } else {
             if (type == Enums.PlayerAnimation.FIRE) {
                 me._insideSprite.play('player_fire');
+                me._container.body.setVelocityX(0);
                 me._container.setPosition(400, me._container.y);
                 console.log(me._container.po)
             }
