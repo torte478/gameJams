@@ -106,6 +106,13 @@ export default class Animation {
             frameRate: 3,
             repeat: -1
         });
+
+        scene.anims.create({
+            key: 'enemy_catcher',
+            frames: Animation.getFrames(scene, 'enemy_catcher', [ 0, 1, 2 ]),
+            frameRate: 12,
+            repeat: -1
+        });
     }
 
     static getFrames(scene, texture, frames) {

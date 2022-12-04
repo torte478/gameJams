@@ -149,7 +149,8 @@ export default class Core {
             Config.Start.EnemyCatcher.x,
             Config.Start.EnemyCatcher.y,
             Config.Start.EnemyCatcher.zone,
-            laser);
+            laser,
+            me._audio);
         me._toUpdate.push(enemyCatcher);
 
         const gui = new GUI(scene, gunLogic, enemyCatcher);

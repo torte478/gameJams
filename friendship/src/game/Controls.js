@@ -42,8 +42,8 @@ export default class Controls {
         me._keys.right.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         me._keys.up.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         me._keys.down.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-        me._keys.jump.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
-        me._keys.fire.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
+        me._keys.jump.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        me._keys.fire.key = input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
     }
 
     isDown(key) {

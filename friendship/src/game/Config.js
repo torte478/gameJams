@@ -12,14 +12,14 @@ export default class Config {
     };
 
     static Start = {
-        Player: { x: 2500, y: 1850 },
+        Player: { x: 2700, y: 1850 },
         InsideHub: false,
         StartGunCharge: 750,
         MaxGunCharge: 1000,
         ContainerSpawn: { x: 2850, y: 1800 },
         EnemyCatcher: {
-            x: 2750,
-            y: 1400,
+            x: 2982,
+            y: 1420,
             zone: new Phaser.Geom.Rectangle(
                 2700,
                 1300,

@@ -32,9 +32,9 @@ export default class Game extends Phaser.Scene {
         Utils.loadSpriteSheet(me, 'triangle', Consts.Unit * 4, Consts.Unit * 3);
         Utils.loadSpriteSheet(me, 'circle', Consts.Unit * 2);
         Utils.loadSpriteSheet(me, 'charger', Consts.Unit * 3);
+        Utils.loadSpriteSheet(me, 'enemy_catcher', 300, 150);
 
         Utils.loadImage(me, 'background');
-        Utils.loadImage(me, 'enemy_catcher');
         Utils.loadImage(me, 'hub');
         Utils.loadImage(me, 'fade');
         Utils.loadImage(me, 'hub_outside');
@@ -43,6 +43,7 @@ export default class Game extends Phaser.Scene {
         Utils.loadWav(me, 'button_click');
         Utils.loadWav(me, 'charger');
         Utils.loadWav(me, 'action');
+        Utils.loadWav(me, 'enemy_catched');
 
         Utils.loadMp3(me, 'laserShoot');
         Utils.loadMp3(me, 'jump');

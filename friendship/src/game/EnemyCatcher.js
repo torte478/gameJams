@@ -1,5 +1,7 @@
 import Phaser from '../lib/phaser.js';
+import Consts from './Consts.js';
 import Enums from './Enums.js';
+import Audio from './utils/Audio.js';
 import Utils from './utils/Utils.js';
 
 export default class EnemyCatcher {
@@ -16,13 +18,17 @@ export default class EnemyCatcher {
     /** @type {Number[]} */
     _stat;
 
+    /** @type {Audio} */
+    _audio;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Number} x 
      * @param {Number} y 
      * @param {Phaser.Geom.Rectangle} zone
+     * 
      */
-    constructor(scene, x, y, zone, laser) {
+    constructor(scene, x, y, zone, laser, audio) {
         const me = this;
 
         me._scene = scene;
@@ -32,7 +38,11 @@ export default class EnemyCatcher {
 
         me._stat = [0, 0, 0];
 
-        scene.add.image(x, y, 'enemy_catcher');
+        me._audio = audio;
+
+        scene.add.sprite(x, y, 'enemy_catcher')
+            .setDepth(Consts.Depth.HubTop)
+            .play('enemy_catcher');
 
         // scene.add.rectangle(
         //     zone.x + (zone.width / 2), 
@@ -71,5 +81,31 @@ export default class EnemyCatcher {
 
         const value = type == Enums.EnemyType.CIRCLE ? size : 1;
         me._stat[type] += value;
+
+        me._audio.play('enemy_catched');
+
+        const rect = new Phaser.Geom.Rectangle(2190, 1400, 2620 - 2190, 1500 - 1400);
+        const sprite = type == Enums.EnemyType.CIRCLE 
+            ? 'circle'
+            : type == Enums.EnemyType.SQUARE
+                ? 'square'
+                : 'triangle';
+
+        const image = me._scene.add.image(2700, 1450, sprite, 0).setDepth(Consts.Depth.Hub + 10);
+        const tweens = [];
+        for (let i = 0; i < 4; ++i) {
+            const point = rect.getRandomPoint();
+            tweens.push({
+                x: point.x,
+                y: point.y,
+                duration: 4000
+            });
+        };
+
+        me._scene.tweens.timeline({
+            targets: image,
+            yoyo: true,
+            repeat: -1,
+            tweens: tweens});
     }
 }
