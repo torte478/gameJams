@@ -14,7 +14,7 @@ export default class Config {
     static WasTriggerAction = false;
 
     static Start = {
-        Player: { x: 3100, y: 1850 },
+        Player: { x: 1300, y: 1850 },
         InsideHub: false,
         StartGunCharge: 20,
         MaxGunCharge: 1000,
@@ -30,6 +30,7 @@ export default class Config {
             )
         },
         HubEnterTrigger: new Phaser.Geom.Rectangle(2075, 1685, 200, 200),
+        BossTrigger: new Phaser.Geom.Rectangle(0, 1300, 1000, 1000),
         Containers: [
             // { x: 3800, y: 1600 }
         ],

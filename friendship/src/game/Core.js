@@ -54,6 +54,9 @@ export default class Core {
     /** @type {Graphics} */
     _graphics;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _boss;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -66,6 +69,15 @@ export default class Core {
         me._background = scene.add.image(scene.cameras.main.width / 2, scene.cameras.main.height / 2, 'background')
             .setDepth(Consts.Depth.Background)
             .setScrollFactor(0);
+
+        scene.add.image(300, 1600, 'cave', 0)
+            .setDepth(Consts.Depth.Background);
+
+        scene.add.image(300, 1600, 'cave', 1)
+            .setDepth(Consts.Depth.Tiles + 100);
+
+        me._boss = scene.add.image(200, 1650, 'boss', 0)
+            .setDepth(Consts.Depth.Background + 10);
 
         const bulletGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
         const gunLogic = new GunLogic(scene, bulletGroup, Config.Start.StartGunCharge, me._audio);
@@ -107,6 +119,41 @@ export default class Core {
             new Callback(() => { console.log('exit')}, me));
 
         me._toUpdate.push(hubExitTrigger);
+
+        /** @type {Phaser.Tweens.Tween} */
+        let bossTween = null;
+        const bossTrigger = new PlayerTrigger(
+            scene,
+            Config.Start.BossTrigger,
+            me._controls,
+            new Callback(() => { 
+                if (!!bossTween)
+                    bossTween.pause();
+
+                bossTween = scene.add.tween({
+                    targets: me._boss,
+                    x: 700,
+                    duration: 1000,
+                    ease: 'Sine.easeInOut',
+                    onComplete: () => { bossTween = null; }
+                });
+            }, me),
+            new Callback(null, me),
+            new Callback(() => { 
+                if (!!bossTween)
+                    bossTween.pause();
+
+                bossTween = scene.add.tween({
+                    targets: me._boss,
+                    x: 200,
+                    duration: 1000,
+                    ease: 'Sine.easeInOut',
+                    onComplete: () => { bossTween = null; }
+                });
+                
+            }, me));
+
+        me._toUpdate.push(bossTrigger);
 
         const hubFireTrigger = new PlayerTrigger(
             scene,
