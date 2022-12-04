@@ -78,7 +78,7 @@ export default class GUI {
     update() {
         const me = this;
 
-        const gunChargePercent = me._gunLogic._charge / Config.Start.GunCharge;
+        const gunChargePercent = me._gunLogic._charge / Config.Start.MaxGunCharge;
         const newPosition = -600 * (1 - gunChargePercent);
         me._chargeBarMask.setPosition(newPosition, 0);
 

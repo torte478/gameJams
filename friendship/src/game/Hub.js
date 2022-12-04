@@ -2,6 +2,7 @@ import Phaser from '../lib/phaser.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Player from './Player.js';
+import Audio from './utils/Audio.js';
 
 export default class Hub {
 
@@ -20,12 +21,17 @@ export default class Hub {
     /** @type {Phaser.GameObjects.Sprite} */
     _charger;
 
+    /** @type {Audio} */
+    _audio;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Geom.Rectangle} originBounds
      */
-    constructor(scene, originBounds) {
+    constructor(scene, originBounds, audio) {
         const me = this;
+
+        me._audio = audio;
 
         me._scene = scene;
         me._originBounds = originBounds;
@@ -96,12 +102,16 @@ export default class Hub {
         player._gun.setVisible(false);
         player._sprite.setFrame(6);
 
+        me._audio.play('action');
+
         me._scene.time.delayedCall(rate, () => {
             me._charger.setFrame(2);
             player._sprite.setVisible(false);
-            player._insideSprite.setFlipX(true).setVisible(true);
+            player._insideSprite.setFlipX(true).setVisible(true).play('player_idle_inside');
 
-            me._scene.time.delayedCall(rate, () => {
+            me._audio.play('action');
+
+            me._scene.time.delayedCall(rate / 2, () => {
                 me._charger.play('charger_charge');
                 player.isBusy = false;
                 player.startCharge();

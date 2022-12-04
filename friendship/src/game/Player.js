@@ -30,9 +30,6 @@ export default class Player {
     /** @type {Audio} */
     _audio;
 
-    /** @type {Boolean} */
-    _isWalkAudioPlaying;
-
     /** @type {Number} */
     _jumpCount;
 
@@ -67,7 +64,7 @@ export default class Player {
         me._gunLogic = gunLogic;
         me._charging = false;
         me._audio = audio;
-        me._isWalkAudioPlaying = false;
+        me._AudioPlaying = false;
         me._jumpCount = 0;
         me.isBusy = false;
         me._isInside = false;
@@ -103,8 +100,11 @@ export default class Player {
     update(delta) {
         const me = this;
 
-        if (me._charging)
+        if (me._charging) {
             me._gunLogic.charge(delta);
+            if (me._gunLogic._charge >= Config.Start.MaxGunCharge)
+                 me._audio.stop('charger');
+        }
 
         if (me.isBusy)
             return;
@@ -122,12 +122,14 @@ export default class Player {
         const me = this;
 
         me._charging = true;
+        me._audio.playSingleton('charger', { loop: true, volume: 0.25});
     }
 
     stopCharge() {
         const me = this;
 
         me._charging = false;
+        me._audio.stop('charger');
     }
 
     toggleAnimation(type) {
@@ -174,11 +176,11 @@ export default class Player {
         if (movementKeyPress && body.blocked.down) {
             me._sprite.play('player_walk', true);
             me._insideSprite.play('player_walk_inside', true);
-            if (!me._isWalkAudioPlaying && !me._isInside) {
-                me._audio.play('walk_snow', { loop: true, volume: 0.5 });
+            if (!me._isInside) {
+                me._audio.playSingleton('walk_snow', { loop: true, volume: 0.5 });
                 me._isWalkAudioPlaying = true;
             }
-        } else if (me._isWalkAudioPlaying) {
+        } else {
             me._audio.stop('walk_snow');
             me._isWalkAudioPlaying = false;
         }

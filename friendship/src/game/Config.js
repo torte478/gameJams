@@ -13,8 +13,9 @@ export default class Config {
 
     static Start = {
         Player: { x: 2500, y: 1850 },
-        InsideHub: true,
-        GunCharge: 1000,
+        InsideHub: false,
+        StartGunCharge: 750,
+        MaxGunCharge: 1000,
         ContainerSpawn: { x: 2850, y: 1800 },
         EnemyCatcher: {
             x: 2750,
@@ -96,7 +97,7 @@ export default class Config {
         ]
     };
 
-    static HubAnimationRate = 200;
+    static HubAnimationRate = 750;
     static EnemySize = [ 100, 100, 1 ];
     static ContainerCapacity = 3;
 

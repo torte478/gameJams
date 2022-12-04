@@ -39,7 +39,7 @@ export default class GunLogic {
 
         me._scene = scene;
         me._shotCount = 0;
-        me._charge = 0;//charge;
+        me._charge = charge;
         me._audio = audio;
 
         me._bullets = [];
@@ -126,7 +126,7 @@ export default class GunLogic {
         const me = this;
 
         me._charge = Math.min(
-            Config.Start.GunCharge, 
+            Config.Start.MaxGunCharge, 
             me._charge + Config.GunChargeSpeed * delta / 1000);
     }
 

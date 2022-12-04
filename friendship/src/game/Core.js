@@ -68,7 +68,7 @@ export default class Core {
             .setScrollFactor(0);
 
         const bulletGroup = new Phaser.Physics.Arcade.Group(scene.physics.world, scene);
-        const gunLogic = new GunLogic(scene, bulletGroup, Config.Start.GunCharge, me._audio);
+        const gunLogic = new GunLogic(scene, bulletGroup, Config.Start.StartGunCharge, me._audio);
         me._gunLogic = gunLogic;
 
         me._controls = new Controls(scene.input);
@@ -129,7 +129,7 @@ export default class Core {
             .setBounds(0, 0, me._level.widthInPixels, me._level.heightInPixels);
 
         scene.physics.world.setBounds(0, 0, me._level.widthInPixels, me._level.heightInPixels);
-        const hub = new Hub(scene, scene.cameras.main.getBounds());
+        const hub = new Hub(scene, scene.cameras.main.getBounds(), me._audio);
         me._hub = hub;
 
         for (let i = 0; i < Consts.CollideTiles.length; ++i) {
@@ -290,6 +290,10 @@ export default class Core {
         const me = this;
 
         me._player.isBusy = true;
+        me._player._container.body.setVelocity(0);
+        me._player._sprite.play('player_idle');
+        me._audio.stop('walk_snow');
+        me._audio.play('action');
 
         me._graphics.runFade(
             new Callback(() => {
