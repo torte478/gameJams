@@ -75,6 +75,7 @@ export default class PlayerTrigger {
         }
 
         if (me._isPlayerInside && me._controls.isDownOnce(Enums.Keyboard.FIRE)) {
+            Config.WasTriggerAction = true;
             me._onAction.call();
         }
     }

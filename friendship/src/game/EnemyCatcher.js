@@ -65,7 +65,7 @@ export default class EnemyCatcher {
             const body = colliders[i];
             const type = body.gameObject.owner.getType();
             const size = body.gameObject.owner._size;
-            body.gameObject.owner.startCatchByCatcher(me._pos.x, me._pos.y, () => me._onCatch(type, size), me);
+            body.gameObject.owner.startCatchByCatcher(me._pos.x + 50, me._pos.y, () => me._onCatch(type, size), me);
             me._laser.checkHide(body.gameObject);
         }
     }

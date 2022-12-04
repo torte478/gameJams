@@ -80,6 +80,7 @@ export default class Container extends Movable {
         me._bodyContainer.setVelocity(0);
         me._bodyContainer.body.setEnable(false);
 
+
         me._scene.tweens.timeline({
             targets: me._bodyContainer,
             tweens: [
@@ -90,7 +91,8 @@ export default class Container extends Movable {
                         Utils.toPoint(me._bodyContainer),
                         Utils.buildPoint(x, y),
                         Config.Physics.CatcherSpeed),
-                    ease: 'Sine.easeInOut'
+                    ease: 'Sine.easeInOut',
+                    onComplete: () => { me._bodyContainer.setDepth(Consts.Depth.Hub) }
                 },
                 {
                     x: x - 100,

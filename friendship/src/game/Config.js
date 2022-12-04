@@ -11,12 +11,14 @@ export default class Config {
         ShowTrigger: true,
     };
 
+    static WasTriggerAction = false;
+
     static Start = {
-        Player: { x: 3800, y: 1850 },
+        Player: { x: 3100, y: 1850 },
         InsideHub: false,
         StartGunCharge: 750,
         MaxGunCharge: 1000,
-        ContainerSpawn: { x: 2850, y: 1800 },
+        ContainerSpawn: { x: 3100, y: 1825 },
         EnemyCatcher: {
             x: 2982,
             y: 1420,
@@ -29,7 +31,7 @@ export default class Config {
         },
         HubEnterTrigger: new Phaser.Geom.Rectangle(2075, 1685, 200, 200),
         Containers: [
-            { x: 3800, y: 1600 }
+            // { x: 3800, y: 1600 }
         ],
         Squares: [
             { x: 4200, y: 1850 }

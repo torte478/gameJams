@@ -1,13 +1,15 @@
 import Phaser from '../lib/phaser.js';
+import Callback from './Callback.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Container from './Container.js';
+import PlayerTrigger from './PlayerTrigger.js';
 import Utils from './utils/Utils.js';
 
 export default class ContainerSpawn {
     
     /** @type {Container[]} */
-    _containers;
+    static _containers = [];
 
     /** @type {Phaser.Scene} */
     _scene;
@@ -18,54 +20,99 @@ export default class ContainerSpawn {
     /** @type {Phaser.Geom.Point} */
     _pos;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    _sprite;
+    
+    /** @type {PlayerTrigger} */
+    _trigger;
+
+    /** @type {Boolean} */
+    _canSpawn;
+
+    _index;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Physics.Arcade.Group} group 
      * @param {Phaser.Geom.Point} pos 
      */
-    constructor(scene, group, pos) {
+    constructor(scene, group, pos, controls, index) {
         const me = this;
 
         me._scene = scene;
         me._group = group;
         me._pos = pos;
-        me._containers = [];
+        me._index = 0;
+
+        me._canSpawn = false;
+
+        me._sprite = scene.add.sprite(pos.x, pos.y, 'container_spawn', 0)
+            .setDepth(Consts.Depth.HubTop);
+        me._trigger = new PlayerTrigger(
+            scene, 
+            new Phaser.Geom.Rectangle(
+                pos.x - 75,
+                pos.y - 75,
+                150,
+                150
+            ),
+            controls,
+            new Callback(() => console.log('enter'), me),
+            new Callback(me.spawn, me),
+            new Callback(() => console.log('exit'), me)
+            );
     }
 
     update(delta) {
         const me = this;
 
-        const colliders = me._scene.physics.overlapCirc(me._pos.x, me._pos.y, Consts.Unit * 1.5, true);
-        const isFreeSpace = Utils.all(colliders, c => !c.gameObject.isMovable);
-        if (isFreeSpace) {
-            me._tryDeleteRedundant();
-            me.spawn(me._pos.x, me._pos.y);
-        }
-            
+        me._trigger.update();
 
-        for (let i = 0; i < me._containers.length; ++i)
-            me._containers[i].update(delta);
+        const colliders = me._scene.physics.overlapRect(me._pos.x - 75, me._pos.y - 150 - 75, 150, 300, true);
+        const isFreeSpace = Utils.all(colliders, c => !c.gameObject.isMovable);
+        me._canSpawn = isFreeSpace;
+        me._sprite.setFrame(me._canSpawn ? 0 : 1);
+            
+        for (let i = 0; i < ContainerSpawn._containers.length; ++i) {
+            const container = ContainerSpawn._containers[i];
+            if (container.spawnIndex === me._index)
+                container.update(delta);
+        }
     }
 
-    spawn(x, y) {
+    spawn() {
         const me = this;
 
-        const container = new Container(me._scene, me._group, x, y);
-        me._containers.push(container);
+        if (!me._canSpawn)
+            return;
+
+        me._tryDeleteRedundant();
+
+        const container = new Container(me._scene, me._group, me._pos.x, me._pos.y);
+        container._bodyContainer.setDepth(Consts.Depth.Hub);
+        me._scene.tweens.add({
+            targets: container._bodyContainer,
+            y: me._pos.y - 200,
+            duration: 1000,
+            onComplete: () => { container._bodyContainer.setDepth(Consts.Depth.HubTop + 200)}
+        });
+
+        container.spawnIndex = me._index;
+        ContainerSpawn._containers.push(container);
     }
 
     _tryDeleteRedundant() {
         const me = this;
 
-        while (me._containers.length >= Config.ContainerLimit) {
-            const deleted = Utils.firstIndexOrNull(me._containers, c => c.isFree());
+        while (ContainerSpawn._containers.length >= Config.ContainerLimit) {
+            const deleted = Utils.firstIndexOrNull(ContainerSpawn._containers, c => c.isFree());
             if (deleted === null)
                 return;
 
-            const container = me._containers[deleted];
+            const container = ContainerSpawn._containers[deleted];
             container.backToPool();
-            me._containers = Utils.removeAt(me._containers, deleted);
+            ContainerSpawn._containers = Utils.removeAt(ContainerSpawn._containers, deleted);
         }
     }
 }

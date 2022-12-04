@@ -111,11 +111,15 @@ export default class Player {
 
         const lookDirection = me._updateMovement();
 
-        if (/*me._container.x >= 2100 &&*/ me._controls.isDownOnce(Enums.Keyboard.FIRE) && !me._isInside)
+        if (me._controls.isDownOnce(Enums.Keyboard.FIRE) && !me._isInside) {
+            if (Config.WasTriggerAction)
+                return;
+
             me._gunLogic.tryShot(
                 Utils.toPoint(me.toGameObject()),
                 lookDirection,
                 me._sprite.flipX ? -1 : 1);
+        }
     }
 
     startCharge() {

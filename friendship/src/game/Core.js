@@ -172,13 +172,15 @@ export default class Core {
 
         const containerSpawn = new ContainerSpawn(scene, containerGroup, Utils.buildPoint(
             Config.Start.ContainerSpawn.x,
-            Config.Start.ContainerSpawn.y));
+            Config.Start.ContainerSpawn.y),
+            me._controls,
+            0);
         me._toUpdate.push(containerSpawn);
 
-        for (let i = 0; i < Config.Start.Containers.length; ++i) {
-            const pos = Config.Start.Containers[i];
-            containerSpawn.spawn(pos.x, pos.y);
-        }
+        // for (let i = 0; i < Config.Start.Containers.length; ++i) {
+        //     const pos = Config.Start.Containers[i];
+        //     containerSpawn.spawn(pos.x, pos.y);
+        // }
 
         for (let i = 0; i < Config.Start.Squares.length; ++i) {
             const pos = Config.Start.Squares[i];
@@ -297,6 +299,8 @@ export default class Core {
 
     update(delta) {
         const me = this;
+
+        Config.WasTriggerAction = false;
         
         me._controls.update();
 
