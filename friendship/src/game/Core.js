@@ -144,6 +144,17 @@ export default class Core {
         const laser = gunLogic.getLaser();
         me._toUpdate.push(laser);
 
+        const particles = scene.add.particles('particle').setDepth(Consts.Depth.Laser);
+
+        const particleEmmiter = particles.createEmitter();
+        particleEmmiter.setPosition(Config.Start.Player.x, Config.Start.Player.y);
+        particleEmmiter.setSpeed(400);
+        particleEmmiter.setBlendMode(Phaser.BlendModes.ADD);
+        particleEmmiter.on = false;
+
+        /** @type {Phaser.Time.TimerEvent} */
+        let particleTimer = null;
+
         const enemyCatcher = new EnemyCatcher(
             scene, 
             Config.Start.EnemyCatcher.x,
@@ -233,6 +244,19 @@ export default class Core {
                     e.owner.backToPool();
                     c.owner.catchEnemy(size, e.owner.getType());
                     laser.checkHide(c);
+
+                    me._audio.play('enemy_catched');
+
+                    particleEmmiter.setPosition(c.x, c.y);
+                    particleEmmiter.on = true;
+                    if (!!particleTimer)
+                        particleTimer.destroy();
+
+                    particleTimer = scene.time.delayedCall(400, () => {
+                        particleEmmiter.on = false;
+                        particleTimer.destroy();
+                        particleTimer = null;
+                    }, me);
                 }
             });
 

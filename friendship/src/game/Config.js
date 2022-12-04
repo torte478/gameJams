@@ -12,7 +12,7 @@ export default class Config {
     };
 
     static Start = {
-        Player: { x: 2700, y: 1850 },
+        Player: { x: 3800, y: 1850 },
         InsideHub: false,
         StartGunCharge: 750,
         MaxGunCharge: 1000,
@@ -29,7 +29,7 @@ export default class Config {
         },
         HubEnterTrigger: new Phaser.Geom.Rectangle(2075, 1685, 200, 200),
         Containers: [
-            { x: 6978, y: 1606 }
+            { x: 3800, y: 1600 }
         ],
         Squares: [
             { x: 4200, y: 1850 }
