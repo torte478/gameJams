@@ -17,6 +17,9 @@ export default class Hub {
     /** @type {Phaser.Geom.Rectangle} */
     _originBounds;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    _charger;
+
     /**
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Geom.Rectangle} originBounds
@@ -55,6 +58,8 @@ export default class Hub {
 
         scene.add.image(me._pos.x + 400, me._pos.y + 200, 'hub')
             .setDepth(Consts.Depth.Background);
+
+        me._charger = scene.add.sprite(125, 3275, 'charger', 0);
     }
 
     getTiles() {
@@ -70,9 +75,33 @@ export default class Hub {
         const me = this;
 
         me._scene.cameras.main.setBounds(me._pos.x - 100, me._pos.y - 200, 1000, 800);
-        player.toGameObject().setPosition(me._pos.x + 200, me._pos.y + 290);
+        player.toGameObject().setPosition(me._pos.x + 250, me._pos.y + 290);
+    }
 
-        player.startCharge();
+    /**
+     * @param {Player} player 
+     */
+    startCharge(player) {
+        const me = this;
+
+        player._sprite.setFlipX(true).setFrame(0).stop();
+        player._gun.setFrame(0).setFlipX(true);
+
+        me._charger.setFrame(1);
+        player._gun.setVisible(false);
+        player._sprite.setFrame(6);
+
+        me._scene.time.delayedCall(1000, () => {
+            me._charger.setFrame(2);
+            player._sprite.setVisible(false);
+            player._insideSprite.setFlipX(true).setVisible(true);
+
+            me._scene.time.delayedCall(1000, () => {
+                me._charger.play('charger_charge');
+                player.isBusy = false;
+                player.startCharge();
+            }, me);
+        }, me);
     }
 
     /**

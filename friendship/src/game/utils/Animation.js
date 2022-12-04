@@ -71,6 +71,13 @@ export default class Animation {
             frameRate: 12,
             repeat: -1
         });
+
+        scene.anims.create({
+            key: 'charger_charge',
+            frames: Animation.getFrames(scene, 'charger', [ 3, 4, 5, 6, 7, 8 ]),
+            frameRate: 6,
+            repeat: -1
+        });
     }
 
     static getFrames(scene, texture, frames) {

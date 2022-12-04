@@ -20,6 +20,7 @@ import TriangleBehaviour from './TriangleBehaviour.js';
 import CircleBehaviour from './CircleBehaviour.js';
 import Enums from './Enums.js';
 import Laser from './Laser.js';
+import Graphics from './Graphics.js';
 
 export default class Core {
 
@@ -50,6 +51,9 @@ export default class Core {
     /** @type {Hub} */
     _hub;
 
+    /** @type {Graphics} */
+    _graphics;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -75,6 +79,8 @@ export default class Core {
             me._controls,
             gunLogic,
             me._audio);
+
+        me._graphics = new Graphics(scene);
 
         me._toUpdate = [];
 
@@ -283,12 +289,33 @@ export default class Core {
     _enterHub() {
         const me = this;
 
-        me._background.setVisible(false);
-        me._hub.enter(me._player);       
+        me._player.isBusy = true;
+
+        me._graphics.runFade(
+            new Callback(() => {
+                me._background.setVisible(false);
+                me._hub.enter(me._player);
+            }, me),
+            new Callback(() => {
+                me._hub.startCharge(me._player);
+            }, me)
+        );
     }
 
     _exitHub() {
         const me = this;
+
+        // me._player.isBusy = true;
+
+        // me._graphics.runFade(
+        //     new Callback(() => {
+        //         me._background.setVisible(trie);
+        //         me._hub.exit(me._player);
+        //     }, me),
+        //     new Callback(() => {
+        //         me._hub.startCharge(me._player);
+        //     }, me)
+        // );
 
         me._background.setVisible(true);
         me._hub.exit(me._player);

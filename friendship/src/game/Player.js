@@ -36,6 +36,12 @@ export default class Player {
     /** @type {Number} */
     _jumpCount;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    _insideSprite;
+
+    /** @type {Boolean} */
+    isBusy;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
@@ -57,10 +63,15 @@ export default class Player {
         me._audio = audio;
         me._isWalkAudioPlaying = false;
         me._jumpCount = 0;
+        me.isBusy = false;
+
+        me._insideSprite = scene.add.sprite(0, 0, 'player', 7)
+            .setVisible(false);
 
         me._container = scene.add.container(x, y, [ 
             me._sprite,
-            me._gun
+            me._gun,
+            me._insideSprite
             ])
             .setDepth(Consts.Depth.Player)
             .setSize(Consts.Unit, Consts.Unit * 2);
@@ -83,6 +94,9 @@ export default class Player {
 
     update(delta) {
         const me = this;
+
+        if (me.isBusy)
+            return;
 
         const lookDirection = me._updateMovement();
 
@@ -112,6 +126,22 @@ export default class Player {
         const me = this;
 
         console.log(type);
+    }
+
+    enterHub() {
+        const me = this;
+
+        me._sprite.setVisible(false);
+        me._gun.setVisible(false);
+        me._insideSprite.setVisible(true);
+    }
+
+    exitHub() {
+        const me = this;
+
+        me._sprite.setVisible(true);
+        me._gun.setVisible(true);
+        me._insideSprite.setVisible(false);
     }
 
     _updateMovement() {

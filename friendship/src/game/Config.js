@@ -12,8 +12,8 @@ export default class Config {
     };
 
     static Start = {
-        Player: { x: 4200, y: 1850 },
-        InsideHub: true,
+        Player: { x: 2500, y: 1850 },
+        InsideHub: false,
         GunCharge: 1000,
         ContainerSpawn: { x: 2850, y: 1800 },
         EnemyCatcher: {

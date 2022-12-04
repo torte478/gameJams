@@ -1,22 +1,22 @@
 export default class Callback {
 
     /** @type {Function} */
-    fn;
+    _fn;
 
     /** @type {Object} */
-    context;
+    _context;
 
     constructor(fn, context) {
         const me = this;
 
-        me.fn = fn;
-        me.context = context;
+        me._fn = fn;
+        me._context = context;
     }
 
     call() {
         const me = this;
 
-        if (!!me.fn)
-            me.fn.call(me.context);
+        if (!!me._fn)
+            me._fn.call(me._context);
     }
 }

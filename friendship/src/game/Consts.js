@@ -13,6 +13,7 @@ export default class Consts {
         Tiles: 2000,
         Laser: 4000,
         GUI: 10000,
+        Fade: 20000,
         Max: 100000
     };
 
