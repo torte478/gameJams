@@ -109,7 +109,7 @@ export default class Core {
             Config.Hub.FireTrigger,
             me._controls,
             new Callback(() => { console.log('enter')}, me),
-            new Callback(() => { me._player.runAnimation(Enums.PlayerAnimation.FIRE) }, me),
+            new Callback(() => { me._player.toggleAnimation(Enums.PlayerAnimation.FIRE) }, me),
             new Callback(() => { console.log('exit')}, me));
 
         me._toUpdate.push(hubFireTrigger);

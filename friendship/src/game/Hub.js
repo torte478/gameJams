@@ -60,6 +60,9 @@ export default class Hub {
             .setDepth(Consts.Depth.Background);
 
         me._charger = scene.add.sprite(125, 3275, 'charger', 0);
+
+        scene.add.sprite(400, 3314, 'main', 5)
+            .play('fire')
     }
 
     getTiles() {
@@ -84,6 +87,8 @@ export default class Hub {
     startCharge(player) {
         const me = this;
 
+        const rate = Config.HubAnimationRate;
+
         player._sprite.setFlipX(true).setFrame(0).stop();
         player._gun.setFrame(0).setFlipX(true);
 
@@ -91,15 +96,16 @@ export default class Hub {
         player._gun.setVisible(false);
         player._sprite.setFrame(6);
 
-        me._scene.time.delayedCall(1000, () => {
+        me._scene.time.delayedCall(rate, () => {
             me._charger.setFrame(2);
             player._sprite.setVisible(false);
             player._insideSprite.setFlipX(true).setVisible(true);
 
-            me._scene.time.delayedCall(1000, () => {
+            me._scene.time.delayedCall(rate, () => {
                 me._charger.play('charger_charge');
                 player.isBusy = false;
                 player.startCharge();
+                player._isInside = true;
             }, me);
         }, me);
     }

@@ -40,7 +40,13 @@ export default class Player {
     _insideSprite;
 
     /** @type {Boolean} */
+    _isInside;
+
+    /** @type {Boolean} */
     isBusy;
+
+    /** @type {Boolean} */
+    _isAnimation;
 
     /**
      * 
@@ -64,6 +70,8 @@ export default class Player {
         me._isWalkAudioPlaying = false;
         me._jumpCount = 0;
         me.isBusy = false;
+        me._isInside = false;
+        me._isAnimation = false;
 
         me._insideSprite = scene.add.sprite(0, 0, 'player', 7)
             .setVisible(false);
@@ -95,19 +103,19 @@ export default class Player {
     update(delta) {
         const me = this;
 
+        if (me._charging)
+            me._gunLogic.charge(delta);
+
         if (me.isBusy)
             return;
 
         const lookDirection = me._updateMovement();
 
-        if (me._charging)
-            me._gunLogic.charge(delta);
-        else
-            if (/*me._container.x >= 2100 &&*/ me._controls.isDownOnce(Enums.Keyboard.FIRE))
-                me._gunLogic.tryShot(
-                    Utils.toPoint(me.toGameObject()),
-                    lookDirection,
-                    me._sprite.flipX ? -1 : 1);
+        if (/*me._container.x >= 2100 &&*/ me._controls.isDownOnce(Enums.Keyboard.FIRE) && !me._isInside)
+            me._gunLogic.tryShot(
+                Utils.toPoint(me.toGameObject()),
+                lookDirection,
+                me._sprite.flipX ? -1 : 1);
     }
 
     startCharge() {
@@ -122,26 +130,24 @@ export default class Player {
         me._charging = false;
     }
 
-    runAnimation(type) {
+    toggleAnimation(type) {
         const me = this;
 
-        console.log(type);
-    }
+        if (me._isAnimation) {
+            me.isBusy = false;
+            me._isAnimation = false;
+        } else {
+            if (type == Enums.PlayerAnimation.FIRE) {
+                me._insideSprite.play('player_fire');
+                me._container.setPosition(400, me._container.y);
+                console.log(me._container.po)
+            }
+            else
+                return;
 
-    enterHub() {
-        const me = this;
-
-        me._sprite.setVisible(false);
-        me._gun.setVisible(false);
-        me._insideSprite.setVisible(true);
-    }
-
-    exitHub() {
-        const me = this;
-
-        me._sprite.setVisible(true);
-        me._gun.setVisible(true);
-        me._insideSprite.setVisible(false);
+            me.isBusy = true;
+            me._isAnimation = true;
+        }
     }
 
     _updateMovement() {
@@ -153,11 +159,13 @@ export default class Player {
             body.setVelocityX(-Config.Physics.PlayerSpeed);
             me._sprite.setFlipX(true);
             me._gun.setFlipX(true);
+            me._insideSprite.setFlipX(true);
             movementKeyPress = true;
         } else if (me._controls.isDown(Enums.Keyboard.RIGHT)) {
             body.setVelocityX(Config.Physics.PlayerSpeed)
             me._sprite.setFlipX(false);
             me._gun.setFlipX(false);
+            me._insideSprite.setFlipX(false);
             movementKeyPress = true;
         } else {
             body.setVelocityX(0);
@@ -165,7 +173,8 @@ export default class Player {
 
         if (movementKeyPress && body.blocked.down) {
             me._sprite.play('player_walk', true);
-            if (!me._isWalkAudioPlaying) {
+            me._insideSprite.play('player_walk_inside', true);
+            if (!me._isWalkAudioPlaying && !me._isInside) {
                 me._audio.play('walk_snow', { loop: true, volume: 0.5 });
                 me._isWalkAudioPlaying = true;
             }
@@ -192,15 +201,17 @@ export default class Player {
         else if (me._jumpCount == 0)
             me._jumpCount = 1;
 
-        if (me._controls.isDownOnce(Enums.Keyboard.JUMP) && me._jumpCount < 2) {
+        if (me._controls.isDownOnce(Enums.Keyboard.JUMP) && me._jumpCount < 2 && !me._isInside) {
             body.setVelocityY(Config.Physics.PlayerJump);
             me._audio.play('jump');
             me._sprite.play('player_jump');
             me._jumpCount += 1;
         }
 
-        if (body.velocity.x == 0 && body.blocked.down)
-            me._sprite.play('player_idle');
+        if (body.velocity.x == 0 && body.blocked.down) {
+            me._sprite.play('player_idle', true);
+            me._insideSprite.play('player_idle_inside', true);
+        }
         if (body.velocity.y != 0)
             me._sprite.play('player_jump');
 

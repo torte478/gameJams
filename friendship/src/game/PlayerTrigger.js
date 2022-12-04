@@ -1,6 +1,7 @@
 import Phaser from '../lib/phaser.js';
 import Callback from './Callback.js';
 import Config from './Config.js';
+import Consts from './Consts.js';
 import Controls from './Controls.js';
 import Enums from './Enums.js';
 import Player from './Player.js';
@@ -54,6 +55,7 @@ export default class PlayerTrigger {
                 zone.y + (zone.height / 2), 
                 zone.width, 
                 zone.height)
+                .setDepth(Consts.Depth.Max)
                 .setStrokeStyle(2, 0xff0000);
         });
     }

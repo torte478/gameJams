@@ -8,12 +8,12 @@ export default class Config {
         ShowSceneLog: true,
         PlaySound: true,
         Random: false,
-        ShowTrigger: false,
+        ShowTrigger: true,
     };
 
     static Start = {
         Player: { x: 2500, y: 1850 },
-        InsideHub: false,
+        InsideHub: true,
         GunCharge: 1000,
         ContainerSpawn: { x: 2850, y: 1800 },
         EnemyCatcher: {
@@ -96,13 +96,14 @@ export default class Config {
         ]
     };
 
+    static HubAnimationRate = 200;
     static EnemySize = [ 100, 100, 1 ];
     static ContainerCapacity = 3;
 
     static Hub = {
         Pos: new Phaser.Geom.Point(0, 3000),
-        ExitTrigger: new Phaser.Geom.Rectangle(50, 3250, 100, 100),
-        FireTrigger: new Phaser.Geom.Rectangle(400, 3175, 150, 200)
+        ExitTrigger: new Phaser.Geom.Rectangle(50, 3200, 150, 150),
+        FireTrigger: new Phaser.Geom.Rectangle(350, 3175, 100, 200)
     }
 
     static ContainerLimit = 20;

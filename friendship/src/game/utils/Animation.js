@@ -78,6 +78,34 @@ export default class Animation {
             frameRate: 6,
             repeat: -1
         });
+
+        scene.anims.create({
+            key: 'player_idle_inside',
+            frames: Animation.getFrames(scene, 'player', [ 7, 8 ]),
+            frameRate: 2,
+            repeat: -1
+        });
+
+        scene.anims.create({
+            key: 'player_walk_inside',
+            frames: Animation.getFrames(scene, 'player', [ 9, 10 ]),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        scene.anims.create({
+            key: 'player_fire',
+            frames: Animation.getFrames(scene, 'player', [ 11, 12 ]),
+            frameRate: 1,
+            repeat: -1
+        });
+
+        scene.anims.create({
+            key: 'fire',
+            frames: Animation.getFrames(scene, 'main', [ 4, 5 ]),
+            frameRate: 3,
+            repeat: -1
+        });
     }
 
     static getFrames(scene, texture, frames) {
