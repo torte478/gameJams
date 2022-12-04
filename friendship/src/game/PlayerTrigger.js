@@ -1,5 +1,6 @@
 import Phaser from '../lib/phaser.js';
 import Callback from './Callback.js';
+import Config from './Config.js';
 import Controls from './Controls.js';
 import Enums from './Enums.js';
 import Player from './Player.js';
@@ -47,12 +48,14 @@ export default class PlayerTrigger {
         me._onExit = onExit;
         me._isPlayerInside = false;
         
-        scene.add.rectangle(
-            zone.x + (zone.width / 2), 
-            zone.y + (zone.height / 2), 
-            zone.width, 
-            zone.height)
-            .setStrokeStyle(2, 0xff0000);
+        Utils.ifDebug(Config.Debug.ShowTrigger, () => {
+            scene.add.rectangle(
+                zone.x + (zone.width / 2), 
+                zone.y + (zone.height / 2), 
+                zone.width, 
+                zone.height)
+                .setStrokeStyle(2, 0xff0000);
+        });
     }
 
     update() {

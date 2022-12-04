@@ -5,14 +5,15 @@ export default class Config {
     static Debug = {
         Global: true,
         Log: true,
-        ShowSceneLog: false,
+        ShowSceneLog: true,
         PlaySound: true,
-        Random: false
+        Random: false,
+        ShowTrigger: false,
     };
 
     static Start = {
         Player: { x: 4200, y: 1850 },
-        InsideHub: false,
+        InsideHub: true,
         GunCharge: 1000,
         ContainerSpawn: { x: 2850, y: 1800 },
         EnemyCatcher: {

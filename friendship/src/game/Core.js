@@ -47,6 +47,9 @@ export default class Core {
     /** @type {Phaser.GameObjects.Image} */
     _background;
 
+    /** @type {Hub} */
+    _hub;
+
     /**
      * @param {Phaser.Scene} scene
      */
@@ -80,7 +83,7 @@ export default class Core {
             Config.Start.HubEnterTrigger,
             me._controls,
             new Callback(() => { console.log('enter')}, me),
-            new Callback(() => { hub.enter(me._player) }, me),
+            new Callback(me._enterHub, me),
             new Callback(() => { console.log('exit')}, me));
 
         me._toUpdate.push(hubEnterTrigger);
@@ -90,7 +93,7 @@ export default class Core {
             Config.Hub.ExitTrigger,
             me._controls,
             new Callback(() => { console.log('enter')}, me),
-            new Callback(() => { hub.exit(me._player) }, me),
+            new Callback(me._exitHub, me),
             new Callback(() => { console.log('exit')}, me));
 
         me._toUpdate.push(hubExitTrigger);
@@ -121,6 +124,7 @@ export default class Core {
 
         scene.physics.world.setBounds(0, 0, me._level.widthInPixels, me._level.heightInPixels);
         const hub = new Hub(scene, scene.cameras.main.getBounds());
+        me._hub = hub;
 
         for (let i = 0; i < Consts.CollideTiles.length; ++i) {
             const tileIndex = Consts.CollideTiles[i];
@@ -247,7 +251,7 @@ export default class Core {
         );
 
         if (Config.Start.InsideHub)
-            hub.enter(me._player);
+            me._enterHub();
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = scene.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
@@ -274,5 +278,19 @@ export default class Core {
 
             me._log.setText(text);
         });
+    }
+
+    _enterHub() {
+        const me = this;
+
+        me._background.setVisible(false);
+        me._hub.enter(me._player);       
+    }
+
+    _exitHub() {
+        const me = this;
+
+        me._background.setVisible(true);
+        me._hub.exit(me._player);
     }
 }

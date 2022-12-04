@@ -16,5 +16,5 @@ export default class Consts {
         Max: 100000
     };
 
-    static CollideTiles = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11 ];
+    static CollideTiles = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 15 ];
 }
