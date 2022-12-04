@@ -13,7 +13,7 @@ export default class Config {
 
     static Start = {
         Player: { x: 2500, y: 1850 },
-        InsideHub: true,
+        InsideHub: false,
         StartGunCharge: 750,
         MaxGunCharge: 1000,
         ContainerSpawn: { x: 2850, y: 1800 },

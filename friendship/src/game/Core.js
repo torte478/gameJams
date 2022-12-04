@@ -84,6 +84,10 @@ export default class Core {
 
         me._toUpdate = [];
 
+        const hubPos = { x: 2400, y : 1600 };
+        scene.add.image(hubPos.x, hubPos.y, 'hub_outside').setDepth(Consts.Depth.Hub);
+        scene.add.image(hubPos.x, hubPos.y, 'hub_outside_top').setDepth(Consts.Depth.HubTop);
+
         const hubEnterTrigger = new PlayerTrigger(
             scene,
             Config.Start.HubEnterTrigger,
