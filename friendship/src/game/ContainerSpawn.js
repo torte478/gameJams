@@ -4,6 +4,7 @@ import Config from './Config.js';
 import Consts from './Consts.js';
 import Container from './Container.js';
 import PlayerTrigger from './PlayerTrigger.js';
+import Audio from './utils/Audio.js';
 import Utils from './utils/Utils.js';
 
 export default class ContainerSpawn {
@@ -31,19 +32,23 @@ export default class ContainerSpawn {
 
     _index;
 
+    /** @type {Audio} */
+    _audio;
+
     /**
      * 
      * @param {Phaser.Scene} scene 
      * @param {Phaser.Physics.Arcade.Group} group 
      * @param {Phaser.Geom.Point} pos 
      */
-    constructor(scene, group, pos, controls, index) {
+    constructor(scene, group, pos, controls, index, audio) {
         const me = this;
 
         me._scene = scene;
         me._group = group;
         me._pos = pos;
         me._index = 0;
+        me._audio = audio;
 
         me._canSpawn = false;
 
@@ -84,8 +89,13 @@ export default class ContainerSpawn {
     spawn() {
         const me = this;
 
-        if (!me._canSpawn)
+        if (!me._canSpawn) {
+            me._audio.play('warning');
             return;
+        }
+            
+
+        me._audio.play('action');
 
         me._tryDeleteRedundant();
 

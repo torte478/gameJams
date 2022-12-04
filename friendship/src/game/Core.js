@@ -174,7 +174,8 @@ export default class Core {
             Config.Start.ContainerSpawn.x,
             Config.Start.ContainerSpawn.y),
             me._controls,
-            0);
+            0,
+            me._audio);
         me._toUpdate.push(containerSpawn);
 
         // for (let i = 0; i < Config.Start.Containers.length; ++i) {
@@ -213,7 +214,6 @@ export default class Core {
             me._toUpdate.push(circle);
         }
 
-
         scene.physics.add.collider(
             enemyGroup,
             tiles);
@@ -226,6 +226,7 @@ export default class Core {
                 second.owner.stopAccelerate();
                 laser.checkHide(first);
                 laser.checkHide(second);
+                me._audio.play('hit');
             });
 
         scene.physics.add.collider(
@@ -234,6 +235,7 @@ export default class Core {
             (m, t) => {
                 m.owner.stopAccelerate();
                 laser.checkHide(m)
+                me._audio.play('hit');
             }
         );
 
