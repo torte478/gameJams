@@ -1,5 +1,12 @@
 # gameJams
 
+## I want to be friends
+Game: https://torte478.itch.io/i-want-to-be-friends
+
+Submission for https://itch.io/jam/cozy-winter-jam-2022
+
+02.12.22 - 05.12.22
+
 ## Happy Minesweeper
 Game: https://torte478.itch.io/happy-minesweeper
 
