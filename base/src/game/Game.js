@@ -5,6 +5,7 @@ import Utils from '../framework/Utils.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
+import Enums from './Enums.js';
 
 export default class Game {
 
@@ -26,11 +27,15 @@ export default class Game {
     update() {
         const me = this;
 
+        if (Here.Controls.isPressed(Enums.Keyboard.RESTART) 
+            && Utils.isDebug(Config.Debug.Global))
+            Here._.scene.restart({ isRestart: true });
+
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
 
             let text = 
-                `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}`;
+                `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n`;
 
             me._log.setText(text);
         });

@@ -9,12 +9,25 @@ export default class GameScene extends HereScene {
 	/** @type {Game} */
 	_game;
 
+    /** @type {Boolean} */
+    _isRestart;
+
     constructor() {
         super('gameScene');
     }
 
+    init(data) {
+        const me = this;
+
+        me._isRestart = !!data.isRestart;
+    }
+
     preload() {
-        Utils.runLoadingBar();
+        super.preload();
+        const me = this;
+
+        if (!me._isRestart)
+            Utils.runLoadingBar();
 
         Utils.loadWav('button_click');
     }
@@ -28,6 +41,8 @@ export default class GameScene extends HereScene {
     }
 
     update() {
+        super.update();
+
         const me = this;
 
         me._game.update();

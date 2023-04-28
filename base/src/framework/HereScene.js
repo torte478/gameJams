@@ -9,6 +9,17 @@ export default class HereScene extends Phaser.Scene {
      */
     constructor(sceneName) {
         super(sceneName);
-        Here.init(this);
+    }
+
+    preload() {
+        const me = this;
+
+        Here.init(me);
+    }
+
+    update() {
+        const me = this;
+
+        Here.Controls.update();
     }
 }
