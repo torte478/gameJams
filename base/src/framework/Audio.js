@@ -1,6 +1,6 @@
 import Utils from './Utils.js';
-import Config from '../Config.js';
 import Here from './Here.js';
+import Config from '../game/Config.js';
 
 export default class Audio {
 

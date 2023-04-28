@@ -1,4 +1,4 @@
-import Config from "../Config.js";
+import Config from "../game/Config.js";
 import Here from "./Here.js";
 
 export default class Utils {

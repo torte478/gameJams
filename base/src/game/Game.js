@@ -1,15 +1,12 @@
 import Phaser from '../lib/phaser.js';
 
-import Audio from './utils/Audio.js';
-import Button from './utils/Button.js';
-import ButtonConfig from './utils/ButtonConfig.js';
-import Utils from './utils/Utils.js';
+import Here from '../framework/Here.js';
+import Utils from '../framework/Utils.js';
 
 import Config from './Config.js';
 import Consts from './Consts.js';
-import Here from './utils/Here.js';
 
-export default class Core {
+export default class Game {
 
     /** @type {Phaser.GameObjects.Text} */
     _log;
