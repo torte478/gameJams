@@ -1,4 +1,5 @@
 import Config from "../Config.js";
+import Here from "./Here.js";
 
 export default class Utils {
 
@@ -300,42 +301,36 @@ export default class Utils {
     // --- Start loading ---
 
     /**
-     * @param {Phaser.Scene} scene 
      * @param {String} name 
      * @param {Number} width 
      * @param {Number} height 
      */
-    static loadSpriteSheet(scene, name, width, height) {
-        return scene.load.spritesheet(name, `assets/${name}.png`, {
+    static loadSpriteSheet(name, width, height) {
+        return Here._.load.spritesheet(name, `assets/${name}.png`, {
             frameWidth: width,
             frameHeight: !!height ? height : width
         });
     }
 
     /**
-     * @param {Phaser.Scene} scene 
      * @param {String} name 
      */
-    static loadImage(scene, name) {
-        return scene.load.image(name, `assets/${name}.png`);
+    static loadImage(name) {
+        return Here._.load.image(name, `assets/${name}.png`);
     }
 
     /**
-     * @param {Phaser.Scene} scene 
      * @param {String} name 
-     * @returns 
      */
-    static loadWav(scene, name) {
-        return scene.load.audio(name, `assets/${name}.wav`);
+    static loadWav(name) {
+        return Here._.load.audio(name, `assets/${name}.wav`);
     }
 
     /**
-     * @param {Phaser.Scene} scene 
      * @param {String} name 
-     * @returns 
      */
-    static loadMp3(scene, name) {
-        return scene.load.audio(name, `assets/${name}.mp3`);
+    static loadMp3(name) {
+        return Here._.load.audio(name, `assets/${name}.mp3`);
     }
 
     // --- Debug ---
@@ -410,18 +405,15 @@ export default class Utils {
         return !(isNaN(s));
     }
 
-    /**
-     * @param {Phaser.Scene} scene 
-     */
-     static runLoadingBar(scene) {
-        const progressBar = scene.add.graphics();
-        const progressBox = scene.add.graphics();
+    static runLoadingBar() {
+        const progressBar = Here._.add.graphics();
+        const progressBox = Here._.add.graphics();
         progressBox.fillStyle(0x222222, 0.8);
 
-        var width = scene.cameras.main.width;
-        var height = scene.cameras.main.height;
+        var width = Here._.cameras.main.width;
+        var height = Here._.cameras.main.height;
 
-        const loadingText = scene.make.text({
+        const loadingText = Here._.make.text({
             x: width / 2,
             y: height / 2 - 50,
             text: 'Loading...',
@@ -438,7 +430,7 @@ export default class Utils {
             320, 
             50);
 
-        scene.load.on('progress', value => {
+        Here._.load.on('progress', value => {
             progressBar.clear();
             progressBar.fillStyle(0xffffff, 1);
             progressBar.fillRect(
@@ -448,7 +440,7 @@ export default class Utils {
                 30);
         });
 
-        scene.load.on('complete', () => {
+        Here._.load.on('complete', () => {
             progressBar.destroy();
             progressBox.destroy();
             loadingText.destroy();

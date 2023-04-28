@@ -1,18 +1,12 @@
 import Phaser from '../../lib/phaser.js';
+import Here from './Here.js';
 
-import Audio from './Audio.js';
-import ButtonConfig from './ButtonConfig.js';
+import ButtonConfig from "./ButtonConfig.js";
 
 export default class Button {
 
-    /** @type {Phaser.Scene} */
-    _scene;
-
     /** @type {ButtonConfig} */
     _config;
-
-    /** @type {Audio} */
-    _audio;
 
     /** @type {Phaser.GameObjects.Container} */
     _container;
@@ -24,31 +18,26 @@ export default class Button {
     _isClicked;
 
     /**
-     * 
-     * @param {Phaser.Scene} scene 
-     * @param {Audio} audio 
      * @param {ButtonConfig} config 
      */
-    constructor(scene, audio, config) {
+    constructor(config) {
         const me = this;
 
-        me._scene = scene;
         me._config = config;
-        me._audio = audio;
         me._isClicked = false;
 
-        me._sprite = scene.add.sprite(0, 0, config.texture, config.frameIdle);
+        me._sprite = Here._.add.sprite(0, 0, config.texture, config.frameIdle);
         const children = [ me._sprite ];
 
         if (!!config.text) {
-            const text = scene.add.text(0, 0, config.text, config.textStyle)
+            const text = Here._.add.text(0, 0, config.text, config.textStyle)
                 .setOrigin(0.5, 0.5);
 
             children.push(text);
         }
 
         var bounds = me._sprite.getBounds();
-        me._container = scene.add.container(config.x, config.y, children)
+        me._container = Here._.add.container(config.x, config.y, children)
             .setSize(bounds.width, bounds.height)
             .setInteractive();
 
@@ -65,15 +54,15 @@ export default class Button {
 
         me._container.setScale(0.75);
         me._isClicked = true;
-        me._scene.time.delayedCall(500, () => { 
+        Here._.time.delayedCall(500, () => { 
             me._container.setScale(1) 
             me._isClicked = false;
         }, me);
 
         if (!!me._config.sound)
-            me._audio.play(me._config.sound);
+            Here.Audio.play(me._config.sound);
 
-        me._scene.time.delayedCall(
+        Here._.time.delayedCall(
             200, 
             me._config.callback, 
             me._config.callbackScope);

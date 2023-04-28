@@ -1,11 +1,10 @@
-import Phaser from '../lib/phaser.js';
-
 import Animation from '../game/utils/Animation.js';
 import Utils from '../game/utils/Utils.js';
 
 import Core from '../game/Core.js';
+import HereScene from '../game/utils/HereScene.js';
 
-export default class Game extends Phaser.Scene {
+export default class Game extends HereScene {
 
 	/** @type {Core} */
 	_core;
@@ -15,19 +14,17 @@ export default class Game extends Phaser.Scene {
     }
 
     preload() {
-        const me = this;
+        Utils.runLoadingBar();
 
-        Utils.runLoadingBar(this);
-
-        Utils.loadWav(me, 'button_click');
+        Utils.loadWav('button_click');
     }
 
     create() {
         const me = this;
 
-        Animation.init(me);
+        Animation.init();
 
-        me._core = new Core(me);
+        me._core = new Core();
     }
 
     update() {
