@@ -41,3 +41,21 @@ export class SinCoeffs {
     /** @type {Number} */
     start;
 }
+
+export class SignalProcessResult {
+
+    /** @type {Boolean} */
+    isLevelComplete;
+
+    /** @type {Boolean} */
+    currentChanged;
+
+    /** @type {Boolean} */
+    from;
+
+    /** @type {String} */
+    to;
+
+    /** @type {Boolean} */
+    correct;
+}

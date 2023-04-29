@@ -1,3 +1,5 @@
+import { SignalProcessResult } from "./Models.js";
+
 export default class Delivery {
 
     /** @type {String} */
@@ -7,7 +9,7 @@ export default class Delivery {
     _index;
 
     /** @type {String} */
-    _currentLetter;
+    _current;
 
     /** @type {String} */
     _currentWord;
@@ -24,21 +26,21 @@ export default class Delivery {
         me._word = word;
 
         me._index = 0;
-        me._currentLetter = me._word[me._index];
+        me._current = me._word[me._index];
         me._currentWord = '';
         me._isNumerals = false;
     }
 
     /**
      * @param {String} signal 
-     * @returns {Boolean}
+     * @returns {SignalProcessResult}
      */
     applySignal(signal) {
         const me = this;
 
         if (signal == 'SWITCH') {
             me._isNumerals = !me._isNumerals;
-            return false
+            return { currentChanged: false };
         }
 
         if (signal == 'CANCEL') {
@@ -46,35 +48,41 @@ export default class Delivery {
                 --me._index;
                 me._currentWord = me._currentWord.substring(0, me._currentWord.length - 1);
             }
-            return false;
+            return { currentChanged: false };
         }
 
+        /** @type {String} */
+        const currentChar = me._getChar(signal);
+        const correct = currentChar == me._current;
+
         ++me._index;
-        me._currentWord += me._getChar(signal);
+        me._currentWord += currentChar;
 
         const isComplete = me._index >= me._word.length;
         if (!isComplete)
-            me._currentLetter = me._word[me._index];
+            me._current = me._word[me._index];
 
-        return isComplete;
+        return { 
+            isLevelComplete: isComplete, 
+            currentChanged: true,
+            from: currentChar.toUpperCase(),
+            to: me._current.toUpperCase(),
+            correct: correct };
     }
 
     _getChar(signal) {
         const me = this;
 
         if (signal == 'SPACE')
-            return ' ';
+            return '_';
 
         if (signal == 'UNKNOWN')
             return '?';
 
         const lowercase = signal.toLowerCase();
         
-        if (!me._isNumerals)
-            return lowercase[0];
-
-        return lowercase.length == 2
+        return me._isNumerals && lowercase.length == 2
             ? lowercase[1]
-            : '?';
+            : lowercase[0];
     }
 }

@@ -1,4 +1,5 @@
 import Here from '../framework/Here.js';
+import Utils from '../framework/Utils.js';
 import Phaser from '../lib/phaser.js';
 import { ContainerOffset, SinCoeffs } from './Models.js';
 import Player from './Player.js';
@@ -60,9 +61,17 @@ export default class PlayerContainer {
     update(time) {
         const me = this;
 
-        const newX = me._magicMath(time, me._sinXCoefs);
-        const newY = me._magicMath(time, me._sinYCoefs);
-        const newAngle = me._magicMath(time, me._sinAngleCoefs);
+        const newX = me._sinXCoefs.amplitude > 0 
+            ? me._magicMath(time, me._sinXCoefs) 
+            : me._container.x;
+
+        const newY = me._sinYCoefs.amplitude > 0 
+            ? me._magicMath(time, me._sinYCoefs)
+            : me._container.y;
+
+        const newAngle = me._sinAngleCoefs.amplitude > 0 
+            ? me._magicMath(time, me._sinAngleCoefs)
+            : me._container.angle;
 
         me._container
             .setPosition(newX, newY)
@@ -80,6 +89,16 @@ export default class PlayerContainer {
             y: me._container.y,
             angle: me._container.angle
         };
+    }
+
+    /**
+     * @returns {Phaser.Geom.Point}
+     */
+    getPlayerPos() {
+        const me = this;
+
+        const origin = Utils.toPoint(me._container);
+        return origin;
     }
 
     /**

@@ -10,6 +10,7 @@ import Player from './Player.js';
 import Delivery from './Delivery.js';
 import Waves from './Waves.js';
 import PlayerContainer from './PlayerContainer.js';
+import Tape from './Tape.js';
 
 export default class Game {
 
@@ -25,6 +26,9 @@ export default class Game {
     /** @type {PlayerContainer} */
     _playerContainer;
 
+    /** @type {Tape} */
+    _tape;
+
     constructor() {
         const me = this;
 
@@ -37,9 +41,11 @@ export default class Game {
         Here._.input.mouse.disableContextMenu();
 
         const waves = new Waves();
-        me._delivery = new Delivery('grtew');
+        me._delivery = new Delivery('a1_2b');
         me._player = new Player();
         me._playerContainer = new PlayerContainer(me._player);
+
+        me._tape = new Tape(me._delivery._current);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 28, backgroundColor: '#000' })
@@ -62,7 +68,7 @@ export default class Game {
 
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
-                `inp: ${me._delivery._word} => ${me._delivery._currentLetter}\n` +
+                `inp: ${me._delivery._word} => ${me._delivery._current}\n` +
                 `cur: ${me._delivery._currentWord}\n` + 
                 `time: ${time / 1000 | 0}`;
 
@@ -85,6 +91,11 @@ export default class Game {
         const me = this;
 
         const signal = me._player.getSignal();
-        me._delivery.applySignal(signal);
+        const result = me._delivery.applySignal(signal);
+
+        if (result.currentChanged) {
+            const playerPos = me._playerContainer.getPlayerPos();
+            me._tape.processSignal(playerPos, result);
+        }
     }
 }
