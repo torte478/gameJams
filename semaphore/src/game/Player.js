@@ -62,6 +62,9 @@ export default class Player {
         return me._container;
     }
 
+    /**
+     * @returns {String}
+     */
     getSignal() {
         const me = this;
 

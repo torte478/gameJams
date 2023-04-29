@@ -14,6 +14,9 @@ export default class SignalBox {
     /** @type {Phaser.GameObjects.Text} */
     _text;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _loadingFade;
+
     /**
      * 
      * @param {Number} y 
@@ -22,7 +25,12 @@ export default class SignalBox {
     constructor(y, signal) {
         const me = this;
 
-        me._box = Here._.add.image(0, 0, 'signal_box');
+        me._box = Here._.add.image(0, 0, 'signal_box', 0);
+
+        me._loadingFade = Here._.add.image(0, 0, 'signal_box', 1)
+            .setAlpha(0.5)
+            .setScale(0);
+
         me._text = Here._.add.text(0, 0, signal.toUpperCase(), {
             fontFamily: 'Arial Black',
             fontSize: 96,
@@ -33,6 +41,7 @@ export default class SignalBox {
 
         me._container = Here._.add.container(0, y, [
                 me._box,
+                me._loadingFade,
                 me._text
             ])
             .setDepth(Consts.Depth.GUI_TAPE);
@@ -47,11 +56,12 @@ export default class SignalBox {
         return me._container;
     }
 
-    setText(text) {
+    reset(text) {
         const me = this;
 
         me._box.clearTint();
         me._text.setText(text);
+        me._loadingFade.setScale(0);
     }
 
     setTint(isCorrect) {
@@ -59,5 +69,12 @@ export default class SignalBox {
 
         me._box.setTint(
             isCorrect ? 0x42B300 : 0xCA0050);
+    }
+
+    updateProgress(progress) {
+        const me = this;
+
+        me._loadingFade.setScale(
+            Math.min(1, progress));
     }
 }

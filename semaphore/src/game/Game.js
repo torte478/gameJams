@@ -69,8 +69,7 @@ export default class Game {
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `inp: ${me._delivery._word} => ${me._delivery._current}\n` +
-                `cur: ${me._delivery._currentWord}\n` + 
-                `time: ${time / 1000 | 0}`;
+                `cur: ${me._delivery._currentWord}`;
 
             me._log.setText(text);
         });
@@ -83,14 +82,21 @@ export default class Game {
         me._player.update(delta, offset);
         me._playerContainer.update(time);
 
-        if (!me._tape.isBusy() && Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION))
-            me._processSignalInput();
+        if (me._tape.isBusy())
+            return;
+            
+        if (Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION)) {
+            const signal = me._player.getSignal();    
+            return me._processSignalInput(signal);
+        }
+
+        if (me._tape.checkTimeout())
+            return me._processSignalInput('UNKNOWN');
     }
 
-    _processSignalInput() {
+    _processSignalInput(signal) {
         const me = this;
 
-        const signal = me._player.getSignal();
         const playerPos = me._playerContainer.getPlayerPos();
         const result = me._delivery.applySignal(signal, playerPos);
 

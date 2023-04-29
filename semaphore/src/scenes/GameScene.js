@@ -34,8 +34,8 @@ export default class GameScene extends HereScene {
         Utils.loadImage('ship_front');
         Utils.loadImage('ship_back');
         Utils.loadImage('wave');
-        Utils.loadImage('signal_box');
 
+        Utils.loadSpriteSheet('signal_box', Consts.Unit.Normal * 3);
         Utils.loadSpriteSheet('hand', Consts.Unit.Normal * 4, Consts.Unit.Normal * 3);
         Utils.loadSpriteSheet('letters_numbers', Consts.Unit.Big);
     }

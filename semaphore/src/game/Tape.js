@@ -28,11 +28,18 @@ export default class Tape {
     /** @type {Boolean} */
     _isBusy;
 
+    /** @type {Number} */
+    _signalStartTimeMs;
+
+    /** @type {Number} */
+    _signalTimeoutMs;
+
     constructor(startSignal) {
         const me = this;
 
         me._xOffset = 300;
         me._y = 300;
+        me._signalTimeoutMs = 60000;
 
         me._first = new SignalBox(me._y, startSignal);
         me._second = new SignalBox(me._y, 'A');
@@ -51,6 +58,7 @@ export default class Tape {
             .setAlpha(0);
 
         me._isBusy = false;
+        me._signalStartTimeMs = new Date().getTime();
     }
 
     /**
@@ -93,6 +101,23 @@ export default class Tape {
     }
 
     /**
+     * @returns {Boolean}
+     */
+    checkTimeout() {
+        const me = this;
+
+        if (me._isBusy)
+            throw 'is bussy!';
+
+        const elapsed = new Date().getTime() - me._signalStartTimeMs;
+        const progress = elapsed / me._signalTimeoutMs;
+
+        me._getCurrentBox().updateProgress(progress);
+
+        return progress >= 1;
+    }
+
+    /**
      * @param {SignalProcessResult} signal 
      */
     _processCancel(signal) {
@@ -114,7 +139,7 @@ export default class Tape {
             .getGameObject()
             .setAlpha(0)
             .setX(-me._xOffset);
-        nextBox.setText(signal.to);
+        nextBox.reset(signal.to);
 
         Here._.tweens.add({
             targets: nextBox.getGameObject(),
@@ -151,7 +176,7 @@ export default class Tape {
             .getGameObject()
             .setAlpha(0)
             .setX(me._xOffset);
-        nextBox.setText(signal.to);
+        nextBox.reset(signal.to);
 
         Here._.tweens.add({
             targets: nextBox.getGameObject(),
@@ -175,6 +200,7 @@ export default class Tape {
         const me = this;
 
         me._isBusy = false;
+        me._signalStartTimeMs = new Date().getTime();
         // TODO: sfx
     }
 }
