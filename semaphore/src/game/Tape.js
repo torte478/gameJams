@@ -129,8 +129,11 @@ export default class Tape {
     /**
      * @param {SignalProcessResult} signal 
      */
-    _processCancel(signal) {
+    _processCancel(signal, callback, context) {
         const me = this;
+
+        if (!!callback)
+            callback.call(context);
 
         const currentBox = me._getCurrentBox();
 

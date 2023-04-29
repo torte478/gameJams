@@ -39,6 +39,12 @@ export default class Score {
     processSignal(signal) {
         const me = this;
 
+        if (!!signal.cancel && me._scoreHistory.length > 0) {
+            me._score -= me._scoreHistory[me._scoreHistory.length - 1];
+            me._scoreHistory.splice(me._scoreHistory.length - 1, 1);
+            return;
+        }
+
         if (signal.correct) {
             me._scoreHistory.push(1);
             me._score += 1;
