@@ -12,10 +12,20 @@ export default class Game {
     /** @type {Phaser.GameObjects.Text} */
     _log;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _hand;
+
     constructor() {
         const me = this;
 
-        Utils.debugLog('PAST YOUR CODE HERE!');
+        Here._.cameras.main.setScroll(
+            Consts.Viewport.Width / -2,
+            Consts.Viewport.Height / -2
+        );
+
+        me._hand = Here._.add
+            .image(0, 0, 'hand')
+            .setOrigin(0, 0.5);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
@@ -26,6 +36,18 @@ export default class Game {
 
     update() {
         const me = this;
+
+        const mouse = Here._.input.activePointer;
+
+        const angle = Phaser.Math.RadToDeg(
+            Phaser.Math.Angle.Between(
+                me._hand.x,
+                me._hand.y,
+                mouse.worldX,
+                mouse.worldY)
+            );
+        
+        me._hand.setAngle(angle);
 
         if (Here.Controls.isPressed(Enums.Keyboard.RESTART) 
             && Utils.isDebug(Config.Debug.Global))

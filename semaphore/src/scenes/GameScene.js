@@ -29,7 +29,7 @@ export default class GameScene extends HereScene {
         if (!me._isRestart)
             Utils.runLoadingBar();
 
-        Utils.loadWav('button_click');
+        Utils.loadImage('hand');
     }
 
     create() {
