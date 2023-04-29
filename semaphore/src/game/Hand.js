@@ -1,6 +1,8 @@
 import Here from '../framework/Here.js';
+import Utils from '../framework/Utils.js';
 import Phaser from '../lib/phaser.js';
 import Enums from './Enums.js';
+import { ContainerOffset } from './Models.js';
 
 export default class Hand {
 
@@ -34,16 +36,22 @@ export default class Hand {
         me._rotationSpeed = 360;
     }
 
+    getGameObject() {
+        const me = this;
+        return me._sprite;
+    }
+
     /**
      * @param {Boolean} isButtonPressed 
      * @param {Phaser.Math.Vector2} mouse 
      * @param {Number} delta
+     * @param {ContainerOffset} offset
      * @returns {Boolean}
      */
-    updateRotation(isButtonPressed, mouse, delta) {
+    updateRotation(isButtonPressed, mouse, delta, offset) {
         const me = this;
 
-        me._targetAngle = me._getTargetAngle(isButtonPressed, mouse);
+        me._targetAngle = me._getTargetAngle(isButtonPressed, mouse, offset);
 
         me._rotateHand(delta);
 
@@ -97,18 +105,28 @@ export default class Hand {
         me._sprite.setAngle(me._sprite.angle + rotationValue);
     }
  
-    _getTargetAngle(isButtonPressed, mouse) {
+    /**
+     * @param {Boolean} isButtonPressed 
+     * @param {Phaser.Geom.Point} mouse 
+     * @param {ContainerOffset} offset 
+     * @returns {Number}
+     */
+    _getTargetAngle(isButtonPressed, mouse, offset) {
         const me = this;
 
         if (!isButtonPressed)
             return me._getNearestAngle();
 
-        let rotation = Phaser.Math.Angle.BetweenPoints(me._sprite, mouse);
+        const point = Utils.buildPoint(
+            me._sprite.x + offset.x,
+            me._sprite.y + offset.y
+        );
+        let rotation = Phaser.Math.Angle.BetweenPoints(point, mouse);
 
         if (me._isLeft)
             rotation += Math.PI;
 
-        return Phaser.Math.RadToDeg(rotation);
+        return Phaser.Math.RadToDeg(rotation) - offset.angle;
     }
 
     _normalizeAngle(angle) {

@@ -5,8 +5,8 @@ import Utils from '../framework/Utils.js';
 
 import Consts from './Consts.js';
 import Enums from './Enums.js';
-import SignalConfig from './SignalConfig.js';
 import Hand from './Hand.js';
+import { ContainerOffset, SignalModel } from './Models.js';
 
 export default class Player {
 
@@ -19,31 +19,47 @@ export default class Player {
     /** @type {Phaser.Input.Pointer} */
     _mouse;
 
+    /** @type {Phaser.GameObjects.Container} */
+    _container;
+
     constructor() {
         const me = this;
-
+        
         const body = Here._.add
             .image(0, 0, 'body');
 
         me._leftHand = new Hand(true);
         me._rightHand = new Hand(false);
+
+        me._container = Here._.add.container(0, 0, [
+            body,
+            me._leftHand.getGameObject(),
+            me._rightHand.getGameObject()
+        ]);
+
         me._mouse = Here._.input.activePointer;
     }
 
-    
     /**
      * @param {Number} delta 
+     * @param {ContainerOffset} offset
      */
-    update(delta) {
+    update(delta, offset) {
         const me = this;
 
         const mouse = new Phaser.Math.Vector2(me._mouse.worldX, me._mouse.worldY);
 
-        if (me._leftHand.updateRotation(me._mouse.leftButtonDown(), mouse, delta))
-            me._swapHandDepth(me._rightHand, me._leftHand);
+        if (me._leftHand.updateRotation(me._mouse.leftButtonDown(), mouse, delta, offset))
+            me._container.bringToTop(me._leftHand.getGameObject());
 
-        if (me._rightHand.updateRotation(me._mouse.rightButtonDown(), mouse, delta))
-            me._swapHandDepth(me._leftHand, me._rightHand);
+        if (me._rightHand.updateRotation(me._mouse.rightButtonDown(), mouse, delta, offset))
+        me._container.bringToTop(me._rightHand.getGameObject());
+    }
+
+    getGameObject() {
+        const me = this;
+
+        return me._container;
     }
 
     getSignal() {
@@ -52,7 +68,7 @@ export default class Player {
         const left = me._leftHand.getAngle();
         const right = me._rightHand.getAngle();
 
-        /** @type {SignalConfig} */
+        /** @type {SignalModel} */
         const signal = Utils.firstOrNull(
             Consts.Signals,
             s => s.left == left && s.right == right);
@@ -66,14 +82,5 @@ export default class Player {
                 return key;
 
         throw `Unknown signal l(${left}) r(${right}): ${index}`;
-    }
-
-    /**
-     * @param {Hand} bottom 
-     * @param {Hand} upper 
-     */
-    _swapHandDepth(bottom, upper) {
-        bottom.setDepth(Consts.Depth.BottonHand);
-        upper.setDepth(Consts.Depth.UpperHand);
     }
 }

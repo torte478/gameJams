@@ -9,6 +9,7 @@ import Enums from './Enums.js';
 import Player from './Player.js';
 import Delivery from './Delivery.js';
 import Waves from './Waves.js';
+import PlayerContainer from './PlayerContainer.js';
 
 export default class Game {
 
@@ -20,6 +21,9 @@ export default class Game {
 
     /** @type {Delivery} */
     _delivery;
+
+    /** @type {PlayerContainer} */
+    _playerContainer;
 
     constructor() {
         const me = this;
@@ -33,10 +37,9 @@ export default class Game {
         Here._.input.mouse.disableContextMenu();
 
         const waves = new Waves();
-        const shipBack = Here._.add.image(-75, 125, 'ship_back');
-        me._player = new Player();
         me._delivery = new Delivery('grtew');
-        const shipFront = Here._.add.image(10, 325, 'ship_front');
+        me._player = new Player();
+        me._playerContainer = new PlayerContainer(me._player);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 28, backgroundColor: '#000' })
@@ -45,14 +48,14 @@ export default class Game {
         });
     }
 
-    update(delta) {
+    update(time, delta) {
         const me = this;
 
         if (Here.Controls.isPressed(Enums.Keyboard.RESTART) 
             && Utils.isDebug(Config.Debug.Global))
             Here._.scene.restart({ isRestart: true });
 
-        me._gameLoop(delta);
+        me._gameLoop(time, delta);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
@@ -61,17 +64,18 @@ export default class Game {
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `inp: ${me._delivery._word} => ${me._delivery._currentLetter}\n` +
                 `cur: ${me._delivery._currentWord}\n` + 
-                `lft: ${me._player._leftHand._sprite.angle | 0}\n` + 
-                `rgt: ${me._player._rightHand._sprite.angle | 0}\n`;
+                `time: ${time / 1000 | 0}`;
 
             me._log.setText(text);
         });
     }
 
-    _gameLoop(delta) {
+    _gameLoop(time, delta) {
         const me = this;
 
-        me._player.update(delta);
+        const offset = me._playerContainer.getOffset();
+        me._player.update(delta, offset);
+        me._playerContainer.update(time);
 
         if (Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION))
             me._processSignalInput();

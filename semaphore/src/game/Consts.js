@@ -1,5 +1,5 @@
 import Enums from "./Enums.js";
-import SignalConfig from "./SignalConfig.js";
+import { SignalModel } from "./Models.js";
 
 export default class Consts {
 
@@ -15,12 +15,10 @@ export default class Consts {
     };
 
     static Depth = {
-        BottonHand: 1000,
-        UpperHand: 2000,
         Max: 100000
     };
 
-    /** @type {SignalConfig[]} */
+    /** @type {SignalModel[]} */
     static Signals = [
         {
             signal: Enums.Signals.A1,

@@ -1,5 +1,6 @@
-import Here from '../framework/Here.js';
 import Phaser from '../lib/phaser.js';
+
+import Here from '../framework/Here.js';
 
 export default class Waves { 
 

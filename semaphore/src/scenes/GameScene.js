@@ -51,6 +51,6 @@ export default class GameScene extends HereScene {
 
         const me = this;
 
-        me._game.update(delta);
+        me._game.update(time, delta);
     }
 }
