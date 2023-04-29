@@ -18,6 +18,9 @@ export default class Score {
     /** @type {Phaser.GameObjects.Text} */
     _effectText;
 
+    /** @type {Combo} */
+    _combo
+
     constructor() {
         const me = this;
 
@@ -52,6 +55,8 @@ export default class Score {
             .setOrigin(0.5)
             .setDepth(Consts.Depth.GUI_MAX)
             .setAlpha(0);
+
+        me._combo = new Combo();
     }
 
     /**
@@ -64,16 +69,18 @@ export default class Score {
             const value = me._scoreHistory[me._scoreHistory.length - 1];
             me._score -= value;
             me._scoreHistory.splice(me._scoreHistory.length - 1, 1);
-            me._runEffectTween(value, false) 
+            me._runEffectTween(value, false);
+            me._combo.reset();
             return;
         }
 
         if (!signal.correct) {
             me._scoreHistory.push(0);
+            me._combo.reset();
             return;
         }
 
-        const value = 1;
+        const value = me._combo.success();
         me._scoreHistory.push(value);
         me._score += value;
 
@@ -84,14 +91,14 @@ export default class Score {
         const me = this;
 
         me._scoreText.setText(
-            ` SCORE: ${me._score < 1000 ? '0' : ''}${me._score < 100 ? '0' : ''}${me._score < 10 ? '0' : ''}${me._score} TIME: 0:00`);
+            ` SCORE: ${me._score < 1000 ? '0' : ''}${me._score < 100 ? '0' : ''}${me._score < 10 ? '0' : ''}${me._score} TIME: 0:00 `);
     }
 
     _runEffectTween(value, success) {
         const me = this;
 
         me._effectText
-            .setText(`${success ? '+' : '-'}${value}`)
+            .setText(me._getEffectText(value, success))
             .setColor(success ? '#57E402' : '#E40207')
             .setAlpha(1)
             .setPosition(-40, 20 - Consts.Viewport.Height / 2);
@@ -103,5 +110,58 @@ export default class Score {
             duration: 1000,
             ease: 'sine.inout'
         });
+    }
+
+    _getEffectText(value, success) {
+        if (!success)
+            return `-${value}`;
+
+        return value == 1
+            ? `+${value}`
+            : `COMBO x${value}`;
+    }
+}
+
+class Combo {
+
+    /** @type {Number} */
+    _durationMs;
+
+    /** @type {Number} */
+    _maxCounter;
+
+    /** @type {Number} */
+    _lastSuccessTimeMs;
+
+    /** @type {Number} */
+    _counter;
+
+    constructor() {
+        const me = this;
+
+        me._durationMs = 2000;
+        me._maxCounter = 5;
+
+        me.reset();
+    }
+
+    reset() {
+        const me = this;
+
+        me._counter = 0;
+        me._lastSuccessTimeMs = 0;
+    }
+
+    success() {
+        const me = this;
+
+        const now = new Date().getTime();
+        const increaseComboCounter = me._lastSuccessTimeMs == 0 || now - me._lastSuccessTimeMs <= me._durationMs;
+        me._counter = increaseComboCounter
+            ?  Math.min(me._maxCounter, me._counter + 1)
+            : 1;
+        me._lastSuccessTimeMs = now;
+
+        return me._counter;
     }
 }
