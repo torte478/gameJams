@@ -31,8 +31,10 @@ export default class Game {
 
         Here._.input.mouse.disableContextMenu();
 
+        const shipBack = Here._.add.image(-75, 125, 'ship_back');
         me._player = new Player();
         me._delivery = new Delivery('grtew');
+        const shipFront = Here._.add.image(10, 325, 'ship_front');
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 28, backgroundColor: '#000' })
