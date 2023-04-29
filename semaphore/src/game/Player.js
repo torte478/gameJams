@@ -43,7 +43,7 @@ export default class Player {
     getSignal() {
         const me = this;
 
-        let left = me._normalizeAngle(me._getNearestAngle(me._leftHand) - 180);
+        const left = me._normalizeAngle(me._getNearestAngle(me._leftHand) - 180);
         const right = me._normalizeAngle(me._getNearestAngle(me._rightHand));
 
         /** @type {SignalConfig} */
@@ -54,7 +54,12 @@ export default class Player {
         if (signal == null)
             return 'unknown';
 
-        return signal.signal;
+        const index = signal.signal;
+        for (let key in Enums.Signals)
+            if (Enums.Signals[key] == index)
+                return key;
+
+        throw `Unknown signal l(${left}) r(${right}): ${index}`;
     }
 
     _normalizeAngle(angle) {

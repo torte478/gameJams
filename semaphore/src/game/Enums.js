@@ -27,7 +27,7 @@ export default class Enums {
         R: 17,
         S: 18,
         T: 19,
-        Y: 20,
+        U: 20,
         V: 21,
         W: 22,
         X: 23,
