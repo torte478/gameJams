@@ -58,4 +58,7 @@ export class SignalProcessResult {
 
     /** @type {Boolean} */
     correct;
+
+    /** @type {Boolean} */
+    cancel;
 }

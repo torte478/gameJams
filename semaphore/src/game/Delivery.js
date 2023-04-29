@@ -44,11 +44,18 @@ export default class Delivery {
         }
 
         if (signal == 'CANCEL') {
-            if (me._index > 0) {
-                --me._index;
-                me._currentWord = me._currentWord.substring(0, me._currentWord.length - 1);
-            }
-            return { currentChanged: false };
+            if (me._index == 0) 
+                return { currentChanged: false };
+            
+            --me._index;
+            me._currentWord = me._currentWord.substring(0, me._currentWord.length - 1);
+            me._current = me._word  [me._index];
+            
+            return { 
+                currentChanged: true,
+                cancel: true,
+                to: me._current.toUpperCase() 
+            };
         }
 
         /** @type {String} */

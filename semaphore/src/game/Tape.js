@@ -55,6 +55,9 @@ export default class Tape {
     processSignal(playerPos, signal) {
         const me = this;
 
+        if (!!signal.cancel)
+            return me._processCancel(signal);
+
         me._inputEffect
             .setPosition(playerPos.x, playerPos.y)
             .setText(signal.from)
@@ -68,6 +71,39 @@ export default class Tape {
             duration: 500 ,
             ease: 'sine.out',
             onComplete: () => me._onSignalProcessed.call(me, signal)
+        });
+    }
+
+    /**
+     * @param {SignalProcessResult} signal 
+     */
+    _processCancel(signal) {
+        const me = this;
+
+        const currentBox = me._getCurrentBox();
+
+        Here._.tweens.add({
+            targets: currentBox.getGameObject(),
+            x: me._xOffset,
+            alpha: { from: 1, to: 0},
+            duration: 1000,
+            ease: 'sine.inout'
+        });
+
+        me._isFirst = !me._isFirst;
+        const nextBox = me._getCurrentBox();
+        nextBox
+            .getGameObject()
+            .setAlpha(0)
+            .setX(-me._xOffset);
+        nextBox.setText(signal.to);
+
+        Here._.tweens.add({
+            targets: nextBox.getGameObject(),
+            x: 0, 
+            alpha: { from: 0, to: 1},
+            duration: 1000,
+            ease: 'sine.inout'
         });
     }
 
