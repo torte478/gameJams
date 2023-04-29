@@ -29,7 +29,7 @@ export default class Game {
         me._player = new Player();
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
-            me._log = Here._.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
+            me._log = Here._.add.text(10, 10, '', { fontSize: 28, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
         });
@@ -44,11 +44,16 @@ export default class Game {
 
         me._player.update();
 
+        if (Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION))
+            console.log(me._player.getSignal());
+
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
 
             let text = 
-                `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n`;
+                `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
+                `lft: ${me._player._leftHand.angle | 0}\n` +
+                `rgt: ${me._player._rightHand.angle | 0}\n`;
 
             me._log.setText(text);
         });

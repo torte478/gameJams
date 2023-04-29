@@ -1,13 +1,53 @@
 export default class Enums {
     static Keyboard = {
-        LEFT: 0,
-        RIGHT: 1,
-        UP: 2,
-        DOWN: 3,
+        MAIN_ACTION: 0,
+        SECOND_ACTION: 1,
 
-        MAIN_ACTION: 4,
-        SECOND_ACTION: 5,
+        RESTART: 2
+    }
 
-        RESTART: 6
+    static Signals = {
+        A1: 0,
+        B2: 1,
+        C3: 2,
+        D4: 3,
+        E5: 4,
+        F6: 5,
+        G7: 6,
+        H8: 7,
+        I9: 8,
+        J0: 9,
+        K: 10,
+        L: 11,
+        M: 12,
+        N: 13,
+        O: 14,
+        P: 15,
+        Q: 16,
+        R: 17,
+        S: 18,
+        T: 19,
+        Y: 20,
+        V: 21,
+        W: 22,
+        X: 23,
+        Y: 24,
+        Z: 25,
+        SWITCH: 26,
+        SPACE: 27,
+        CANCEL: 28,
+        UNKNOWN: 29
+    };
+
+    static Angles = {
+        p0: 0,
+        p45: 45,
+        p90: 90,
+        p135: 135,
+        p180: 180,
+        n45: -45,
+        n90: -90,
+        n135: -135,
+        n180: -180
     }
 }

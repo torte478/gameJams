@@ -4,12 +4,8 @@ import Utils from "./Utils.js";
 export default class Controls {
 
     static _schema = [
-        { key: Enums.Keyboard.LEFT, value: Phaser.Input.Keyboard.KeyCodes.LEFT },
-        { key: Enums.Keyboard.RIGHT, value: Phaser.Input.Keyboard.KeyCodes.RIGHT },
-        { key: Enums.Keyboard.UP, value: Phaser.Input.Keyboard.KeyCodes.UP },
-        { key: Enums.Keyboard.DOWN, value: Phaser.Input.Keyboard.KeyCodes.DOWN },
-        { key: Enums.Keyboard.MAIN_ACTION, value: Phaser.Input.Keyboard.KeyCodes.Z },
-        { key: Enums.Keyboard.SECOND_ACTION, value: Phaser.Input.Keyboard.KeyCodes.X },
+        { key: Enums.Keyboard.MAIN_ACTION, value: Phaser.Input.Keyboard.KeyCodes.SPACE },
+        { key: Enums.Keyboard.SECOND_ACTION, value: Phaser.Input.Keyboard.KeyCodes.Z },
         { key: Enums.Keyboard.RESTART, value: Phaser.Input.Keyboard.KeyCodes.R }
     ];
 
