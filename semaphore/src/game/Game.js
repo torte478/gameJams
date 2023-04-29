@@ -83,7 +83,7 @@ export default class Game {
         me._player.update(delta, offset);
         me._playerContainer.update(time);
 
-        if (Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION))
+        if (!me._tape.isBusy() && Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION))
             me._processSignalInput();
     }
 

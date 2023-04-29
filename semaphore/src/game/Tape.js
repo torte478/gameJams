@@ -25,6 +25,9 @@ export default class Tape {
     /** @type {Phaser.GameObjects.Text} */
     _inputEffect;
 
+    /** @type {Boolean} */
+    _isBusy;
+
     constructor(startSignal) {
         const me = this;
 
@@ -45,7 +48,9 @@ export default class Tape {
             .setOrigin(0.5)
             .setStroke('#4A271E', 16)
             .setDepth(Consts.Depth.GUI_EFFECTS)
-            .setAlpha(0)
+            .setAlpha(0);
+
+        me._isBusy = false;
     }
 
     /**
@@ -55,6 +60,10 @@ export default class Tape {
     processSignal(playerPos, signal) {
         const me = this;
 
+        if (me._isBusy)
+            throw 'is busy!';
+
+        me._isBusy = true;
         if (!!signal.cancel)
             return me._processCancel(signal);
 
@@ -72,6 +81,15 @@ export default class Tape {
             ease: 'sine.out',
             onComplete: () => me._onSignalProcessed.call(me, signal)
         });
+    }
+
+    /**
+     * @returns {Boolean}
+     */
+    isBusy() {
+        const me = this;
+
+        return me._isBusy;
     }
 
     /**
@@ -103,7 +121,8 @@ export default class Tape {
             x: 0, 
             alpha: { from: 0, to: 1},
             duration: 1000,
-            ease: 'sine.inout'
+            ease: 'sine.inout',
+            onComplete: () => me._free.call(me)
         });
     }
 
@@ -139,7 +158,8 @@ export default class Tape {
             x: 0,
             alpha: { from: 0, to: 1},
             duration: 1000,
-            ease: 'sine.inout'
+            ease: 'sine.inout',
+            onComplete: () => me._free.call(me)
         });
     }
 
@@ -149,6 +169,13 @@ export default class Tape {
         return me._isFirst
             ? me._first
             : me._second;
+    }
+
+    _free() {
+        const me = this;
+
+        me._isBusy = false;
+        // TODO: sfx
     }
 }
 
