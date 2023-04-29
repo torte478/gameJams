@@ -21,16 +21,23 @@ export default class Player {
     constructor() {
         const me = this;
 
-        const offset = 50;
+        const x = 35;
+        const y = -75;
+        const offset = 0;
+        const origin = new Phaser.Math.Vector2(0.1, 0.5);
+        
+
+        const body = Here._.add
+            .image(0, 0, 'body');
 
         me._rightHand = Here._.add
-            .image(offset, 0, 'hand')
-            .setOrigin(0, 0.5);
+            .image(x + offset, y, 'hand')
+            .setOrigin(origin.x, origin.y);
 
         me._leftHand = Here._.add
-            .image(-offset, 0, 'hand')
+            .image(-x + offset, y, 'hand')
             .setFlipX(true)
-            .setOrigin(1, 0.5);
+            .setOrigin(1 - origin.x, origin.y);
 
         me._mouse = Here._.input.activePointer;
     }

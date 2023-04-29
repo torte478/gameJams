@@ -30,6 +30,7 @@ export default class GameScene extends HereScene {
             Utils.runLoadingBar();
 
         Utils.loadImage('hand');
+        Utils.loadImage('body');
     }
 
     create() {

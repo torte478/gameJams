@@ -23,10 +23,11 @@ export default class Game {
     constructor() {
         const me = this;
 
-        Here._.cameras.main.setScroll(
-            Consts.Viewport.Width / -2,
-            Consts.Viewport.Height / -2
-        );
+        Here._.cameras.main
+            .setScroll(
+                Consts.Viewport.Width / -2,
+                Consts.Viewport.Height / -2)
+            .setBackgroundColor('#158CD6');
 
         Here._.input.mouse.disableContextMenu();
 
