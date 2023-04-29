@@ -17,6 +17,7 @@ export default class Consts {
     static Depth = {
         GUI_TAPE: 1000,
         GUI_EFFECTS: 2000,
+        GUI_MAX: 10000,
         Max: 100000
     };
 

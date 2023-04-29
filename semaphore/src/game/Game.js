@@ -11,6 +11,7 @@ import Delivery from './Delivery.js';
 import Waves from './Waves.js';
 import PlayerContainer from './PlayerContainer.js';
 import Tape from './Tape.js';
+import Score from './Score.js';
 
 export default class Game {
 
@@ -29,6 +30,9 @@ export default class Game {
     /** @type {Tape} */
     _tape;
 
+    /** @type {Score} */
+    _score;
+
     constructor() {
         const me = this;
 
@@ -41,11 +45,12 @@ export default class Game {
         Here._.input.mouse.disableContextMenu();
 
         const waves = new Waves();
-        me._delivery = new Delivery('a1_2b');
+        me._delivery = new Delivery('yyyy');
         me._player = new Player();
         me._playerContainer = new PlayerContainer(me._player);
 
         me._tape = new Tape(me._delivery._current);
+        me._score = new Score();
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 28, backgroundColor: '#000' })
@@ -62,6 +67,7 @@ export default class Game {
             Here._.scene.restart({ isRestart: true });
 
         me._gameLoop(time, delta);
+        me._score.updateGUI();
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
@@ -69,7 +75,8 @@ export default class Game {
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `inp: ${me._delivery._word} => ${me._delivery._current}\n` +
-                `cur: ${me._delivery._currentWord}`;
+                `cur: ${me._delivery._currentWord}\n` +
+                `scr: ${me._score._scoreHistory}`;
 
             me._log.setText(text);
         });
@@ -100,7 +107,13 @@ export default class Game {
         const playerPos = me._playerContainer.getPlayerPos();
         const result = me._delivery.applySignal(signal, playerPos);
 
-        if (result.currentChanged)
-            me._tape.processSignal(playerPos, result);
+        if (!result.currentChanged) 
+            return;
+
+        me._tape.processSignal(
+            playerPos, 
+            result, 
+            () => me._score.processSignal(result), 
+            me);
     }
 }

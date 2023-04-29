@@ -1,5 +1,7 @@
-import Here from '../framework/Here.js';
 import Phaser from '../lib/phaser.js';
+
+import Here from '../framework/Here.js';
+
 import Consts from './Consts.js';
 import { SignalProcessResult } from './Models.js';
 
@@ -64,8 +66,10 @@ export default class Tape {
     /**
      * @param {Phaser.Geom.Point} playerPos 
      * @param {SignalProcessResult} signal 
+     * @param {Function} callback
+     * @param {Object} context
      */
-    processSignal(playerPos, signal) {
+    processSignal(playerPos, signal, callback, context) {
         const me = this;
 
         if (me._isBusy)
@@ -73,7 +77,7 @@ export default class Tape {
 
         me._isBusy = true;
         if (!!signal.cancel)
-            return me._processCancel(signal);
+            return me._processCancel(signal, callback, context);
 
         me._inputEffect
             .setPosition(playerPos.x, playerPos.y)
@@ -87,7 +91,12 @@ export default class Tape {
             alpha: { from: 0, to: 1},
             duration: 500 ,
             ease: 'sine.out',
-            onComplete: () => me._onSignalProcessed.call(me, signal)
+            onComplete: () => {
+                if (!!callback)
+                    callback.call(context);
+
+                me._onSignalProcessed.call(me, signal);
+            } 
         });
     }
 
