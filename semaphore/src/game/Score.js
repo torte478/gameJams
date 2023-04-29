@@ -19,7 +19,10 @@ export default class Score {
     _effectText;
 
     /** @type {Combo} */
-    _combo
+    _combo;
+
+    /** @type {Phaser.GameObjects.Image} */
+    _fade;
 
     constructor() {
         const me = this;
@@ -57,6 +60,11 @@ export default class Score {
             .setAlpha(0);
 
         me._combo = new Combo();
+
+        me._fade = Here._.add
+            .image(0, 0, 'fade')
+            .setAlpha(0)
+            .setDepth(Consts.Depth.GUI_MAX);
     }
 
     /**
@@ -92,6 +100,24 @@ export default class Score {
 
         me._scoreText.setText(
             ` SCORE: ${me._score < 1000 ? '0' : ''}${me._score < 100 ? '0' : ''}${me._score < 10 ? '0' : ''}${me._score} TIME: 0:00 `);
+    }
+
+    startShowResult() {
+        const me = this;
+
+        Here._.tweens.add({
+            targets: me._scoreText,
+            y: -500,
+            duration: 500,
+            ease: 'sine.in'
+        });
+
+        Here._.tweens.add({
+            targets: me._fade,
+            alpha: { from: 0, to: 0.75 },
+            duration: 1000,
+            ease: 'sine.out'
+        });
     }
 
     _runEffectTween(value, success) {

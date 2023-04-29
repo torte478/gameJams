@@ -66,10 +66,11 @@ export default class Tape {
     /**
      * @param {Phaser.Geom.Point} playerPos 
      * @param {SignalProcessResult} signal 
-     * @param {Function} callback
+     * @param {Function} onMiddleCallback
+     * @param {Function} onEndCallback
      * @param {Object} context
      */
-    processSignal(playerPos, signal, callback, context) {
+    processSignal(playerPos, signal, onMiddleCallback, onEndCallback, context) {
         const me = this;
 
         if (me._isBusy)
@@ -77,7 +78,7 @@ export default class Tape {
 
         me._isBusy = true;
         if (!!signal.cancel)
-            return me._processCancel(signal, callback, context);
+            return me._processCancel(signal, onMiddleCallback, context);
 
         me._inputEffect
             .setPosition(playerPos.x, playerPos.y)
@@ -92,10 +93,10 @@ export default class Tape {
             duration: 500 ,
             ease: 'sine.out',
             onComplete: () => {
-                if (!!callback)
-                    callback.call(context);
+                if (!!onMiddleCallback)
+                    onMiddleCallback.call(context);
 
-                me._onSignalProcessed.call(me, signal);
+                me._onSignalProcessed.call(me, signal, onEndCallback, context);
             } 
         });
     }
@@ -166,7 +167,7 @@ export default class Tape {
     /**
      * @param {SignalProcessResult} signal 
      */
-    _onSignalProcessed(signal) {
+    _onSignalProcessed(signal, callback, context) {
         const me = this
 
         me._inputEffect.setAlpha(0);
@@ -179,10 +180,17 @@ export default class Tape {
             x: -me._xOffset,
             alpha: { from: 1, to: 0},
             duration: 1000,
-            ease: 'sine.inout'
+            ease: 'sine.inout',
+            onComplete: () => {
+                if (!!signal.isLevelComplete)
+                    me._free.call(me, callback, context);
+            }
         });
 
         me._isFirst = !me._isFirst;
+        if (!!signal.isLevelComplete)
+            return;
+
         const nextBox = me._getCurrentBox();
         nextBox
             .getGameObject()
@@ -208,12 +216,15 @@ export default class Tape {
             : me._second;
     }
 
-    _free() {
+    _free(callback, context) {
         const me = this;
 
         me._isBusy = false;
         me._signalStartTimeMs = new Date().getTime();
         // TODO: sfx
+
+        if (!!callback)
+            callback.call(context);
     }
 }
 

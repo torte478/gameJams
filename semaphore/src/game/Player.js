@@ -43,17 +43,18 @@ export default class Player {
     /**
      * @param {Number} delta 
      * @param {ContainerOffset} offset
+     * @param {Number} state
      */
-    update(delta, offset) {
+    update(delta, offset, state) {
         const me = this;
 
         const mouse = new Phaser.Math.Vector2(me._mouse.worldX, me._mouse.worldY);
 
-        if (me._leftHand.updateRotation(me._mouse.leftButtonDown(), mouse, delta, offset))
+        if (me._leftHand.updateRotation(me._isMouseButtonPressed(true, state), mouse, delta, offset))
             me._container.bringToTop(me._leftHand.getGameObject());
 
-        if (me._rightHand.updateRotation(me._mouse.rightButtonDown(), mouse, delta, offset))
-        me._container.bringToTop(me._rightHand.getGameObject());
+        if (me._rightHand.updateRotation(me._isMouseButtonPressed(false, state), mouse, delta, offset))
+            me._container.bringToTop(me._rightHand.getGameObject());
     }
 
     getGameObject() {
@@ -85,5 +86,20 @@ export default class Player {
                 return key;
 
         throw `Unknown signal l(${left}) r(${right}): ${index}`;
+    }
+
+    /**
+     * @param {Boolean} left 
+     * @param {Number} state 
+     */
+    _isMouseButtonPressed(left, state) {
+        const me = this;
+
+        if (state != Enums.GameState.GAME)
+            return false;
+
+        return left
+            ? me._mouse.leftButtonDown()
+            : me._mouse.rightButtonDown();
     }
 }

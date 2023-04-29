@@ -1,9 +1,16 @@
 export default class Enums {
+
     static Keyboard = {
         MAIN_ACTION: 0,
         SECOND_ACTION: 1,
 
         RESTART: 2
+    }
+
+    static GameState = {
+        UNKNOWN: 0,
+        GAME: 1,
+        LEVEL_COMPLETED: 2
     }
 
     static Signals = {

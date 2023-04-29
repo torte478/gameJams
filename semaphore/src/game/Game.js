@@ -18,6 +18,9 @@ export default class Game {
     /** @type {Phaser.GameObjects.Text} */
     _log;
 
+    /** @type {Number} */
+    _state;
+
     /** @type {Player} */
     _player;
 
@@ -45,12 +48,14 @@ export default class Game {
         Here._.input.mouse.disableContextMenu();
 
         const waves = new Waves();
-        me._delivery = new Delivery('yyyy');
+        me._delivery = new Delivery('y');
         me._player = new Player();
         me._playerContainer = new PlayerContainer(me._player);
 
         me._tape = new Tape(me._delivery._current);
         me._score = new Score();
+
+        me._state = Enums.GameState.GAME;
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 28, backgroundColor: '#000' })
@@ -86,8 +91,15 @@ export default class Game {
         const me = this;
 
         const offset = me._playerContainer.getOffset();
-        me._player.update(delta, offset);
+        me._player.update(delta, offset, me._state);
         me._playerContainer.update(time);
+
+        if (me._state == Enums.GameState.GAME)
+            return me._onGameLoop(time, delta);
+    }
+
+    _onGameLoop() {
+        const me = this;
 
         if (me._tape.isBusy())
             return;
@@ -114,6 +126,14 @@ export default class Game {
             playerPos, 
             result, 
             () => me._score.processSignal(result), 
+            () => me._onLevelComplete(),
             me);
+    }
+
+    _onLevelComplete() {
+        const me = this;
+
+        me._state = Enums.GameState.LEVEL_COMPLETED;
+        me._score.startShowResult();
     }
 }
