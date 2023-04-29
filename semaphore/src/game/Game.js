@@ -7,6 +7,7 @@ import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Player from './Player.js';
+import Delivery from './Delivery.js';
 
 export default class Game {
 
@@ -15,6 +16,9 @@ export default class Game {
 
     /** @type {Player} */
     _player;
+
+    /** @type {Delivery} */
+    _delivery;
 
     constructor() {
         const me = this;
@@ -27,6 +31,7 @@ export default class Game {
         Here._.input.mouse.disableContextMenu();
 
         me._player = new Player();
+        me._delivery = new Delivery('grtew');
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 28, backgroundColor: '#000' })
@@ -42,20 +47,34 @@ export default class Game {
             && Utils.isDebug(Config.Debug.Global))
             Here._.scene.restart({ isRestart: true });
 
-        me._player.update();
-
-        if (Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION))
-            console.log(me._player.getSignal());
+        me._gameLoop();
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
 
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
-                `lft: ${me._player._leftHand.angle | 0}\n` +
-                `rgt: ${me._player._rightHand.angle | 0}\n`;
+                `inp: ${me._delivery._word} => ${me._delivery._currentLetter}\n` +
+                `cur: ${me._delivery._currentWord}\n` + 
+                `num: ${me._delivery._isNumerals}`;
 
             me._log.setText(text);
         });
+    }
+
+    _gameLoop() {
+        const me = this;
+
+        me._player.update();
+
+        if (Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION))
+            me._processSignalInput();
+    }
+
+    _processSignalInput() {
+        const me = this;
+
+        const signal = me._player.getSignal();
+        me._delivery.applySignal(signal);
     }
 }

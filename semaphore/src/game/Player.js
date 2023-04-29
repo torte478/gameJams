@@ -1,6 +1,8 @@
+import Phaser from '../lib/phaser.js';
+
 import Here from '../framework/Here.js';
 import Utils from '../framework/Utils.js';
-import Phaser from '../lib/phaser.js';
+
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import SignalConfig from './SignalConfig.js';
@@ -52,7 +54,7 @@ export default class Player {
             s => s.left == left && s.right == right);
 
         if (signal == null)
-            return 'unknown';
+            return 'UNKNOWN';
 
         const index = signal.signal;
         for (let key in Enums.Signals)
