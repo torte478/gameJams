@@ -24,6 +24,9 @@ export default class Score {
     /** @type {Phaser.GameObjects.Image} */
     _fade;
 
+    /** @type {Menu} */
+    _menu;
+
     constructor() {
         const me = this;
 
@@ -65,6 +68,8 @@ export default class Score {
             .image(0, 0, 'fade')
             .setAlpha(0)
             .setDepth(Consts.Depth.GUI_MAX);
+
+        me._menu = new Menu();
     }
 
     /**
@@ -116,7 +121,11 @@ export default class Score {
             targets: me._fade,
             alpha: { from: 0, to: 0.75 },
             duration: 1000,
-            ease: 'sine.out'
+            ease: 'sine.out',
+            onComplete: () => {
+                const timeBonus = 0; // TODO
+                me._menu.open(me._score, timeBonus);
+            }
         });
     }
 
@@ -189,5 +198,84 @@ class Combo {
         me._lastSuccessTimeMs = now;
 
         return me._counter;
+    }
+}
+
+class Menu {
+
+    /** @type {Phaser.GameObjects.Container} */
+    _container;
+
+    /** @type {Phaser.GameObjects.Text} */
+    _totalText;
+
+    /** @type {Phaser.GameObjects.Text} */
+    _scoreText;
+
+    /** @type {Phaser.GameObjects.Text} */
+    _timeBonusText;
+
+    constructor() {
+        const me = this;
+
+        me._totalText = Here._.add.text(
+            0, 
+            -300, 
+            'TOTAL: 0', 
+            {
+                fontFamily: 'Arial Black',
+                fontSize: 128,
+                color: '#F0E2E1'
+            })
+            .setOrigin(0.5)
+            .setStroke('#4A271E', 16);
+
+        me._scoreText = Here._.add.text(
+            0, 
+            -175, 
+            'SCORE: 0', 
+            {
+                fontFamily: 'Arial Black',
+                fontSize: 72,
+                color: '#F0E2E1'
+            })
+            .setOrigin(0.5)
+            .setStroke('#4A271E', 8);
+
+        me._timeBonusText = Here._.add.text(
+            0, 
+            -75, 
+            'TIME BONUS: 0', 
+            {
+                fontFamily: 'Arial Black',
+                fontSize: 72,
+                color: '#F0E2E1'
+            })
+            .setOrigin(0.5)
+            .setStroke('#4A271E', 8);
+
+        me._container = Here._.add.container(0, 0, [
+            me._totalText,
+            me._scoreText,
+            me._timeBonusText
+        ])
+            .setDepth(Consts.Depth.GUI_MAX);
+    }
+
+    getGameObject() {
+        const me = this;
+
+        return me._container;
+    }
+
+    open(score, timeBonus) {
+        const me = this;
+
+        // поменять местами: total вниз
+        // показываем элементы по очереди
+        // посчитать time bonus
+        // кнопки
+        // лента
+        throw 'not implemented';
     }
 }
