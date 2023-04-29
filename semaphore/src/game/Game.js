@@ -8,6 +8,7 @@ import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Player from './Player.js';
 import Delivery from './Delivery.js';
+import Waves from './Waves.js';
 
 export default class Game {
 
@@ -31,6 +32,7 @@ export default class Game {
 
         Here._.input.mouse.disableContextMenu();
 
+        const waves = new Waves();
         const shipBack = Here._.add.image(-75, 125, 'ship_back');
         me._player = new Player();
         me._delivery = new Delivery('grtew');
