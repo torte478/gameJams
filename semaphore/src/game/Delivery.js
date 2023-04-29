@@ -1,3 +1,5 @@
+import Here from "../framework/Here.js";
+import Consts from "./Consts.js";
 import { SignalProcessResult } from "./Models.js";
 
 export default class Delivery {
@@ -17,6 +19,12 @@ export default class Delivery {
     /** @type {Boolean} */
     _isNumerals;
 
+    /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+    _numeralParticles;
+
+    /** @type {Phaser.Time.TimerEvent} */
+    _particlesTimer;
+
     /**
      * @param {String} word 
      */
@@ -29,17 +37,30 @@ export default class Delivery {
         me._current = me._word[me._index];
         me._currentWord = '';
         me._isNumerals = false;
+
+        me._numeralParticles = Here._.add
+            .particles('letters_numbers')
+            .setDepth(Consts.Depth.GUI_EFFECTS)
+            .createEmitter({
+                speed: 200,
+                on: false,
+                alpha: { start: 0, end: 1},
+                frame: [ 0, 1, 2, 3, 4, 5, 6, 7],
+                scale: { start: 1, end: 0},
+            });
     }
 
     /**
      * @param {String} signal 
+     * @param {Phaser.Geom.Point}
      * @returns {SignalProcessResult}
      */
-    applySignal(signal) {
+    applySignal(signal, position) {
         const me = this;
 
         if (signal == 'SWITCH') {
             me._isNumerals = !me._isNumerals;
+            me._runNumeralParticles(position);
             return { currentChanged: false };
         }
 
@@ -75,6 +96,28 @@ export default class Delivery {
             from: currentChar.toUpperCase(),
             to: me._current.toUpperCase(),
             correct: correct };
+    }
+
+    _runNumeralParticles(position) {
+        const me = this;
+
+        me._numeralParticles
+            .setPosition(position.x, position.y)
+            .setFrame(
+                me._isNumerals
+                    ? [ 8, 9, 10, 11, 12, 13, 14, 15]
+                    : [ 0, 1, 2, 3, 4, 5, 6, 7]);
+
+        me._numeralParticles.on = true;
+        if (!!me._particlesTimer)
+            me._particlesTimer.destroy();
+
+        me._particlesTimer = Here._.time.delayedCall(
+            1000, 
+            () => {
+                me._numeralParticles.on = false;
+                me._particlesTimer.destroy();
+            })
     }
 
     _getChar(signal) {

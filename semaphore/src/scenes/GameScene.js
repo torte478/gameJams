@@ -37,6 +37,7 @@ export default class GameScene extends HereScene {
         Utils.loadImage('signal_box');
 
         Utils.loadSpriteSheet('hand', Consts.Unit.Normal * 4, Consts.Unit.Normal * 3);
+        Utils.loadSpriteSheet('letters_numbers', Consts.Unit.Big);
     }
 
     create() {

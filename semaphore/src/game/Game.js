@@ -91,11 +91,10 @@ export default class Game {
         const me = this;
 
         const signal = me._player.getSignal();
-        const result = me._delivery.applySignal(signal);
+        const playerPos = me._playerContainer.getPlayerPos();
+        const result = me._delivery.applySignal(signal, playerPos);
 
-        if (result.currentChanged) {
-            const playerPos = me._playerContainer.getPlayerPos();
+        if (result.currentChanged)
             me._tape.processSignal(playerPos, result);
-        }
     }
 }
