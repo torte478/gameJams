@@ -15,6 +15,8 @@ export default class Consts {
     };
 
     static Depth = {
+        BottonHand: 1000,
+        UpperHand: 2000,
         Max: 100000
     };
 

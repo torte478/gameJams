@@ -38,8 +38,12 @@ export default class Player {
         const me = this;
 
         const mouse = new Phaser.Math.Vector2(me._mouse.worldX, me._mouse.worldY);
-        me._leftHand.updateRotation(me._mouse.leftButtonDown(), mouse, delta);
-        me._rightHand.updateRotation(me._mouse.rightButtonDown(), mouse, delta);
+
+        if (me._leftHand.updateRotation(me._mouse.leftButtonDown(), mouse, delta))
+            me._swapHandDepth(me._rightHand, me._leftHand);
+
+        if (me._rightHand.updateRotation(me._mouse.rightButtonDown(), mouse, delta))
+            me._swapHandDepth(me._leftHand, me._rightHand);
     }
 
     getSignal() {
@@ -62,5 +66,14 @@ export default class Player {
                 return key;
 
         throw `Unknown signal l(${left}) r(${right}): ${index}`;
+    }
+
+    /**
+     * @param {Hand} bottom 
+     * @param {Hand} upper 
+     */
+    _swapHandDepth(bottom, upper) {
+        bottom.setDepth(Consts.Depth.BottonHand);
+        upper.setDepth(Consts.Depth.UpperHand);
     }
 }

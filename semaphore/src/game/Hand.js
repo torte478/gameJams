@@ -31,37 +31,34 @@ export default class Hand {
             .setFlipX(isLeft);
 
         me._targetAngle = 0;
-        me._rotationSpeed = 720;
+        me._rotationSpeed = 360;
     }
 
     /**
      * @param {Boolean} isButtonPressed 
      * @param {Phaser.Math.Vector2} mouse 
      * @param {Number} delta
+     * @returns {Boolean}
      */
     updateRotation(isButtonPressed, mouse, delta) {
         const me = this;
 
-        if (isButtonPressed) {
-            let rotation = Phaser.Math.Angle.BetweenPoints(me._sprite, mouse);
+        me._targetAngle = me._getTargetAngle(isButtonPressed, mouse);
 
-            if (me._isLeft)
-                rotation += Math.PI;
+        me._rotateHand(delta);
 
-            me._targetAngle = Phaser.Math.RadToDeg(rotation);
-        } else {
-            me._targetAngle = me._getNearestAngle();
-        }
-
-        const diff = me._targetAngle - me._sprite.angle;
-        if (Math.abs(diff) < 0.01)
-            return;
-
-        const rotationValue = Math.min(Math.abs(diff), me._rotationSpeed) * Math.sign(diff);
-        const newAngle = me._sprite.angle + rotationValue * (delta / 1000);
-        me._sprite.setAngle(newAngle);
+        const currentFrame = Number(me._sprite.frame.name);
+        const nextFrame = Math.abs(me._sprite.angle) > 90 ? 1 : 0;
+        if (currentFrame == nextFrame)
+            return false;
+    
+        me._sprite.setFrame(nextFrame);
+        return true;
     }
 
+    /**
+     * @returns {Number}
+     */
     getAngle() {
         const me = this;
         
@@ -71,7 +68,48 @@ export default class Hand {
 
         return me._normalizeAngle(nearestAngle);
     }
+
+    /**
+     * @param {Number} depth 
+     */
+    setDepth(depth) {
+        const me = this;
+
+        me._sprite.setDepth(depth);
+    }
+
+    _rotateHand(delta) {
+        const me = this;
+
+        let diff = me._targetAngle - me._sprite.angle;
+        if (diff > 180)
+            diff -= 360;
+        else if (diff < -180)
+            diff += 360;
+
+        if (Math.abs(diff) < 0.01)
+            return;
+
+        const rotationValue = Math.sign(diff) * Math.min(
+                Math.abs(diff), 
+                me._rotationSpeed * (delta / 1000));
+
+        me._sprite.setAngle(me._sprite.angle + rotationValue);
+    }
  
+    _getTargetAngle(isButtonPressed, mouse) {
+        const me = this;
+
+        if (!isButtonPressed)
+            return me._getNearestAngle();
+
+        let rotation = Phaser.Math.Angle.BetweenPoints(me._sprite, mouse);
+
+        if (me._isLeft)
+            rotation += Math.PI;
+
+        return Phaser.Math.RadToDeg(rotation);
+    }
 
     _normalizeAngle(angle) {
         let result = angle;

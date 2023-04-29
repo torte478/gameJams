@@ -57,7 +57,8 @@ export default class Game {
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `inp: ${me._delivery._word} => ${me._delivery._currentLetter}\n` +
                 `cur: ${me._delivery._currentWord}\n` + 
-                `num: ${me._delivery._isNumerals}`;
+                `lft: ${me._player._leftHand._sprite.angle | 0}\n` + 
+                `rgt: ${me._player._rightHand._sprite.angle | 0}\n`;
 
             me._log.setText(text);
         });
