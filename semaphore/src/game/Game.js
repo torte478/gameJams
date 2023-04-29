@@ -41,14 +41,14 @@ export default class Game {
         });
     }
 
-    update() {
+    update(delta) {
         const me = this;
 
         if (Here.Controls.isPressed(Enums.Keyboard.RESTART) 
             && Utils.isDebug(Config.Debug.Global))
             Here._.scene.restart({ isRestart: true });
 
-        me._gameLoop();
+        me._gameLoop(delta);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
@@ -63,10 +63,10 @@ export default class Game {
         });
     }
 
-    _gameLoop() {
+    _gameLoop(delta) {
         const me = this;
 
-        me._player.update();
+        me._player.update(delta);
 
         if (Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION))
             me._processSignalInput();

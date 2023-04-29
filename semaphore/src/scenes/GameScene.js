@@ -1,6 +1,7 @@
 import Animation from '../framework/Animation.js';
 import HereScene from '../framework/HereScene.js';
 import Utils from '../framework/Utils.js';
+import Consts from '../game/Consts.js';
 
 import Game from '../game/Game.js';
 
@@ -29,8 +30,9 @@ export default class GameScene extends HereScene {
         if (!me._isRestart)
             Utils.runLoadingBar();
 
-        Utils.loadImage('hand');
         Utils.loadImage('body');
+
+        Utils.loadSpriteSheet('hand', Consts.Unit.Normal * 4, Consts.Unit.Normal * 3);
     }
 
     create() {
@@ -41,11 +43,11 @@ export default class GameScene extends HereScene {
         me._game = new Game();
     }
 
-    update() {
-        super.update();
+    update(time, delta) {
+        super.update(time, delta);
 
         const me = this;
 
-        me._game.update();
+        me._game.update(delta);
     }
 }

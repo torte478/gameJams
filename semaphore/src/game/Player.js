@@ -6,13 +6,14 @@ import Utils from '../framework/Utils.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import SignalConfig from './SignalConfig.js';
+import Hand from './Hand.js';
 
 export default class Player {
 
-    /** @type {Phaser.GameObjects.Image} */
+    /** @type {Hand} */
     _leftHand;
 
-    /** @type {Phaser.GameObjects.Image} */
+    /** @type {Hand} */
     _rightHand;
 
     /** @type {Phaser.Input.Pointer} */
@@ -21,39 +22,31 @@ export default class Player {
     constructor() {
         const me = this;
 
-        const x = 35;
-        const y = -75;
-        const offset = 0;
-        const origin = new Phaser.Math.Vector2(0.1, 0.5);
-        
-
         const body = Here._.add
             .image(0, 0, 'body');
 
-        me._rightHand = Here._.add
-            .image(x + offset, y, 'hand')
-            .setOrigin(origin.x, origin.y);
-
-        me._leftHand = Here._.add
-            .image(-x + offset, y, 'hand')
-            .setFlipX(true)
-            .setOrigin(1 - origin.x, origin.y);
-
+        me._leftHand = new Hand(true);
+        me._rightHand = new Hand(false);
         me._mouse = Here._.input.activePointer;
     }
 
-    update() {
+    
+    /**
+     * @param {Number} delta 
+     */
+    update(delta) {
         const me = this;
 
-        me._setRotation(me._leftHand, me._mouse.leftButtonDown(), true);
-        me._setRotation(me._rightHand, me._mouse.rightButtonDown(), false);
+        const mouse = new Phaser.Math.Vector2(me._mouse.worldX, me._mouse.worldY);
+        me._leftHand.updateRotation(me._mouse.leftButtonDown(), mouse, delta);
+        me._rightHand.updateRotation(me._mouse.rightButtonDown(), mouse, delta);
     }
 
     getSignal() {
         const me = this;
 
-        const left = me._normalizeAngle(me._getNearestAngle(me._leftHand) - 180);
-        const right = me._normalizeAngle(me._getNearestAngle(me._rightHand));
+        const left = me._leftHand.getAngle();
+        const right = me._rightHand.getAngle();
 
         /** @type {SignalConfig} */
         const signal = Utils.firstOrNull(
@@ -69,68 +62,5 @@ export default class Player {
                 return key;
 
         throw `Unknown signal l(${left}) r(${right}): ${index}`;
-    }
-
-    _normalizeAngle(angle) {
-        let result = angle;
-        if (result == -180)
-            return 180;
-
-        while (result > 180)
-            result -= 360;
-        
-        while (result < -180)
-            result += 360
-
-        return result;
-    }
-
-    /**
-     * @param {Phaser.GameObjects.Image} hand 
-     * @param {Boolean} isMousePressed 
-     * @param {Boolean} isLeft 
-     */
-    _setRotation(hand, isMousePressed, isLeft) {
-        const me = this;
-
-        if (isMousePressed) {
-            let rotation = Phaser.Math.Angle.Between(
-                hand.x,
-                hand.y,
-                me._mouse.worldX,
-                me._mouse.worldY)
-
-            if (isLeft)
-                rotation += Math.PI;
-
-            hand.setRotation(rotation);
-        } else {
-            const nearestAngle = me._getNearestAngle(hand);
-            hand.setAngle(nearestAngle);
-        }
-    }
-
-    /**
-     * @param {Phaser.GameObjects.Image} hand 
-     * @returns {Number}
-     */
-    _getNearestAngle(hand) {
-        let nearestAngle = Enums.Angles.p0;
-        let minDiff = 999;
-        for (let key in Enums.Angles) {
-            const angle = Enums.Angles[key];
-            const diff = Math.abs(angle - hand.angle);
-
-            if (diff > minDiff)
-                continue;
-
-            minDiff = diff;
-            nearestAngle = angle;
-        }
-        
-        if (nearestAngle == Enums.Angles.n180)
-            return Enums.Angles.p180;
-
-        return nearestAngle;
     }
 }
