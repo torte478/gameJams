@@ -1,4 +1,5 @@
 import Here from '../framework/Here.js';
+import HereScene from '../framework/HereScene.js';
 import Utils from '../framework/Utils.js';
 import Phaser from '../lib/phaser.js';
 import Consts from './Consts.js';
@@ -8,11 +9,23 @@ export default class Seagull {
     /** @type {Phaser.GameObjects.Image} */
     _bigSprite;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    _smallSprite;
+
     /** @type {Boolean} */
     _isRunning;
 
     /** @type {Number} */
     _nextBigTimeMs;
+
+    /** @type {Phaser.Tweens.Tween} */
+    _smallAttackTween;
+
+    /** @type {Boolean} */
+    _isSmallAttacking;
+
+    /** @type {Boolean} */
+    _isAttackNow;
 
     constructor() {
         const me = this;
@@ -20,8 +33,15 @@ export default class Seagull {
         me._bigSprite = Here._.add.image(0, Consts.Viewport.Height, 'seagull_big')
             .setDepth(Consts.Depth.SEAGULL_BIG);
 
+        me._smallSprite = Here._.add
+            .sprite(- Consts.Viewport.Width/ 2 - 100, 0, 'seagul_small', 0)
+            .play('seagull_fly');
+
         me._isRunning = false;
         me._nextBigTimeMs = -1;
+        me._smallAttackTween = null;
+        me._isSmallAttacking = false;
+        me._isAttackNow = false;
     }
 
     start() {
@@ -34,29 +54,90 @@ export default class Seagull {
     stop() {
         const me = this;
         me._hideBig();
+        me._hideSmall();
+
 
         me._isRunning = false;
         me._nextBigTimeMs = -1;
+        me._isAttackNow = false;
     }
 
-    update() {
+    update(playerPos, playerAttackedCallback, context) {
         const me = this;
 
-        if (!me._isRunning || me._nextBigTimeMs < 0)
+        if (!me._isRunning)
             return;
 
-        const now = new Date().getTime();
-        if (now < me._nextBigTimeMs)
+        if (me._isAttackNow) {
+            if (me._isSmallAttacking)
+                me._processSmallAttack(playerPos, playerAttackedCallback, context);
+            else
+                me._processBigAttack();
+        } else {
+            // check start attack
+            const now = new Date().getTime();
+            if (now < me._nextBigTimeMs)
+                return;
+
+            me._nextBigTimeMs = -1;
+            me._isAttackNow = true;
+
+            me._isSmallAttacking = Utils.getRandom(0, 1, 0) == 0;
+            if (!me._isSmallAttacking) {
+                
+                me._bigSprite.setPosition(0, Consts.Viewport.Height);
+                Here._.tweens.add({
+                    targets: me._bigSprite,
+                    y: 0,
+                    ease: 'sine.out',
+                    duration: 1000
+                });
+            } else {
+                me._smallSprite
+                    .setPosition(-Consts.Viewport.Width / 2 - 100, 0)
+                    .setFlipX(false);
+
+                me._smallAttackTween = Here._.tweens.add({
+                    targets: me._smallSprite,
+                    x: 0,
+                    y: -100,
+                    duration: 1000,
+                    ease: 'sine.out',
+                    onComplete: () => {
+                        me._smallAttackTween = null;
+                    }
+                });
+            }
+        }    
+    }
+
+    _processBigAttack() {
+        const me = this;
+    }
+
+    _processSmallAttack(playerPos, playerAttackedCallback, context) {
+        const me = this;
+
+        if (me._smallAttackTween != null)
             return;
 
-        me._nextBigTimeMs = -1;
-        me._bigSprite.setPosition(0, Consts.Viewport.Height);
-        Here._.tweens.add({
-            targets: me._bigSprite,
-            y: 0,
-            ease: 'sine.out',
-            duration: 1000
-        });
+        me._smallSprite.setFlipX(playerPos.x < me._smallSprite.x);
+
+        me._smallAttackTween = Here._.tweens.add({
+            targets: me._smallSprite,
+            x: playerPos.x,
+            y: playerPos.y,
+            duration: 500,
+            delay: 500,
+            yoyo: true,
+            ease: 'sine.inout',
+            onYoyo: () => {
+                playerAttackedCallback.call(context);
+            },
+            onComplete: () => {
+                me._smallAttackTween = null;
+            }
+        })
     }
 
     _hideBig() {
@@ -73,9 +154,35 @@ export default class Seagull {
         });       
     }
 
+    _hideSmall() {
+        const me = this;
+
+        if (me._smallAttackTween != null) {
+            me._smallAttackTween.remove();
+            me._smallAttackTween = null;
+        }
+
+        me._smallSprite.setFlipX(true);
+        Here._.tweens.add({
+            targets: me._smallSprite,
+            x: -Consts.Viewport.Width / 2 - 100,
+            ease: 'sine.in',
+            duration: 1000,
+            onComplete: () => {
+                me._nextBigTimeMs = me._getNextBigTime()
+            }
+        });       
+     }
+
     _getNextBigTime() {
         const me = this;
 
         return new Date().getTime() + Utils.getRandom(1000, 5000, 1000);
+    }
+
+    _smallAttack() {
+        const me = this;
+
+        console.log('small attack');
     }
 }

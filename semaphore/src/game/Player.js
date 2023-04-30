@@ -88,6 +88,13 @@ export default class Player {
         throw `Unknown signal l(${left}) r(${right}): ${index}`;
     }
 
+    attack() {
+        const me = this;
+
+        me._leftHand.attack();
+        me._rightHand.attack();
+    }
+
     /**
      * @param {Boolean} left 
      * @param {Number} state 

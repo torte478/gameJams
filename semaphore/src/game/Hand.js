@@ -86,6 +86,12 @@ export default class Hand {
         me._sprite.setDepth(depth);
     }
 
+    attack() {
+        const me = this;
+
+        me._sprite.setAngle(Utils.getRandom(-179, 180));
+    }
+
     _rotateHand(delta) {
         const me = this;
 

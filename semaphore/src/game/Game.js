@@ -139,7 +139,10 @@ export default class Game {
         if (me._tape.checkTimeout())
             me._processSignalInput('UNKNOWN');
 
-        me._seagull.update(); 
+        me._seagull.update(
+            me._playerContainer.getPlayerPos(),
+            () => me._player.attack(),
+            me); 
     }
 
     _processSignalInput(signal) {
