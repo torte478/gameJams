@@ -162,7 +162,7 @@ export default class Game {
 
         me._delivery.init(me._currentLevelConfig.message);
 
-        me._score.init(me._currentLevelConfig.isMainMenu);
+        me._score.init(me._currentLevelConfig.isMainMenu, me._currentLevelConfig.bonusTimeMs);
         me._tape.init(
             me._currentLevelConfig.isMainMenu,
             me._currentLevelConfig.message[0].toUpperCase(),
@@ -251,14 +251,19 @@ export default class Game {
         if (!result.currentChanged) 
             return;
 
-        if (result.isLevelComplete) {
-            me._tutorialIndex = 6;
+        if (result.isLevelComplete && !!me._currentLevelConfig.isTutorial) {
+            me._tutorialIndex = 7;
             me._tutorialText.setText('use the mouse in unexpected situations!!!');
         }
 
-        if (result.to == '5' && !!me._currentLevelConfig.isTutorial && me._tutorialIndex == 4) {
-            me._tutorialIndex = 5;
+        if (result.to == '5' && !!me._currentLevelConfig.isTutorial && me._tutorialIndex == 5) {
+            me._tutorialIndex = 6;
             me._tutorialText.setText('use "SWITCH" signal to switch to numbers and back')
+        }
+
+        if (result.to == '_' && !!me._currentLevelConfig.isTutorial && me._tutorialIndex == 4) {
+            me._tutorialIndex = 5;
+            me._tutorialText.setText('use can "CANCEL" signal to delete previous signals')
         }
 
         if (!!me._currentLevelConfig.isTutorial && me._tutorialIndex == 3) {
@@ -291,6 +296,9 @@ export default class Game {
     _onRestartButtonClick() { 
         const me = this;
 
+        if (!!me._currentLevelConfig.isTutorial)
+            me._startTutorial();
+
         me._score.stopShowResult(false, me._restart, me);
     }
 
@@ -309,7 +317,7 @@ export default class Game {
 
         me._delivery.reset();
         me._tape.reset(me._delivery._current.toUpperCase());
-        me._seagull.start();
+        // me._seagull.start(); // TODO
         me._state = Enums.GameState.GAME;
     }
 

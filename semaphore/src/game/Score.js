@@ -82,12 +82,13 @@ export default class Score {
         me._maxTimeMs = 10 * 1000;
     }
 
-    init(isMainMenu) {
+    init(isMainMenu, bonusTime) {
         const me = this;
 
         me._scoreHistory = [];
         me._score = 0;
         me._startTimeMs = new Date().getTime();
+        me._maxTimeMs = bonusTime;
 
         if (!!isMainMenu)
             return;
@@ -160,7 +161,7 @@ export default class Score {
             ease: 'sine.out',
             onComplete: () => {
                 const timeBonus = Math.max(
-                    (me._maxTimeMs - (new Date().getTime() - me._startTimeMs)) / 100 | 0,
+                    (me._maxTimeMs - (new Date().getTime() - me._startTimeMs)) / 5000 | 0,
                     0);
 
                 me._menu.open(me._score, timeBonus, message);

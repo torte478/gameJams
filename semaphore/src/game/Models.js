@@ -98,6 +98,9 @@ export class LevelModel {
     /** @type {Number} */
     signalTimeout;
 
+    /** @type {Number} */
+    bonusTimeMs;
+
     /** @type {Boolean} */
     isSeagullPoop;
 }

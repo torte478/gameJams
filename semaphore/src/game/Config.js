@@ -24,12 +24,13 @@ export default class Config {
         },
         // 1 - tutorial
         {
-            message: 'tt', //'ludum_dare_53',
+            message: 'ludum_dare_53',
             isTutorial: true,
             sinXCoefs: { amplitude: 0 },
             sinYCoefs: { amplitude: 0 },
             sinAngleCoefs: { amplitude: 0 },
             signalTimeout: 120000,
+            bonusTimeMs: 120 * 1000,
         },
         // 2 - sea seagull little
         {
@@ -60,6 +61,7 @@ export default class Config {
                 start: 321
             },
             signalTimeout: 10000,
+            bonusTimeMs: 120 * 1000,
         },
         // 3 - seagull big
         {
@@ -90,6 +92,7 @@ export default class Config {
                 start: 321
             },
             signalTimeout: 10000,
+            bonusTimeMs: 1000,
         },
         // 4 - seagul poop
         {
@@ -120,6 +123,7 @@ export default class Config {
                 start: 321
             },
             signalTimeout: 10000,
+            bonusTimeMs: 1000,
         },
         // 5 - rain and lightning
         {
@@ -150,6 +154,7 @@ export default class Config {
                 start: 321
             },
             signalTimeout: 10000,
+            bonusTimeMs: 1000,
         },
         // 6 - final
         {
@@ -180,6 +185,7 @@ export default class Config {
                 start: 321
             },
             signalTimeout: 10000,
+            bonusTimeMs: 1000,
         }
     ];
 }
