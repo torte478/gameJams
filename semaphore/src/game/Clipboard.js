@@ -2,6 +2,7 @@ import Here from '../framework/Here.js';
 import Utils from '../framework/Utils.js';
 import Phaser from '../lib/phaser.js';
 import Consts from './Consts.js';
+import MyGraphics from './MyGraphics.js';
 
 export default class Clipboard {
 
@@ -39,7 +40,12 @@ export default class Clipboard {
             .setDepth(Consts.Depth.CLIPBOARD);
 
         me._nextTrashTimeMs = me._getNextTrashTime();
-        me._trashPool = Here._.add.group('trash');
+        me._trashPool = Here._.add.group({
+            createCallback: entity => {
+                entity.setInteractive();
+                entity.on('pointerdown', pointer => me._onSpotClick(pointer, entity), me);
+            }
+        });
         me._currentTrashCount = 0;
     }
 
@@ -50,7 +56,7 @@ export default class Clipboard {
             !me._toggleTween 
             && !me._isOpen 
             && new Date().getTime() > me._nextTrashTimeMs 
-            && me._currentTrashCount < 1;
+            && me._currentTrashCount < 20   ;
 
         if (addTrash) {
             const trash = me._trashPool
@@ -59,7 +65,10 @@ export default class Clipboard {
                     Utils.getRandom(-220, 245), 
                     'trash', 0)
                 .setAngle(Utils.getRandom(-179, 180))
-                .setFlipX(Utils.getRandom(0, 1) == 0);
+                .setFlipX(Utils.getRandom(0, 1) == 0)
+                .setVisible(true)
+                .setAlpha(1)
+                .setActive(true);
 
             me._container.add(trash);
 
@@ -101,5 +110,23 @@ export default class Clipboard {
         const me = this;
 
         return new Date().getTime() + Utils.getRandom(1000, 5000, 10)
+    }
+
+    /**
+     * @param {Phaser.Input.Pointer} pointer 
+     * @param {Phaser.GameObjects.Image} spot 
+     */
+    _onSpotClick(pointer, spot) {
+        const me = this;
+
+        MyGraphics.runMinusOne(
+            Utils.buildPoint(pointer.worldX, pointer.worldY)
+        );
+
+        const nextAlpha = Math.max(0, spot.alpha - 0.4);
+        if (nextAlpha <= 0)
+            me._trashPool.killAndHide(spot);
+        else
+            spot.setAlpha(nextAlpha); 
     }
 }

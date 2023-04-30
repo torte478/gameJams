@@ -79,7 +79,7 @@ export default class Game {
         me._clipboard = new Clipboard();
 
         me._seagull = new Seagull();
-        me._seagull.start(); 
+        // me._seagull.start();  
 
         new MyGraphics();
 
