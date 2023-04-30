@@ -72,7 +72,7 @@ export default class Game {
             Here._.scene.restart({ isRestart: true });
 
         me._gameLoop(time, delta);
-        me._score.updateGUI();
+        me._score.updateGUI(me._state);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;

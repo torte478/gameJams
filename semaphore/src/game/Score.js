@@ -3,6 +3,7 @@ import Phaser from '../lib/phaser.js';
 import Here from '../framework/Here.js';
 import Consts from './Consts.js';
 import { SignalProcessResult } from './Models.js';
+import Enums from './Enums.js';
 
 export default class Score { 
 
@@ -82,7 +83,10 @@ export default class Score {
             const value = me._scoreHistory[me._scoreHistory.length - 1];
             me._score -= value;
             me._scoreHistory.splice(me._scoreHistory.length - 1, 1);
-            me._runEffectTween(value, false);
+
+            if (value > 0)
+                me._runEffectTween(value, false);
+
             me._combo.reset();
             return;
         }
@@ -100,11 +104,17 @@ export default class Score {
         me._runEffectTween(value, true);
     }
 
-    updateGUI() {
+    /**
+     * @param {Number} state 
+     */
+    updateGUI(state) {
         const me = this;
 
-        me._scoreText.setText(
-            ` SCORE: ${me._score < 1000 ? '0' : ''}${me._score < 100 ? '0' : ''}${me._score < 10 ? '0' : ''}${me._score} TIME: 0:00 `);
+        if (state == Enums.GameState.GAME)
+            me._scoreText.setText(
+                ` SCORE: ${me._score < 1000 ? '0' : ''}${me._score < 100 ? '0' : ''}${me._score < 10 ? '0' : ''}${me._score} TIME: 0:00 `);
+        else if (state == Enums.GameState.LEVEL_COMPLETED)
+            me._menu.update();
     }
 
     startShowResult() {
@@ -174,7 +184,7 @@ class Combo {
     constructor() {
         const me = this;
 
-        me._durationMs = 2000;
+        me._durationMs = 4000;
         me._maxCounter = 5;
 
         me.reset();
@@ -215,24 +225,18 @@ class Menu {
     /** @type {Phaser.GameObjects.Text} */
     _timeBonusText;
 
+    /** @type {Number} */
+    _showStartTimeMs;
+
+    /** @type {Number} */
+    _timelineIndex;
+
     constructor() {
         const me = this;
 
-        me._totalText = Here._.add.text(
-            0, 
-            -300, 
-            'TOTAL: 0', 
-            {
-                fontFamily: 'Arial Black',
-                fontSize: 128,
-                color: '#F0E2E1'
-            })
-            .setOrigin(0.5)
-            .setStroke('#4A271E', 16);
-
         me._scoreText = Here._.add.text(
             0, 
-            -175, 
+            -350, 
             'SCORE: 0', 
             {
                 fontFamily: 'Arial Black',
@@ -240,11 +244,12 @@ class Menu {
                 color: '#F0E2E1'
             })
             .setOrigin(0.5)
-            .setStroke('#4A271E', 8);
+            .setStroke('#4A271E', 8)
+            .setVisible(false);
 
         me._timeBonusText = Here._.add.text(
             0, 
-            -75, 
+            -250, 
             'TIME BONUS: 0', 
             {
                 fontFamily: 'Arial Black',
@@ -252,7 +257,21 @@ class Menu {
                 color: '#F0E2E1'
             })
             .setOrigin(0.5)
-            .setStroke('#4A271E', 8);
+            .setStroke('#4A271E', 8)
+            .setVisible(false);
+
+        me._totalText = Here._.add.text(
+            0, 
+            -100, 
+            'TOTAL: 0', 
+            {
+                fontFamily: 'Arial Black',
+                fontSize: 128,
+                color: '#F0E2E1'
+            })
+            .setOrigin(0.5)
+            .setStroke('#4A271E', 16)
+            .setVisible(false);
 
         me._container = Here._.add.container(0, 0, [
             me._totalText,
@@ -271,11 +290,34 @@ class Menu {
     open(score, timeBonus) {
         const me = this;
 
-        // поменять местами: total вниз
-        // показываем элементы по очереди
-        // посчитать time bonus
-        // кнопки
-        // лента
-        throw 'not implemented';
+        me._scoreText.setText(`SCORE: ${score}`);
+        me._timeBonusText.setText(`TIME BONUS: ${timeBonus}`);
+        me._totalText.setText(`TOTAL: ${score + timeBonus}`);
+
+        me._scoreText.setVisible(true);
+
+        me._showStartTimeMs = new Date().getTime();
+        me._timelineIndex = 0;
     }
+
+    update() {
+        const me = this;
+
+        const elapsed = new Date().getTime() - me._showStartTimeMs;
+
+        if (me._timelineIndex == 0 && elapsed > 1000) {
+            me._timeBonusText.setVisible(true);
+            ++me._timelineIndex;
+        }
+
+        if (me._timelineIndex == 1 && elapsed > 2000) {
+            me._totalText.setVisible(true);
+            ++me._timelineIndex;
+        }
+    }
+
+    // посчитать time bonus
+    // кнопки
+    // лента
+    // рестарт
 }
