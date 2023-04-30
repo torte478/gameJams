@@ -39,6 +39,7 @@ export default class GameScene extends HereScene {
         Utils.loadImage('clipboard');
         Utils.loadImage('hints');
         Utils.loadImage('seagull_big');
+        Utils.loadImage('minus_one');
 
         Utils.loadSpriteSheet('signal_box', Consts.Unit.Normal * 3);
         Utils.loadSpriteSheet('hand', Consts.Unit.Normal * 4, Consts.Unit.Normal * 3);

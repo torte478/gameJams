@@ -1,8 +1,8 @@
 import Here from '../framework/Here.js';
-import HereScene from '../framework/HereScene.js';
 import Utils from '../framework/Utils.js';
 import Phaser from '../lib/phaser.js';
 import Consts from './Consts.js';
+import MyGraphics from './MyGraphics.js';
 
 export default class Seagull {
 
@@ -27,11 +27,23 @@ export default class Seagull {
     /** @type {Boolean} */
     _isAttackNow;
 
+    /** @type {Phaser.Time.TimerEvent} */
+    _damageTimeEvent;
+
+    /** @type {Number} */
+    _bigCurrentHp;
+
+    /** @type {Number} */
+    _bigMaxHp;
+
     constructor() {
         const me = this;
 
         me._bigSprite = Here._.add.image(0, Consts.Viewport.Height, 'seagull_big')
-            .setDepth(Consts.Depth.SEAGULL_BIG);
+            .setDepth(Consts.Depth.SEAGULL_BIG)
+            .setInteractive();
+
+        me._bigSprite.on('pointerdown', me._onBigSpriteClick, me);
 
         me._smallSprite = Here._.add
             .sprite(- Consts.Viewport.Width/ 2 - 100, 0, 'seagul_small', 0)
@@ -42,11 +54,14 @@ export default class Seagull {
         me._smallAttackTween = null;
         me._isSmallAttacking = false;
         me._isAttackNow = false;
+
+        me._bigMaxHp = 5;
     }
 
     start() {
         const me = this;
 
+        me._bigCurrentHp = me._bigMaxHp;
         me._nextBigTimeMs = me._getNextBigTime();
         me._isRunning = true;
     }
@@ -55,7 +70,6 @@ export default class Seagull {
         const me = this;
         me._hideBig();
         me._hideSmall();
-
 
         me._isRunning = false;
         me._nextBigTimeMs = -1;
@@ -82,7 +96,7 @@ export default class Seagull {
             me._nextBigTimeMs = -1;
             me._isAttackNow = true;
 
-            me._isSmallAttacking = Utils.getRandom(0, 1, 0) == 0;
+            me._isSmallAttacking = Utils.getRandom(0, 1, 1) == 0;
             if (!me._isSmallAttacking) {
                 
                 me._bigSprite.setPosition(0, Consts.Viewport.Height);
@@ -150,6 +164,9 @@ export default class Seagull {
             duration: 1000,
             onComplete: () => {
                 me._nextBigTimeMs = me._getNextBigTime()
+
+                me._bigCurrentHp = me._bigMaxHp;
+                me._isAttackNow = false;
             }
         });       
     }
@@ -179,10 +196,33 @@ export default class Seagull {
 
         return new Date().getTime() + Utils.getRandom(1000, 5000, 1000);
     }
-
-    _smallAttack() {
+    
+    _onBigSpriteClick(pointer) {
         const me = this;
 
-        console.log('small attack');
+        if (me._bigCurrentHp < 0)
+            return;
+
+        if (!!me._damageTimeEvent) {
+            me._damageTimeEvent.paused = true;
+            me._damageTimeEvent.destroy();
+        }
+
+        me._bigCurrentHp -= 1;
+        if (me._bigCurrentHp == 0)
+            me._hideBig();
+
+        MyGraphics.runMinusOne(
+            Utils.buildPoint(pointer.worldX, pointer.worldY)
+        );
+
+        me._bigSprite.setTint(0xff0000);
+        me._damageTimeEvent = Here._.time.delayedCall(
+            100,
+            () => {
+                me._bigSprite.clearTint();
+                me._damageTimeEvent = null;
+            }
+        );
     }
 }

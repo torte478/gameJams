@@ -15,6 +15,7 @@ import Score from './Score.js';
 import Rain from './Rain.js';
 import Clipboard from './Clipboard.js';
 import Seagull from './Seagull.js';
+import MyGraphics from './MyGraphics.js';
 
 export default class Game {
 
@@ -72,14 +73,15 @@ export default class Game {
         me._score = new Score(
             me._onRestartButtonClick,
             me._onRestartButtonClick, // TODO
-            me
-        );
+            me);
 
         me._rain = new Rain();
         me._clipboard = new Clipboard();
 
         me._seagull = new Seagull();
-        // me._seagull.start(); 
+        me._seagull.start(); 
+
+        new MyGraphics();
 
         me._state = Enums.GameState.GAME;
 
