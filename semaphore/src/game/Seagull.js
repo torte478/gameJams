@@ -36,6 +36,12 @@ export default class Seagull {
     /** @type {Number} */
     _bigMaxHp;
 
+    /** @type {Number} */
+    _smallCurrentHp;
+
+    /** @type {Number} */
+    _smallMaxHp;
+
     constructor() {
         const me = this;
 
@@ -46,8 +52,11 @@ export default class Seagull {
         me._bigSprite.on('pointerdown', me._onBigSpriteClick, me);
 
         me._smallSprite = Here._.add
-            .sprite(- Consts.Viewport.Width/ 2 - 100, 0, 'seagul_small', 0)
+            .sprite(- Consts.Viewport.Width/ 2 - 100, 0, 'seagull_small', 0)
+            .setInteractive()
             .play('seagull_fly');
+
+        me._smallSprite.on('pointerdown', me._onSmallSpriteClick, me);
 
         me._isRunning = false;
         me._nextBigTimeMs = -1;
@@ -56,12 +65,15 @@ export default class Seagull {
         me._isAttackNow = false;
 
         me._bigMaxHp = 5;
+        me._smallMaxHp = 3;
     }
 
     start() {
         const me = this;
 
         me._bigCurrentHp = me._bigMaxHp;
+        me._smallCurrentHp = me._smallMaxHp;
+
         me._nextBigTimeMs = me._getNextBigTime();
         me._isRunning = true;
     }
@@ -96,7 +108,7 @@ export default class Seagull {
             me._nextBigTimeMs = -1;
             me._isAttackNow = true;
 
-            me._isSmallAttacking = Utils.getRandom(0, 1, 1) == 0;
+            me._isSmallAttacking = Utils.getRandom(0, 1, 0) == 0;
             if (!me._isSmallAttacking) {
                 
                 me._bigSprite.setPosition(0, Consts.Viewport.Height);
@@ -132,7 +144,7 @@ export default class Seagull {
     _processSmallAttack(playerPos, playerAttackedCallback, context) {
         const me = this;
 
-        if (me._smallAttackTween != null)
+        if (!!me._smallAttackTween || me._smallCurrentHp <= 0)
             return;
 
         me._smallSprite.setFlipX(playerPos.x < me._smallSprite.x);
@@ -174,8 +186,8 @@ export default class Seagull {
     _hideSmall() {
         const me = this;
 
-        if (me._smallAttackTween != null) {
-            me._smallAttackTween.remove();
+        if (!!me._smallAttackTween) {
+            me._smallAttackTween.pause();
             me._smallAttackTween = null;
         }
 
@@ -186,7 +198,10 @@ export default class Seagull {
             ease: 'sine.in',
             duration: 1000,
             onComplete: () => {
-                me._nextBigTimeMs = me._getNextBigTime()
+                me._nextBigTimeMs = me._getNextBigTime();
+
+                me._smallCurrentHp = me._smallMaxHp;
+                me._isAttackNow = false;
             }
         });       
      }
@@ -195,6 +210,35 @@ export default class Seagull {
         const me = this;
 
         return new Date().getTime() + Utils.getRandom(1000, 5000, 1000);
+    }
+
+    _onSmallSpriteClick(pointer) {
+        const me = this;
+
+        if (me._smallCurrentHp < 0)
+            return;
+
+        if (!!me._damageTimeEvent) {
+            me._damageTimeEvent.paused = true;
+            me._damageTimeEvent.destroy();
+        }
+
+        me._smallCurrentHp -= 1;
+        if (me._smallCurrentHp == 0)
+            me._hideSmall();
+
+        MyGraphics.runMinusOne(
+            Utils.buildPoint(pointer.worldX, pointer.worldY)
+        );
+
+        me._smallSprite.setTint(0xff0000);
+        me._damageTimeEvent = Here._.time.delayedCall(
+            100,
+            () => {
+                me._smallSprite.clearTint();
+                me._damageTimeEvent = null;
+            }
+        );
     }
     
     _onBigSpriteClick(pointer) {
