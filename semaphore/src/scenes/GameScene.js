@@ -68,6 +68,9 @@ export default class GameScene extends HereScene {
         Utils.loadWav('send');
         Utils.loadWav('success');
         Utils.loadWav('switch');
+
+        Utils.loadMp3('idle');
+        Utils.loadMp3('ending');
     }
 
     create() {

@@ -506,6 +506,7 @@ class Menu {
             if (!!me._isFinal) {
                 //FINAL
 
+                
                 const jumpscare = Here._.add.image(0, 0, 'seagull_attack')
                     .setScale(0)
                     .setDepth(Consts.Depth.LIGHTNING + 10);
@@ -518,10 +519,12 @@ class Menu {
                     delay: 0, // 7000, TODO!!!
                     ease: 'sine.in',
                     onStart: () => {
+                        Here.Audio.stopAll();
                         Here.Audio.play('seagull_jumpscare');
                     },
                     onComplete: () => {
                         
+                        Here.Audio.play('ending', { loop: -1, volume: 0.5});
                         const text = 'Thank you for playing!\n\n' + `Total score: ${me._superTotalScore}`;
 
                             Here._.add.text(0, 0, text, {

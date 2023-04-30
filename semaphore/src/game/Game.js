@@ -120,6 +120,8 @@ export default class Game {
 
         me._startLevel();
 
+        Here.Audio.playIfNotPlaying('idle', { volume: 0.25, loop: -1});
+
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 28, backgroundColor: '#000' })
                 .setScrollFactor(0)
@@ -298,6 +300,7 @@ export default class Game {
         me._clipboard.hide();
         me._seagull.stop();
         me._state = Enums.GameState.LEVEL_COMPLETED;
+        me._rain.stop();
         me._score.startShowResult(me._delivery.getMessage());
     }
 
