@@ -73,7 +73,7 @@ export default class Tape {
         me._canCalcTimeout = true;
     }
 
-    init(isMainMenu, text) {
+    init(isMainMenu, text, timeout) {
         const me = this;
 
         me._isFirst = true;
@@ -81,6 +81,7 @@ export default class Tape {
         me._first.getGameObject().setAlpha(0);
         me._second.getGameObject().setAlpha(0);
         me._signalStartTimeMs = new Date().getTime();
+        me._signalTimeoutMs = timeout;
 
         if (!isMainMenu)
             me.reset(text);

@@ -94,4 +94,10 @@ export class LevelModel {
 
     /** @type {SinCoeffs} */
     sinAngleCoefs;
+
+    /** @type {Number} */
+    signalTimeout;
+
+    /** @type {Boolean} */
+    isSeagullPoop;
 }

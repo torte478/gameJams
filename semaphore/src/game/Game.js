@@ -165,7 +165,10 @@ export default class Game {
         me._score.init(me._currentLevelConfig.isMainMenu);
         me._tape.init(
             me._currentLevelConfig.isMainMenu,
-            me._currentLevelConfig.message[0].toUpperCase());
+            me._currentLevelConfig.message[0].toUpperCase(),
+            me._currentLevelConfig.signalTimeout);
+
+        me._clipboard.init(me._currentLevelConfig.isSeagullPoop);
 
         if (previousIndex == 0)
             Here._.tweens.add({
@@ -186,6 +189,16 @@ export default class Game {
                 }
             });
 
+        if (previousIndex == 1) {
+            me._tutorialText.setText('');
+            Here._.tweens.add({
+                targets: me._tutorialBackground,
+                x: -Consts.Viewport.Width,
+                duration: 1000,
+                ease: 'sine.in'
+            });
+        }
+
         me._state = Enums.GameState.GAME;
     }
 
@@ -203,8 +216,14 @@ export default class Game {
     _onGameLoop() {
         const me = this;
 
-        if (Here.Controls.isPressed(Enums.Keyboard.SECOND_ACTION))
+        if (Here.Controls.isPressed(Enums.Keyboard.SECOND_ACTION)) {
             me._clipboard.toggle();
+
+            if (!!me._currentLevelConfig.isTutorial && me._tutorialIndex == 1) {
+                me._tutorialIndex = 2;
+                me._tutorialText.setText('use LMB and RMB to move flags\nuse SPACE to send signal below')
+            }
+        }
             
         if (!me._currentLevelConfig.isMainMenu 
             && !me._delivery.isComplete() 
@@ -231,6 +250,26 @@ export default class Game {
 
         if (!result.currentChanged) 
             return;
+
+        if (result.isLevelComplete) {
+            me._tutorialIndex = 6;
+            me._tutorialText.setText('use the mouse in unexpected situations!!!');
+        }
+
+        if (result.to == '5' && !!me._currentLevelConfig.isTutorial && me._tutorialIndex == 4) {
+            me._tutorialIndex = 5;
+            me._tutorialText.setText('use "SWITCH" signal to switch to numbers and back')
+        }
+
+        if (!!me._currentLevelConfig.isTutorial && me._tutorialIndex == 3) {
+            me._tutorialIndex = 4;
+            me._tutorialText.setText('')
+        }
+
+        if (result.to == '_' && !!me._currentLevelConfig.isTutorial && me._tutorialIndex == 2) {
+            me._tutorialIndex = 3;
+            me._tutorialText.setText('this is "space" signal. hands down =)')
+        }
 
         me._tape.enqueueSignal(
             playerPos, 
@@ -363,12 +402,10 @@ export default class Game {
         return me._startLevel(previous);
     }
 
-
-
     _startTutorial() {
         const me = this;
 
-        me._tutorialText.setText('press TAB to open clipboard');
+        me._tutorialText.setText('press TAB to show/hide clipboard');
         me._tutorialIndex = 1;
     }
 }

@@ -24,6 +24,9 @@ export default class Clipboard {
     /** @type {Number} */
     _currentTrashCount;
 
+    /** @type {Boolean} */
+    _isPoop;
+
     constructor() {
         const me = this;
 
@@ -47,6 +50,13 @@ export default class Clipboard {
             }
         });
         me._currentTrashCount = 0;
+        me._isPoop = false;
+    }
+
+    init(isPoop) {
+        const me = this;
+
+        me._isPoop = !!isPoop;
     }
 
     toggle() {
@@ -56,7 +66,8 @@ export default class Clipboard {
             !me._toggleTween 
             && !me._isOpen 
             && new Date().getTime() > me._nextTrashTimeMs 
-            && me._currentTrashCount < 20   ;
+            && me._currentTrashCount < 20
+            && me._isPoop;
 
         if (addTrash) {
             const trash = me._trashPool
