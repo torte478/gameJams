@@ -307,7 +307,7 @@ export default class Game {
         if (!!me._currentLevelConfig.isTutorial)
             me._startTutorial();
 
-        me._score.stopShowResult(false, me._restart, me);
+        me._score.stopShowResult(false, me._restart, me, true);
     }
 
     _onNextButtonClick() {
@@ -317,7 +317,7 @@ export default class Game {
         me._currentLevelIndex = me._currentLevelIndex + 1;
         me._currentLevelConfig = Config.Levels[me._currentLevelIndex];
 
-        me._score.stopShowResult(false, () => me._startLevel(previous), me);
+        me._score.stopShowResult(false, () => me._startLevel(previous), me, false);
     }
 
     _restart() {

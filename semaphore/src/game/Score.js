@@ -32,8 +32,11 @@ export default class Score {
     /** @type {Numer} */
     _startTimeMs;
 
-    /** @type {Numer} */
+    /** @type {Number} */
     _maxTimeMs;
+
+    /** @type {Number} */
+    _totalScore;
 
     constructor(restartCallback, nextLevelCallback, callbackContext) {
         const me = this;
@@ -80,6 +83,7 @@ export default class Score {
         me._menu = new Menu(restartCallback, nextLevelCallback, callbackContext);
         me._startTimeMs = new Date().getTime();
         me._maxTimeMs = 10 * 1000;
+        me._totalScore = 0;
     }
 
     init(isMainMenu, bonusTime, isFinal) {
@@ -167,13 +171,21 @@ export default class Score {
                     (me._maxTimeMs - (new Date().getTime() - me._startTimeMs)) / 5000 | 0,
                     0);
 
-                me._menu.open(me._score, timeBonus, message);
+                me._totalScore += me._score + timeBonus;
+                me._lastTimeBonus = timeBonus;
+
+                me._menu.open(me._score, timeBonus, message, me._totalScore);
             }
         });
     }
 
-    stopShowResult(toMainMenu, callback, context) {
+    _lastTimeBonus = 0;
+
+    stopShowResult(toMainMenu, callback, context, isRestart) {
         const me = this;
+        
+        if (!!isRestart)
+            me._totalScore -= (me._score + me._lastTimeBonus);
 
         me._menu.hide(() => {
             Here._.tweens.add({
@@ -458,19 +470,19 @@ class Menu {
         me._isFinal = !!isFinal;
     }
 
-    open(score, timeBonus, message) {
+    open(score, timeBonus, message, superTotalScore) {
         const me = this;
 
         me._scoreText.setText(`SCORE: ${score}`);
         me._timeBonusText.setText(`TIME BONUS: ${timeBonus}`);
         me._totalText.setText(`TOTAL: ${score + timeBonus}`);
+        me._superTotalScore = superTotalScore;
 
         me._scoreText.setVisible(true);
 
         me._showStartTimeMs = new Date().getTime();
         me._timelineIndex = 0;
         me._wholeMessage = message;
-        me._wholeMessage = 'where_is_seagull'; // TODO!
     }
 
     update() {
@@ -503,10 +515,22 @@ class Menu {
                     scale: { from: 0, to: 40 },
                     y: 1200,
                     duration: 1000,
-                    delay: 7000,
+                    delay: 0, // 7000, TODO!!!
                     ease: 'sine.in',
                     onComplete: () => {
-                        console.log('game over');
+                        
+                        const text = 'Thank you for playing!\n\n' + `Total score: ${me._superTotalScore}`;
+
+                            Here._.add.text(0, 0, text, {
+                                fontFamily: 'Arial Black',
+                                fontSize: 64,
+                                color: '#F0E2E1',
+                                align: 'center'
+                            })
+                            .setOrigin(0.5)
+                            .setStroke('#4A271E', 16)
+                            .setDepth(Consts.Depth.MAX);
+
                     }
                 })
 

@@ -133,7 +133,7 @@ export default class Config {
         },
         // 5 - rain and lightning
         {
-            message: 'the_quick_brown_fox_jumps_over_the_lazy_dog',
+            message: 't',//he_quick_brown_fox_jumps_over_the_lazy_dog',
 
             sinYCoefs: {
                 min: -100,
