@@ -112,4 +112,7 @@ export class LevelModel {
 
     /** @type {Boolean} */
     isRain;
+
+    /** @type {Boolean} */
+    isFinal;
 }

@@ -82,13 +82,16 @@ export default class Score {
         me._maxTimeMs = 10 * 1000;
     }
 
-    init(isMainMenu, bonusTime) {
+    init(isMainMenu, bonusTime, isFinal) {
         const me = this;
 
         me._scoreHistory = [];
         me._score = 0;
         me._startTimeMs = new Date().getTime();
         me._maxTimeMs = bonusTime;
+        me._isFinal = isFinal;
+
+        me._menu.init(isFinal)
 
         if (!!isMainMenu)
             return;
@@ -184,7 +187,7 @@ export default class Score {
                     me._score = 0;
                     me._startTimeMs = new Date().getTime();
 
-                    me.init(toMainMenu);
+                    me.init(toMainMenu, me._maxTimeMs, me._isFinal);
 
                     if (!!callback)
                         callback.call(context);
@@ -449,6 +452,12 @@ class Menu {
         return me._container;
     }
 
+    init(isFinal) {
+        const me = this;
+        
+        me._isFinal = !!isFinal;
+    }
+
     open(score, timeBonus, message) {
         const me = this;
 
@@ -461,6 +470,7 @@ class Menu {
         me._showStartTimeMs = new Date().getTime();
         me._timelineIndex = 0;
         me._wholeMessage = message;
+        me._wholeMessage = 'where_is_seagull'; // TODO!
     }
 
     update() {
@@ -479,9 +489,31 @@ class Menu {
         }
 
         if (me._timelineIndex == 2 && elapsed > 3000) {
-            me._restartButton.getGameObject().setVisible(true);
-            me._nextLevelButton.getGameObject().setVisible(true);
             me._messageLabelText.setVisible(true);
+
+            if (!!me._isFinal) {
+                //FINAL
+
+                const jumpscare = Here._.add.image(0, 0, 'seagull_attack')
+                    .setScale(0)
+                    .setDepth(Consts.Depth.LIGHTNING + 10);
+
+                Here._.tweens.add({
+                    targets: jumpscare,
+                    scale: { from: 0, to: 40 },
+                    y: 1200,
+                    duration: 1000,
+                    delay: 7000,
+                    ease: 'sine.in',
+                    onComplete: () => {
+                        console.log('game over');
+                    }
+                })
+
+            } else {
+                me._nextLevelButton.getGameObject().setVisible(true);
+                me._restartButton.getGameObject().setVisible(true);
+            }
 
             ++me._timelineIndex;
         }

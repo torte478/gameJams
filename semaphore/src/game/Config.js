@@ -133,7 +133,7 @@ export default class Config {
         },
         // 5 - rain and lightning
         {
-            message: 'th',//e_quick_brown_fox_jumps_over_the_lazy_dog',
+            message: 'the_quick_brown_fox_jumps_over_the_lazy_dog',
 
             sinYCoefs: {
                 min: -100,
@@ -168,7 +168,7 @@ export default class Config {
         },
         // 6 - final
         {
-            message: 'where_is_seagull',
+            message: 'w',//here_is_seagull',
 
             sinYCoefs: {
                 min: 0,
@@ -199,7 +199,8 @@ export default class Config {
             isSeagullSmall: false,
             isSeagullBig: false,
             isSeagullPoop: false,
-            isRain: true
+            isRain: true,
+            isFinal: true
         }
     ];
 }

@@ -162,7 +162,10 @@ export default class Game {
 
         me._delivery.init(me._currentLevelConfig.message);
 
-        me._score.init(me._currentLevelConfig.isMainMenu, me._currentLevelConfig.bonusTimeMs);
+        me._score.init(
+            me._currentLevelConfig.isMainMenu, 
+            me._currentLevelConfig.bonusTimeMs,
+            me._currentLevelConfig.isFinal);
         me._tape.init(
             me._currentLevelConfig.isMainMenu,
             me._currentLevelConfig.message[0].toUpperCase(),
