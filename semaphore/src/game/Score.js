@@ -438,8 +438,6 @@ class Menu {
     open(score, timeBonus, message) {
         const me = this;
 
-        console.log(message);
-
         me._scoreText.setText(`SCORE: ${score}`);
         me._timeBonusText.setText(`TIME BONUS: ${timeBonus}`);
         me._totalText.setText(`TOTAL: ${score + timeBonus}`);

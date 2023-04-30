@@ -58,7 +58,7 @@ export default class Game {
         const waves = new Waves();
         me._delivery = new Delivery(
             // 'hello_world'
-            'ludum_dare_53'
+            'ludum_dare_53  '
             );
         me._player = new Player();
         me._playerContainer = new PlayerContainer(me._player);
@@ -100,9 +100,9 @@ export default class Game {
 
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
-                `inp: ${me._delivery._word} => ${me._delivery._current}\n` +
-                `cur: ${me._delivery._currentWord}\n` +
-                `scr: ${me._score._scoreHistory}`;
+                `que: ${me._tape._queue.size()}\n` +
+                `trg: ${me._delivery._word}\n` +
+                `cur: ${me._delivery._currentWord}`;
 
             me._log.setText(text);
         });
@@ -124,13 +124,10 @@ export default class Game {
 
         if (Here.Controls.isPressed(Enums.Keyboard.SECOND_ACTION))
             me._clipboard.toggle();
-
-        if (me._tape.isBusy())
-            return;
             
-        if (Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION)) {
+        if (!me._delivery.isComplete() && Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION)) {
             const signal = me._player.getSignal();    
-            return me._processSignalInput(signal);
+            me._processSignalInput(signal);
         }
 
         if (me._tape.checkTimeout())
@@ -146,7 +143,7 @@ export default class Game {
         if (!result.currentChanged) 
             return;
 
-        me._tape.processSignal(
+        me._tape.enqueueSignal(
             playerPos, 
             result, 
             () => me._score.processSignal(result), 

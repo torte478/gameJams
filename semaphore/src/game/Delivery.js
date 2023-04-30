@@ -113,6 +113,12 @@ export default class Delivery {
         return me._currentWord.toUpperCase();
     }
 
+    isComplete() {
+        const me = this;
+
+        return me._currentWord.length >= me._word.length;
+    }
+
     _runNumeralParticles(position) {
         const me = this;
 

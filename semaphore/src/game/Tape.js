@@ -6,6 +6,7 @@ import Consts from './Consts.js';
 import { SignalProcessResult } from './Models.js';
 
 import SignalBox from './SignalBox.js';
+import Queue from '../framework/Queue.js';
 
 export default class Tape {
 
@@ -27,21 +28,27 @@ export default class Tape {
     /** @type {Phaser.GameObjects.Text} */
     _inputEffect;
 
-    /** @type {Boolean} */
-    _isBusy;
-
     /** @type {Number} */
     _signalStartTimeMs;
 
     /** @type {Number} */
     _signalTimeoutMs;
 
+    /** @type {Queue} */
+    _queue;
+
+    /** @type {Phaser.Tweens.Tween} */
+    _inputEffectTween;
+
+    /** @type {Boolean} */
+    _canCalcTimeout;
+
     constructor(startSignal) {
         const me = this;
 
         me._xOffset = 300;
         me._y = 300;
-        me._signalTimeoutMs = 60000;
+        me._signalTimeoutMs = 10000;
 
         me._first = new SignalBox(me._y, startSignal);
         me._second = new SignalBox(me._y, 'A');
@@ -59,8 +66,10 @@ export default class Tape {
             .setDepth(Consts.Depth.GUI_EFFECTS)
             .setAlpha(0);
 
-        me._isBusy = false;
         me._signalStartTimeMs = new Date().getTime();
+
+        me._queue = new Queue();
+        me._canCalcTimeout = true;
     }
 
     /**
@@ -70,44 +79,65 @@ export default class Tape {
      * @param {Function} onEndCallback
      * @param {Object} context
      */
-    processSignal(playerPos, signal, onMiddleCallback, onEndCallback, context) {
+    enqueueSignal(playerPos, signal, onMiddleCallback, onEndCallback, context) {
         const me = this;
 
-        if (me._isBusy)
-            throw 'is busy!';
-
-        me._isBusy = true;
         if (!!signal.cancel)
             return me._processCancel(signal, onMiddleCallback, context);
+
+        me._queue.enqueue({
+            playerPos: playerPos,
+            signal: signal,
+            onMiddleCallback: onMiddleCallback,
+            onEndCallback: onEndCallback,
+            context: context
+        });
+        me._canCalcTimeout = false;
+
+        const delay = 500;
+
+        if (!!me._inputEffectTween)
+            me._inputEffectTween.remove();
 
         me._inputEffect
             .setPosition(playerPos.x, playerPos.y)
             .setText(signal.from)
             .setAlpha(0);
-            
-        Here._.tweens.add({
+
+        me._inputEffectTween = Here._.tweens.add({
             targets: me._inputEffect,
             x: 0,
             y: me._y,
             alpha: { from: 0, to: 1},
-            duration: 500 ,
+            duration: delay ,
             ease: 'sine.out',
             onComplete: () => {
-                if (!!onMiddleCallback)
-                    onMiddleCallback.call(context);
-
-                me._onSignalProcessed.call(me, signal, onEndCallback, context);
+                me._inputEffectTween = null;
+                me._inputEffect.setAlpha(0); 
             } 
         });
+
+        if (me._queue.size() == 1)
+            Here._.time.delayedCall(
+                delay,
+                () => me._processSignalQueue(),
+                me);
     }
 
-    /**
-     * @returns {Boolean}
-     */
-    isBusy() {
+    _processSignalQueue() {
         const me = this;
 
-        return me._isBusy;
+        if (me._queue.size() == 0) {
+            me._canCalcTimeout = true;
+            return;
+        }
+
+        /** @type {QueueItem} */
+        const item = me._queue.top();
+        if (!!item.onMiddleCallback)
+            item.onMiddleCallback.call(item.context);
+
+        me._onSignalProcessed.call(me, item.signal, item.onEndCallback, item.context);
     }
 
     /**
@@ -116,8 +146,8 @@ export default class Tape {
     checkTimeout() {
         const me = this;
 
-        if (me._isBusy)
-            throw 'is bussy!';
+        if (!me._canCalcTimeout)
+            return false;
 
         const elapsed = new Date().getTime() - me._signalStartTimeMs;
         const progress = elapsed / me._signalTimeoutMs;
@@ -136,14 +166,16 @@ export default class Tape {
         me._first.reset(text);
         me._second.getGameObject().setAlpha(0);
 
-        me._isBusy = true;
         Here._.tweens.add({
             targets: me._first.getGameObject(),
             x: 0,
             alpha: { from: 0, to: 1},
             duration: 1000,
             ease: 'sine.inout',
-            onComplete: () => me._free.call(me)
+            onComplete: () => { 
+                me._signalStartTimeMs = new Date().getTime();
+                me._canCalcTimeout = true;
+            }
         });
     }
 
@@ -152,6 +184,9 @@ export default class Tape {
      */
     _processCancel(signal, callback, context) {
         const me = this;
+
+        if (me._queue.size() > 0)
+            return me._queue.clear();
 
         if (!!callback)
             callback.call(context);
@@ -174,13 +209,16 @@ export default class Tape {
             .setX(-me._xOffset);
         nextBox.reset(signal.to);
 
+        me._signalStartTimeMs = new Date().getTime();
         Here._.tweens.add({
             targets: nextBox.getGameObject(),
             x: 0, 
             alpha: { from: 0, to: 1},
             duration: 1000,
             ease: 'sine.inout',
-            onComplete: () => me._free.call(me)
+            onComplete: () => {
+                me._signalStartTimeMs = new Date().getTime();
+            }
         });
     }
 
@@ -189,8 +227,6 @@ export default class Tape {
      */
     _onSignalProcessed(signal, callback, context) {
         const me = this
-
-        me._inputEffect.setAlpha(0);
 
         const currentBox = me._getCurrentBox();
         currentBox.setTint(signal.correct);
@@ -202,8 +238,10 @@ export default class Tape {
             duration: 1000,
             ease: 'sine.inout',
             onComplete: () => {
-                if (!!signal.isLevelComplete)
-                    me._free.call(me, callback, context);
+                if (!!signal.isLevelComplete)  {
+                    me._queue.clear();
+                    callback.call(context);
+                }
             }
         });
 
@@ -224,7 +262,11 @@ export default class Tape {
             alpha: { from: 0, to: 1},
             duration: 1000,
             ease: 'sine.inout',
-            onComplete: () => me._free.call(me)
+            onComplete: () => {
+                me._queue.dequeue();
+                me._signalStartTimeMs = new Date().getTime();
+                me._processSignalQueue()
+            } 
         });
     }
 
@@ -235,16 +277,23 @@ export default class Tape {
             ? me._first
             : me._second;
     }
+}
 
-    _free(callback, context) {
-        const me = this;
+class QueueItem {
 
-        me._isBusy = false;
-        me._signalStartTimeMs = new Date().getTime();
-        // TODO: sfx
+    /** @type {Phaser.Geom.Point} */
+    playerPos;
 
-        if (!!callback)
-            callback.call(context);
-    }
+    /** @type {SignalProcessResult} */
+    signal;
+
+    /** @type {Function} */
+    onMiddleCallback;
+
+    /** @type Function */
+    onEndCallback;
+
+    /** @type {Object} */
+    context;
 }
 
