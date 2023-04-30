@@ -4,6 +4,7 @@ import Here from '../framework/Here.js';
 import Consts from './Consts.js';
 import { SignalProcessResult } from './Models.js';
 import Enums from './Enums.js';
+import Button from '../framework/Button.js';
 
 export default class Score { 
 
@@ -124,7 +125,7 @@ export default class Score {
             me._menu.update();
     }
 
-    startShowResult() {
+    startShowResult(message) {
         const me = this;
 
         Here._.tweens.add({
@@ -144,7 +145,7 @@ export default class Score {
                     (me._maxTimeMs - (new Date().getTime() - me._startTimeMs)) / 100 | 0,
                     0);
 
-                me._menu.open(me._score, timeBonus);
+                me._menu.open(me._score, timeBonus, message);
             }
         });
     }
@@ -273,6 +274,18 @@ class Menu {
     /** @type {Number} */
     _timelineIndex;
 
+    /** @type {Button} */
+    _restartButton;
+
+    /** @type {Phaser.GameObjects.Text} */
+    _messageLabelText;
+
+    /** @type {Phaser.GameObjects.Text} */
+    _message;
+
+    /** @type {String} */
+    _wholeMessage;
+
     constructor() {
         const me = this;
 
@@ -304,7 +317,7 @@ class Menu {
 
         me._totalText = Here._.add.text(
             0, 
-            -100, 
+            -125, 
             'TOTAL: 0', 
             {
                 fontFamily: 'Arial Black',
@@ -315,10 +328,54 @@ class Menu {
             .setStroke('#4A271E', 16)
             .setVisible(false);
 
+        me._restartButton = new Button({
+            x: 0,
+            y: 300,
+            callback: () => { throw 'not implemented'},
+            text: 'RESTART',
+            textStyle: {
+                fontFamily: 'Arial Black',
+                fontSize: 64,
+                color: '#5AB7D4'
+            }
+        });
+        const restartButtonContainer = me._restartButton.getGameObject();
+        restartButtonContainer.setVisible(false);
+
+        me._messageLabelText = Here._.add.text(
+            0, 
+            5, 
+            'MESSAGE', 
+            {
+                fontFamily: 'Arial Black',
+                fontSize: 50,
+                color: '#F0E2E1'
+            })
+            .setOrigin(0.5)
+            .setStroke('#4A271E', 16)
+            .setVisible(false);
+
+        me._message = Here._.add.text(
+            0, 
+            65, 
+            '',
+            {
+                fontFamily: 'Monospace',
+                fontSize: 64,
+                color: '#F0E2E1',
+                wordWrap: { width: 900, useAdvancedWrap: true }
+            })
+            .setOrigin(0.5, 0)
+            .setStroke('#4A271E', 4)
+            .setVisible(true);
+
         me._container = Here._.add.container(0, 0, [
             me._totalText,
             me._scoreText,
-            me._timeBonusText
+            me._timeBonusText,
+            restartButtonContainer,
+            me._messageLabelText,
+            me._message
         ])
             .setDepth(Consts.Depth.GUI_MAX);
     }
@@ -329,7 +386,7 @@ class Menu {
         return me._container;
     }
 
-    open(score, timeBonus) {
+    open(score, timeBonus, message) {
         const me = this;
 
         me._scoreText.setText(`SCORE: ${score}`);
@@ -340,6 +397,7 @@ class Menu {
 
         me._showStartTimeMs = new Date().getTime();
         me._timelineIndex = 0;
+        me._wholeMessage = message;
     }
 
     update() {
@@ -356,10 +414,24 @@ class Menu {
             me._totalText.setVisible(true);
             ++me._timelineIndex;
         }
+
+        if (me._timelineIndex == 2 && elapsed > 3000) {
+            me._restartButton.getGameObject().setVisible(true);
+            me._messageLabelText.setVisible(true);
+
+            ++me._timelineIndex;
+        }
+
+        if (me._timelineIndex == 3) {
+            const count = ((elapsed - 3000) / 250 )| 0;
+            const oldLength = me._message.text.length;
+            if (count > oldLength)
+                me._message.setText(me._message.text + me._wholeMessage[oldLength]);
+
+            if (me._message.text.length >= me._wholeMessage.length)
+                ++me._timelineIndex;
+        }
     }
 
-    // посчитать time bonus
-    // кнопки
-    // лента
     // рестарт
 }

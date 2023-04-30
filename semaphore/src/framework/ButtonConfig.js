@@ -6,15 +6,6 @@ export default class ButtonConfig {
     /** @type {Number} */
     y;
 
-    /** @type {String} */
-    texture;
-
-    /** @type {Number} */
-    frameIdle;
-
-    /** @type {Number} */
-    frameSelected;
-
     /** @type {Function} */
     callback;
 

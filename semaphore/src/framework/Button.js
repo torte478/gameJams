@@ -1,4 +1,4 @@
-import Phaser from '../../lib/phaser.js';
+import Phaser from '../lib/phaser.js';
 import Here from './Here.js';
 
 import ButtonConfig from "./ButtonConfig.js";
@@ -8,14 +8,14 @@ export default class Button {
     /** @type {ButtonConfig} */
     _config;
 
-    /** @type {Phaser.GameObjects.Container} */
-    _container;
-
-    /** @type {Phaser.GameObjects.Sprite} */
-    _sprite;
-
     /** @type {Boolean} */
     _isClicked;
+
+    /** @type {Phaser.GameObjects.Text} */
+    _text;
+
+    /** @type {Phaser.GameObjects.Container} */
+    _container;
 
     /**
      * @param {ButtonConfig} config 
@@ -26,24 +26,26 @@ export default class Button {
         me._config = config;
         me._isClicked = false;
 
-        me._sprite = Here._.add.sprite(0, 0, config.texture, config.frameIdle);
-        const children = [ me._sprite ];
+        if (!config.text)
+            throw 'text undefined';
 
-        if (!!config.text) {
-            const text = Here._.add.text(0, 0, config.text, config.textStyle)
-                .setOrigin(0.5, 0.5);
+        me._text = Here._.add.text(0, 0, config.text, config.textStyle)
+            .setOrigin(0.5, 0.5);
 
-            children.push(text);
-        }
-
-        var bounds = me._sprite.getBounds();
-        me._container = Here._.add.container(config.x, config.y, children)
+        var bounds = me._text.getBounds();
+        me._container = Here._.add.container(config.x, config.y, [me._text])
             .setSize(bounds.width, bounds.height)
             .setInteractive();
 
         me._container.on('pointerdown', me._onButtonClick, me);
         me._container.on('pointerover', me._select, me);
         me._container.on('pointerout', me._unselect, me);
+    }
+
+    getGameObject() {
+        const me = this;
+
+        return me._container;
     }
 
     _onButtonClick() {
@@ -71,14 +73,12 @@ export default class Button {
     _select() {
         const me = this;
 
-        if (me._config.frameSelected !== null)
-            me._sprite.setFrame(me._config.frameSelected);
+        me._container.setScale(1.25);
     }
 
     _unselect() {
         const me = this;
 
-        if (me._config.frameIdle !== null)
-            me._sprite.setFrame(me._config.frameIdle);
+        me._container.setScale(1);
     }
 }

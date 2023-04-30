@@ -98,6 +98,12 @@ export default class Delivery {
             correct: correct };
     }
 
+    getMessage() {
+        const me = this;
+
+        return me._currentWord.toUpperCase();
+    }
+
     _runNumeralParticles(position) {
         const me = this;
 

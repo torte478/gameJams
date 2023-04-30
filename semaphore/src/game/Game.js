@@ -48,7 +48,7 @@ export default class Game {
         Here._.input.mouse.disableContextMenu();
 
         const waves = new Waves();
-        me._delivery = new Delivery('y');
+        me._delivery = new Delivery('hello_world');
         me._player = new Player();
         me._playerContainer = new PlayerContainer(me._player);
 
@@ -134,6 +134,6 @@ export default class Game {
         const me = this;
 
         me._state = Enums.GameState.LEVEL_COMPLETED;
-        me._score.startShowResult();
+        me._score.startShowResult(me._delivery.getMessage());
     }
 }
