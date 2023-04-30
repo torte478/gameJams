@@ -19,7 +19,8 @@ export default class Consts {
         GUI_TAPE: 1000,
         GUI_EFFECTS: 2000,
         GUI_MAX: 5000,
-        CLIPBOARD: 10000, 
+        CLIPBOARD: 10000,
+        SEAGULL_BIG: 15000, 
         LIGHTNING: 20000,
         MAX: 100000
     };

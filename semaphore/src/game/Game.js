@@ -14,6 +14,7 @@ import Tape from './Tape.js';
 import Score from './Score.js';
 import Rain from './Rain.js';
 import Clipboard from './Clipboard.js';
+import Seagull from './Seagull.js';
 
 export default class Game {
 
@@ -44,6 +45,9 @@ export default class Game {
     /** @type {Clipboard} */
     _clipboard;
 
+    /** @type {Seagull} */
+    _seagull;
+
     constructor() {
         const me = this;
 
@@ -58,7 +62,7 @@ export default class Game {
         const waves = new Waves();
         me._delivery = new Delivery(
             // 'hello_world'
-            'ludum_dare_53  '
+            'yy'
             );
         me._player = new Player();
         me._playerContainer = new PlayerContainer(me._player);
@@ -72,8 +76,10 @@ export default class Game {
         );
 
         me._rain = new Rain();
-        
         me._clipboard = new Clipboard();
+
+        me._seagull = new Seagull();
+        me._seagull.start();
 
         me._state = Enums.GameState.GAME;
 
@@ -131,7 +137,9 @@ export default class Game {
         }
 
         if (me._tape.checkTimeout())
-            return me._processSignalInput('UNKNOWN');
+            me._processSignalInput('UNKNOWN');
+
+        me._seagull.update(); 
     }
 
     _processSignalInput(signal) {
@@ -155,6 +163,7 @@ export default class Game {
         const me = this;
 
         me._clipboard.hide();
+        me._seagull.stop();
         me._state = Enums.GameState.LEVEL_COMPLETED;
         me._score.startShowResult(me._delivery.getMessage());
     }
@@ -170,6 +179,7 @@ export default class Game {
 
         me._delivery.reset();
         me._tape.reset(me._delivery._current.toUpperCase());
+        me._seagull.start();
         me._state = Enums.GameState.GAME;
     }
 }

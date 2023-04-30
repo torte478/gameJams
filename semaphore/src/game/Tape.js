@@ -290,7 +290,7 @@ class QueueItem {
     /** @type {Function} */
     onMiddleCallback;
 
-    /** @type Function */
+    /** @type {Function} */
     onEndCallback;
 
     /** @type {Object} */
