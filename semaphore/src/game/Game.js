@@ -86,7 +86,7 @@ export default class Game {
 
         me._score = new Score(
             me._onRestartButtonClick,
-            me._onRestartButtonClick, // TODO
+            me._onNextButtonClick, // TODO
             me);
 
         me._rain = new Rain();
@@ -136,13 +136,13 @@ export default class Game {
     _startLevel(previousIndex) {
         const me = this;
 
-        const containerPosition = me._playerContainer.init(
+        me._playerContainer.init(
             me._currentLevelIndex,
             me._currentLevelConfig.sinXCoefs,
             me._currentLevelConfig.sinYCoefs,
             me._currentLevelConfig.sinAngleCoefs);
 
-        console.log(containerPosition);
+        me._delivery.init(me._currentLevelConfig.message);
 
         me._score.init(me._currentLevelConfig.isMainMenu);
         me._tape.init(
@@ -156,6 +156,8 @@ export default class Game {
                 duration: 1000,
                 ease: 'sine.in'
             });
+
+        me._state = Enums.GameState.GAME;
     }
 
     _gameLoop(time, delta) {
@@ -163,7 +165,7 @@ export default class Game {
 
         const offset = me._playerContainer.getOffset();
         me._player.update(delta, offset, me._state);
-        me._playerContainer.update(time);
+        me._playerContainer.update();
 
         if (me._state == Enums.GameState.GAME)
             return me._onGameLoop(time, delta);
@@ -221,7 +223,17 @@ export default class Game {
     _onRestartButtonClick() { 
         const me = this;
 
-        me._score.stopShowResult(me._restart, me);
+        me._score.stopShowResult(false, me._restart, me);
+    }
+
+    _onNextButtonClick() {
+        const me = this;
+
+        const previous = me._currentLevelIndex;
+        me._currentLevelIndex = me._currentLevelIndex + 1;
+        me._currentLevelConfig = Config.Levels[me._currentLevelIndex];
+
+        me._score.stopShowResult(false, () => me._startLevel(previous), me);
     }
 
     _restart() {
@@ -238,22 +250,74 @@ export default class Game {
 
         const background = Here._.add.image(0, 0, 'main_menu');
 
-        const firstButton = new Button({
-            x: -300,
+        const style = {
+            fontFamily: 'Arial Black',
+            fontSize: 64,
+            color: '#d6d415'
+        };
+
+        const button1 = new Button({
+            x: -250,
             y: -200,
             text: '1',
-            textStyle: {
-                fontFamily: 'Arial Black',
-                fontSize: 64,
-                color: '#d6d415'
-            },
+            textStyle: style,
             callback: () => me._selectLevel(1),
+            callbackScope: me
+        });
+
+        const button2 = new Button({
+            x: -300,
+            y: 0,
+            text: '2',
+            textStyle: style,
+            callback: () => me._selectLevel(2),
+            callbackScope: me
+        });
+
+        const button3 = new Button({
+            x: -250,
+            y: 200,
+            text: '3',
+            textStyle: style,
+            callback: () => me._selectLevel(3),
+            callbackScope: me
+        });
+
+        const button4 = new Button({
+            x: 250,
+            y: -200,
+            text: '4',
+            textStyle: style,
+            callback: () => me._selectLevel(4),
+            callbackScope: me
+        });
+
+        const button5 = new Button({
+            x: 300,
+            y: 0,
+            text: '5',
+            textStyle: style,
+            callback: () => me._selectLevel(5),
+            callbackScope: me
+        });
+
+        const button6 = new Button({
+            x: 250,
+            y: 200,
+            text: '6',
+            textStyle: style,
+            callback: () => me._selectLevel(6),
             callbackScope: me
         });
 
         const container = Here._.add.container(0, 0, [
             background,
-            firstButton.getGameObject()
+            button1.getGameObject(),
+            button2.getGameObject(),
+            button3.getGameObject(),
+            button4.getGameObject(),
+            button5.getGameObject(),
+            button6.getGameObject()
         ])
             .setDepth(Consts.Depth.BACKGROUND);
 

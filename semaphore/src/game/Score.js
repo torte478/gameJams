@@ -192,8 +192,6 @@ export default class Score {
         }, me);
     }
 
-
-
     _buildScoreText() {
         const me = this;
 

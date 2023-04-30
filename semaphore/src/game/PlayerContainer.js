@@ -28,6 +28,9 @@ export default class PlayerContainer {
     /** @type {Number} */
     _startTime;
 
+    /** @type {Boolean} */
+    _isCalculating;
+
     /**
      * @param {Player} player 
      */
@@ -43,6 +46,8 @@ export default class PlayerContainer {
             me._shipFrontSprite
         ])
             .setDepth(Consts.Depth.PLAYER_CONTAINER);
+
+        me._isCalculating = false;
     }
 
     /**
@@ -63,13 +68,32 @@ export default class PlayerContainer {
         me._shipBackSprite.setVisible(isShipVisible);
         me._shipFrontSprite.setVisible(isShipVisible);
 
-        me._startTime = 0;
+        const position = me._getPositionAtTime(0);
 
-        return me._getPositionAtTime(0);
+        if (levelIndex == 0)
+            return;
+
+        me._isCalculating = false;
+
+        Here._.add.tween({
+            targets: me._container,
+            x: position.x,
+            y: position.y,
+            angle: position.angle,
+            duration: 1000,
+
+            onComplete: () => {
+                me._isCalculating = true;
+                me._startTime = new Date().getTime();
+            }
+        });
     }
 
-    update(time) {
+    update() {
         const me = this;
+
+        if (!me._isCalculating)
+            return;
 
         const position = me._getPositionAtTime(
             new Date().getTime() - me._startTime

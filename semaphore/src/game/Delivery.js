@@ -98,6 +98,13 @@ export default class Delivery {
             correct: correct };
     }
 
+    init(message) {
+        const me = this;
+
+        me._word = message;
+        me.reset();
+    }
+
     reset() {
         const me = this;
 
