@@ -28,6 +28,12 @@ export default class Score {
     /** @type {Menu} */
     _menu;
 
+    /** @type {Numer} */
+    _startTimeMs;
+
+    /** @type {Numer} */
+    _maxTimeMs;
+
     constructor() {
         const me = this;
 
@@ -71,6 +77,8 @@ export default class Score {
             .setDepth(Consts.Depth.GUI_MAX);
 
         me._menu = new Menu();
+        me._startTimeMs = new Date().getTime();
+        me._maxTimeMs = 10 * 1000;
     }
 
     /**
@@ -111,8 +119,7 @@ export default class Score {
         const me = this;
 
         if (state == Enums.GameState.GAME)
-            me._scoreText.setText(
-                ` SCORE: ${me._score < 1000 ? '0' : ''}${me._score < 100 ? '0' : ''}${me._score < 10 ? '0' : ''}${me._score} TIME: 0:00 `);
+            me._scoreText.setText(me._buildScoreText());
         else if (state == Enums.GameState.LEVEL_COMPLETED)
             me._menu.update();
     }
@@ -133,10 +140,45 @@ export default class Score {
             duration: 1000,
             ease: 'sine.out',
             onComplete: () => {
-                const timeBonus = 0; // TODO
+                const timeBonus = Math.max(
+                    (me._maxTimeMs - (new Date().getTime() - me._startTimeMs)) / 100 | 0,
+                    0);
+
                 me._menu.open(me._score, timeBonus);
             }
         });
+    }
+
+    _buildScoreText() {
+        const me = this;
+
+        const res = [];
+        res.push(' SCORE ');
+
+        if (me._score < 1000)
+            res.push('0');
+
+        if (me._score < 100)
+            res.push('0');
+
+        if (me._score < 10)
+            res.push('0');
+
+        res.push(me._score.toString());
+
+        res.push('   TIME ');
+
+        const time = new Date().getTime() - me._startTimeMs;
+        res.push(Math.floor(time / 60000).toString());
+        res.push(':');
+
+        const seconds = (time / 1000) % 60 | 0;
+        if (seconds < 10)
+            res.push('0');
+        res.push(seconds.toString());
+        res.push(' ');
+
+        return res.join('');
     }
 
     _runEffectTween(value, success) {
@@ -236,7 +278,7 @@ class Menu {
 
         me._scoreText = Here._.add.text(
             0, 
-            -350, 
+            -335, 
             'SCORE: 0', 
             {
                 fontFamily: 'Arial Black',
