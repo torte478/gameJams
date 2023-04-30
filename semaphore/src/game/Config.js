@@ -34,7 +34,7 @@ export default class Config {
         },
         // 2 - sea seagull little
         {
-            message: 'as' ,//'torte_478_the_best',
+            message: '30_april_2023',
 
             sinYCoefs: {
                 min: -25,
@@ -74,7 +74,7 @@ export default class Config {
                 a: 1,
                 b: 1.66,
                 amplitude: 1,
-                start: 0
+                start: 4
             },
             sinXCoefs: {
                 min: -35,
@@ -82,7 +82,7 @@ export default class Config {
                 a: 1,
                 b: 1.33,
                 amplitude: 1,
-                start: 123
+                start: 777
             },
             sinAngleCoefs: {
                 min: -5,
@@ -90,7 +90,7 @@ export default class Config {
                 a: 1,
                 b: 1.72,
                 amplitude: 1,
-                start: 321
+                start: 423
             },
             signalTimeout: 15 * 1000,
             bonusTimeMs: 3 * 60 * 1000,
@@ -99,36 +99,37 @@ export default class Config {
         },
         // 4 - seagul poop
         {
-            message: 'yy',
+            message: 'lost_4_8_15_16_23_42',
 
             sinYCoefs: {
-                min: 0,
-                max: 200,
-                a: 1,
-                b: 1.66,
-                amplitude: 1,
-                start: 0
-            },
-            sinXCoefs: {
                 min: -100,
                 max: 100,
                 a: 1,
-                b: 1.33,
+                b: 1.66,
                 amplitude: 1,
-                start: 123
+                start: 42
             },
-            sinAngleCoefs: {
-                min: -30,
-                max: 30,
+            sinXCoefs: {
+                min: -50,
+                max: 50,
                 a: 1,
-                b: 1.72,
+                b: 1.33,
                 amplitude: 1,
                 start: 321
             },
-            signalTimeout: 10000,
-            bonusTimeMs: 1000,
+            sinAngleCoefs: {
+                min: -12,
+                max: 12,
+                a: 1,
+                b: 1.72,
+                amplitude: 1,
+                start: 123
+            },
+            signalTimeout: 10 * 1000,
+            bonusTimeMs: 3 * 60 * 1000,
             isSeagullSmall: true,
             isSeagullBig: true,
+            isSeagullPoop: true,
         },
         // 5 - rain and lightning
         {
@@ -162,6 +163,7 @@ export default class Config {
             bonusTimeMs: 1000,
             isSeagullSmall: true,
             isSeagullBig: true,
+            isSeagullPoop: true,
         },
         // 6 - final
         {
@@ -195,6 +197,7 @@ export default class Config {
             bonusTimeMs: 1000,
             isSeagullSmall: true,
             isSeagullBig: true,
+            isSeagullPoop: true,
         }
     ];
 }
