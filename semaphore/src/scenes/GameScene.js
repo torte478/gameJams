@@ -37,7 +37,7 @@ export default class GameScene extends HereScene {
         Utils.loadImage('fade');
         Utils.loadImage('fade_white');
         Utils.loadImage('clipboard');
-        Utils.loadImage('legend');
+        Utils.loadImage('hints');
 
         Utils.loadSpriteSheet('signal_box', Consts.Unit.Normal * 3);
         Utils.loadSpriteSheet('hand', Consts.Unit.Normal * 4, Consts.Unit.Normal * 3);

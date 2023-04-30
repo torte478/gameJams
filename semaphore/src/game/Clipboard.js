@@ -20,7 +20,7 @@ export default class Clipboard {
         me._isOpen = false;
 
         const clipboard = Here._.add.image(0, 0, 'clipboard');
-        const legend = Here._.add.image(0, 85, 'legend')
+        const legend = Here._.add.image(0, 85, 'hints')
             .setAngle(3);
 
         me._container = Here._.add.container(0, Consts.Viewport.Height, [ 

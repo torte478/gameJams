@@ -58,7 +58,7 @@ export default class Game {
         const waves = new Waves();
         me._delivery = new Delivery(
             // 'hello_world'
-            'y'
+            'ludum_dare_53'
             );
         me._player = new Player();
         me._playerContainer = new PlayerContainer(me._player);
