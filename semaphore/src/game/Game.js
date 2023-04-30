@@ -169,6 +169,9 @@ export default class Game {
             me._currentLevelConfig.signalTimeout);
 
         me._clipboard.init(me._currentLevelConfig.isSeagullPoop);
+        me._seagull.start(
+            me._currentLevelConfig.isSeagullSmall,
+            me._currentLevelConfig.isSeagullBig);
 
         if (previousIndex == 0)
             Here._.tweens.add({
@@ -317,7 +320,11 @@ export default class Game {
 
         me._delivery.reset();
         me._tape.reset(me._delivery._current.toUpperCase());
-        // me._seagull.start(); // TODO
+
+        me._seagull.start(
+            me._currentLevelConfig.isSeagullSmall,
+            me._currentLevelConfig.isSeagullBig);
+
         me._state = Enums.GameState.GAME;
     }
 

@@ -102,5 +102,11 @@ export class LevelModel {
     bonusTimeMs;
 
     /** @type {Boolean} */
+    isSeagullSmall;
+
+    /** @type {Boolean} */
+    isSeagullBig;
+
+    /** @type {Boolean} */
     isSeagullPoop;
 }

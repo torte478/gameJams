@@ -42,6 +42,12 @@ export default class Seagull {
     /** @type {Number} */
     _smallMaxHp;
 
+    /** @type {Boolean} */
+    _canSmallSeagulAttack;
+
+    /** @type {Boolean} */
+    _canBigSeagulAttack;
+
     constructor() {
         const me = this;
 
@@ -53,6 +59,7 @@ export default class Seagull {
 
         me._smallSprite = Here._.add
             .sprite(- Consts.Viewport.Width/ 2 - 100, 0, 'seagull_small', 0)
+            .setDepth(Consts.Depth.SEAGUL_SMALL)
             .setInteractive()
             .play('seagull_fly');
 
@@ -68,8 +75,14 @@ export default class Seagull {
         me._smallMaxHp = 3;
     }
 
-    start() {
+    start(canSmallSeagulAttack, canBigSeagulAttack) {
         const me = this;
+
+        me._canSmallSeagulAttack = !!canSmallSeagulAttack;
+        me._canBigSeagulAttack = !!canBigSeagulAttack;
+
+        if (!me._canBigSeagulAttack && !me._canSmallSeagulAttack)
+            return;
 
         me._bigCurrentHp = me._bigMaxHp;
         me._smallCurrentHp = me._smallMaxHp;
@@ -108,7 +121,7 @@ export default class Seagull {
             me._nextBigTimeMs = -1;
             me._isAttackNow = true;
 
-            me._isSmallAttacking = Utils.getRandom(0, 1, 0) == 0;
+            me._isSmallAttacking = !me._canBigSeagulAttack || Utils.getRandom(0, 1, 0) == 0;
             if (!me._isSmallAttacking) {
                 
                 me._bigSprite.setPosition(0, Consts.Viewport.Height);
@@ -209,7 +222,7 @@ export default class Seagull {
     _getNextBigTime() {
         const me = this;
 
-        return new Date().getTime() + Utils.getRandom(1000, 5000, 1000);
+        return new Date().getTime() + Utils.getRandom(5000, 20000, 1000);
     }
 
     _onSmallSpriteClick(pointer) {

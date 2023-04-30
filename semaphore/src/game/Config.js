@@ -34,7 +34,7 @@ export default class Config {
         },
         // 2 - sea seagull little
         {
-            message: 'rr',
+            message: 'torte_478_the_best',
 
             sinYCoefs: {
                 min: -25,
@@ -60,8 +60,9 @@ export default class Config {
                 amplitude: 1,
                 start: 321
             },
-            signalTimeout: 10000,
-            bonusTimeMs: 120 * 1000,
+            signalTimeout: 30 * 1000,
+            bonusTimeMs: 4 * 60 * 1000,
+            isSeagullSmall: true,
         },
         // 3 - seagull big
         {
@@ -93,6 +94,8 @@ export default class Config {
             },
             signalTimeout: 10000,
             bonusTimeMs: 1000,
+            isSeagullSmall: true,
+            isSeagullBig: true,
         },
         // 4 - seagul poop
         {
@@ -124,6 +127,8 @@ export default class Config {
             },
             signalTimeout: 10000,
             bonusTimeMs: 1000,
+            isSeagullSmall: true,
+            isSeagullBig: true,
         },
         // 5 - rain and lightning
         {
@@ -155,6 +160,8 @@ export default class Config {
             },
             signalTimeout: 10000,
             bonusTimeMs: 1000,
+            isSeagullSmall: true,
+            isSeagullBig: true,
         },
         // 6 - final
         {
@@ -186,6 +193,8 @@ export default class Config {
             },
             signalTimeout: 10000,
             bonusTimeMs: 1000,
+            isSeagullSmall: true,
+            isSeagullBig: true,
         }
     ];
 }

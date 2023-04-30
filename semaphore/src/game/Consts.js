@@ -17,6 +17,7 @@ export default class Consts {
     static Depth = {
         BACKGROUND: 0,
         PLAYER_CONTAINER: 250,
+        SEAGUL_SMALL: 400,
         RAIN: 500,
         GUI_TAPE: 1000,
         GUI_EFFECTS: 2000,
