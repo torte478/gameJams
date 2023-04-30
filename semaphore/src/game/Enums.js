@@ -3,8 +3,9 @@ export default class Enums {
     static Keyboard = {
         MAIN_ACTION: 0,
         SECOND_ACTION: 1,
+        DEBUG: 2,
 
-        RESTART: 2
+        RESTART: 3
     }
 
     static GameState = {

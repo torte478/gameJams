@@ -15,10 +15,12 @@ export default class Consts {
     };
 
     static Depth = {
+        RAIN: 500,
         GUI_TAPE: 1000,
         GUI_EFFECTS: 2000,
         GUI_MAX: 10000,
-        Max: 100000
+        LIGHTNING: 20000,
+        MAX: 100000
     };
 
     /** @type {SignalModel[]} */

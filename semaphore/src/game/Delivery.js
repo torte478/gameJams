@@ -110,7 +110,7 @@ export default class Delivery {
     getMessage() {
         const me = this;
 
-        return me._currentWord.toUpperCase() ;
+        return me._currentWord.toUpperCase();
     }
 
     _runNumeralParticles(position) {

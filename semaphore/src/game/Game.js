@@ -12,6 +12,7 @@ import Waves from './Waves.js';
 import PlayerContainer from './PlayerContainer.js';
 import Tape from './Tape.js';
 import Score from './Score.js';
+import Rain from './Rain.js';
 
 export default class Game {
 
@@ -35,6 +36,9 @@ export default class Game {
 
     /** @type {Score} */
     _score;
+
+    /** @type {Rain} */
+    _rain;
 
     constructor() {
         const me = this;
@@ -63,12 +67,14 @@ export default class Game {
             me
         );
 
+        me._rain = new Rain();
+
         me._state = Enums.GameState.GAME;
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 28, backgroundColor: '#000' })
                 .setScrollFactor(0)
-                .setDepth(Consts.Depth.Max);
+                .setDepth(Consts.Depth.MAX);
         });
     }
 
@@ -81,6 +87,7 @@ export default class Game {
 
         me._gameLoop(time, delta);
         me._score.updateGUI(me._state);
+        me._rain.update();
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;

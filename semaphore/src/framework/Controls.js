@@ -5,7 +5,8 @@ export default class Controls {
 
     static _schema = [
         { key: Enums.Keyboard.MAIN_ACTION, value: Phaser.Input.Keyboard.KeyCodes.SPACE },
-        { key: Enums.Keyboard.SECOND_ACTION, value: Phaser.Input.Keyboard.KeyCodes.Z },
+        { key: Enums.Keyboard.SECOND_ACTION, value: Phaser.Input.Keyboard.KeyCodes.TAB },
+        { key: Enums.Keyboard.DEBUG, value: Phaser.Input.Keyboard.KeyCodes.Z },
         { key: Enums.Keyboard.RESTART, value: Phaser.Input.Keyboard.KeyCodes.R }
     ];
 
