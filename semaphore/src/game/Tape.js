@@ -114,6 +114,8 @@ export default class Tape {
         if (!!me._inputEffectTween)
             me._inputEffectTween.remove();
 
+        Here.Audio.play('send');
+
         me._inputEffect
             .setPosition(playerPos.x, playerPos.y)
             .setText(signal.from)
@@ -200,6 +202,8 @@ export default class Tape {
     _processCancel(signal, callback, context) {
         const me = this;
 
+        Here.Audio.play('cancel')
+
         if (me._queue.size() > 0)
             return me._queue.clear();
 
@@ -245,6 +249,11 @@ export default class Tape {
 
         const currentBox = me._getCurrentBox();
         currentBox.setTint(signal.correct);
+
+        if (signal.correct)
+            Here.Audio.play('success')
+        else 
+            Here.Audio.play('fail', { volume: 0.5});
 
         Here._.tweens.add({
             targets: currentBox.getGameObject(),

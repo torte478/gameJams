@@ -100,6 +100,8 @@ export default class Clipboard {
             me._isOpen ? Consts.Viewport.Height : 0);
 
         me._isOpen = !me._isOpen;
+
+        Here.Audio.play('clipboard', { volume: 0.5});
         
         me._toggleTween = Here._.tweens.add({
             targets: me._container,

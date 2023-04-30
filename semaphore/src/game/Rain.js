@@ -72,6 +72,8 @@ export default class Rain {
         if (me._nextLightTimeMs > 0 && now > me._nextLightTimeMs) {
             me._nextLightTimeMs = me._getNextLightningTime();
 
+            Here.Audio.play('lightning');
+
             Here._.time.addEvent({
                 delay: 100,
                 repeat: 3,
@@ -84,6 +86,6 @@ export default class Rain {
 
     _getNextLightningTime() {
         const now = new Date().getTime();
-        return now + Utils.getRandom(1000, 5000, 1000);
+        return now + Utils.getRandom(3000, 12000, 1000);
     }
 }

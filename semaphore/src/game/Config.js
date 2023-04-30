@@ -7,7 +7,7 @@ export default class Config {
         Log: true,
         ShowSceneLog: false,
         PlaySound: true,
-        Random: true,
+        Random: false,
         Level: 0,
     };
 
@@ -133,7 +133,7 @@ export default class Config {
         },
         // 5 - rain and lightning
         {
-            message: 't',//he_quick_brown_fox_jumps_over_the_lazy_dog',
+            message: 'he_quick_brown_fox_jumps_over_the_lazy_dog',
 
             sinYCoefs: {
                 min: -100,

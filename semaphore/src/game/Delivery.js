@@ -61,6 +61,7 @@ export default class Delivery {
         if (signal == 'SWITCH') {
             me._isNumerals = !me._isNumerals;
             me._runNumeralParticles(position);
+            Here.Audio.play('switch');
             return { currentChanged: false };
         }
 

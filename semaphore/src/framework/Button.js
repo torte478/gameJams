@@ -61,8 +61,7 @@ export default class Button {
             me._isClicked = false;
         }, me);
 
-        if (!!me._config.sound)
-            Here.Audio.play(me._config.sound);
+        Here.Audio.play('button_click');
 
         Here._.time.delayedCall(
             200, 

@@ -59,6 +59,15 @@ export default class GameScene extends HereScene {
         Utils.loadMp3('seagull_click');
         Utils.loadMp3('seagull_pop');
         Utils.loadMp3('seagull_jumpscare');
+
+        Utils.loadWav('button_click');
+        Utils.loadWav('cancel');
+        Utils.loadWav('clipboard');
+        Utils.loadWav('fail');
+        Utils.loadWav('lightning');
+        Utils.loadWav('send');
+        Utils.loadWav('success');
+        Utils.loadWav('switch');
     }
 
     create() {
