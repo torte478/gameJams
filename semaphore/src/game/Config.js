@@ -21,6 +21,7 @@ export default class Config {
             sinXCoefs: { amplitude: 0 },
             sinYCoefs: { amplitude: 0 },
             sinAngleCoefs: { amplitude: 0 },
+            skyColor: '#158CD6',
         },
         // 1 - tutorial
         {
@@ -31,6 +32,7 @@ export default class Config {
             sinAngleCoefs: { amplitude: 0 },
             signalTimeout: 120000,
             bonusTimeMs: 120 * 1000,
+            skyColor: '#158CD6',
         },
         // 2 - sea seagull little
         {
@@ -63,6 +65,7 @@ export default class Config {
             signalTimeout: 30 * 1000,
             bonusTimeMs: 4 * 60 * 1000,
             isSeagullSmall: true,
+            skyColor: '#58AADD',
         },
         // 3 - seagull big
         {
@@ -96,6 +99,7 @@ export default class Config {
             bonusTimeMs: 3 * 60 * 1000,
             isSeagullSmall: true,
             isSeagullBig: true,
+            skyColor: '#158CD6',
         },
         // 4 - seagul poop
         {
@@ -130,10 +134,11 @@ export default class Config {
             isSeagullSmall: true,
             isSeagullBig: true,
             isSeagullPoop: true,
+            skyColor: '#106BA3',
         },
         // 5 - rain and lightning
         {
-            message: 'he_quick_brown_fox_jumps_over_the_lazy_dog',
+            message: 'h',//e_quick_brown_fox_jumps_over_the_lazy_dog',
 
             sinYCoefs: {
                 min: -100,
@@ -165,6 +170,7 @@ export default class Config {
             isSeagullBig: true,
             isSeagullPoop: true,
             isRain: true,
+            skyColor: '#234357',
         },
         // 6 - final
         {
@@ -200,7 +206,8 @@ export default class Config {
             isSeagullBig: false,
             isSeagullPoop: false,
             isRain: true,
-            isFinal: true
+            isFinal: true,
+            skyColor: '#7B2B2C',
         }
     ];
 }

@@ -56,6 +56,8 @@ export default class Rain {
         me._particles.on = true;
 
         me._nextLightTimeMs = me._getNextLightningTime();
+
+        Here.Audio.playIfNotPlaying('rain', { loop: -1});
     }
 
     stop() {
@@ -63,6 +65,8 @@ export default class Rain {
 
         me._particles.on = false;
         me._nextLightTimeMs = -1;
+
+        Here.Audio.stop('rain');
     }
 
     update() {

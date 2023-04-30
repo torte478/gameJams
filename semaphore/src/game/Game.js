@@ -99,7 +99,6 @@ export default class Game {
         me._clipboard = new Clipboard();
 
         me._seagull = new Seagull();
-        // me._seagull.start();  
 
         new MyGraphics();
 
@@ -209,6 +208,7 @@ export default class Game {
             });
         }
 
+        Here._.cameras.main.setBackgroundColor(me._currentLevelConfig.skyColor);
         me._state = Enums.GameState.GAME;
     }
 
@@ -320,6 +320,7 @@ export default class Game {
         me._currentLevelIndex = me._currentLevelIndex + 1;
         me._currentLevelConfig = Config.Levels[me._currentLevelIndex];
 
+        Here._.cameras.main.setBackgroundColor(me._currentLevelConfig.skyColor);
         me._score.stopShowResult(false, () => me._startLevel(previous), me, false);
     }
 

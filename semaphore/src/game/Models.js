@@ -115,4 +115,6 @@ export class LevelModel {
 
     /** @type {Boolean} */
     isFinal;
+
+    skyColor;
 }

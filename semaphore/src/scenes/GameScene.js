@@ -71,6 +71,7 @@ export default class GameScene extends HereScene {
 
         Utils.loadMp3('idle');
         Utils.loadMp3('ending');
+        Utils.loadMp3('rain');
     }
 
     create() {
