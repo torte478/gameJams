@@ -83,6 +83,9 @@ export class LevelModel {
     /** @type {Boolean} */
     isMainMenu;
 
+    /** @type {Boolean} */
+    isTutorial;
+
     /** @type {SinCoeffs} */
     sinXCoefs;
 

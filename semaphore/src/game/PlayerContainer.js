@@ -64,13 +64,13 @@ export default class PlayerContainer {
         me._sinYCoefs = sinYCoefs;
         me._sinAngleCoefs = sinAngleCoefs;
 
-        const isShipVisible = levelIndex > 0;
+        const isShipVisible = levelIndex > 1;
         me._shipBackSprite.setVisible(isShipVisible);
         me._shipFrontSprite.setVisible(isShipVisible);
 
         const position = me._getPositionAtTime(0);
 
-        if (levelIndex == 0)
+        if (levelIndex == 0 || levelIndex == 1)
             return;
 
         me._isCalculating = false;

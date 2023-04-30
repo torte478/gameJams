@@ -60,6 +60,15 @@ export default class Game {
     /** @type {Phaser.GameObjects.Container} */
     _mainMenuContainer;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _tutorialBackground;
+
+    /** @type {Phaser.GameObjects.Text} */
+    _tutorialText;
+
+    /** @type {Number} */
+    _tutorialIndex;
+
     constructor() {
         const me = this;
 
@@ -75,10 +84,7 @@ export default class Game {
         me._currentLevelConfig = Config.Levels[me._currentLevelIndex];
 
         const waves = new Waves();
-        me._delivery = new Delivery(
-            // 'hello_world'
-            'yyyyyyyyyyyyyy'
-            );
+        me._delivery = new Delivery('');
         me._player = new Player();
         me._playerContainer = new PlayerContainer(me._player);
 
@@ -99,6 +105,18 @@ export default class Game {
 
         me._state = Enums.GameState.GAME;
         me._mainMenuContainer = me._createMainMenuContainer();
+
+        me._tutorialBackground = Here._.add.image(Consts.Viewport.Width, 0, 'tutorial')
+            .setDepth(Consts.Depth.BACKGROUND);
+
+        me._tutorialIndex = 0;
+        me._tutorialText = Here._.add.text(-450, -300, '', {
+            fontFamily: 'Arial Black',
+            fontSize: 32,
+            color: '#e1d2d1',
+            wordWrap: { width: 650, useAdvancedWrap: true }
+        })
+            .setOrigin(0, 0);
 
         me._startLevel();
 
@@ -155,6 +173,17 @@ export default class Game {
                 x: -Consts.Viewport.Width,
                 duration: 1000,
                 ease: 'sine.in'
+            });
+
+        if (!!me._currentLevelConfig.isTutorial)
+            Here._.tweens.add({
+                targets: me._tutorialBackground,
+                x: 0,
+                duration: 1000,
+                ease: 'sine.in',
+                onComplete: () => {
+                    me._startTutorial()
+                }
             });
 
         me._state = Enums.GameState.GAME;
@@ -332,5 +361,14 @@ export default class Game {
         me._currentLevelConfig = Config.Levels[index];
 
         return me._startLevel(previous);
+    }
+
+
+
+    _startTutorial() {
+        const me = this;
+
+        me._tutorialText.setText('press TAB to open clipboard');
+        me._tutorialIndex = 1;
     }
 }

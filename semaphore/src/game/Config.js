@@ -5,7 +5,7 @@ export default class Config {
     static Debug = {
         Global: true,
         Log: true,
-        ShowSceneLog: true,
+        ShowSceneLog: false,
         PlaySound: true,
         Random: true,
         Level: 0,
@@ -24,7 +24,15 @@ export default class Config {
         },
         // 1 - tutorial
         {
-            message: 'yy',
+            message: 'yy', // ludum dare
+            isTutorial: true,
+            sinXCoefs: { amplitude: 0 },
+            sinYCoefs: { amplitude: 0 },
+            sinAngleCoefs: { amplitude: 0 },
+        },
+        // 2 - sea seagull little
+        {
+            message: 'rr',
 
             sinYCoefs: {
                 min: -25,
@@ -45,35 +53,6 @@ export default class Config {
             sinAngleCoefs: {
                 min: -2,
                 max: 2,
-                a: 1,
-                b: 1.72,
-                amplitude: 1,
-                start: 321
-            },
-        },
-        // 2 - sea seagull little
-        {
-            message: 'rr',
-
-            sinYCoefs: {
-                min: 0,
-                max: 200,
-                a: 1,
-                b: 1.66,
-                amplitude: 1,
-                start: 0
-            },
-            sinXCoefs: {
-                min: -100,
-                max: 100,
-                a: 1,
-                b: 1.33,
-                amplitude: 1,
-                start: 123
-            },
-            sinAngleCoefs: {
-                min: -30,
-                max: 30,
                 a: 1,
                 b: 1.72,
                 amplitude: 1,

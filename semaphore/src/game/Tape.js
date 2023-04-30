@@ -48,7 +48,7 @@ export default class Tape {
 
         me._xOffset = 300;
         me._y = 300;
-        me._signalTimeoutMs = 10000;
+        me._signalTimeoutMs = 20000;
 
         me._first = new SignalBox(me._y, 'A');
         me._second = new SignalBox(me._y, 'B');
