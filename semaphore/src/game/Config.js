@@ -7,7 +7,7 @@ export default class Config {
         Log: true,
         ShowSceneLog: false,
         PlaySound: true,
-        Random: false,
+        Random: true,
         Level: 0,
     };
 

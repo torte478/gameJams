@@ -517,6 +517,9 @@ class Menu {
                     duration: 1000,
                     delay: 0, // 7000, TODO!!!
                     ease: 'sine.in',
+                    onStart: () => {
+                        Here.Audio.play('seagull_jumpscare');
+                    },
                     onComplete: () => {
                         
                         const text = 'Thank you for playing!\n\n' + `Total score: ${me._superTotalScore}`;

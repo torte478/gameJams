@@ -121,9 +121,11 @@ export default class Seagull {
             me._nextBigTimeMs = -1;
             me._isAttackNow = true;
 
-            me._isSmallAttacking = !me._canBigSeagulAttack || Utils.getRandom(0, 1, 0) == 0;
+            me._isSmallAttacking = !me._canBigSeagulAttack || Utils.getRandom(0, 1, 1) == 0;
             if (!me._isSmallAttacking) {
-                
+
+                Here.Audio.play('seagull_big_in');
+
                 me._bigSprite.setPosition(0, Consts.Viewport.Height);
                 Here._.tweens.add({
                     targets: me._bigSprite,
@@ -132,6 +134,9 @@ export default class Seagull {
                     duration: 1000
                 });
             } else {
+
+                Here.Audio.play('seagull_small_in');
+
                 me._smallSprite
                     .setPosition(-Consts.Viewport.Width / 2 - 100, 0)
                     .setFlipX(false);
@@ -170,6 +175,9 @@ export default class Seagull {
             delay: 500,
             yoyo: true,
             ease: 'sine.inout',
+            onStart: () => {
+                Here.Audio.play('seagull_damage')
+            },
             onYoyo: () => {
                 playerAttackedCallback.call(context);
             },
@@ -237,8 +245,10 @@ export default class Seagull {
         }
 
         me._smallCurrentHp -= 1;
-        if (me._smallCurrentHp == 0)
+        if (me._smallCurrentHp == 0) {
+            Here.Audio.play('seagull_small_out');
             me._hideSmall();
+        }
 
         MyGraphics.runMinusOne(
             Utils.buildPoint(pointer.worldX, pointer.worldY)
@@ -266,8 +276,10 @@ export default class Seagull {
         }
 
         me._bigCurrentHp -= 1;
-        if (me._bigCurrentHp == 0)
+        if (me._bigCurrentHp == 0) {
+            Here.Audio.play('seagull_big_out');
             me._hideBig();
+        }
 
         MyGraphics.runMinusOne(
             Utils.buildPoint(pointer.worldX, pointer.worldY)

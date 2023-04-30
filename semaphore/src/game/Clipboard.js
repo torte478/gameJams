@@ -85,6 +85,8 @@ export default class Clipboard {
 
             me._nextTrashTimeMs = me._getNextTrashTime();
             ++me._currentTrashCount;
+
+            Here.Audio.play('seagull_pop');
         };
 
         if (!!me._toggleTween) {

@@ -37,5 +37,7 @@ export default class MyGraphics {
                 MyGraphics._group.killAndHide(minus);
             }
         });
+
+        Here.Audio.play('seagull_click');
     }
 }

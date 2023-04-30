@@ -50,6 +50,15 @@ export default class GameScene extends HereScene {
         Utils.loadSpriteSheet('rain', 10)
         Utils.loadSpriteSheet('seagull_small', Consts.Unit.Big);
         Utils.loadSpriteSheet('trash', 300);
+
+        Utils.loadMp3('seagull_big_in');
+        Utils.loadMp3('seagull_big_out');
+        Utils.loadMp3('seagull_small_in');
+        Utils.loadMp3('seagull_small_out');
+        Utils.loadMp3('seagull_damage');
+        Utils.loadMp3('seagull_click');
+        Utils.loadMp3('seagull_pop');
+        Utils.loadMp3('seagull_jumpscare');
     }
 
     create() {
