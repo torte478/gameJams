@@ -127,6 +127,26 @@ export default class Tape {
         return progress >= 1;
     }
 
+    reset(text) {
+        const me = this;
+
+        me._isFirst = true;
+
+        me._first.getGameObject().setAlpha(0).setX(me._xOffset);
+        me._first.reset(text);
+        me._second.getGameObject().setAlpha(0);
+
+        me._isBusy = true;
+        Here._.tweens.add({
+            targets: me._first.getGameObject(),
+            x: 0,
+            alpha: { from: 0, to: 1},
+            duration: 1000,
+            ease: 'sine.inout',
+            onComplete: () => me._free.call(me)
+        });
+    }
+
     /**
      * @param {SignalProcessResult} signal 
      */

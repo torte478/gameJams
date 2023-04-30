@@ -98,10 +98,19 @@ export default class Delivery {
             correct: correct };
     }
 
+    reset() {
+        const me = this;
+
+        me._index = 0;
+        me._current =  me._word[0];
+        me._currentWord = '';
+        me._isNumerals = false;
+    }
+
     getMessage() {
         const me = this;
 
-        return me._currentWord.toUpperCase();
+        return me._currentWord.toUpperCase() ;
     }
 
     _runNumeralParticles(position) {

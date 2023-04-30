@@ -54,9 +54,9 @@ export default class Button {
         if (me._isClicked)
             return;
 
-        me._container.setScale(0.75);
+        me._container.setScale(0.5);
         me._isClicked = true;
-        Here._.time.delayedCall(500, () => { 
+        Here._.time.delayedCall(2000, () => { 
             me._container.setScale(1) 
             me._isClicked = false;
         }, me);
@@ -66,19 +66,22 @@ export default class Button {
 
         Here._.time.delayedCall(
             200, 
-            me._config.callback, 
+            me._config.callback,
+            [], 
             me._config.callbackScope);
     }
 
     _select() {
         const me = this;
 
-        me._container.setScale(1.25);
+        if (!me._isClicked)
+            me._container.setScale(1.25);
     }
 
     _unselect() {
         const me = this;
 
-        me._container.setScale(1);
+        if (!me._isClicked)
+            me._container.setScale(1);
     }
 }

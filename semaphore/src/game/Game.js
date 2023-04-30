@@ -48,12 +48,20 @@ export default class Game {
         Here._.input.mouse.disableContextMenu();
 
         const waves = new Waves();
-        me._delivery = new Delivery('hello_world');
+        me._delivery = new Delivery(
+            // 'hello_world'
+            'y'
+            );
         me._player = new Player();
         me._playerContainer = new PlayerContainer(me._player);
 
         me._tape = new Tape(me._delivery._current);
-        me._score = new Score();
+
+        me._score = new Score(
+            me._onRestartButtonClick,
+            me._onRestartButtonClick, // TODO
+            me
+        );
 
         me._state = Enums.GameState.GAME;
 
@@ -135,5 +143,19 @@ export default class Game {
 
         me._state = Enums.GameState.LEVEL_COMPLETED;
         me._score.startShowResult(me._delivery.getMessage());
+    }
+
+    _onRestartButtonClick() { 
+        const me = this;
+
+        me._score.stopShowResult(me._restart, me);
+    }
+
+    _restart() {
+        const me = this;
+
+        me._delivery.reset();
+        me._tape.reset(me._delivery._current.toUpperCase());
+        me._state = Enums.GameState.GAME;
     }
 }

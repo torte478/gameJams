@@ -35,7 +35,7 @@ export default class Score {
     /** @type {Numer} */
     _maxTimeMs;
 
-    constructor() {
+    constructor(restartCallback, nextLevelCallback, callbackContext) {
         const me = this;
 
         me._scoreHistory = [];
@@ -77,7 +77,7 @@ export default class Score {
             .setAlpha(0)
             .setDepth(Consts.Depth.GUI_MAX);
 
-        me._menu = new Menu();
+        me._menu = new Menu(restartCallback, nextLevelCallback, callbackContext);
         me._startTimeMs = new Date().getTime();
         me._maxTimeMs = 10 * 1000;
     }
@@ -148,6 +148,35 @@ export default class Score {
                 me._menu.open(me._score, timeBonus, message);
             }
         });
+    }
+
+    stopShowResult(callback, context) {
+        const me = this;
+
+        me._menu.hide(() => {
+            Here._.tweens.add({
+                targets: me._fade,
+                alpha: { from: 0.75, to: 0 },
+                duration: 1000,
+                ease: 'sin.out',
+                onComplete: () => {
+
+                    me._scoreHistory = [];
+                    me._score = 0;
+                    me._startTimeMs = new Date().getTime();
+
+                    Here._.tweens.add({
+                        targets: me._scoreText,
+                        y: 10 - Consts.Viewport.Height / 2,
+                        duration: 500,
+                        ease: 'sine.out'
+                    });
+
+                    if (!!callback)
+                        callback.call(context);
+                }
+            });
+        }, me);
     }
 
     _buildScoreText() {
@@ -286,7 +315,10 @@ class Menu {
     /** @type {String} */
     _wholeMessage;
 
-    constructor() {
+    /** @type {Button} */
+    _nextLevelButton;
+
+    constructor(restartCallback, nextLevelCallback, callbackContext) {
         const me = this;
 
         me._scoreText = Here._.add.text(
@@ -329,18 +361,34 @@ class Menu {
             .setVisible(false);
 
         me._restartButton = new Button({
-            x: 0,
-            y: 300,
-            callback: () => { throw 'not implemented'},
+            x: 250,
+            y: 325,
+            callback: restartCallback,
+            callbackScope: callbackContext,
             text: 'RESTART',
+            textStyle: {
+                fontFamily: 'Arial Black',
+                fontSize: 40,
+                color: '#5AB7D4'
+            }
+        });
+        const restartButtonContainer = me._restartButton.getGameObject();
+        restartButtonContainer.setVisible(false);
+
+        me._nextLevelButton = new Button({
+            x: -200,
+            y: 325,
+            callback: nextLevelCallback,
+            callbackScope: callbackContext,
+            text: 'NEXT LEVEL',
             textStyle: {
                 fontFamily: 'Arial Black',
                 fontSize: 64,
                 color: '#5AB7D4'
             }
         });
-        const restartButtonContainer = me._restartButton.getGameObject();
-        restartButtonContainer.setVisible(false);
+        const nextLevelButtonContainer = me._nextLevelButton.getGameObject();
+        nextLevelButtonContainer.setVisible(false);
 
         me._messageLabelText = Here._.add.text(
             0, 
@@ -374,6 +422,7 @@ class Menu {
             me._scoreText,
             me._timeBonusText,
             restartButtonContainer,
+            nextLevelButtonContainer,
             me._messageLabelText,
             me._message
         ])
@@ -388,6 +437,8 @@ class Menu {
 
     open(score, timeBonus, message) {
         const me = this;
+
+        console.log(message);
 
         me._scoreText.setText(`SCORE: ${score}`);
         me._timeBonusText.setText(`TIME BONUS: ${timeBonus}`);
@@ -417,6 +468,7 @@ class Menu {
 
         if (me._timelineIndex == 2 && elapsed > 3000) {
             me._restartButton.getGameObject().setVisible(true);
+            me._nextLevelButton.getGameObject().setVisible(true);
             me._messageLabelText.setVisible(true);
 
             ++me._timelineIndex;
@@ -433,5 +485,27 @@ class Menu {
         }
     }
 
-    // рестарт
+    hide(callback, context) {
+        const me = this;
+
+        Here._.tweens.add({
+            targets: me._container,
+            x: 1000,
+            duration: 1000,
+            ease: 'sine.in',
+            onComplete: () => {
+                me._scoreText.setVisible(false);
+                me._timeBonusText.setVisible(false);
+                me._totalText.setVisible(false);
+                me._messageLabelText.setVisible(false);
+                me._message.setText('');
+                me._restartButton.getGameObject().setVisible(false);
+                me._nextLevelButton.getGameObject() .setVisible(false);
+
+                me._container.x = 0;
+
+                callback.call(context);
+            }
+        })
+    }
 }
