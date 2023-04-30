@@ -34,7 +34,7 @@ export default class Config {
         },
         // 2 - sea seagull little
         {
-            message: 'torte_478_the_best',
+            message: 'as' ,//'torte_478_the_best',
 
             sinYCoefs: {
                 min: -25,
@@ -66,34 +66,34 @@ export default class Config {
         },
         // 3 - seagull big
         {
-            message: 'yy',
+            message: 'do_the_harlem_shake',
 
             sinYCoefs: {
-                min: 0,
-                max: 200,
+                min: -50,
+                max: 50,
                 a: 1,
                 b: 1.66,
                 amplitude: 1,
                 start: 0
             },
             sinXCoefs: {
-                min: -100,
-                max: 100,
+                min: -35,
+                max: 35,
                 a: 1,
                 b: 1.33,
                 amplitude: 1,
                 start: 123
             },
             sinAngleCoefs: {
-                min: -30,
-                max: 30,
+                min: -5,
+                max: 5,
                 a: 1,
                 b: 1.72,
                 amplitude: 1,
                 start: 321
             },
-            signalTimeout: 10000,
-            bonusTimeMs: 1000,
+            signalTimeout: 15 * 1000,
+            bonusTimeMs: 3 * 60 * 1000,
             isSeagullSmall: true,
             isSeagullBig: true,
         },
