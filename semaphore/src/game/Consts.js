@@ -18,7 +18,8 @@ export default class Consts {
         RAIN: 500,
         GUI_TAPE: 1000,
         GUI_EFFECTS: 2000,
-        GUI_MAX: 10000,
+        GUI_MAX: 5000,
+        CLIPBOARD: 10000, 
         LIGHTNING: 20000,
         MAX: 100000
     };

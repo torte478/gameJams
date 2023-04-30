@@ -13,6 +13,7 @@ import PlayerContainer from './PlayerContainer.js';
 import Tape from './Tape.js';
 import Score from './Score.js';
 import Rain from './Rain.js';
+import Clipboard from './Clipboard.js';
 
 export default class Game {
 
@@ -39,6 +40,9 @@ export default class Game {
 
     /** @type {Rain} */
     _rain;
+
+    /** @type {Clipboard} */
+    _clipboard;
 
     constructor() {
         const me = this;
@@ -68,6 +72,8 @@ export default class Game {
         );
 
         me._rain = new Rain();
+        
+        me._clipboard = new Clipboard();
 
         me._state = Enums.GameState.GAME;
 
@@ -116,6 +122,9 @@ export default class Game {
     _onGameLoop() {
         const me = this;
 
+        if (Here.Controls.isPressed(Enums.Keyboard.SECOND_ACTION))
+            me._clipboard.toggle();
+
         if (me._tape.isBusy())
             return;
             
@@ -148,6 +157,7 @@ export default class Game {
     _onLevelComplete() {
         const me = this;
 
+        me._clipboard.hide();
         me._state = Enums.GameState.LEVEL_COMPLETED;
         me._score.startShowResult(me._delivery.getMessage());
     }
