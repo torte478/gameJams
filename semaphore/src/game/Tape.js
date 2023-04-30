@@ -50,10 +50,11 @@ export default class Tape {
         me._y = 300;
         me._signalTimeoutMs = 10000;
 
-        me._first = new SignalBox(me._y, startSignal);
-        me._second = new SignalBox(me._y, 'A');
+        me._first = new SignalBox(me._y, 'A');
+        me._second = new SignalBox(me._y, 'B');
         me._isFirst = true;
 
+        me._first.getGameObject().setAlpha(0);
         me._second.getGameObject().setAlpha(0);
 
         me._inputEffect = Here._.add.text(0, 0, 'A', {
@@ -70,6 +71,19 @@ export default class Tape {
 
         me._queue = new Queue();
         me._canCalcTimeout = true;
+    }
+
+    init(isMainMenu, text) {
+        const me = this;
+
+        me._isFirst = true;
+
+        me._first.getGameObject().setAlpha(0);
+        me._second.getGameObject().setAlpha(0);
+        me._signalStartTimeMs = new Date().getTime();
+
+        if (!isMainMenu)
+            me.reset(text);
     }
 
     /**

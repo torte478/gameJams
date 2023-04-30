@@ -43,7 +43,7 @@ export default class Score {
 
         me._scoreText = Here._.add.text(
             0, 
-            10 - Consts.Viewport.Height / 2, 
+            -500,
             ' SCORE: 0000 TIME: 0:00 ', 
             {
                 fontFamily: 'Monospace',
@@ -80,6 +80,24 @@ export default class Score {
         me._menu = new Menu(restartCallback, nextLevelCallback, callbackContext);
         me._startTimeMs = new Date().getTime();
         me._maxTimeMs = 10 * 1000;
+    }
+
+    init(isMainMenu) {
+        const me = this;
+
+        me._scoreHistory = [];
+        me._score = 0;
+        me._startTimeMs = new Date().getTime();
+
+        if (!!isMainMenu)
+            return;
+
+        Here._.tweens.add({
+            targets: me._scoreText,
+            y: 10 - Consts.Viewport.Height / 2,
+            duration: 500,
+            ease: 'sine.out'
+        });
     }
 
     /**
@@ -150,7 +168,7 @@ export default class Score {
         });
     }
 
-    stopShowResult(callback, context) {
+    stopShowResult(toMainMenu, callback, context) {
         const me = this;
 
         me._menu.hide(() => {
@@ -165,12 +183,7 @@ export default class Score {
                     me._score = 0;
                     me._startTimeMs = new Date().getTime();
 
-                    Here._.tweens.add({
-                        targets: me._scoreText,
-                        y: 10 - Consts.Viewport.Height / 2,
-                        duration: 500,
-                        ease: 'sine.out'
-                    });
+                    me.init(toMainMenu);
 
                     if (!!callback)
                         callback.call(context);
@@ -178,6 +191,8 @@ export default class Score {
             });
         }, me);
     }
+
+
 
     _buildScoreText() {
         const me = this;

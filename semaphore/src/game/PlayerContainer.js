@@ -18,44 +18,38 @@ export default class PlayerContainer {
     /** @type {SinCoeffs} */
     _sinAngleCoefs;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _shipBackSprite;
+
+    /** @type {Phaser.GameObjects.Image} */
+    _shipFrontSprite;
+
     /**
      * @param {Player} player 
      */
     constructor(player) {
         const me = this;
 
+        me._shipBackSprite = Here._.add.image(-75, 125, 'ship_back');
+        me._shipFrontSprite = Here._.add.image(10, 325, 'ship_front');
+
         me._container = Here._.add.container(0, 0, [
-            Here._.add.image(-75, 125, 'ship_back'),
+            me._shipBackSprite,
             player.getGameObject(),
-            Here._.add.image(10, 325, 'ship_front')
+            me._shipFrontSprite
         ]);
+    }
 
-        me._sinYCoefs = {
-            min: 0,
-            max: 200,
-            a: 1,
-            b: 1.66,
-            amplitude: 1,
-            start: 0
-        };
+    init(levelIndex, sinXCoefs, sinYCoefs, sinAngleCoefs) {
+        const me = this;
 
-        me._sinXCoefs = {
-            min: -100,
-            max: 100,
-            a: 1,
-            b: 1.33,
-            amplitude: 1,
-            start: 123
-        };
+        me._sinXCoefs = sinXCoefs;
+        me._sinYCoefs = sinYCoefs;
+        me._sinAngleCoefs = sinAngleCoefs;
 
-        me._sinAngleCoefs = {
-            min: -30,
-            max: 30,
-            a: 1,
-            b: 1.72,
-            amplitude: 1,
-            start: 321
-        };
+        const isShipVisible = levelIndex > 0;
+        me._shipBackSprite.setVisible(isShipVisible);
+        me._shipFrontSprite.setVisible(isShipVisible);
     }
 
     update(time) {

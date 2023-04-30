@@ -109,7 +109,7 @@ export default class Clipboard {
     _getNextTrashTime() {
         const me = this;
 
-        return new Date().getTime() + Utils.getRandom(1000, 5000, 10)
+        return new Date().getTime() + Utils.getRandom(1000, 5000, 1000)
     }
 
     /**

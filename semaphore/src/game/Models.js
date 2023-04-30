@@ -62,3 +62,21 @@ export class SignalProcessResult {
     /** @type {Boolean} */
     cancel;
 }
+
+export class LevelModel {
+
+    /** @type {String} */
+    message;
+
+    /** @type {Boolean} */
+    isMainMenu;
+
+    /** @type {SinCoeffs} */
+    sinXCoefs;
+
+    /** @type {SinCoeffs} */
+    sinYCoefs;
+
+    /** @type {SinCoeffs} */
+    sinAngleCoefs;
+}

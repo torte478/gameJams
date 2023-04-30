@@ -16,6 +16,7 @@ import Rain from './Rain.js';
 import Clipboard from './Clipboard.js';
 import Seagull from './Seagull.js';
 import MyGraphics from './MyGraphics.js';
+import { LevelModel } from './Models.js';
 
 export default class Game {
 
@@ -49,6 +50,12 @@ export default class Game {
     /** @type {Seagull} */
     _seagull;
 
+    /** @type {Number} */
+    _currentLevelIndex;
+
+    /** @type {LevelModel} */
+    _currentLevelConfig;
+
     constructor() {
         const me = this;
 
@@ -59,6 +66,9 @@ export default class Game {
             .setBackgroundColor('#158CD6');
 
         Here._.input.mouse.disableContextMenu();
+
+        me._currentLevelIndex = Config.Debug.Level;
+        me._currentLevelConfig = Config.Levels[me._currentLevelIndex];
 
         const waves = new Waves();
         me._delivery = new Delivery(
@@ -84,6 +94,8 @@ export default class Game {
         new MyGraphics();
 
         me._state = Enums.GameState.GAME;
+
+        me._startLevel();
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 28, backgroundColor: '#000' })
@@ -116,6 +128,21 @@ export default class Game {
         });
     }
 
+    _startLevel(previousIndex) {
+        const me = this;
+
+        me._playerContainer.init(
+            me._currentLevelIndex,
+            me._currentLevelConfig.sinXCoefs,
+            me._currentLevelConfig.sinYCoefs,
+            me._currentLevelConfig.sinAngleCoefs);
+
+        me._score.init(me._currentLevelConfig.isMainMenu);
+        me._tape.init(
+            me._currentLevelConfig.isMainMenu,
+            me._currentLevelConfig.message[0].toUpperCase());
+    }
+
     _gameLoop(time, delta) {
         const me = this;
 
@@ -133,12 +160,14 @@ export default class Game {
         if (Here.Controls.isPressed(Enums.Keyboard.SECOND_ACTION))
             me._clipboard.toggle();
             
-        if (!me._delivery.isComplete() && Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION)) {
+        if (!me._currentLevelConfig.isMainMenu 
+            &&!me._delivery.isComplete() 
+            && Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION)) {
             const signal = me._player.getSignal();    
             me._processSignalInput(signal);
         }
 
-        if (me._tape.checkTimeout())
+        if (!me._currentLevelConfig.isMainMenu && me._tape.checkTimeout())
             me._processSignalInput('UNKNOWN');
 
         me._seagull.update(
