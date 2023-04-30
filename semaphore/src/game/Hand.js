@@ -34,6 +34,11 @@ export default class Hand {
 
         me._targetAngle = 0;
         me._rotationSpeed = 360;
+
+        if (!isLeft) {
+            me._targetAngle = -45;
+            me._sprite.setAngle(-45);
+        }
     }
 
     getGameObject() {

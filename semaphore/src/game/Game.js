@@ -17,6 +17,7 @@ import Clipboard from './Clipboard.js';
 import Seagull from './Seagull.js';
 import MyGraphics from './MyGraphics.js';
 import { LevelModel } from './Models.js';
+import Button from '../framework/Button.js';
 
 export default class Game {
 
@@ -56,6 +57,9 @@ export default class Game {
     /** @type {LevelModel} */
     _currentLevelConfig;
 
+    /** @type {Phaser.GameObjects.Container} */
+    _mainMenuContainer;
+
     constructor() {
         const me = this;
 
@@ -94,6 +98,7 @@ export default class Game {
         new MyGraphics();
 
         me._state = Enums.GameState.GAME;
+        me._mainMenuContainer = me._createMainMenuContainer();
 
         me._startLevel();
 
@@ -131,16 +136,26 @@ export default class Game {
     _startLevel(previousIndex) {
         const me = this;
 
-        me._playerContainer.init(
+        const containerPosition = me._playerContainer.init(
             me._currentLevelIndex,
             me._currentLevelConfig.sinXCoefs,
             me._currentLevelConfig.sinYCoefs,
             me._currentLevelConfig.sinAngleCoefs);
 
+        console.log(containerPosition);
+
         me._score.init(me._currentLevelConfig.isMainMenu);
         me._tape.init(
             me._currentLevelConfig.isMainMenu,
             me._currentLevelConfig.message[0].toUpperCase());
+
+        if (previousIndex == 0)
+            Here._.tweens.add({
+                targets: me._mainMenuContainer,
+                x: -Consts.Viewport.Width,
+                duration: 1000,
+                ease: 'sine.in'
+            });
     }
 
     _gameLoop(time, delta) {
@@ -161,8 +176,9 @@ export default class Game {
             me._clipboard.toggle();
             
         if (!me._currentLevelConfig.isMainMenu 
-            &&!me._delivery.isComplete() 
+            && !me._delivery.isComplete() 
             && Here.Controls.isPressed(Enums.Keyboard.MAIN_ACTION)) {
+
             const signal = me._player.getSignal();    
             me._processSignalInput(signal);
         }
@@ -215,5 +231,42 @@ export default class Game {
         me._tape.reset(me._delivery._current.toUpperCase());
         me._seagull.start();
         me._state = Enums.GameState.GAME;
+    }
+
+    _createMainMenuContainer() {
+        const me = this;
+
+        const background = Here._.add.image(0, 0, 'main_menu');
+
+        const firstButton = new Button({
+            x: -300,
+            y: -200,
+            text: '1',
+            textStyle: {
+                fontFamily: 'Arial Black',
+                fontSize: 64,
+                color: '#d6d415'
+            },
+            callback: () => me._selectLevel(1),
+            callbackScope: me
+        });
+
+        const container = Here._.add.container(0, 0, [
+            background,
+            firstButton.getGameObject()
+        ])
+            .setDepth(Consts.Depth.BACKGROUND);
+
+        return container;
+    }
+
+    _selectLevel(index) {
+        const me = this;
+
+        const previous = me._currentLevelIndex;
+        me._currentLevelIndex = index;
+        me._currentLevelConfig = Config.Levels[index];
+
+        return me._startLevel(previous);
     }
 }

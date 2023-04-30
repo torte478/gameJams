@@ -63,6 +63,18 @@ export class SignalProcessResult {
     cancel;
 }
 
+export class PlayerContainerPosition {
+
+    /** @type {Number} */
+    x;
+
+    /** @type {Number} */
+    y;
+
+    /** @type {Number} */
+    angle;
+}
+
 export class LevelModel {
 
     /** @type {String} */

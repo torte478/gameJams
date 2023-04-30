@@ -24,7 +24,7 @@ export default class Config {
         },
         // 1
         {
-            message: 'yyy',
+            message: 'yy',
 
             sinYCoefs: {
                 min: 0,

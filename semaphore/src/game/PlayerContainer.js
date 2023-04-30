@@ -1,7 +1,8 @@
 import Here from '../framework/Here.js';
 import Utils from '../framework/Utils.js';
 import Phaser from '../lib/phaser.js';
-import { ContainerOffset, SinCoeffs } from './Models.js';
+import Consts from './Consts.js';
+import { ContainerOffset, PlayerContainerPosition, SinCoeffs } from './Models.js';
 import Player from './Player.js';
 
 export default class PlayerContainer {
@@ -24,6 +25,9 @@ export default class PlayerContainer {
     /** @type {Phaser.GameObjects.Image} */
     _shipFrontSprite;
 
+    /** @type {Number} */
+    _startTime;
+
     /**
      * @param {Player} player 
      */
@@ -37,9 +41,17 @@ export default class PlayerContainer {
             me._shipBackSprite,
             player.getGameObject(),
             me._shipFrontSprite
-        ]);
+        ])
+            .setDepth(Consts.Depth.PLAYER_CONTAINER);
     }
 
+    /**
+     * @param {Number} levelIndex 
+     * @param {SinCoeffs} sinXCoefs 
+     * @param {SinCoeffs} sinYCoefs 
+     * @param {SinCoeffs} sinAngleCoefs 
+     * @returns {PlayerContainerPosition}
+     */
     init(levelIndex, sinXCoefs, sinYCoefs, sinAngleCoefs) {
         const me = this;
 
@@ -50,26 +62,40 @@ export default class PlayerContainer {
         const isShipVisible = levelIndex > 0;
         me._shipBackSprite.setVisible(isShipVisible);
         me._shipFrontSprite.setVisible(isShipVisible);
+
+        me._startTime = 0;
+
+        return me._getPositionAtTime(0);
     }
 
     update(time) {
         const me = this;
 
-        const newX = me._sinXCoefs.amplitude > 0 
-            ? me._magicMath(time, me._sinXCoefs) 
-            : me._container.x;
-
-        const newY = me._sinYCoefs.amplitude > 0 
-            ? me._magicMath(time, me._sinYCoefs)
-            : me._container.y;
-
-        const newAngle = me._sinAngleCoefs.amplitude > 0 
-            ? me._magicMath(time, me._sinAngleCoefs)
-            : me._container.angle;
+        const position = me._getPositionAtTime(
+            new Date().getTime() - me._startTime
+        );
 
         me._container
-            .setPosition(newX, newY)
-            .setAngle(newAngle);
+            .setPosition(position.x, position.y)
+            .setAngle(position.angle);
+    }
+
+    _getPositionAtTime(time) {
+        const me = this;
+
+        return {
+            x: me._sinXCoefs.amplitude > 0 
+                ? me._magicMath(time, me._sinXCoefs) 
+                : me._container.x,
+
+            y: me._sinYCoefs.amplitude > 0 
+                ? me._magicMath(time, me._sinYCoefs)
+                : me._container.y,
+
+            angle: me._sinAngleCoefs.amplitude > 0 
+                ? me._magicMath(time, me._sinAngleCoefs)
+                : me._container.angle
+        };
     }
 
     /**
