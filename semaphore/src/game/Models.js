@@ -109,4 +109,7 @@ export class LevelModel {
 
     /** @type {Boolean} */
     isSeagullPoop;
+
+    /** @type {Boolean} */
+    isRain;
 }

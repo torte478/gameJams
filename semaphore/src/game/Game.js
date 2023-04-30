@@ -173,6 +173,8 @@ export default class Game {
             me._currentLevelConfig.isSeagullSmall,
             me._currentLevelConfig.isSeagullBig);
 
+        me._rain.start(me._currentLevelConfig.isRain);
+
         if (previousIndex == 0)
             Here._.tweens.add({
                 targets: me._mainMenuContainer,

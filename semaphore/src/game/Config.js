@@ -99,7 +99,7 @@ export default class Config {
         },
         // 4 - seagul poop
         {
-            message: 'lost_4_8_15_16_23_42',
+            message: 'as', //'lost_4_8_15_16_23_42',
 
             sinYCoefs: {
                 min: -100,
@@ -133,41 +133,42 @@ export default class Config {
         },
         // 5 - rain and lightning
         {
-            message: 'yy',
+            message: 'th',//e_quick_brown_fox_jumps_over_the_lazy_dog',
 
             sinYCoefs: {
-                min: 0,
-                max: 200,
+                min: -100,
+                max: 150,
                 a: 1,
                 b: 1.66,
                 amplitude: 1,
-                start: 0
+                start: 222
             },
             sinXCoefs: {
-                min: -100,
-                max: 100,
+                min: -75,
+                max: 57,
                 a: 1,
                 b: 1.33,
                 amplitude: 1,
                 start: 123
             },
             sinAngleCoefs: {
-                min: -30,
-                max: 30,
+                min: -20,
+                max: 20,
                 a: 1,
                 b: 1.72,
                 amplitude: 1,
                 start: 321
             },
-            signalTimeout: 10000,
-            bonusTimeMs: 1000,
+            signalTimeout: 10 * 1000,
+            bonusTimeMs: 8 * 60 * 1000,
             isSeagullSmall: true,
             isSeagullBig: true,
             isSeagullPoop: true,
+            isRain: true,
         },
         // 6 - final
         {
-            message: 'yy',
+            message: 'where_is_seagull',
 
             sinYCoefs: {
                 min: 0,
@@ -193,11 +194,12 @@ export default class Config {
                 amplitude: 1,
                 start: 321
             },
-            signalTimeout: 10000,
-            bonusTimeMs: 1000,
-            isSeagullSmall: true,
-            isSeagullBig: true,
-            isSeagullPoop: true,
+            signalTimeout: 10 * 1000,
+            bonusTimeMs: 4 * 60 * 1000,
+            isSeagullSmall: false,
+            isSeagullBig: false,
+            isSeagullPoop: false,
+            isRain: true
         }
     ];
 }

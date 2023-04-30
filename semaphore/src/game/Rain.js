@@ -42,12 +42,16 @@ export default class Rain {
 
         me._lightning = Here._.add.image(0, 0, 'fade_white')
             .setDepth(Consts.Depth.LIGHTNING)
+            .setAlpha(0.5)
             .setVisible(false);
         me._nextLightTimeMs = -1;
     }
 
-    start() {
+    start(isRain) {
         const me = this;
+
+        if (!isRain)
+            return;
 
         me._particles.on = true;
 
