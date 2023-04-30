@@ -45,6 +45,7 @@ export default class GameScene extends HereScene {
         Utils.loadSpriteSheet('letters_numbers', Consts.Unit.Big);
         Utils.loadSpriteSheet('rain', 10)
         Utils.loadSpriteSheet('seagull_small', Consts.Unit.Big);
+        Utils.loadSpriteSheet('trash', 300);
     }
 
     create() {

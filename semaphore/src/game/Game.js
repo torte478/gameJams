@@ -62,7 +62,7 @@ export default class Game {
         const waves = new Waves();
         me._delivery = new Delivery(
             // 'hello_world'
-            'yy'
+            'yyyyyyyyyyyyyy'
             );
         me._player = new Player();
         me._playerContainer = new PlayerContainer(me._player);
@@ -79,7 +79,7 @@ export default class Game {
         me._clipboard = new Clipboard();
 
         me._seagull = new Seagull();
-        me._seagull.start();
+        // me._seagull.start(); 
 
         me._state = Enums.GameState.GAME;
 

@@ -14,6 +14,15 @@ export default class Clipboard {
     /** @type {Boolean} */
     _isOpen;
 
+    /** @type {Number} */
+    _nextTrashTimeMs;
+
+    /** @type {Phaser.GameObjects.Group} */
+    _trashPool;
+
+    /** @type {Number} */
+    _currentTrashCount;
+
     constructor() {
         const me = this;
 
@@ -28,10 +37,35 @@ export default class Clipboard {
             legend
         ])
             .setDepth(Consts.Depth.CLIPBOARD);
+
+        me._nextTrashTimeMs = me._getNextTrashTime();
+        me._trashPool = Here._.add.group('trash');
+        me._currentTrashCount = 0;
     }
 
     toggle() {
         const me = this;
+
+        const addTrash = 
+            !me._toggleTween 
+            && !me._isOpen 
+            && new Date().getTime() > me._nextTrashTimeMs 
+            && me._currentTrashCount < 1;
+
+        if (addTrash) {
+            const trash = me._trashPool
+                .get(
+                    Utils.getRandom(-300, 245), 
+                    Utils.getRandom(-220, 245), 
+                    'trash', 0)
+                .setAngle(Utils.getRandom(-179, 180))
+                .setFlipX(Utils.getRandom(0, 1) == 0);
+
+            me._container.add(trash);
+
+            me._nextTrashTimeMs = me._getNextTrashTime();
+            ++me._currentTrashCount;
+        };
 
         if (!!me._toggleTween) {
             me._toggleTween.pause();
@@ -61,5 +95,11 @@ export default class Clipboard {
 
         if (me._isOpen)
             me.toggle();
+    }
+
+    _getNextTrashTime() {
+        const me = this;
+
+        return new Date().getTime() + Utils.getRandom(1000, 5000, 10)
     }
 }
