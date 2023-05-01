@@ -20,9 +20,7 @@ export default class Audio {
     play(sound, config) {
         const me = this;
 
-        Utils.ifDebug(Config.Debug.PlaySound, () => {
-            Here._.sound.play(sound, config ? config : null);
-        });
+        Here._.sound.play(sound, config ? config : null);
     }
 
     /**

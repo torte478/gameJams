@@ -3,7 +3,7 @@ import { LevelModel } from "./Models.js";
 export default class Config {
 
     static Debug = {
-        Global: true,
+        Global: false,
         Log: true,
         ShowSceneLog: false,
         PlaySound: true,
@@ -36,7 +36,7 @@ export default class Config {
         },
         // 2 - sea seagull little
         {
-            message: '30_april_2023',
+            message: 'april_30_2023',
 
             sinYCoefs: {
                 min: -25,
@@ -103,7 +103,7 @@ export default class Config {
         },
         // 4 - seagul poop
         {
-            message: 'as', //'lost_4_8_15_16_23_42',
+            message: 'lost_4_8_15_16_23_42',
 
             sinYCoefs: {
                 min: -100,
@@ -138,7 +138,7 @@ export default class Config {
         },
         // 5 - rain and lightning
         {
-            message: 'h',//e_quick_brown_fox_jumps_over_the_lazy_dog',
+            message: 'the_quick_brown_fox_jumps',
 
             sinYCoefs: {
                 min: -100,
@@ -165,7 +165,7 @@ export default class Config {
                 start: 321
             },
             signalTimeout: 10 * 1000,
-            bonusTimeMs: 8 * 60 * 1000,
+            bonusTimeMs: 5 * 60 * 1000,
             isSeagullSmall: true,
             isSeagullBig: true,
             isSeagullPoop: true,
@@ -174,7 +174,7 @@ export default class Config {
         },
         // 6 - final
         {
-            message: 'w',//here_is_seagull',
+            message: 'where_is_seagull',
 
             sinYCoefs: {
                 min: 0,

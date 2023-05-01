@@ -92,7 +92,7 @@ export default class Game {
 
         me._score = new Score(
             me._onRestartButtonClick,
-            me._onNextButtonClick, // TODO
+            me._onNextButtonClick,
             me);
 
         me._rain = new Rain();
@@ -136,7 +136,7 @@ export default class Game {
             Here._.scene.restart({ isRestart: true });
 
         me._gameLoop(time, delta);
-        me._score.updateGUI(me._state);
+        me._score.updateGUI(me._state, me._currentLevelIndex);
         me._rain.update();
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
@@ -166,7 +166,8 @@ export default class Game {
         me._score.init(
             me._currentLevelConfig.isMainMenu, 
             me._currentLevelConfig.bonusTimeMs,
-            me._currentLevelConfig.isFinal);
+            me._currentLevelConfig.isFinal,
+            me._currentLevelIndex);
         me._tape.init(
             me._currentLevelConfig.isMainMenu,
             me._currentLevelConfig.message[0].toUpperCase(),
@@ -273,7 +274,7 @@ export default class Game {
 
         if (result.to == '_' && !!me._currentLevelConfig.isTutorial && me._tutorialIndex == 4) {
             me._tutorialIndex = 5;
-            me._tutorialText.setText('use can "CANCEL" signal to delete previous signals')
+            me._tutorialText.setText('you can use "CANCEL" signal to delete previous signals')
         }
 
         if (!!me._currentLevelConfig.isTutorial && me._tutorialIndex == 3) {

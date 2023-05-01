@@ -86,7 +86,7 @@ export default class Score {
         me._totalScore = 0;
     }
 
-    init(isMainMenu, bonusTime, isFinal) {
+    init(isMainMenu, bonusTime, isFinal, currentLevel) {
         const me = this;
 
         me._scoreHistory = [];
@@ -95,7 +95,7 @@ export default class Score {
         me._maxTimeMs = bonusTime;
         me._isFinal = isFinal;
 
-        me._menu.init(isFinal)
+        me._menu.init(isFinal, currentLevel)
 
         if (!!isMainMenu)
             return;
@@ -142,11 +142,11 @@ export default class Score {
     /**
      * @param {Number} state 
      */
-    updateGUI(state) {
+    updateGUI(state, currentLevel) {
         const me = this;
 
         if (state == Enums.GameState.GAME)
-            me._scoreText.setText(me._buildScoreText());
+            me._scoreText.setText(me._buildScoreText(currentLevel));
         else if (state == Enums.GameState.LEVEL_COMPLETED)
             me._menu.update();
     }
@@ -208,10 +208,12 @@ export default class Score {
         }, me);
     }
 
-    _buildScoreText() {
+    _buildScoreText(currentLevel) {
         const me = this;
 
         const res = [];
+        res.push(' LEVEL ')
+        res.push(currentLevel.toString())
         res.push(' SCORE ');
 
         if (me._score < 1000)
@@ -225,7 +227,7 @@ export default class Score {
 
         res.push(me._score.toString());
 
-        res.push('   TIME ');
+        res.push(' TIME ');
 
         const time = new Date().getTime() - me._startTimeMs;
         res.push(Math.floor(time / 60000).toString());
@@ -464,7 +466,7 @@ class Menu {
         return me._container;
     }
 
-    init(isFinal) {
+    init(isFinal, currentLevel) {
         const me = this;
         
         me._isFinal = !!isFinal;
@@ -505,7 +507,6 @@ class Menu {
 
             if (!!me._isFinal) {
                 //FINAL
-
                 
                 const jumpscare = Here._.add.image(0, 0, 'seagull_attack')
                     .setScale(0)
@@ -516,7 +517,7 @@ class Menu {
                     scale: { from: 0, to: 40 },
                     y: 1200,
                     duration: 1000,
-                    delay: 0, // 7000, TODO!!!
+                    delay: 7000,
                     ease: 'sine.in',
                     onStart: () => {
                         Here.Audio.stopAll();
