@@ -18,7 +18,7 @@ export default class Game {
         Utils.debugLog('PAST YOUR CODE HERE!');
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
-            me._log = Here._.add.text(10, 10, '', { fontSize: 14, backgroundColor: '#000' })
+            me._log = Here._.add.text(10, 10, '', { fontSize: 18, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
         });
@@ -27,7 +27,7 @@ export default class Game {
     update() {
         const me = this;
 
-        if (Here.Controls.isPressed(Enums.Keyboard.RESTART) 
+        if (Here.Controls.isPressedOnce(Enums.Keyboard.RESTART) 
             && Utils.isDebug(Config.Debug.Global))
             Here._.scene.restart({ isRestart: true });
 

@@ -49,7 +49,11 @@ export default class Controls {
         return me._keys[key].key.isDown;
     }
 
-    isPressed(key) {
+    /**
+     * @param {Number} key 
+     * @returns {Boolean}
+     */
+    isPressedOnce(key) {
         const me = this;
 
         return me._keys[key].justPressed;
