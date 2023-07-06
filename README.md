@@ -1,5 +1,12 @@
 # gameJams
 
+## Seagullarity
+Game: https://torte478.itch.io/seagullarity
+
+Submission for https://ldjam.com/events/ludum-dare/53
+
+29.04.23 - 02.05.23
+
 ## I want to be friends
 Game: https://torte478.itch.io/i-want-to-be-friends
 
