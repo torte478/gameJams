@@ -58,7 +58,7 @@ export default class Player {
         /** @type {Phaser.Physics.Arcade.Body} */
         const  body = me._container.body;
 
-        const speed = Config.Player.GroundSpeed;
+        const speed = Config.Player.Speed;
 
         if (Here.Controls.isPressing(Enums.Keyboard.RIGHT)) 
             body.setVelocityX(speed);
@@ -70,34 +70,6 @@ export default class Player {
         me._processJump(time);
         me._prevY = me._container.y;
         me._prevGrounded = body.blocked.down;
-
-        return;
-
-        // if (Here.Controls.isPressedOnce(Enums.Keyboard.UP) && body.blocked.down) {
-        //     me._lastJumpTime = time;
-        //     body.setVelocityY(Config.Player.Jump / 2);
-        // }
-
-        // const currentIsFalling = time - me._lastJumpTime > 600;
-        // if (Here.Controls.isPressing(Enums.Keyboard.UP) && !currentIsFalling)
-        //     body.setAccelerationY(-(Config.Player.Gravity + 300));
-        // else if (currentIsFalling != me._isFalling) {
-        //     body.setGravityY(3 * Config.Player.Gravity);
-        //     body.setVelocityY(100);
-        // }
-        // else
-        //     body.setAccelerationY(0);
-
-        // if (body.blocked.down) {
-        //     body.setGravityY(300);
-        // }
-        // else if (currentIsFalling)
-        //     body.setGravityY(1800);
-        // me._prevY = me._container.y;
-        // me._isFalling = currentIsFalling;
-
-        // if (Here.Controls.isPressedOnce(Enums.Keyboard.UP) && body.blocked.down)
-        //     body.setVelocityY(Config.Player.Jump);
     }
 
     _isFalling = true;
@@ -113,8 +85,8 @@ export default class Player {
         const  body = me._container.body;
 
         if (Here.Controls.isPressedOnce(Enums.Keyboard.UP) && body.blocked.down) {
-            body.setGravityY(400);
-            body.setVelocityY(-600);
+            body.setGravityY(Config.Player.GravityJump);
+            body.setVelocityY(Config.Player.JumpForce);
             me._isJump = true;
             me._lastJump = time;
             // console.log('jump start');
@@ -122,7 +94,7 @@ export default class Player {
         }
 
         if (me._isJump && me._container.y > me._prevY) {
-            body.setGravityY(1200);
+            body.setGravityY(Config.Player.GravityFall);
             me._isJump = false;
             // console.log('jump end')
             return;
@@ -133,8 +105,9 @@ export default class Player {
             // console.log('grounded');
         }
             
-        if (!body.blocked.down && time - me._lastJump > 100) {
-            body.setAccelerationY(800);
+        if (!body.blocked.down 
+            && time - me._lastJump > Config.Player.JumpTimeMs) {
+            body.setAccelerationY(Config.Player.FallAccelaration);
             me._isJumpPressing = false;
             // console.log('force down');
         }
@@ -189,6 +162,6 @@ export default class Player {
 
         /** @type {Phaser.Physics.Arcade.Body} */
         const body = me._container.body;
-        body.setGravityY(1000);
+        body.setGravityY(Config.Player.GravityFall);
     }
 }

@@ -54,7 +54,7 @@ export default class Game {
             Config.Camera.OffsetY)
             .setBackgroundColor('#1a1a1a');
 
-        me._teleportCamera = new TeleportCamera(me._player, Config.Camera.Border, me._log);
+        me._teleportCamera = new TeleportCamera(me._player, Config.Border, me._log);
         me._backBorder = new Border(me._player, -200);
 
         const lightPool = Here._.physics.add.staticGroup();
@@ -71,7 +71,7 @@ export default class Game {
 
         me._createTrigger(
             me._onTeleportTrigger,
-            Config.Camera.Border + Consts.Unit.Normal, 
+            Config.Border + Consts.Unit.Normal, 
             800, 
             Consts.Unit.Big, 
             1600, 
@@ -119,7 +119,7 @@ export default class Game {
         me._player.update(time);
         Here._.cameras.main.setBounds(
             Here._.cameras.main.scrollX,
-            200,
+            300,
             2 * Consts.Viewport.Width,
             Consts.Viewport.Height);
 
@@ -143,7 +143,7 @@ export default class Game {
     _onTeleportTrigger() {
         const me = this;
 
-        me._player.teleport(Config.Player.StartX);
+        me._player.teleport(Config.Start);
         me._teleportCamera.reset();
         Here._.cameras.main.setScroll(100, 0); // TODO
         me._backBorder.reset();
