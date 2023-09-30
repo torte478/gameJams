@@ -8,6 +8,7 @@ import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Level from './Level.js';
 import Player from './Player.js';
+import Triggers from './Triggers.js';
 
 export default class Game {
 
@@ -36,6 +37,12 @@ export default class Game {
         const lightPool = Here._.physics.add.staticGroup();
         lightPool.create(700, 700, 'items', 0);
         lightPool.create(600, 700, 'items', 0);
+
+        const triggers = new Triggers(me._player);
+        triggers.create(900, 700, 200, 200, false, () => {
+            if (me._player.tryGiveAwayLight())
+                Utils.debugLog('light');
+        }, me);
 
         // physics
 

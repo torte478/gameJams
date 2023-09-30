@@ -72,6 +72,19 @@ export default class Player {
         return true;
     }
 
+    /**
+     * @returns {Boolean}
+     */
+    tryGiveAwayLight() {
+        const me = this;
+
+        if (!me._hasLight)
+            return false;
+
+        me._hasLight = false;
+        return true;
+    }
+
     _initPhysics() {
         const me = this;
 
