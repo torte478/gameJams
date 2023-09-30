@@ -3,18 +3,18 @@ import Enums from "./Enums.js";
 export default class Config {
 
     static Debug = {
-        Global: true,
+        Global: false,
         Log: true,
         ShowSceneLog: true,
         PlaySound: true,
         Random: false,
-        IsFinalUndeground: true,
+        IsFinalUndeground: false,
         Position: false,
         DebugX: 4800,
         DebugY: 1390
     };
 
-    static StartLevel = 5;
+    static StartLevel = 0;
 
     static WorldBorder = 9525;
     static WorldStartX = 400;

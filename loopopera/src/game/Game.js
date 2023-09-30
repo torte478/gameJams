@@ -570,9 +570,6 @@ export default class Game {
             : Consts.Tiles.UndegroundSecondWallDown,
             0);
 
-        for (let i = 0; i < secondWall.length; ++i)
-            me._level.setTile(secondWall[i].x, secondWall[i].y, 0);
-
         me._isThirdWallUp = me._firstDeadEndTrigger == -1 
             ? Utils.getRandom(0, 1, 0) == 0 
             : !me._isThirdWallUp;
@@ -676,6 +673,9 @@ export default class Game {
         if (next == 4)
             return me._initLevel4();
 
+        if (next == 5)
+            return me._initLevel5();
+
         throw `unknown level ${next}`;
     }
 
@@ -757,7 +757,7 @@ export default class Game {
     _initStartFromLevel4() {
         const me = this;
 
-        // me._player.tryTakeLight();
+        me._player.tryTakeLight();
         me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
         me._initLevel4();
     }

@@ -1,3 +1,6 @@
+deadend bugs
+open underground later
+
 WASD + arrows
 movement particles and angle
 #0D0D0D
@@ -7,3 +10,5 @@ tutorial
 cinema frames
 deadend timeout
 movement controller
+back collider animation
+restart by button for player
