@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Player from "./Player.js";
@@ -20,17 +21,15 @@ export default class TeleportCamera {
         me._player = player;
         me._border = border;
 
+        const scroll = me._player.toPos().x + Consts.Unit.Small;
         me._camera = Here._.cameras.add(
             Consts.Viewport.Width + 100,
             0, 
             Consts.Viewport.Width,
             Consts.Viewport.Height,
             false)
-            .setScroll(
-                (Consts.Viewport.Width / 2) + Config.Camera.OffsetX,
-                0
-            )
-            // .setBackgroundColor('#A0908D')
+            .setScroll(scroll, 0)
+            .setBackgroundColor('#A0908D') //debug
             .setBackgroundColor('#000000')
             ;
 

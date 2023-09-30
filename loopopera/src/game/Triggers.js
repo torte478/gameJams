@@ -32,7 +32,7 @@ export default class Triggers {
         Here._.physics.add.existing(zone, true);
 
         Here._.physics.add.overlap(
-            me._player.getCollider(),
+            me._player.toCollider(),
             zone,
             (p, z) => {
                 if (!!callback)

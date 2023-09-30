@@ -36,7 +36,7 @@ export default class Player {
     /**
      * @returns {Phaser.Physics.Arcade.Body}
      */
-    getCollider() {
+    toCollider() {
         const me = this;
         return me._container;
     }
@@ -47,7 +47,7 @@ export default class Player {
         /** @type {Phaser.Physics.Arcade.Body} */
         const  body = me._container.body;
 
-        const speed = Config.PlayerPhysics.GroundSpeed;
+        const speed = Config.Player.GroundSpeed;
 
         if (Here.Controls.isPressing(Enums.Keyboard.RIGHT)) 
             body.setVelocityX(speed);
@@ -57,7 +57,7 @@ export default class Player {
             body.setVelocityX(0);
 
         if (Here.Controls.isPressedOnce(Enums.Keyboard.UP) && body.blocked.down)
-            body.setVelocityY(Config.PlayerPhysics.Jump);
+            body.setVelocityY(Config.Player.Jump);
     }
 
     /**
@@ -109,6 +109,6 @@ export default class Player {
 
         /** @type {Phaser.Physics.Arcade.Body} */
         const body = me._container.body;
-        body.setGravityY(Config.PlayerPhysics.Gravity);
+        body.setGravityY(Config.Player.Gravity);
     }
 }

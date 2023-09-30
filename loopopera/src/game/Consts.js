@@ -11,8 +11,6 @@ export default class Consts {
         Big: 100
     };
 
-    static Border = 1300;
-
     static Depth = {
         Background: -100,
         Tiles: 0,

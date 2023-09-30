@@ -10,6 +10,7 @@ import Level from './Level.js';
 import Player from './Player.js';
 import Triggers from './Triggers.js';
 import TeleportCamera from './TeleportCamera.js';
+import Border from './Border.js';
 
 export default class Game {
 
@@ -22,6 +23,9 @@ export default class Game {
     /** @type {TeleportCamera} */
     _teleportCamera;
 
+    /** @type {Border} */
+    _backBorder;
+
     constructor() {
         const me = this;
 
@@ -33,44 +37,51 @@ export default class Game {
                 .setDepth(Consts.Depth.Max);
         });
 
-        // init
+        // create
 
         const level = new Level();
-        me._player = new Player(300, 600);
+        me._player = new Player(Config.Player.StartX, Config.Player.StartY);
 
         Here._.cameras.main.startFollow(
-            me._player.getCollider(),
+            me._player.toCollider(),
             true,
             1,
             0,
             Config.Camera.OffsetX,
             Config.Camera.OffsetY);
 
-        me._teleportCamera = new TeleportCamera(me._player, Consts.Border, me._log);
+        me._teleportCamera = new TeleportCamera(me._player, Config.Camera.Border, me._log);
+        me._backBorder = new Border(me._player, -200);
 
         const lightPool = Here._.physics.add.staticGroup();
-        // lightPool.create(700, 700, 'items', 0);
-        // lightPool.create(600, 700, 'items', 0);
-
         const triggers = new Triggers(me._player);
-        // triggers.create(900, 700, 200, 200, false, () => {
-        //     if (me._player.tryGiveAwayLight())
-        //         Utils.debugLog('light');
-        // }, me);
-        triggers.create(1350, 400, 100, 800, false, () => {
-                me._player.teleport(300 - 25);
+
+        // init
+
+        // lightPool.create(700, 700, 'items', 0);
+        lightPool.create(1000, 700, 'items', 0);
+
+        triggers.create(600, 700, 200, 200, false, () => {
+            if (me._player.tryGiveAwayLight())
+                Utils.debugLog('light');
+        }, me);
+
+        triggers.create(Config.Camera.Border + Consts.Unit.Normal, 400, Consts.Unit.Big, 800, false, () => {
+                me._player.teleport(Config.Player.StartX);
                 me._teleportCamera.reset();
+                Here._.cameras.main.setScroll(100, 0); // TODO
+                me._backBorder.reset();
                 console.log('teleport');
             }, me);
 
         // physics
 
         Here._.physics.add.collider(
-            me._player.getCollider(), 
+            me._player.toCollider(), 
             level.getCollider());
 
         Here._.physics.add.overlap(
-            me._player.getCollider(),
+            me._player.toCollider(),
             lightPool,
             (p, l) => {
                 if (me._player.tryTakeLight())
@@ -85,8 +96,7 @@ export default class Game {
             && Utils.isDebug(Config.Debug.Global))
             Here._.scene.restart({ isRestart: true });
 
-        me._player.update();
-        me._teleportCamera.update();
+        me._updateInternal();
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
@@ -94,9 +104,23 @@ export default class Game {
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `plr: ${me._player._container.x | 0} ${me._player._container.y | 0}\n` +
-                `vie: ${Here._.cameras.main.scrollX}`;
+                `vie: ${Here._.cameras.main.scrollX | 0} ${me._teleportCamera._camera.scrollX | 0}`;
 
             me._log.setText(text);
         });
+    }
+
+    _updateInternal() {
+        const me = this;
+
+        me._player.update();
+        Here._.cameras.main.setBounds(
+            Here._.cameras.main.scrollX,
+            0,
+            2 * Consts.Viewport.Width,
+            Consts.Viewport.Height);
+
+        me._teleportCamera.update();
+        me._backBorder.update();
     }
 }
