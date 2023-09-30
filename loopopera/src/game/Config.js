@@ -2,21 +2,24 @@ export default class Config {
 
     static Debug = {
         Global: true,
-        Log: false,
+        Log: true,
         ShowSceneLog: true,
         PlaySound: true,
         Random: false,
-        IsFinalUndeground: false
+        IsFinalUndeground: false,
+        Position: false,
+        DebugX: 4800,
+        DebugY: 1390
     };
 
-    static StartLevel = 0;
+    static StartLevel = 2;
 
     static WorldBorder = 9525;
     static WorldStartX = 400;
     static BackgroundColor = '#0d0d0d';
 
     static Player = {
-        StartX: 2800,
+        StartX: 100,
         StartY: 1390,
         // Speed: 500,
         Speed: 300,

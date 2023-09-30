@@ -29,4 +29,10 @@ export default class Level {
 
         return me._tiles;
     }
+
+    setTile(x, y, tileIndex) {
+        const me = this;
+
+        me._tiles.fill(tileIndex, x, y, 1, 1);
+    }
 }

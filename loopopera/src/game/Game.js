@@ -41,6 +41,12 @@ export default class Game {
     /** @type {Boolean} */
     _startScreenHiding = true;
 
+    /** @type {Level} */
+    _level;
+
+    /** @type {Phaser.GameObjects.Group} */
+    _lightBulletPool;
+
     constructor() {
         const me = this;
 
@@ -54,7 +60,7 @@ export default class Game {
 
         // create
 
-        const level = new Level();
+        me._level = new Level();
         me._player = new Player(Config.Player.StartX, Config.Player.StartY);
 
         Here._.cameras.main.startFollow(
@@ -77,8 +83,13 @@ export default class Game {
 
         me._startScreen = Here._.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'start_screen')
             .setScrollFactor(0)
-            .setDepth(Consts.Depth.Max)
+            .setDepth(Consts.Depth.Foreground)
             .setVisible(false);
+
+        const penragram = Here._.add.image(5000, 1100, 'pentagram')
+            .setDepth(Consts.Depth.Tiles);
+
+        me._lightBulletPool = Here._.add.group();
 
         // init
 
@@ -97,11 +108,14 @@ export default class Game {
 
         me._initGame();
 
+        if (Utils.isDebug(Config.Debug.Position))
+            me._player.setPosition(Config.Debug.DebugX, Config.Debug.DebugY);
+
         // physics
 
         Here._.physics.add.collider(
             me._player.toCollider(), 
-            level.getCollider());
+            me._level.getCollider());
 
         Here._.physics.add.overlap(
             me._player.toCollider(),
@@ -124,10 +138,12 @@ export default class Game {
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
 
+            const tile = me._leve
+
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `plr: ${me._player._container.x | 0} ${me._player._container.y | 0}\n` +
-                `dbg: ${Here._.cameras.main.scrollX | 0} ${Here._.cameras.main.scrollY | 0}`;
+                `dbg: ${me._currentLevel}`;
 
             me._log.setText(text);
         });
@@ -187,6 +203,10 @@ export default class Game {
                 Here._.cameras.main.scrollY);
         me._backBorder.reset();
         console.log('teleport');
+
+
+        if (me._currentLevel === 1)
+           throw 'me._currentLevel === 2';
     }
 
     /** @type {Phaser.Time.TimerEvent} */
@@ -338,10 +358,15 @@ export default class Game {
     _initGame() {
         const me = this;
 
-        // triggers.create(600, 700, 200, 200, false, () => {
-            //     if (me._player.tryGiveAwayLight())
-            //         Utils.debugLog('light');
-            // }, me);
+        me._createTrigger(
+            me._onPlayerGiveAwayLightTrigger,
+            4725,
+            1200,
+            200,
+            400,
+            false);
+
+        me._fillHoles();
 
         me._currentLevel = Config.StartLevel;
         
@@ -350,6 +375,69 @@ export default class Game {
 
         if (me._currentLevel === 1)
             return me._initLevel1();
+
+        if (me._currentLevel === 2)
+            return me._initLevel2();
+
+        throw `unknown level ${me._currentLevel}`;
+    }
+
+    _fillHoles() {
+        const me = this;
+
+        // undeground enter
+        for (let i = 0; i < 3; ++i)
+            me._level.setTile(32 + i, 29, 0);
+
+        // first grave
+        for (let i = 0; i < 2; ++i)
+            for (let j = 0; j < 2; ++j)
+                me._level.setTile(36 + i, 27 + j, -1);
+
+        // undeground exit
+        for (let i = 0; i < 4; ++i)
+            me._level.setTile(138 + i, 29, 0);
+
+        // super undeground enter
+        for (let i = 0; i < 3; ++i)
+            me._level.setTile(161 + i, 29, 0);
+    }
+
+    _onPlayerGiveAwayLightTrigger() {
+        const me = this;
+
+        if (!me._player.tryGiveAwayLight())
+            return;
+
+        const playerPos = me._player.toPos();
+        /** @type {Phaser.GameObjects.Image} */
+        const bullet = me._lightBulletPool.create(playerPos.x, playerPos.y, 'items', 0);
+        bullet.setDepth(Consts.Depth.Player + 25);
+        const targetPos = me._getBulletTargetPos();
+        Here._.tweens.timeline({
+            targets: bullet,
+            tweens: [
+                {
+                    x: 5000,
+                    y: 1150,
+                    duration: 1500,
+                    ease: 'Sine.easeInOut'
+                },
+                {
+                    x: targetPos.x,
+                    y: targetPos.y,
+                    duration: 1500,
+                    ease: 'Sine.easeInOut'
+                }
+            ]
+        })
+    }
+
+    _getBulletTargetPos() {
+        const me = this;
+
+        if (me._currentLevel <= 1)
+            return Utils.buildPoint(4861, 1099);
 
         throw `unknown level ${me._currentLevel}`;
     }
@@ -360,6 +448,7 @@ export default class Game {
         me._startScreenHiding = false;
         me._startScreen.setVisible(true);
 
+        me._player.setPosition(2625, 1390);
         me._player.setBusy(true);
         me._lightPool.create(3500, 1175, 'items', 0);
 
@@ -381,7 +470,6 @@ export default class Game {
                 duration: 2000,
                 ease: 'Sine.easeOut',
                 onComplete: () => {
-                    console.log('foo');
                     me._player.setBusy(false);
                     me._currentLevel = 1;
                 }
@@ -391,5 +479,14 @@ export default class Game {
 
     _initLevel1() {
         const me = this;
+
+        me._player.setPosition(4400, 1390);
+        me._player.tryTakeLight();
+    }
+
+    _initLevel2() {
+        const me = this;
+
+        me._player.setPosition(435, 1390);
     }
 }

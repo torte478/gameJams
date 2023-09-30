@@ -100,6 +100,12 @@ export default class Player {
         me._container.setPosition(posX, me._container.y);
     }
 
+    setPosition(posX, posY) {
+        const me = this;
+
+        me._container.setPosition(posX, posY);
+    }
+
     /** @type {Phaser.Geom.Point} */
     toPos() {
         const me = this;

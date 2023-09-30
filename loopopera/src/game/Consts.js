@@ -15,6 +15,7 @@ export default class Consts {
         Background: -100,
         Tiles: 0,
         Player: 1000,
+        Foreground: 10000,
         Max: 100000
     };
 }
