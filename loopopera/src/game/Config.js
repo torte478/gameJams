@@ -5,15 +5,16 @@ export default class Config {
         Log: true,
         ShowSceneLog: true,
         PlaySound: true,
-        Random: false
+        Random: false,
+        IsFinalUndeground: true
     };
 
     static Border = 9525;
     static Start = 400;
 
     static Player = {
-        StartX: 7850,
-        StartY: 1200,
+        StartX: 3000,
+        StartY: 2800,
         // Speed: 500,
         Speed: 300,
         GravityFall: 1200,

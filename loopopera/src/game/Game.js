@@ -84,6 +84,9 @@ export default class Game {
 
         me._createCameraBoundYTriggers();
 
+        if (Utils.isDebug(Config.Debug.IsFinalUndeground))
+            me._onFinalUndergroundTrigger();
+
         // physics
 
         Here._.physics.add.collider(
