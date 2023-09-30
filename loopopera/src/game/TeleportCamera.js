@@ -30,7 +30,7 @@ export default class TeleportCamera {
             false)
             .setScroll(scroll, 0)
             .setBackgroundColor('#A0908D') //debug
-            .setBackgroundColor('#000000')
+            .setBackgroundColor('#1a1a1a')
             ;
 
         if (!!log)

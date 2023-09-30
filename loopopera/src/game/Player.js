@@ -15,6 +15,15 @@ export default class Player {
     /** @type {Boolean} */
     _hasLight;
 
+    // /** @type {Number} */
+    // _prevY;
+
+    // /** @type {Number} */
+    // _lastJumpTime;
+
+    // /** @type {Boolean} */
+    // _isFalling;
+
     /**
      * @param {Number} x 
      * @param {Number} y 
@@ -29,6 +38,8 @@ export default class Player {
             .setSize(Consts.Unit.Normal, Consts.Unit.Big);
 
         me._hasLight = false;
+        // me._prevY = me._container.y;
+        // me._isFalling = false;
 
         me._initPhysics();
     }
@@ -41,7 +52,7 @@ export default class Player {
         return me._container;
     }
 
-    update() {
+    update(time) {
         const me = this;
 
         /** @type {Phaser.Physics.Arcade.Body} */
@@ -56,8 +67,77 @@ export default class Player {
         else
             body.setVelocityX(0);
 
-        if (Here.Controls.isPressedOnce(Enums.Keyboard.UP) && body.blocked.down)
-            body.setVelocityY(Config.Player.Jump);
+        me._processJump(time);
+        me._prevY = me._container.y;
+        me._prevGrounded = body.blocked.down;
+
+        return;
+
+        // if (Here.Controls.isPressedOnce(Enums.Keyboard.UP) && body.blocked.down) {
+        //     me._lastJumpTime = time;
+        //     body.setVelocityY(Config.Player.Jump / 2);
+        // }
+
+        // const currentIsFalling = time - me._lastJumpTime > 600;
+        // if (Here.Controls.isPressing(Enums.Keyboard.UP) && !currentIsFalling)
+        //     body.setAccelerationY(-(Config.Player.Gravity + 300));
+        // else if (currentIsFalling != me._isFalling) {
+        //     body.setGravityY(3 * Config.Player.Gravity);
+        //     body.setVelocityY(100);
+        // }
+        // else
+        //     body.setAccelerationY(0);
+
+        // if (body.blocked.down) {
+        //     body.setGravityY(300);
+        // }
+        // else if (currentIsFalling)
+        //     body.setGravityY(1800);
+        // me._prevY = me._container.y;
+        // me._isFalling = currentIsFalling;
+
+        // if (Here.Controls.isPressedOnce(Enums.Keyboard.UP) && body.blocked.down)
+        //     body.setVelocityY(Config.Player.Jump);
+    }
+
+    _isFalling = true;
+    _isJump = true;
+    _prevY = 0;
+    _lastJump = 9999;
+    _prevGrounded = false;
+
+    _processJump(time) {
+        const me = this;
+
+        /** @type {Phaser.Physics.Arcade.Body} */
+        const  body = me._container.body;
+
+        if (Here.Controls.isPressedOnce(Enums.Keyboard.UP) && body.blocked.down) {
+            body.setGravityY(400);
+            body.setVelocityY(-600);
+            me._isJump = true;
+            me._lastJump = time;
+            // console.log('jump start');
+            return;
+        }
+
+        if (me._isJump && me._container.y > me._prevY) {
+            body.setGravityY(1200);
+            me._isJump = false;
+            // console.log('jump end')
+            return;
+        }
+
+        if (!!body.blocked.down && !me._prevGrounded) {
+            body.setAccelerationY(0);
+            // console.log('grounded');
+        }
+            
+        if (!body.blocked.down && time - me._lastJump > 100) {
+            body.setAccelerationY(800);
+            me._isJumpPressing = false;
+            // console.log('force down');
+        }
     }
 
     /**
@@ -109,6 +189,6 @@ export default class Player {
 
         /** @type {Phaser.Physics.Arcade.Body} */
         const body = me._container.body;
-        body.setGravityY(Config.Player.Gravity);
+        body.setGravityY(1000);
     }
 }

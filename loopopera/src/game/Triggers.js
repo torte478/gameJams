@@ -17,15 +17,15 @@ export default class Triggers {
     }
 
     /**
+     * @param {Function} callback 
+     * @param {Object} context 
      * @param {Number} x 
      * @param {Number} y 
      * @param {Number} width 
      * @param {Number} height 
      * @param {Boolean} disposable 
-     * @param {Function} callback 
-     * @param {Object} context 
      */
-    create(x, y, width, height, disposable, callback, context) {
+    create(callback, context, x, y, width, height, disposable) {
         const me = this;
 
         const zone = Here._.add.zone(x, y, width, height);
