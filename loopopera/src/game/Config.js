@@ -11,7 +11,12 @@ export default class Config {
     static PlayerPhysics = {
         Gravity: 600,
         Bounce: 0.2,
-        GroundSpeed: 300,
+        GroundSpeed: 500, // 300,
         Jump: -590
     };
+
+    static Camera = {
+        OffsetX: -200,
+        OffsetY: 200
+    }
 }

@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
@@ -83,6 +84,22 @@ export default class Player {
 
         me._hasLight = false;
         return true;
+    }
+
+    /**
+     * @param {Number} posX 
+     */
+    teleport(posX) {
+        const me = this;
+
+        me._container.setPosition(posX, me._container.y);
+    }
+
+    /** @type {Phaser.Geom.Point} */
+    toPos() {
+        const me = this;
+
+        return Utils.toPoint(me._container);
     }
 
     _initPhysics() {
