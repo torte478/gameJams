@@ -12,6 +12,9 @@ export default class Consts {
     };
 
     static Depth = {
+        Background: -100,
+        Tiles: 0,
+        Player: 1000,
         Max: 100000
     };
 }

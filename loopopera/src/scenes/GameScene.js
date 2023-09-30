@@ -1,6 +1,7 @@
 import Animation from '../framework/Animation.js';
 import HereScene from '../framework/HereScene.js';
 import Utils from '../framework/Utils.js';
+import Consts from '../game/Consts.js';
 
 import Game from '../game/Game.js';
 
@@ -29,7 +30,10 @@ export default class GameScene extends HereScene {
         if (!me._isRestart)
             Utils.runLoadingBar();
 
-        Utils.loadWav('button_click');
+        me.load.tilemapCSV('level', `assets/level.csv`);
+
+        Utils.loadSpriteSheet('tiles', Consts.Unit.Normal);
+        Utils.loadSpriteSheet('player', Consts.Unit.Big);
     }
 
     create() {

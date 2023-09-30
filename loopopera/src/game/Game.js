@@ -6,16 +6,26 @@ import Utils from '../framework/Utils.js';
 import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
+import Level from './Level.js';
+import Player from './Player.js';
 
 export default class Game {
 
     /** @type {Phaser.GameObjects.Text} */
     _log;
 
+    /** @type {Player} */
+    _player;
+
     constructor() {
         const me = this;
 
-        Utils.debugLog('PAST YOUR CODE HERE!');
+        const level = new Level();
+        me._player = new Player(120, 600);
+
+        Here._.physics.add.collider(
+            me._player.getCollider(), 
+            level.getCollider());
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 18, backgroundColor: '#000' })
@@ -30,6 +40,8 @@ export default class Game {
         if (Here.Controls.isPressedOnce(Enums.Keyboard.RESTART) 
             && Utils.isDebug(Config.Debug.Global))
             Here._.scene.restart({ isRestart: true });
+
+        me._player.update();
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
