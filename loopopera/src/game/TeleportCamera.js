@@ -43,7 +43,8 @@ export default class TeleportCamera {
         me._camera.setScroll(me._camera.scrollX, Here._.cameras.main.scrollY);
 
         const diff = me._border - Here._.cameras.main.scrollX;
-        if (diff > Consts.Viewport.Width && (me._player.toPos() - me._border) > Consts.Viewport.Width)
+        if (diff > Consts.Viewport.Width 
+            && (me._player.toPos() - me._border) > Consts.Viewport.Width)
             return;
 
         me._camera.setPosition(

@@ -29,6 +29,15 @@ export default class Game {
     /** @type {Triggers} */
     _triggers;
 
+    /** @type {Number} */
+    _cameraBoundY;
+
+    /** @type {Number} */
+    _nextCameraBoundY;
+
+    /** @type {Number} */
+    _oldCameraBoundY;
+
     constructor() {
         const me = this;
 
@@ -51,8 +60,9 @@ export default class Game {
             1,
             1,
             Config.Camera.OffsetX,
-            Config.Camera.OffsetY)
+            0)
             .setBackgroundColor('#1a1a1a');
+        me._cameraBoundY = 300;
 
         me._teleportCamera = new TeleportCamera(me._player, Config.Border, me._log);
         me._backBorder = new Border(me._player, -200);
@@ -76,6 +86,14 @@ export default class Game {
             Consts.Unit.Big, 
             1600, 
             false);
+
+        me._createTrigger(
+            me._onRoofTrigger,
+            2245,
+            400,
+            200,
+            200,
+            true);
 
         // physics
 
@@ -117,14 +135,25 @@ export default class Game {
         const me = this;
 
         me._player.update(time);
+        me._updateCameraBounds();
+
         Here._.cameras.main.setBounds(
             Here._.cameras.main.scrollX,
-            300,
+            me._cameraBoundY,
             2 * Consts.Viewport.Width,
             Consts.Viewport.Height);
 
         me._teleportCamera.update();
         me._backBorder.update();
+    }
+
+    _updateCameraBounds() {
+        const me = this;
+
+        if (!me._timedEvent)
+            return;
+
+        me._cameraBoundY = me._oldCameraBoundY + (me._nextCameraBoundY - me._oldCameraBoundY) * me._timedEvent.getProgress();
     }
 
     _createTrigger(callback, x, y, width, height, disposed) {
@@ -148,5 +177,18 @@ export default class Game {
         Here._.cameras.main.setScroll(100, 0); // TODO
         me._backBorder.reset();
         console.log('teleport');
+    }
+
+    /** @type {Phaser.Time.TimerEvent} */
+    _timedEvent;
+
+    _onRoofTrigger() {
+        const me = this;
+
+        me._oldCameraBoundY = me._cameraBoundY;
+        me._nextCameraBoundY = 0;
+        me._timedEvent = Here._.time.delayedCall(3000, () => {
+            me._timedEvent = null;
+        }, [], me);
     }
 }

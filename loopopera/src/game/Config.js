@@ -12,7 +12,7 @@ export default class Config {
     static Start = 400;
 
     static Player = {
-        StartX: 2500,
+        StartX: 1620,
         StartY: 850,
         // Speed: 500,
         Speed: 300,
