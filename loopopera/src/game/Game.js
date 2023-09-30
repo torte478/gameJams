@@ -11,6 +11,7 @@ import Player from './Player.js';
 import Triggers from './Triggers.js';
 import TeleportCamera from './TeleportCamera.js';
 import Border from './Border.js';
+import Boss from './Boss.js';
 
 export default class Game {
 
@@ -50,6 +51,9 @@ export default class Game {
     /** @type {Phaser.GameObjects.Image} */
     _redScreen;
 
+    /** @type {Boss} */
+    _boss;
+
     constructor() {
         const me = this;
 
@@ -64,7 +68,7 @@ export default class Game {
         // create
 
         me._level = new Level();
-        me._player = new Player(Config.Player.StartX, Config.Player.StartY);
+        me._player = new Player(Config.Player.StartX, Config.Player.StartY, Config.Player.Speed);
 
         Here._.cameras.main.startFollow(
             me._player.toCollider(),
@@ -97,6 +101,8 @@ export default class Game {
             .setScrollFactor(0)
             .setDepth(Consts.Depth.Foreground)
             .setAlpha(0);
+
+        me._boss = new Boss(8500, 1750);
 
         // init
 
@@ -396,6 +402,9 @@ export default class Game {
         if (me._currentLevel === 4)
             return me._initStartFromLevel4();
 
+        if (me._currentLevel === 5)
+            return me._initStartFromLevel5();
+
         throw `unknown level ${me._currentLevel}`;
     }
 
@@ -410,11 +419,8 @@ export default class Game {
         ];
 
         const tile = 0;
-        for (let index = 0; index < positions.length; ++index) {
-            const arr = positions[index];
-            for (let i = 0; i < arr.length; ++i)
-                me._level.setTile(arr[i].x, arr[i].y, tile);
-        }
+        for (let index = 0; index < positions.length; ++index)
+            me._fillTiles(positions[index], 0);
     }
 
     _onPlayerGiveAwayLightTrigger() {
@@ -525,8 +531,6 @@ export default class Game {
         me._triggers.remove(me._secondDeadEndTrigger);
         me._triggers.remove(me._thirdDeadEndTrigger);
 
-        const emptyTile = 2;
-
         const positions = [ 
             Consts.Tiles.UndegroundFirstWallUp,
             Consts.Tiles.UndegroundFirstWallDown,
@@ -535,11 +539,8 @@ export default class Game {
             Consts.Tiles.UndegroundThirdWallUp,
             Consts.Tiles.UndegroundThirdWallDown,
         ];
-        for (let index = 0; index < positions.length; ++index) {
-            const arr = positions[index];
-            for (let i = 0; i < arr.length; ++i)
-                me._level.setTile(arr[i].x, arr[i].y, emptyTile);
-        }
+        for (let index = 0; index < positions.length; ++index)
+            me._fillTiles(positions[index], 2);
 
         me._createDeadEndsWithTriggersAndLight();
     }
@@ -551,19 +552,18 @@ export default class Game {
             ? Utils.getRandom(0, 1, 0) == 0 
             : !me._isFirstWallUp;
 
-        const firstWall = me._isFirstWallUp
-                ? Consts.Tiles.UndegroundFirstWallUp
-                : Consts.Tiles.UndegroundFirstWallDown;
-
-        for (let i = 0; i < firstWall.length; ++i)
-            me._level.setTile(firstWall[i].x, firstWall[i].y, 0);
+        me._fillTiles(me._isFirstWallUp
+            ? Consts.Tiles.UndegroundFirstWallUp
+            : Consts.Tiles.UndegroundFirstWallUp,
+            0);
 
         me._isSecondWallUp = me._firstDeadEndTrigger == -1 
             ? Utils.getRandom(0, 1, 0) == 0 
             : !me._isSecondWallUp;
-        const secondWall = me._isSecondWallUp
-                ? Consts.Tiles.UndegroundSecondWallUp
-                : Consts.Tiles.UndegroundSecondWallDown;
+        me._fillTiles(me._isSecondWallUp
+            ? Consts.Tiles.UndegroundSecondWallUp
+            : Consts.Tiles.UndegroundSecondWallDown,
+            0);
 
         for (let i = 0; i < secondWall.length; ++i)
             me._level.setTile(secondWall[i].x, secondWall[i].y, 0);
@@ -574,12 +574,10 @@ export default class Game {
         if (me._isFirstWallUp === me._isSecondWallUp && me._isThirdWallUp == me._isSecondWallUp)
             me._isThirdWallUp = !me._isThirdWallUp;
 
-        const thirdWall = me._isThirdWallUp
-                ? Consts.Tiles.UndegroundThirdWallUp
-                : Consts.Tiles.UndegroundThirdWallDown;
-
-        for (let i = 0; i < thirdWall.length; ++i)
-            me._level.setTile(thirdWall[i].x, thirdWall[i].y, 0);
+        me._fillTiles(me.thirdWall
+            ? Consts.Tiles.UndegroundThirdWallUp
+            : Consts.Tiles.UndegroundThirdWallDown,
+            0);
 
         if (!me._deadEndLight)
             me._deadEndLight = me._createLight(5825, 1875);
@@ -618,6 +616,32 @@ export default class Game {
             100,
             150,
             true);
+    }
+
+    _onBossAppearance() {
+        const me = this;
+
+        me._player.setBusy(true);
+        Here._.add.tween({
+            targets: me._boss.toCollider(),
+            y: 1150,
+            duration: Config.BossAppearanceTimeMs,
+            ease: 'Sine.easeInOut',
+            onComplete: () => {
+                me._fillTiles(Consts.Tiles.FinalUndegroundEnter, 2);
+                me._fillTiles(Consts.Tiles.FinalUndegroundExit, 2);
+                me._fillTiles(Consts.Tiles.UndegroundExit, 2);
+                me._player.setSpeedX(Config.Player.SpeedFast);
+                me._player.setBusy(false);
+            }
+        });
+    }
+
+    _fillTiles(arr, tile) {
+        const me = this;
+
+        for (let i = 0; i < arr.length; ++i)
+            me._level.setTile(arr[i].x, arr[i].y, tile);
     }
 
     // =levels
@@ -729,18 +753,31 @@ export default class Game {
         const me = this;
 
         const tile = 2;
-        for (let i = 0; i < Consts.Tiles.UndegroundEnter.length; ++i)
-            me._level.setTile(
-                Consts.Tiles.UndegroundEnter[i].x,
-                Consts.Tiles.UndegroundEnter[i].y, 
-                tile);
-
-        for (let i = 0; i < Consts.Tiles.UndegroundExit.length; ++i)
-            me._level.setTile(
-                Consts.Tiles.UndegroundExit[i].x,
-                Consts.Tiles.UndegroundExit[i].y, 
-                tile);
+        me._fillTiles(Consts.Tiles.UndegroundEnter, tile);
+        me._fillTiles(Consts.Tiles.UndegroundExit, tile);
 
         me._createDeadEndsWithTriggersAndLight();
+    }
+
+    _initStartFromLevel5() {
+        const me = this;
+
+        me._player.setPosition(Consts.Positions.FinalUndergroundX, Consts.Positions.GroundY);
+        me._initLevel5();
+    }
+
+    _initLevel5() {
+        const me = this;
+
+        me._createTrigger(
+            me._onBossAppearance,
+            8225,
+            1000,
+            150,
+            800,
+            true
+        );
+
+        me._createLight(8500, 1375);
     }
 }

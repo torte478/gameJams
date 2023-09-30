@@ -18,11 +18,13 @@ export default class Player {
     /** @type {Boolean} */
     _isBusy;
 
+    _speedX;
+
     /**
      * @param {Number} x 
      * @param {Number} y 
      */
-    constructor(x, y) {
+    constructor(x, y, speedX) {
         const me = this;
 
         me._sprite = Here._.physics.add.sprite(0, 0, 'player', 0);
@@ -33,8 +35,15 @@ export default class Player {
 
         me._hasLight = false;
         me._isBusy = false;
+        me._speedX = speedX;
 
         me._initPhysics();
+    }
+
+    setSpeedX(speedX) {
+        const me = this;
+
+        me._speedX = speedX;
     }
 
     /**
@@ -51,12 +60,10 @@ export default class Player {
         /** @type {Phaser.Physics.Arcade.Body} */
         const  body = me._container.body;
 
-        const speed = Config.Player.Speed;
-
         if (!me._isBusy && Here.Controls.isPressing(Enums.Keyboard.RIGHT)) 
-            body.setVelocityX(speed);
+            body.setVelocityX(me._speedX);
         else if (!me._isBusy && Here.Controls.isPressing(Enums.Keyboard.LEFT))
-            body.setVelocityX(-speed);
+            body.setVelocityX(-me._speedX);
         else
             body.setVelocityX(0);
 
