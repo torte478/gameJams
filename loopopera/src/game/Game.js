@@ -145,12 +145,10 @@ export default class Game {
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
 
-            const tile = me._leve
-
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `plr: ${me._player._container.x | 0} ${me._player._container.y | 0}\n` +
-                `dbg: ${me._currentLevel}`;
+                `dbg: ${me._currentLevel} ${me._player._hasLight}`;
 
             me._log.setText(text);
         });
@@ -404,25 +402,19 @@ export default class Game {
     _fillHoles() {
         const me = this;
 
-        for (let i = 0; i < Consts.Tiles.UndegroundEnter.length; ++i)
-            me._level.setTile(
-                Consts.Tiles.UndegroundEnter[i].x,
-                Consts.Tiles.UndegroundEnter[i].y, 
-                0);
+        const positions = [
+            Consts.Tiles.UndegroundEnter,
+            Consts.Tiles.UndegroundExit,
+            Consts.Tiles.FinalUndegroundEnter,
+            Consts.Tiles.FinalUndegroundExit,
+        ];
 
-        // undeground exit
-        for (let i = 0; i < 4; ++i)
-            me._level.setTile(138 + i, 29, 0);
-
-        // final undeground enter
-        for (let i = 0; i < 3; ++i)
-            me._level.setTile(161 + i, 29, 0);
-
-        for (let i = 0; i < Consts.Tiles.FinalUndegroundExit.length; ++i)
-            me._level.setTile(
-                Consts.Tiles.FinalUndegroundExit[i].x,
-                Consts.Tiles.FinalUndegroundExit[i].y, 
-                0);
+        const tile = 0;
+        for (let index = 0; index < positions.length; ++index) {
+            const arr = positions[index];
+            for (let i = 0; i < arr.length; ++i)
+                me._level.setTile(arr[i].x, arr[i].y, tile);
+        }
     }
 
     _onPlayerGiveAwayLightTrigger() {
@@ -458,6 +450,8 @@ export default class Game {
             me._switchLevelTo(3);
         else if (me._currentLevel === 3)
             me._switchLevelTo(4);
+        else if (me._currentLevel === 4)
+            me._switchLevelTo(5);
     }
 
     _getBulletTargetPos() {
@@ -471,6 +465,9 @@ export default class Game {
 
         if (me._currentLevel == 3)
             return Utils.buildPoint(5000, 963);
+
+        if (me._currentLevel == 4)
+            return Utils.buildPoint(5080, 995);
 
         throw `unknown level ${me._currentLevel}`;
     }
@@ -518,6 +515,8 @@ export default class Game {
     _isFirstWallUp = false;
     _isSecondWallUp = false;
     _isThirdWallUp = false;
+    /** @type {Phaser.Physics.Arcade.StaticBody} */
+    _deadEndLight;
 
     _recreateGroundTriggers() {
         const me = this;
@@ -542,10 +541,10 @@ export default class Game {
                 me._level.setTile(arr[i].x, arr[i].y, emptyTile);
         }
 
-        me._createDeadEndsWithTriggers();
+        me._createDeadEndsWithTriggersAndLight();
     }
 
-    _createDeadEndsWithTriggers() {
+    _createDeadEndsWithTriggersAndLight() {
         const me = this;
 
         me._isFirstWallUp = me._firstDeadEndTrigger == -1 
@@ -581,6 +580,14 @@ export default class Game {
 
         for (let i = 0; i < thirdWall.length; ++i)
             me._level.setTile(thirdWall[i].x, thirdWall[i].y, 0);
+
+        if (!me._deadEndLight)
+            me._deadEndLight = me._createLight(5825, 1875);
+
+        me._deadEndLight.setPosition(
+            me._deadEndLight.x, 
+            me._isThirdWallUp ? 2075 : 1875);
+        me._deadEndLight.refreshBody();
 
         me._createGroundTriggers(me._isFirstWallUp, me._isSecondWallUp, me._isThirdWallUp);
     }
@@ -713,6 +720,7 @@ export default class Game {
     _initStartFromLevel4() {
         const me = this;
 
+        // me._player.tryTakeLight();
         me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
         me._initLevel4();
     }
@@ -720,12 +728,19 @@ export default class Game {
     _initLevel4() {
         const me = this;
 
+        const tile = 2;
         for (let i = 0; i < Consts.Tiles.UndegroundEnter.length; ++i)
             me._level.setTile(
                 Consts.Tiles.UndegroundEnter[i].x,
                 Consts.Tiles.UndegroundEnter[i].y, 
-                2);
+                tile);
 
-        me._createDeadEndsWithTriggers();
+        for (let i = 0; i < Consts.Tiles.UndegroundExit.length; ++i)
+            me._level.setTile(
+                Consts.Tiles.UndegroundExit[i].x,
+                Consts.Tiles.UndegroundExit[i].y, 
+                tile);
+
+        me._createDeadEndsWithTriggersAndLight();
     }
 }

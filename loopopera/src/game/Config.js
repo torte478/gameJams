@@ -5,7 +5,7 @@ export default class Config {
         Log: true,
         ShowSceneLog: true,
         PlaySound: true,
-        Random: true,
+        Random: false,
         IsFinalUndeground: false,
         Position: false,
         DebugX: 4800,
@@ -21,9 +21,9 @@ export default class Config {
     static Player = {
         StartX: 100,
         StartY: 1390,
-        Speed: 700, // debug
-        // Speed: 300,
-        GravityFall: 1200,
+        // Speed: 700, // debug
+        Speed: 300,
+        GravityFall: 1000,
         GravityJump: 200,
         JumpForce: -400,
         JumpTimeMs: 200,

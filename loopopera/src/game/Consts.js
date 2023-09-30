@@ -62,6 +62,18 @@ export default class Consts {
             { x: 119, y: 41 },
             { x: 119, y: 42 },
         ],
+        UndegroundExit: [
+            { x: 138, y: 29 },
+            { x: 139, y: 29 },
+            { x: 140, y: 29 },
+            { x: 141, y: 29 },
+
+        ],
+        FinalUndegroundEnter: [
+            { x: 161, y: 29 },
+            { x: 162, y: 29 },
+            { x: 163, y: 29 },
+        ],
         FinalUndegroundExit: [  
             { x: 120, y: 43 },
             { x: 121, y: 43 },
