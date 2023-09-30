@@ -25,4 +25,49 @@ export default class Consts {
         PentagramExitX: 5700,
         GroundY: 1390
     }
+
+    static Tiles = {
+        UndegroundEnter: [ 
+            { x: 32, y: 29 },
+            { x: 33, y: 29 },
+            { x: 34, y: 29 },
+        ],
+        UndegroundFirstWallUp: [
+            { x: 64, y: 36 },
+            { x: 64, y: 37 },
+            { x: 64, y: 38 },
+        ],
+        UndegroundFirstWallDown: [
+            { x: 64, y: 40 },
+            { x: 64, y: 41 },
+            { x: 64, y: 42 },
+        ],
+        UndegroundSecondWallUp: [
+            { x: 89, y: 36 },
+            { x: 89, y: 37 },
+            { x: 89, y: 38 },
+        ],
+        UndegroundSecondWallDown: [
+            { x: 89, y: 40 },
+            { x: 89, y: 41 },
+            { x: 89, y: 42 },
+        ],
+        UndegroundThirdWallUp: [
+            { x: 119, y: 36 },
+            { x: 119, y: 37 },
+            { x: 119, y: 38 },
+        ],
+        UndegroundThirdWallDown: [
+            { x: 119, y: 40 },
+            { x: 119, y: 41 },
+            { x: 119, y: 42 },
+        ],
+        FinalUndegroundExit: [  
+            { x: 120, y: 43 },
+            { x: 121, y: 43 },
+            { x: 122, y: 43 },
+            { x: 123, y: 43 },
+            { x: 124, y: 43 },
+        ]
+    }
 }

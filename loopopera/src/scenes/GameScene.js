@@ -39,6 +39,7 @@ export default class GameScene extends HereScene {
         Utils.loadImage('border');
         Utils.loadImage('start_screen');
         Utils.loadImage('pentagram');
+        Utils.loadImage('red_screen');
     }
 
     create() {

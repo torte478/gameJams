@@ -9,6 +9,9 @@ export default class Triggers {
     /** @type {Object} */
     _context;
 
+    /** @type {Phaser.GameObjects.Zone[]} */
+    _zones = []
+
     /** @type {Player} */
     constructor(player) {
         const me = this;
@@ -29,6 +32,7 @@ export default class Triggers {
         const me = this;
 
         const zone = Here._.add.zone(x, y, width, height);
+        me._zones.push(zone);
         Here._.physics.add.existing(zone, true);
 
         Here._.physics.add.overlap(
@@ -41,5 +45,15 @@ export default class Triggers {
                 if (disposable)
                     zone.destroy();
             });
+
+        return me._zones.length - 1;
+    }
+
+    remove(index) {
+        const me = this;
+
+        const zone = me._zones[index];
+        if (!!zone)
+            zone.destroy();
     }
 }

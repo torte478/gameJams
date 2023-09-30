@@ -47,6 +47,9 @@ export default class Game {
     /** @type {Phaser.GameObjects.Group} */
     _lightBulletPool;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _redScreen;
+
     constructor() {
         const me = this;
 
@@ -90,6 +93,10 @@ export default class Game {
             .setDepth(Consts.Depth.Tiles);
 
         me._lightBulletPool = Here._.add.group();
+        me._redScreen = Here._.add.image(Consts.Viewport.Width / 2, Consts.Viewport.Height / 2, 'red_screen')
+            .setScrollFactor(0)
+            .setDepth(Consts.Depth.Foreground)
+            .setAlpha(0);
 
         // init
 
@@ -182,7 +189,7 @@ export default class Game {
     _createTrigger(callback, x, y, width, height, disposed) {
         const me = this;
 
-        me._triggers.create(
+        return me._triggers.create(
             callback,
             me,
             x, 
@@ -197,15 +204,22 @@ export default class Game {
 
         me._player.teleport(Config.WorldStartX);
         me._teleportCamera.reset();
-        Here._.cameras.main
-            .setScroll(
-                me._isFinalUndeground ? 0 : 100, 
-                Here._.cameras.main.scrollY);
-        me._backBorder.reset();
+        me._resetCameraAfterTeleport();
         console.log('teleport');
 
         if (me._currentLevel === 1)
            me._switchLevelTo(2);
+    }
+
+    _resetCameraAfterTeleport() {
+        const me = this;
+
+        Here._.cameras.main
+            .setScroll(
+                me._isFinalUndeground ? 0 : 100, 
+                Here._.cameras.main.scrollY);
+        
+        me._backBorder.reset();
     }
 
     /** @type {Phaser.Time.TimerEvent} */
@@ -381,23 +395,34 @@ export default class Game {
         if (me._currentLevel === 3)
             return me._initStartFromLevel3();
 
+        if (me._currentLevel === 4)
+            return me._initStartFromLevel4();
+
         throw `unknown level ${me._currentLevel}`;
     }
 
     _fillHoles() {
         const me = this;
 
-        // undeground enter
-        for (let i = 0; i < 3; ++i)
-            me._level.setTile(32 + i, 29, 0);
+        for (let i = 0; i < Consts.Tiles.UndegroundEnter.length; ++i)
+            me._level.setTile(
+                Consts.Tiles.UndegroundEnter[i].x,
+                Consts.Tiles.UndegroundEnter[i].y, 
+                0);
 
         // undeground exit
         for (let i = 0; i < 4; ++i)
             me._level.setTile(138 + i, 29, 0);
 
-        // super undeground enter
+        // final undeground enter
         for (let i = 0; i < 3; ++i)
             me._level.setTile(161 + i, 29, 0);
+
+        for (let i = 0; i < Consts.Tiles.FinalUndegroundExit.length; ++i)
+            me._level.setTile(
+                Consts.Tiles.FinalUndegroundExit[i].x,
+                Consts.Tiles.FinalUndegroundExit[i].y, 
+                0);
     }
 
     _onPlayerGiveAwayLightTrigger() {
@@ -456,6 +481,140 @@ export default class Game {
         return me._lightPool.create(x, y, 'items', 0);
     }
 
+    _onDeadEndTrigger() {
+        const me = this;
+
+        me._player.setBusy(true);
+        Here._.tweens.timeline({
+            targets: me._redScreen,
+            tweens: [
+                {
+                    alpha: { from: 0, to: 1},
+                    duration: 2000,
+                    ease: 'Sine.easeOut',
+                    onComplete: () => {
+                        me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
+                        me._resetCameraAfterTeleport();
+                        me._cameraBoundY = Config.Camera.BoundGroundY;
+                        me._nextCameraBoundY = -100;
+                        me._recreateGroundTriggers();
+                    }
+                },
+                {
+                    alpha: { from: 1, to: 0},
+                    duration: 2000,
+                    ease: 'Sine.easeIn',
+                    onComplete: () => {
+                        me._player.setBusy(false);
+                    }
+                },
+            ]
+        })
+    }
+
+    _firstDeadEndTrigger = -1;
+    _secondDeadEndTrigger = -1;
+    _thirdDeadEndTrigger = -1;
+    _isFirstWallUp = false;
+    _isSecondWallUp = false;
+    _isThirdWallUp = false;
+
+    _recreateGroundTriggers() {
+        const me = this;
+
+        me._triggers.remove(me._firstDeadEndTrigger);
+        me._triggers.remove(me._secondDeadEndTrigger);
+        me._triggers.remove(me._thirdDeadEndTrigger);
+
+        const emptyTile = 2;
+
+        const positions = [ 
+            Consts.Tiles.UndegroundFirstWallUp,
+            Consts.Tiles.UndegroundFirstWallDown,
+            Consts.Tiles.UndegroundSecondWallUp,
+            Consts.Tiles.UndegroundSecondWallDown,
+            Consts.Tiles.UndegroundThirdWallUp,
+            Consts.Tiles.UndegroundThirdWallDown,
+        ];
+        for (let index = 0; index < positions.length; ++index) {
+            const arr = positions[index];
+            for (let i = 0; i < arr.length; ++i)
+                me._level.setTile(arr[i].x, arr[i].y, emptyTile);
+        }
+
+        me._createDeadEndsWithTriggers();
+    }
+
+    _createDeadEndsWithTriggers() {
+        const me = this;
+
+        me._isFirstWallUp = me._firstDeadEndTrigger == -1 
+            ? Utils.getRandom(0, 1, 0) == 0 
+            : !me._isFirstWallUp;
+
+        const firstWall = me._isFirstWallUp
+                ? Consts.Tiles.UndegroundFirstWallUp
+                : Consts.Tiles.UndegroundFirstWallDown;
+
+        for (let i = 0; i < firstWall.length; ++i)
+            me._level.setTile(firstWall[i].x, firstWall[i].y, 0);
+
+        me._isSecondWallUp = me._firstDeadEndTrigger == -1 
+            ? Utils.getRandom(0, 1, 0) == 0 
+            : !me._isSecondWallUp;
+        const secondWall = me._isSecondWallUp
+                ? Consts.Tiles.UndegroundSecondWallUp
+                : Consts.Tiles.UndegroundSecondWallDown;
+
+        for (let i = 0; i < secondWall.length; ++i)
+            me._level.setTile(secondWall[i].x, secondWall[i].y, 0);
+
+        me._isThirdWallUp = me._firstDeadEndTrigger == -1 
+            ? Utils.getRandom(0, 1, 0) == 0 
+            : !me._isThirdWallUp;
+        if (me._isFirstWallUp === me._isSecondWallUp && me._isThirdWallUp == me._isSecondWallUp)
+            me._isThirdWallUp = !me._isThirdWallUp;
+
+        const thirdWall = me._isThirdWallUp
+                ? Consts.Tiles.UndegroundThirdWallUp
+                : Consts.Tiles.UndegroundThirdWallDown;
+
+        for (let i = 0; i < thirdWall.length; ++i)
+            me._level.setTile(thirdWall[i].x, thirdWall[i].y, 0);
+
+        me._createGroundTriggers(me._isFirstWallUp, me._isSecondWallUp, me._isThirdWallUp);
+    }
+
+    _createGroundTriggers(isFirstUp, isSecondUp, isThirdUp) {
+        const me = this;
+
+        me._firstDeadEndTrigger = me._createTrigger(
+            me._onDeadEndTrigger,
+            3150,
+            isFirstUp ? 1880 : 2065,
+            100,
+            150,
+            true);
+
+        me._secondDeadEndTrigger = me._createTrigger(
+            me._onDeadEndTrigger,
+            4400,
+            isSecondUp ? 1880 : 2065,
+            100,
+            150,
+            true);
+
+        me._thirdDeadEndTrigger = me._createTrigger(
+            me._onDeadEndTrigger,
+            5900,
+            isThirdUp ? 1880 : 2065,
+            100,
+            150,
+            true);
+    }
+
+    // =levels
+
     _switchLevelTo(next) {
         const me = this;
 
@@ -469,6 +628,9 @@ export default class Game {
 
         if (next == 3)
             return me._initLevel3();
+
+        if (next == 4)
+            return me._initLevel4();
 
         throw `unknown level ${next}`;
     }
@@ -509,7 +671,6 @@ export default class Game {
         }, me);
     }
 
-
     _initStartFromLevel1() {
         const me = this;
 
@@ -533,8 +694,8 @@ export default class Game {
     _initStartFromLevel3() {
         const me = this;
 
-        me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
-        // me._player.tryTakeLight();
+        me._player.setPosition(Consts.Positions.PentagramX, Consts.Positions.GroundY);
+        me._player.tryTakeLight();
         me._initLevel3();
     }
 
@@ -547,5 +708,24 @@ export default class Game {
         for (let i = 0; i < 2; ++i)
             for (let j = 0; j < 2; ++j)
                 me._level.setTile(36 + i, 27 + j, 0);
+    }
+
+    _initStartFromLevel4() {
+        const me = this;
+
+        me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
+        me._initLevel4();
+    }
+
+    _initLevel4() {
+        const me = this;
+
+        for (let i = 0; i < Consts.Tiles.UndegroundEnter.length; ++i)
+            me._level.setTile(
+                Consts.Tiles.UndegroundEnter[i].x,
+                Consts.Tiles.UndegroundEnter[i].y, 
+                2);
+
+        me._createDeadEndsWithTriggers();
     }
 }
