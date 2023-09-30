@@ -8,14 +8,14 @@ export default class Config {
         Random: false
     };
 
-    static Border = 7425;
+    static Border = 9525;
     static Start = 400;
 
     static Player = {
-        StartX: 2700,
+        StartX: 7850,
         StartY: 1200,
-        Speed: 500,
-        // Speed: 300,
+        // Speed: 500,
+        Speed: 300,
         GravityFall: 1200,
         GravityJump: 200,
         JumpForce: -400,

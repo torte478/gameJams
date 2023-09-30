@@ -29,6 +29,9 @@ export default class Game {
     /** @type {Triggers} */
     _triggers;
 
+    /** @type {Boolean} */
+    _isFinalUndeground = false;
+
     constructor() {
         const me = this;
 
@@ -71,6 +74,14 @@ export default class Game {
         //         Utils.debugLog('light');
         // }, me);
 
+        me._createTrigger(
+            me._onTeleportTrigger,
+            Config.Border + Consts.Unit.Normal, 
+            1600, 
+            Consts.Unit.Big, 
+            3200, 
+            false);
+
         me._createCameraBoundYTriggers();
 
         // physics
@@ -103,7 +114,7 @@ export default class Game {
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `plr: ${me._player._container.x | 0} ${me._player._container.y | 0}\n` +
-                `acc: ${me._player._container.body.acceleration.y | 0}`;
+                `dbg: ${Here._.cameras.main.scrollX | 0} ${Here._.cameras.main.scrollY | 0}`;
 
             me._log.setText(text);
         });
@@ -115,7 +126,8 @@ export default class Game {
         me._player.update(time);
         me._updateCameraBounds();
 
-        Here._.cameras.main
+        if (!me._isFinalUndeground) {
+            Here._.cameras.main
             .setBounds(
                 Here._.cameras.main.scrollX,
                 me._cameraBoundY,
@@ -124,6 +136,15 @@ export default class Game {
             .setFollowOffset(
                 me._cameraOffsetX,
                 0);
+        }
+        else {
+            Here._.cameras.main
+                .setBounds(
+                    Here._.cameras.main.scrollX,
+                    0,
+                    2 * Consts.Viewport.Width,
+                    64 * Consts.Unit.Normal)
+        }
 
         me._teleportCamera.update();
         me._backBorder.update();
@@ -147,7 +168,10 @@ export default class Game {
 
         me._player.teleport(Config.Start);
         me._teleportCamera.reset();
-        Here._.cameras.main.setScroll(100, 0); // TODO
+        Here._.cameras.main
+            .setScroll(
+                me._isFinalUndeground ? 0 : 100, 
+                Here._.cameras.main.scrollY);
         me._backBorder.reset();
         console.log('teleport');
     }
@@ -189,14 +213,6 @@ export default class Game {
         const me = this;
 
         me._createTrigger(
-            me._onTeleportTrigger,
-            Config.Border + Consts.Unit.Normal, 
-            800, 
-            Consts.Unit.Big, 
-            1600, 
-            false);
-
-        me._createTrigger(
             me._onRoofTrigger,
             2640,
             750,
@@ -224,6 +240,14 @@ export default class Game {
             me._onGroundTrigger,
             7250,
             1350,
+            200,
+            200,
+            false);
+
+        me._createTrigger(
+            me._onFinalUndergroundTrigger,
+            8125,
+            1575,
             200,
             200,
             false);
@@ -256,12 +280,31 @@ export default class Game {
             2000);
     }
 
+    _onFinalUndergroundTrigger() {
+        const me = this;
+
+        me._isFinalUndeground = true;
+
+        Here._.cameras.main
+            .startFollow(
+                me._player.toCollider(),
+                true,
+                0.5,
+                0.5,
+                Config.Camera.SecondOffsetX,
+                0)
+            .setBounds(
+                Here._.cameras.main.scrollX,
+                0,
+                2 * Consts.Viewport.Width,
+                64 * Consts.Unit.Normal);
+    }
+
     _startChangeCameraBoundY(targetBoundY, targetOffsetX, duration) {
         const me = this;
         
         if (!!me._timedEvent || Math.abs(me._nextCameraBoundY - targetBoundY) < 10)
             return;
-
         
         me._oldCameraOffsetX = me._cameraOffsetX;
         me._nextCameraOffsetX = targetOffsetX;
