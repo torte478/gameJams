@@ -50,10 +50,11 @@ export default class Game {
             true,
             1,
             1,
-            Config.Camera.OffsetX,
+            Config.Camera.StartOffsetX,
             0)
             .setBackgroundColor('#1a1a1a');
         me._cameraBoundY = Config.Camera.StartBoundY;
+        me._cameraOffsetX = Config.Camera.StartOffsetX;
 
         me._teleportCamera = new TeleportCamera(me._player, Config.Border, me._log);
         me._backBorder = new Border(me._player, -200);
@@ -70,29 +71,7 @@ export default class Game {
         //         Utils.debugLog('light');
         // }, me);
 
-        me._createTrigger(
-            me._onTeleportTrigger,
-            Config.Border + Consts.Unit.Normal, 
-            800, 
-            Consts.Unit.Big, 
-            1600, 
-            false);
-
-        me._createTrigger(
-            me._onRoofTrigger,
-            2640,
-            750,
-            200,
-            200,
-            false);
-
-        me._createTrigger(
-            me._onGroundTrigger,
-            5650,
-            910,
-            1500,
-            150,
-            false);
+        me._createCameraBoundYTriggers();
 
         // physics
 
@@ -136,11 +115,15 @@ export default class Game {
         me._player.update(time);
         me._updateCameraBounds();
 
-        Here._.cameras.main.setBounds(
-            Here._.cameras.main.scrollX,
-            me._cameraBoundY,
-            2 * Consts.Viewport.Width,
-            Consts.Viewport.Height);
+        Here._.cameras.main
+            .setBounds(
+                Here._.cameras.main.scrollX,
+                me._cameraBoundY,
+                2 * Consts.Viewport.Width,
+                Consts.Viewport.Height)
+            .setFollowOffset(
+                me._cameraOffsetX,
+                0);
 
         me._teleportCamera.update();
         me._backBorder.update();
@@ -181,6 +164,15 @@ export default class Game {
     /** @type {Number} */
     _oldCameraBoundY;
 
+    /** @type {Number} */
+    _cameraOffsetX;
+
+    /** @type {Number} */
+    _oldCameraOffsetX;
+
+    /** @type {Number} */
+    _nextCameraOffsetX;
+
     _updateCameraBounds() {
         const me = this;
 
@@ -189,30 +181,95 @@ export default class Game {
 
         me._cameraBoundY = me._oldCameraBoundY 
                            + (me._nextCameraBoundY - me._oldCameraBoundY) * me._timedEvent.getProgress();
+        me._cameraOffsetX = me._oldCameraOffsetX
+                           + (me._nextCameraOffsetX - me._oldCameraOffsetX) * me._timedEvent.getProgress();
+    }
+
+    _createCameraBoundYTriggers() {
+        const me = this;
+
+        me._createTrigger(
+            me._onTeleportTrigger,
+            Config.Border + Consts.Unit.Normal, 
+            800, 
+            Consts.Unit.Big, 
+            1600, 
+            false);
+
+        me._createTrigger(
+            me._onRoofTrigger,
+            2640,
+            750,
+            200,
+            200,
+            false);
+
+        me._createTrigger(
+            me._onGroundTrigger,
+            5650,
+            910,
+            1500,
+            150,
+            false);
+
+        me._createTrigger(
+            me._onUndergroundTrigger,
+            1675,
+            1600,
+            200,
+            100,
+            false);
+
+        me._createTrigger(
+            me._onGroundTrigger,
+            7250,
+            1350,
+            200,
+            200,
+            false);
     }
 
     _onRoofTrigger() {
         const me = this;
 
-        if (!!me._timedEvent || me._nextCameraBoundY == Config.Camera.BoundRoofY)
-            return;
-
-        me._oldCameraBoundY = me._cameraBoundY;
-        me._nextCameraBoundY = Config.Camera.BoundRoofY;
-        me._timedEvent = Here._.time.delayedCall(2000, () => {
-            me._timedEvent = null;
-        }, [], me);
+        me._startChangeCameraBoundY(
+            Config.Camera.BoundRoofY, 
+            Config.Camera.SecondOffsetX, 
+            2000);
     }
 
     _onGroundTrigger() {
         const me = this;
 
-        if (!!me._timedEvent || me._nextCameraBoundY == Config.Camera.BoundGroundY)
+        me._startChangeCameraBoundY(
+            Config.Camera.BoundGroundY, 
+            Config.Camera.StartOffsetX, 
+            1000);
+    }
+
+    _onUndergroundTrigger() {
+        const me = this;
+
+        me._startChangeCameraBoundY(
+            Config.Camera.BoundUndergroundY, 
+            Config.Camera.SecondOffsetX, 
+            2000);
+    }
+
+    _startChangeCameraBoundY(targetBoundY, targetOffsetX, duration) {
+        const me = this;
+        
+        if (!!me._timedEvent || Math.abs(me._nextCameraBoundY - targetBoundY) < 10)
             return;
 
+        
+        me._oldCameraOffsetX = me._cameraOffsetX;
+        me._nextCameraOffsetX = targetOffsetX;
+
         me._oldCameraBoundY = me._cameraBoundY;
-        me._nextCameraBoundY = Config.Camera.BoundGroundY;
-        me._timedEvent = Here._.time.delayedCall(1000, () => {
+        me._nextCameraBoundY = targetBoundY;
+
+        me._timedEvent = Here._.time.delayedCall(duration, () => {
             me._timedEvent = null;
         }, [], me);
     }
