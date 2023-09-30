@@ -12,7 +12,7 @@ export default class Config {
         DebugY: 1390
     };
 
-    static StartLevel = 0;
+    static StartLevel = 3;
 
     static WorldBorder = 9525;
     static WorldStartX = 400;
@@ -21,7 +21,7 @@ export default class Config {
     static Player = {
         StartX: 100,
         StartY: 1390,
-        Speed: 500,
+        Speed: 700, // debug
         // Speed: 300,
         GravityFall: 1200,
         GravityJump: 200,

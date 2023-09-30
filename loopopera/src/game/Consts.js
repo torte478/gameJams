@@ -18,4 +18,11 @@ export default class Consts {
         Foreground: 10000,
         Max: 100000
     };
+
+    static Positions = {
+        GraveX: 1500,
+        PentagramX: 4500,
+        PentagramExitX: 5700,
+        GroundY: 1390
+    }
 }

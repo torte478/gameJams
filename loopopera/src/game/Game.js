@@ -215,7 +215,7 @@ export default class Game {
     _cameraBoundY;
 
     /** @type {Number} */
-    _nextCameraBoundY;
+    _nextCameraBoundY = 0;
 
     /** @type {Number} */
     _oldCameraBoundY;
@@ -349,7 +349,7 @@ export default class Game {
         me._oldCameraBoundY = me._cameraBoundY;
         me._nextCameraBoundY = targetBoundY;
 
-        me._timedEvent = Here._.time.delayedCall(duration, () => {
+        me._cameraBoundChangeTimedEvent = Here._.time.delayedCall(duration, () => {
             me._cameraBoundChangeTimedEvent = null;
         }, [], me);
     }
@@ -378,6 +378,9 @@ export default class Game {
         if (me._currentLevel === 2)
             return me._initStartFromLevel2();
 
+        if (me._currentLevel === 3)
+            return me._initStartFromLevel3();
+
         throw `unknown level ${me._currentLevel}`;
     }
 
@@ -387,11 +390,6 @@ export default class Game {
         // undeground enter
         for (let i = 0; i < 3; ++i)
             me._level.setTile(32 + i, 29, 0);
-
-        // first grave
-        // for (let i = 0; i < 2; ++i)
-        //     for (let j = 0; j < 2; ++j)
-        //         me._level.setTile(36 + i, 27 + j, -1);
 
         // undeground exit
         for (let i = 0; i < 4; ++i)
@@ -433,6 +431,8 @@ export default class Game {
 
         if (me._currentLevel === 2)
             me._switchLevelTo(3);
+        else if (me._currentLevel === 3)
+            me._switchLevelTo(4);
     }
 
     _getBulletTargetPos() {
@@ -444,7 +444,33 @@ export default class Game {
         if (me._currentLevel == 2)
             return Utils.buildPoint(4927, 990);
 
+        if (me._currentLevel == 3)
+            return Utils.buildPoint(5000, 963);
+
         throw `unknown level ${me._currentLevel}`;
+    }
+
+    _createLight(x, y) {
+        const me = this;
+
+        return me._lightPool.create(x, y, 'items', 0);
+    }
+
+    _switchLevelTo(next) {
+        const me = this;
+
+        me._currentLevel = next;
+
+        if (next == 1)
+            return;
+
+        if (next == 2)
+            return me._initLevel2();
+
+        if (next == 3)
+            return me._initLevel3();
+
+        throw `unknown level ${next}`;
     }
 
     _initStartFromLevel0() {
@@ -483,19 +509,6 @@ export default class Game {
         }, me);
     }
 
-    _switchLevelTo(next) {
-        const me = this;
-
-        me._currentLevel = next;
-
-        if (next == 1)
-            return;
-
-        if (next == 2)
-            return me._initLevel2();
-
-        throw `unknown level ${next}`;
-    }
 
     _initStartFromLevel1() {
         const me = this;
@@ -517,9 +530,22 @@ export default class Game {
         me._createLight(5400, 1350);
     }
 
-    _createLight(x, y) {
+    _initStartFromLevel3() {
         const me = this;
 
-        return me._lightPool.create(x, y, 'items', 0);
+        me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
+        // me._player.tryTakeLight();
+        me._initLevel3();
+    }
+
+    _initLevel3() {
+        const me = this;
+
+        me._createLight(6250, 1150);
+
+        // first grave
+        for (let i = 0; i < 2; ++i)
+            for (let j = 0; j < 2; ++j)
+                me._level.setTile(36 + i, 27 + j, 0);
     }
 }
