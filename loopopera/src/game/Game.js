@@ -121,7 +121,7 @@ export default class Game {
             me._player.toCollider(),
             me._lightPool,
             (p, l) => {
-                if (me._player.tryTakeLight())
+                if (l.visible && me._player.tryTakeLight())
                     me._lightPool.killAndHide(l);
             });
     }
@@ -204,9 +204,8 @@ export default class Game {
         me._backBorder.reset();
         console.log('teleport');
 
-
         if (me._currentLevel === 1)
-           throw 'me._currentLevel === 2';
+           me._switchLevelTo(2);
     }
 
     /** @type {Phaser.Time.TimerEvent} */
@@ -371,13 +370,13 @@ export default class Game {
         me._currentLevel = Config.StartLevel;
         
         if (me._currentLevel === 0)
-            return me._initLevel0();
+            return me._initStartFromLevel0();
 
         if (me._currentLevel === 1)
-            return me._initLevel1();
+            return me._initStartFromLevel1();
 
         if (me._currentLevel === 2)
-            return me._initLevel2();
+            return me._initStartFromLevel2();
 
         throw `unknown level ${me._currentLevel}`;
     }
@@ -390,9 +389,9 @@ export default class Game {
             me._level.setTile(32 + i, 29, 0);
 
         // first grave
-        for (let i = 0; i < 2; ++i)
-            for (let j = 0; j < 2; ++j)
-                me._level.setTile(36 + i, 27 + j, -1);
+        // for (let i = 0; i < 2; ++i)
+        //     for (let j = 0; j < 2; ++j)
+        //         me._level.setTile(36 + i, 27 + j, -1);
 
         // undeground exit
         for (let i = 0; i < 4; ++i)
@@ -430,7 +429,10 @@ export default class Game {
                     ease: 'Sine.easeInOut'
                 }
             ]
-        })
+        });
+
+        if (me._currentLevel === 2)
+            me._switchLevelTo(3);
     }
 
     _getBulletTargetPos() {
@@ -439,10 +441,13 @@ export default class Game {
         if (me._currentLevel <= 1)
             return Utils.buildPoint(4861, 1099);
 
+        if (me._currentLevel == 2)
+            return Utils.buildPoint(4927, 990);
+
         throw `unknown level ${me._currentLevel}`;
     }
 
-    _initLevel0() {
+    _initStartFromLevel0() {
         const me = this;
 
         me._startScreenHiding = false;
@@ -450,7 +455,8 @@ export default class Game {
 
         me._player.setPosition(2625, 1390);
         me._player.setBusy(true);
-        me._lightPool.create(3500, 1175, 'items', 0);
+        
+        me._createLight(3500, 1175);
 
         Here._.input.keyboard.on('keydown', () => {
             if (me._startScreenHiding)
@@ -471,22 +477,49 @@ export default class Game {
                 ease: 'Sine.easeOut',
                 onComplete: () => {
                     me._player.setBusy(false);
-                    me._currentLevel = 1;
+                    me._switchLevelTo(1);
                 }
             })
         }, me);
     }
 
-    _initLevel1() {
+    _switchLevelTo(next) {
+        const me = this;
+
+        me._currentLevel = next;
+
+        if (next == 1)
+            return;
+
+        if (next == 2)
+            return me._initLevel2();
+
+        throw `unknown level ${next}`;
+    }
+
+    _initStartFromLevel1() {
         const me = this;
 
         me._player.setPosition(4400, 1390);
         me._player.tryTakeLight();
     }
 
+    _initStartFromLevel2() {
+        const me = this;
+
+        me._player.setPosition(5000, 1390);
+        me._initLevel2();
+    }
+
     _initLevel2() {
         const me = this;
 
-        me._player.setPosition(435, 1390);
+        me._createLight(5400, 1350);
+    }
+
+    _createLight(x, y) {
+        const me = this;
+
+        return me._lightPool.create(x, y, 'items', 0);
     }
 }
