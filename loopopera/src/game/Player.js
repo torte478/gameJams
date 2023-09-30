@@ -11,6 +11,9 @@ export default class Player {
     /** @type {Phaser.GameObjects.Container} */
     _container;
 
+    /** @type {Boolean} */
+    _hasLight;
+
     /**
      * @param {Number} x 
      * @param {Number} y 
@@ -23,6 +26,8 @@ export default class Player {
         me._container = Here._.add.container(x, y, [ me._sprite ])
             .setDepth(Consts.Depth.Player)
             .setSize(Consts.Unit.Normal, Consts.Unit.Big);
+
+        me._hasLight = false;
 
         me._initPhysics();
     }
@@ -52,6 +57,19 @@ export default class Player {
 
         if (Here.Controls.isPressedOnce(Enums.Keyboard.UP) && body.blocked.down)
             body.setVelocityY(Config.PlayerPhysics.Jump);
+    }
+
+    /**
+     * @returns {Boolean}
+     */
+    tryTakeLight() {
+        const me = this;
+
+        if (me._hasLight)
+            return false;
+
+        me._hasLight = true;
+        return true;
     }
 
     _initPhysics() {

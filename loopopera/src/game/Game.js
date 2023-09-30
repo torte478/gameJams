@@ -20,12 +20,38 @@ export default class Game {
     constructor() {
         const me = this;
 
+        // init
+
         const level = new Level();
         me._player = new Player(120, 600);
+
+        Here._.cameras.main.startFollow(
+            me._player.getCollider(),
+            true,
+            1,
+            0,
+            -200,
+            200);
+
+        const lightPool = Here._.physics.add.staticGroup();
+        lightPool.create(700, 700, 'items', 0);
+        lightPool.create(600, 700, 'items', 0);
+
+        // physics
 
         Here._.physics.add.collider(
             me._player.getCollider(), 
             level.getCollider());
+
+        Here._.physics.add.overlap(
+            me._player.getCollider(),
+            lightPool,
+            (p, l) => {
+                if (me._player.tryTakeLight())
+                    lightPool.killAndHide(l);
+            });
+
+        // debug
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 18, backgroundColor: '#000' })
