@@ -1,4 +1,6 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
+import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Player from "./Player.js";
 
@@ -22,7 +24,12 @@ export default class Border {
         me._player = player;
         me._offsetY = offsetY;
 
-        me._sprite = Here._.physics.add.staticImage(-100, 0, 'border');
+        me._sprite = Here._.physics.add.staticImage(-100, 0, 'border')
+            .setVisible(false);
+
+        if (Utils.isDebug(Config.Debug.Global))
+            me._sprite.setVisible(true);
+        
         me.reset();
         me._lastX = me._sprite.x;
 

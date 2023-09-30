@@ -21,7 +21,7 @@ export default class TeleportCamera {
         me._player = player;
         me._border = border;
 
-        const scroll = Config.Start + Consts.Unit.Small;
+        const scroll = Config.WorldStartX + Consts.Unit.Small;
         me._camera = Here._.cameras.add(
             Consts.Viewport.Width + 100,
             0, 
@@ -30,7 +30,7 @@ export default class TeleportCamera {
             false)
             .setScroll(scroll, 0)
             .setBackgroundColor('#A0908D') //debug
-            .setBackgroundColor('#000000')
+            .setBackgroundColor(Config.BackgroundColor)
             ;
 
         if (!!log)
