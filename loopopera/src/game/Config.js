@@ -12,19 +12,22 @@ export default class Config {
     static Start = 400;
 
     static Player = {
-        StartX: 1620,
-        StartY: 850,
+        StartX: 2255,
+        StartY: 1000,
         // Speed: 500,
         Speed: 300,
         GravityFall: 1200,
-        GravityJump: 400,
-        JumpForce: -600,
-        JumpTimeMs: 100,
-        FallAccelaration: 800
+        GravityJump: 200,
+        JumpForce: -400,
+        JumpTimeMs: 200,
+        FallAccelaration: 600
     };
 
     static Camera = {
         OffsetX: -300,
-        OffsetY: 0
+        OffsetY: 0,
+        BoundRoofY: 150,
+        BoundGroundY: 800,
+        StartBoundY: 800
     }
 }

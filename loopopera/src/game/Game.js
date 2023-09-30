@@ -29,15 +29,6 @@ export default class Game {
     /** @type {Triggers} */
     _triggers;
 
-    /** @type {Number} */
-    _cameraBoundY;
-
-    /** @type {Number} */
-    _nextCameraBoundY;
-
-    /** @type {Number} */
-    _oldCameraBoundY;
-
     constructor() {
         const me = this;
 
@@ -62,7 +53,7 @@ export default class Game {
             Config.Camera.OffsetX,
             0)
             .setBackgroundColor('#1a1a1a');
-        me._cameraBoundY = 300;
+        me._cameraBoundY = Config.Camera.StartBoundY;
 
         me._teleportCamera = new TeleportCamera(me._player, Config.Border, me._log);
         me._backBorder = new Border(me._player, -200);
@@ -89,11 +80,19 @@ export default class Game {
 
         me._createTrigger(
             me._onRoofTrigger,
-            2245,
-            400,
+            2640,
+            750,
             200,
             200,
-            true);
+            false);
+
+        me._createTrigger(
+            me._onGroundTrigger,
+            5650,
+            910,
+            1500,
+            150,
+            false);
 
         // physics
 
@@ -147,15 +146,6 @@ export default class Game {
         me._backBorder.update();
     }
 
-    _updateCameraBounds() {
-        const me = this;
-
-        if (!me._timedEvent)
-            return;
-
-        me._cameraBoundY = me._oldCameraBoundY + (me._nextCameraBoundY - me._oldCameraBoundY) * me._timedEvent.getProgress();
-    }
-
     _createTrigger(callback, x, y, width, height, disposed) {
         const me = this;
 
@@ -182,12 +172,47 @@ export default class Game {
     /** @type {Phaser.Time.TimerEvent} */
     _timedEvent;
 
+    /** @type {Number} */
+    _cameraBoundY;
+
+    /** @type {Number} */
+    _nextCameraBoundY;
+
+    /** @type {Number} */
+    _oldCameraBoundY;
+
+    _updateCameraBounds() {
+        const me = this;
+
+        if (!me._timedEvent)
+            return;
+
+        me._cameraBoundY = me._oldCameraBoundY 
+                           + (me._nextCameraBoundY - me._oldCameraBoundY) * me._timedEvent.getProgress();
+    }
+
     _onRoofTrigger() {
         const me = this;
 
+        if (!!me._timedEvent || me._nextCameraBoundY == Config.Camera.BoundRoofY)
+            return;
+
         me._oldCameraBoundY = me._cameraBoundY;
-        me._nextCameraBoundY = 0;
-        me._timedEvent = Here._.time.delayedCall(3000, () => {
+        me._nextCameraBoundY = Config.Camera.BoundRoofY;
+        me._timedEvent = Here._.time.delayedCall(2000, () => {
+            me._timedEvent = null;
+        }, [], me);
+    }
+
+    _onGroundTrigger() {
+        const me = this;
+
+        if (!!me._timedEvent || me._nextCameraBoundY == Config.Camera.BoundGroundY)
+            return;
+
+        me._oldCameraBoundY = me._cameraBoundY;
+        me._nextCameraBoundY = Config.Camera.BoundGroundY;
+        me._timedEvent = Here._.time.delayedCall(1000, () => {
             me._timedEvent = null;
         }, [], me);
     }
