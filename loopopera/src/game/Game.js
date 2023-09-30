@@ -12,6 +12,7 @@ import Triggers from './Triggers.js';
 import TeleportCamera from './TeleportCamera.js';
 import Border from './Border.js';
 import Boss from './Boss.js';
+import Hand from './Hand.js';
 
 export default class Game {
 
@@ -53,6 +54,9 @@ export default class Game {
 
     /** @type {Boss} */
     _boss;
+
+    /** @type {Phaser.Physics.Arcade.Group} */
+    _handsPool;
 
     constructor() {
         const me = this;
@@ -103,6 +107,7 @@ export default class Game {
             .setAlpha(0);
 
         me._boss = new Boss(8500, 1750);
+        me._handsPool = Here._.physics.add.group();
 
         // init
 
@@ -644,6 +649,14 @@ export default class Game {
             me._level.setTile(arr[i].x, arr[i].y, tile);
     }
 
+    _createHands(hands) {
+        const me = this;
+
+        // TODO
+        // for (let i = 0; i < hands.length; ++i)
+        //     new Hand(hands[i].x, hands[i].y, hands[i].dir, me._handsPool);
+    }
+
     // =levels
 
     _switchLevelTo(next) {
@@ -762,7 +775,8 @@ export default class Game {
     _initStartFromLevel5() {
         const me = this;
 
-        me._player.setPosition(Consts.Positions.FinalUndergroundX, Consts.Positions.GroundY);
+        // me._player.setPosition(Consts.Positions.FinalUndergroundX, Consts.Positions.GroundY);
+        me._player.setPosition(640, 2440);
         me._initLevel5();
     }
 
@@ -779,5 +793,7 @@ export default class Game {
         );
 
         me._createLight(8500, 1375);
+
+        me._createHands(Config.Level5Hands);
     }
 }
