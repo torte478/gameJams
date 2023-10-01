@@ -3,7 +3,7 @@ import Enums from "./Enums.js";
 export default class Config {
 
     static Debug = {
-        Global: true,
+        Global: false,
         Log: true,
         ShowSceneLog: true,
         PlaySound: true,
@@ -14,12 +14,12 @@ export default class Config {
         DebugY: 1390
     };
 
-    static StartLevel = 6;
+    static StartLevel = 0;
 
     static WorldBorder = 9525;
     static WorldStartX = 400;
     static BackgroundColor = '#0d0d0d';
-    static BossAppearanceTimeMs = 2000;
+    static BossAppearanceTimeMs = 7000;
     static BossHandsDelayMs = 750;
     static BorderBreakDelayMs = 1500
     static LightColor = {
@@ -29,8 +29,8 @@ export default class Config {
     static Player = {
         StartX: 100,
         StartY: 1390,
-        Speed: 700, // debug
-        // Speed: 300,
+        // Speed: 700, // debug
+        Speed: 300,
         GravityFall: 1000,
         GravityJump: 200,
         JumpForce: -400,

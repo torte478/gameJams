@@ -279,6 +279,7 @@ export default class Game {
             if ((time - me._backBorder._collideTime) > Config.BorderBreakDelayMs) {
                 Here.Audio.stopAll();
                 Here.Audio.play('light_hit');
+                me._playSound('sound0');
                 me._switchLevelTo(7);
                 me._particleEmitter.on = false;
             }
@@ -584,7 +585,7 @@ export default class Game {
         bullet.setDepth(Consts.Depth.Player + 25);
         const targetPos = me._getBulletTargetPos();
         
-        //me._player.setBusy(true); // TODO return
+        me._player.setBusy(true); // TODO return
 
         Here.Audio.play('pickup', { volume: 0.8 });
 
@@ -612,6 +613,7 @@ export default class Game {
 
                         for (let i = 0; i < me._trees.length; ++i)
                             me._trees[i].setFrame(0);
+                        me._govnoTree.setVisible(false);
                         me._bullets.push(me._pentagram);
                         Here._.tweens.add({
                             targets: me._bullets,
@@ -1013,8 +1015,10 @@ export default class Game {
                 Here.Audio.stop('boss');
                 Here.Audio.play('light_hit');
 
-                Here.Audio.stop('sound4');
+                Here.Audio.stop('sound0');
                 me._playSound('sound5');
+
+                me._manyHands.setVisible(false);
 
                 me._nextCameraBoundY = -1;
                 me._startChangeCameraBoundY(
@@ -1033,6 +1037,7 @@ export default class Game {
     }
 
     _trees = [];
+    _govnoTree;
     _createTrees() {
         const me = this;
 
@@ -1046,7 +1051,7 @@ export default class Game {
             Here._.add.sprite(700, 1250, 'tree', frame)
                 .setAngle(-15)
                 .setScale(1.5),
-            Here._.add.sprite(8900, 1150, 'tree', frame)
+            me._govnoTree = Here._.add.sprite(8900, 1150, 'tree', frame)
                 .setScale(2),
         );
     }
@@ -1175,6 +1180,8 @@ export default class Game {
 
     _initLevel3() {
         const me = this;
+
+        me._player.setSpeedX(350);
 
         Here.Audio.stop('sound1');
         me._playSound('sound2');
@@ -1352,6 +1359,8 @@ export default class Game {
             .setDepth(Consts.Depth.Tiles + 100);
 
         me._boss.resetHands();
+        me._scareCrow.play('scarecrow');
+        me._player.setSpeedX(300);
 
         me._createTrigger(
             () => {
