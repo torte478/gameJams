@@ -870,7 +870,7 @@ export default class Game {
     _createTrees() {
         const me = this;
 
-        const frame = 2;
+        const frame = 0;
         me._trees.push(
             Here._.add.sprite(6800, 1150, 'tree', frame)
                 .setScale(2),
@@ -989,7 +989,7 @@ export default class Game {
     _initStartFromLevel3() {
         const me = this;
 
-        me._player.setPosition(Consts.Positions.PentagramX, Consts.Positions.GroundY);
+        me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
         me._player.tryTakeLight();
         me._initLevel3();
     }
@@ -999,10 +999,10 @@ export default class Game {
 
         me._createLight(6250, 1150);
 
-        // first grave
-        for (let i = 0; i < 2; ++i)
-            for (let j = 0; j < 2; ++j)
-                me._level.setTile(36 + i, 27 + j, 0);
+        me._level.setTile(36, 27, 8);
+        me._level.setTile(37, 27, 9);
+        me._level.setTile(36, 28, 18);
+        me._level.setTile(37, 28, 19);
     }
 
     _initStartFromLevel4() {
