@@ -6,10 +6,15 @@ import Hand from "./Hand.js";
 export default class Boss {
 
     _container;
+
+    /** @type {Phaser.Physics.Arcade.Group} */
     _handPool;
 
     /** @type { Hand[]} */
     _hands = [];
+
+    /** @type {Phaser.Time.TimerEvent[]} */
+    _events = [];
 
     constructor(x, y, handPool) {
         const me = this;
@@ -38,6 +43,25 @@ export default class Boss {
             callback: () => me._createHand(index, event),
             callbackScope: me,
             repeat: Boss._handPositions[index].length});
+        me._events.push(event);
+    }
+
+    resetHands() {
+        const me = this;
+
+        for (let i = 0; i < me._events.length; ++i) {
+            const event = me._events[i];
+            event.paused = true;
+            event.destroy();
+        }
+        me._events = [];
+
+        for (let i = 0; i < me._hands.length; ++i) {
+            const hand = me._hands[i];
+            hand.kill();
+            me._handPool.killAndHide(hand._sprite);
+        }
+        me._hands = [];
     }
 
     _createHand(index, event) {

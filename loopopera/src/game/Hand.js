@@ -46,6 +46,13 @@ export default class Hand {
         me._sprite.on(Phaser.Animations.Events.ANIMATION_COMPLETE, me._onAnimationStop, me)
     }
 
+    kill() {
+        const me = this;
+
+        me._sprite.disableBody();
+        me._sprite.body.destroy();
+    }
+
     _onAnimationStop() {
         const me = this;
 

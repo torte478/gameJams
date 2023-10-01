@@ -26,7 +26,9 @@ export default class Consts {
         PentagramX: 4500,
         PentagramExitX: 5700,
         GroundY: 1390,
-        FinalUndergroundX: 7800
+        FinalUndergroundX: 7800,
+        HandsStartX: 400, 
+        HandsStartY: 2440
     }
 
     static Tiles = {

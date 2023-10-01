@@ -148,7 +148,8 @@ export default class Game {
             me._player.toCollider(),
             me._handsPool,
             (p, h) => {
-                console.log('hit')
+                if (!me._player._isBusy)
+                    me._onHandTrigger();
             });
     }
 
@@ -500,6 +501,34 @@ export default class Game {
     _onDeadEndTrigger() {
         const me = this;
 
+        me._onPlayerDeath(
+            Consts.Positions.GraveX,
+            Consts.Positions.GroundY,
+            me._recreateGroundTriggers,
+            me);
+    }
+
+    _onHandTrigger() {
+        const me = this;
+
+        me._onPlayerDeath(
+            Consts.Positions.HandsStartX,
+            Consts.Positions.HandsStartY,
+            me._resetHands,
+            me
+        );
+    }
+
+    _resetHands() {
+        const me = this;
+
+        me._boss.resetHands();
+        me._createHandTriggers();
+    }
+
+    _onPlayerDeath(posX, posY, callback, context) {
+        const me = this;
+
         me._player.setBusy(true);
         Here._.tweens.timeline({
             targets: me._redScreen,
@@ -509,11 +538,11 @@ export default class Game {
                     duration: 2000,
                     ease: 'Sine.easeOut',
                     onComplete: () => {
-                        me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
+                        me._player.setPosition(posX, posY);
                         me._resetCameraAfterTeleport();
                         me._cameraBoundY = Config.Camera.BoundGroundY;
                         me._nextCameraBoundY = -100;
-                        me._recreateGroundTriggers();
+                        callback.call(context);
                     }
                 },
                 {
@@ -525,7 +554,7 @@ export default class Game {
                     }
                 },
             ]
-        })
+        });
     }
 
     _firstDeadEndTrigger = -1;
