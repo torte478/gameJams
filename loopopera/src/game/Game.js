@@ -357,6 +357,8 @@ export default class Game {
             2000);
     }
 
+    _isBossAppeared = false;
+
     _onGroundTrigger() {
         const me = this;
 
@@ -366,7 +368,7 @@ export default class Game {
             Config.Camera.StartOffsetX, 
             1000);
 
-        if (me._currentLevel === 5)
+        if (me._currentLevel === 5 && me._isBossAppeared)
             me._switchLevelTo(6);
     }
 
@@ -374,6 +376,17 @@ export default class Game {
         const me = this;
 
         me._clearTiles(Consts.Tiles.UndegroundExit);
+
+        me._govnoMethod();
+
+        me._startChangeCameraBoundY(
+            Config.Camera.BoundUndergroundY, 
+            Config.Camera.SecondOffsetX, 
+            2000);
+    }
+
+    _govnoMethod() {
+        const me = this;
 
         me._level.setTile(128, 31, 43);
         me._level.setTile(128, 30, 33);
@@ -394,11 +407,6 @@ export default class Game {
 
         me._level.setTile(142, 29, 21);
         me._level.setTile(142, 30, 31);
-
-        me._startChangeCameraBoundY(
-            Config.Camera.BoundUndergroundY, 
-            Config.Camera.SecondOffsetX, 
-            2000);
     }
 
     _onFinalUndergroundTrigger() {
@@ -805,7 +813,8 @@ export default class Game {
             duration: Config.BossAppearanceTimeMs,
             ease: 'Sine.easeInOut',
             onComplete: () => {
-                me._fillTiles(Consts.Tiles.FinalUndegroundEnter, 2);
+                me._clearTiles(Consts.Tiles.FinalUndegroundEnter);
+                me._isBossAppeared = true;
                 me._player.setBusy(false);
             }
         });
@@ -1068,10 +1077,17 @@ export default class Game {
         // me._player.setPosition(400, 2440);
         // me._player.setPosition(5235, 2940);
         me._player.setPosition(6925, 1590);
+        me._isBossAppeared = true;
 
         me._isFinalUndeground = true;
-        me._fillTiles(Consts.Tiles.FinalUndegroundExit, 2);
-        me._fillTiles(Consts.Tiles.UndegroundExit, 2);
+        me._clearTiles(Consts.Tiles.FinalUndegroundExit);
+        me._clearTiles(Consts.Tiles.UndegroundExit);
+
+        me._level.setTile(119, 43, 23);
+        me._level.setTile(125, 43, 21);
+
+        me._govnoMethod();
+
         me._initLevel5();
     }
 

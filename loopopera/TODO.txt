@@ -15,7 +15,6 @@ particles
 sound
 start screen
 end screen
-deadend bugs
 hands
 scarecrow
 beaty
