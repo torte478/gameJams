@@ -28,6 +28,9 @@ export default class Boss {
             .setDepth(Consts.Depth.Boss);
 
         Here._.physics.world.enable(me._container);
+        /** @type {Phaser.Physics.Arcade.Body} */
+        const body = me._container.body;
+        body.setImmovable(true);
     }
 
     toCollider() {

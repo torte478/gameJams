@@ -96,7 +96,7 @@ export default class Game {
             .setDepth(Consts.Depth.Foreground)
             .setVisible(false);
 
-        const penragram = Here._.add.image(5000, 1100, 'pentagram')
+        me._pentagram = Here._.add.image(5000, 1100, 'pentagram')
             .setDepth(Consts.Depth.Tiles);
 
         me._lightBulletPool = Here._.add.group();
@@ -111,7 +111,7 @@ export default class Game {
 
         // init
 
-        me._createTrigger(
+        me._teleportTrigger = me._createTrigger(
             me._onTeleportTrigger,
             Config.WorldBorder + Consts.Unit.Normal, 
             1600, 
@@ -139,8 +139,11 @@ export default class Game {
             me._player.toCollider(),
             me._lightPool,
             (p, l) => {
-                if (l.visible && me._player.tryTakeLight())
+                if (l.visible && me._player.tryTakeLight()) {
                     me._lightPool.killAndHide(l);
+                    if (me._currentLevel === 7)
+                        me._killBoss();
+                }
             });
 
         Here._.physics.add.overlap(
@@ -151,11 +154,11 @@ export default class Game {
                     me._onHandTrigger();
             });
 
-        Here._.physics.add.overlap(
+        Here._.physics.add.collider(
             me._player.toCollider(),
             me._boss.toCollider(),
             (p, b) => {
-                if (!me._player._isBusy)
+                if (!me._player._isBusy && me._currentLevel == 6)
                     me._onBossTouchTrigger();
             }
         )
@@ -176,7 +179,7 @@ export default class Game {
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `plr: ${me._player._container.x | 0} ${me._player._container.y | 0}\n` +
-                `dbg: ${me._currentLevel} ${me._player._hasLight}`;
+                `dbg: ${me._currentLevel} ${(time - me._backBorder._collideTime) / 1000 | 0}`;
 
             me._log.setText(text);
         });
@@ -191,7 +194,9 @@ export default class Game {
         if (!me._isFinalUndeground) {
             Here._.cameras.main
             .setBounds(
-                Here._.cameras.main.scrollX,
+                me._currentLevel === 7
+                    ? Here._.cameras.main.scrollX - Consts.Viewport.Width
+                    : Here._.cameras.main.scrollX,
                 me._cameraBoundY,
                 2 * Consts.Viewport.Width,
                 Consts.Viewport.Height)
@@ -209,7 +214,13 @@ export default class Game {
         }
 
         me._teleportCamera.update();
-        me._backBorder.update();
+        me._backBorder.update(time);
+
+        if (me._currentLevel === 6 && me._backBorder._isCollide) {
+            Utils.debugLog('effect');
+            if ((time - me._backBorder._collideTime) > Config.BorderBreakDelayMs)
+                me._switchLevelTo(7);
+        }
     }
 
     _createTrigger(callback, x, y, width, height, disposed) {
@@ -436,6 +447,12 @@ export default class Game {
         if (me._currentLevel === 6)
             return me._initStartFromLevel6();
 
+        if (me._currentLevel === 7)
+            return me._initStartFromLevel7();
+
+        if (me._currentLevel === 8)
+            return me._initStartFromLevel8();
+
         throw `unknown level ${me._currentLevel}`;
     }
 
@@ -454,6 +471,8 @@ export default class Game {
             me._fillTiles(positions[index], 0);
     }
 
+    _bullets = [];
+
     _onPlayerGiveAwayLightTrigger() {
         const me = this;
 
@@ -463,8 +482,12 @@ export default class Game {
         const playerPos = me._player.toPos();
         /** @type {Phaser.GameObjects.Image} */
         const bullet = me._lightBulletPool.create(playerPos.x, playerPos.y, 'items', 0);
+        me._bullets.push(bullet);
         bullet.setDepth(Consts.Depth.Player + 25);
         const targetPos = me._getBulletTargetPos();
+        if (me._currentLevel === 8)
+            me._player.setBusy(true);
+
         Here._.tweens.timeline({
             targets: bullet,
             tweens: [
@@ -478,7 +501,24 @@ export default class Game {
                     x: targetPos.x,
                     y: targetPos.y,
                     duration: 1500,
-                    ease: 'Sine.easeInOut'
+                    ease: 'Sine.easeInOut',
+                    onComplete: () => {
+                        if (me._currentLevel !== 8)
+                            return;
+
+                        me._bullets.push(me._pentagram);
+                        Here._.tweens.add({
+                            targets: me._bullets,
+                            alpha: { from: 1, to: 0 },
+                            duration: 3000,
+                            ease: 'Sine.easeIn',
+                            onComplete: () => {
+                                me._player.setBusy(false);
+                                me._triggers.remove(me._teleportTrigger);
+                                me._teleportCamera._camera.setVisible(false);
+                            }
+                        });
+                    }
                 }
             ]
         });
@@ -505,6 +545,9 @@ export default class Game {
 
         if (me._currentLevel == 4)
             return Utils.buildPoint(5080, 995);
+
+        if (me._currentLevel == 8)
+            return Utils.buildPoint(5130, 1085);
 
         throw `unknown level ${me._currentLevel}`;
     }
@@ -757,12 +800,44 @@ export default class Game {
         me._boss.toCollider().y = 1150;
         me._bossAttackTween = Here._.tweens.add({
             targets: me._boss.toCollider(),
-            x: { from: 8400, to: 7000 },
-            duration: 20000
+            x: { from: 8400, to: 6500 },
+            duration: 25000
+        });
+    }
+
+    _killBoss() {
+        const me = this;
+
+        me._player._isBusy = true;
+        Here._.tweens.add({
+            targets: me._boss.toCollider(),
+            y: 1750,
+            duration: Config.BossAppearanceTimeMs,
+            ease: 'Sine.easeIn',
+            onComplete: () => {
+                me._nextCameraBoundY = -1;
+                me._startChangeCameraBoundY(
+                    Config.Camera.BoundGroundY, 
+                    Config.Camera.StartOffsetX, 
+                    2000);
+                me._switchLevelTo(8);
+                me._backBorder.reverse();
+                me._player.setBusy(false);
+            }
         });
     }
 
     // =levels
+
+    _onPrepareBossToFightTrigger() {
+        const me = this;
+
+        if (!!me._bossAttackTween)
+            me._bossAttackTween.pause();
+
+        me._boss.toCollider().x = 1100;
+        me._boss.toCollider().y = 1150;
+    }
 
     _switchLevelTo(next) {
         const me = this;
@@ -786,6 +861,12 @@ export default class Game {
 
         if (next == 6)
             return me._initLevel6();
+
+        if (next == 7)
+            return me._initLevel7();
+
+        if (next == 8)
+            return me._initLevel8();
 
         throw `unknown level ${next}`;
     }
@@ -897,10 +978,14 @@ export default class Game {
         me._initLevel5();
     }
 
+    _fakeLight = null;
+
+    _bossAppearanceTrigger = -1;
+
     _initLevel5() {
         const me = this;
 
-        me._createTrigger(
+        me._bossAppearanceTrigger = me._createTrigger(
             me._onBossAppearance,
             8225,
             1000,
@@ -909,7 +994,7 @@ export default class Game {
             true
         );
 
-        me._createLight(8500, 1375);
+        me._fakeLight = me._createLight(8500, 1375);
         me._nextCameraBoundY = -1;           
 
         me._createHandTriggers();
@@ -933,5 +1018,53 @@ export default class Game {
             200,
             200,
             true);
+    }
+
+    _initStartFromLevel7() {
+        const me = this;
+
+        throw `not supported. use 6`;
+        me._player.setPosition(Consts.Positions.BossStartX, Consts.Positions.GroundY);
+        me._initLevel7();
+    }
+
+    _initLevel7() {
+        const me = this;
+
+        if (me._bossAppearanceTrigger != -1)
+            me._triggers.remove(me._bossAppearanceTrigger);
+
+        if (!!me._fakeLight) 
+            me._lightPool.killAndHide(me._fakeLight);
+
+        me._nextCameraBoundY = -1;
+        me._backBorder.reverse();
+        me._createLight(1500, 1400);
+        me._startChangeCameraBoundY(
+            Config.Camera.BoundGroundY, 
+            Config.Camera.ReverseOffset, 
+            2000);
+
+        me._createTrigger(
+            me._onPrepareBossToFightTrigger,
+            2100, 
+            1400,
+            200,
+            200,
+            true);
+    }
+
+    _initStartFromLevel8() {
+        const me = this;
+
+        me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
+        me._player.tryTakeLight();
+        me._initLevel8();       
+    }
+
+    _initLevel8() {
+        const me = this;
+
+        console.log(8);
     }
 }

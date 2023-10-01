@@ -15,6 +15,12 @@ export default class Border {
     /** @type {Number} */
     _lastX;
 
+    _isCollide = false;
+
+    _collideTime = null;
+
+    _isReverse = false;
+
     /**
      * @param {Player} player 
      */
@@ -33,14 +39,25 @@ export default class Border {
         me.reset();
         me._lastX = me._sprite.x;
 
-        Here._.physics.add.collider(me._sprite, me._player.toCollider());
+        Here._.physics.add.collider(
+            me._sprite, 
+            me._player.toCollider(),
+            (b, p) => {
+                if (!me._isCollide)
+                    me._isCollide = true;
+            });
     }
 
-    update() {
+    update(time) {
         const me = this;
 
         me._resetPosition();
         me._lastX = me._sprite.x;
+
+        if (me._isCollide && !me._collideTime)        
+            me._collideTime = time;
+        else if (!me._isCollide)
+            me._collideTime = null;
     }
 
     reset() {
@@ -49,12 +66,25 @@ export default class Border {
         me._resetPosition();
     }
 
+    reverse() {
+        const me = this;
+
+        me._isReverse = !me._isReverse;
+        me._lastX = me._isReverse
+            ? 9999999
+            : -9999;
+        me._resetPosition();
+    }
+
     _resetPosition() {
         const me = this;
 
         me._sprite.setPosition(
-            Math.max(me._lastX, Here._.cameras.main.scrollX - Consts.Unit.Normal), 
+            me._isReverse
+                ? Math.min(me._lastX, Here._.cameras.main.scrollX + Consts.Viewport.Width + Consts.Unit.Normal)
+                : Math.max(me._lastX, Here._.cameras.main.scrollX - Consts.Unit.Normal), 
             me._player.toPos().y + me._offsetY);
+
         me._sprite.refreshBody();
     }
 }
