@@ -9,6 +9,9 @@ export default class Player {
     /** @type {Phaser.GameObjects.Sprite} */
     _sprite;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _aura;
+
     /** @type {Phaser.GameObjects.Container} */
     _container;
 
@@ -29,9 +32,12 @@ export default class Player {
     constructor(x, y, speedX) {
         const me = this;
 
+        me._aura = Here._.add.image(0, 0, 'particle')
+            .setScale(1.5)
+            .setVisible(false);
         me._sprite = Here._.physics.add.sprite(0, 0, 'player', 0);
 
-        me._container = Here._.add.container(x, y, [ me._sprite ])
+        me._container = Here._.add.container(x, y, [ me._aura, me._sprite ])
             .setDepth(Consts.Depth.Player)
             .setSize(Consts.Unit.Normal, Consts.Unit.Big);
 
@@ -104,6 +110,7 @@ export default class Player {
         if (me._hasLight)
             return false;
 
+        me._aura.setVisible(true);
         me._hasLight = true;
         return true;
     }
@@ -118,6 +125,7 @@ export default class Player {
             return false;
 
         me._hasLight = false;
+        me._aura.setVisible(false);
         return true;
     }
 

@@ -57,6 +57,9 @@ export default class Game {
     /** @type {Phaser.Physics.Arcade.Group} */
     _handsPool;
 
+    /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+    _particleEmitter;
+
     constructor() {
         const me = this;
 
@@ -111,6 +114,13 @@ export default class Game {
 
         me._createTrees();
 
+        const particles = Here._.add.particles('particle').setDepth(Consts.Depth.Player + 100);
+        me._particleEmitter = particles.createEmitter();
+        me._particleEmitter.setPosition(me._player.toPos().x, me._player.toPos().y);
+        me._particleEmitter.setSpeed(400);
+        me._particleEmitter.setBlendMode(Phaser.BlendModes.ADD);
+        me._particleEmitter.on = false;
+
         // init
 
         me._teleportTrigger = me._createTrigger(
@@ -146,6 +156,10 @@ export default class Game {
                     l.light.setVisible(false);
                     l.canTaked = false;
                     me._lightPool.killAndHide(l);
+
+                    const targetPos = me._player.toPos();
+                    me._blowParticles(targetPos.x, targetPos.y);
+
                     if (me._currentLevel === 7)
                         me._killBoss();
                 }
@@ -177,6 +191,10 @@ export default class Game {
             Here._.scene.restart({ isRestart: true });
 
         me._updateInternal(time);
+
+        if (me._player.toPos().y > 9999) {
+            throw 'debug';
+        }
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
@@ -522,7 +540,7 @@ export default class Game {
         bullet.setDepth(Consts.Depth.Player + 25);
         const targetPos = me._getBulletTargetPos();
         
-        // me._player.setBusy(true); // TODO return
+        me._player.setBusy(true); // TODO return
 
         Here._.tweens.timeline({
             targets: bullet,
@@ -539,6 +557,7 @@ export default class Game {
                     duration: 1500,
                     ease: 'Sine.easeInOut',
                     onComplete: () => {
+                        me._blowParticles(targetPos.x, targetPos.y);
                         if (me._currentLevel !== 8) {
                             me._player.setBusy(false);
                             return;
@@ -567,6 +586,17 @@ export default class Game {
             me._switchLevelTo(4);
         else if (me._currentLevel === 4)
             me._switchLevelTo(5);
+    }
+
+    _blowParticles(x, y) {
+        const me = this;
+
+        me._particleEmitter.setPosition(x, y);
+        me._particleEmitter.on = true;
+
+        Here._.time.delayedCall(400, () => {
+            me._particleEmitter.on = false;
+        });
     }
 
     _getBulletTargetPos() {
@@ -1020,8 +1050,8 @@ export default class Game {
 
         me._createLight(3500, 1175);
 
-        // me._player.setPosition(2625, Consts.Positions.GroundY);
-        me._player.setPosition(6000, Consts.Positions.GroundY);
+        me._player.setPosition(2625, Consts.Positions.GroundY);
+        // me._player.setPosition(6000, Consts.Positions.GroundY);
         // me._player.tryTakeLight();
     }
 

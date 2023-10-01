@@ -10,7 +10,6 @@ movement controller
 back collider animation
 restart by button for player
 
-graphics
 particles
 sound
 start screen
