@@ -1248,8 +1248,13 @@ export default class Game {
         if (me._bossAppearanceTrigger != -1)
             me._triggers.remove(me._bossAppearanceTrigger);
 
-        if (!!me._fakeLight) 
+        if (!!me._fakeLight) {
+            me._fakeLight.tween.pause();
+            me._fakeLight.light.setVisible(false);
             me._lightPool.killAndHide(me._fakeLight);
+        }
+            
+        me._fillHoles();
 
         me._nextCameraBoundY = -1;
         me._backBorder.reverse();

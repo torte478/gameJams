@@ -10,7 +10,6 @@ movement controller
 back collider animation
 restart by button for player
 
-sound
 start screen
 end screen
 hands

@@ -186,7 +186,7 @@ export default class Player {
             me._isJump = true;
             me._lastJump = time;
             me._sprite.play('player_jump_up', true);
-            Here.Audio.play('jump_up');
+            Here.Audio.play('jump_up', {volume: 0.25});
             // console.log('jump start');
             return;
         }
@@ -202,7 +202,7 @@ export default class Player {
 
         if (!!body.blocked.down && !me._prevGrounded) {
             body.setAccelerationY(0);
-            Here.Audio.play('jump_down', {volume: 0.5});
+            Here.Audio.play('jump_up', {volume: 0.25});
             // console.log('grounded');
         }
             
