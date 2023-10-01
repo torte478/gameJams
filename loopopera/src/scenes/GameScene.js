@@ -36,6 +36,7 @@ export default class GameScene extends HereScene {
         Utils.loadSpriteSheet('player', Consts.Unit.Big);
         Utils.loadSpriteSheet('items', Consts.Unit.Normal);
         Utils.loadSpriteSheet('hand', 100, 200);
+        Utils.loadSpriteSheet('tree', 300, 300);
 
         Utils.loadImage('border');
         Utils.loadImage('start_screen');

@@ -109,6 +109,8 @@ export default class Game {
             .setDepth(Consts.Depth.Hands);
         me._boss = new Boss(8500, 1750, me._handsPool);
 
+        me._createTrees();
+
         // init
 
         me._teleportTrigger = me._createTrigger(
@@ -142,6 +144,7 @@ export default class Game {
                 if (l.canTaked && me._player.tryTakeLight()) {
                     l.tween.pause();
                     l.light.setVisible(false);
+                    l.canTaked = false;
                     me._lightPool.killAndHide(l);
                     if (me._currentLevel === 7)
                         me._killBoss();
@@ -470,7 +473,7 @@ export default class Game {
 
         const tile = 0;
         for (let index = 0; index < positions.length; ++index)
-            me._fillTiles(positions[index], 0);
+            me._fillTiles(positions[index]);
     }
 
     _bullets = [];
@@ -488,8 +491,8 @@ export default class Game {
         me._bullets.push(bullet);
         bullet.setDepth(Consts.Depth.Player + 25);
         const targetPos = me._getBulletTargetPos();
-        if (me._currentLevel === 8)
-            me._player.setBusy(true);
+        
+        // me._player.setBusy(true); // TODO return
 
         Here._.tweens.timeline({
             targets: bullet,
@@ -506,9 +509,11 @@ export default class Game {
                     duration: 1500,
                     ease: 'Sine.easeInOut',
                     onComplete: () => {
-                        if (me._currentLevel !== 8)
+                        if (me._currentLevel !== 8) {
+                            me._player.setBusy(false);
                             return;
-
+                        }
+                            
                         me._bullets.push(me._pentagram);
                         Here._.tweens.add({
                             targets: me._bullets,
@@ -780,11 +785,17 @@ export default class Game {
         });
     }
 
-    _fillTiles(arr, tile) {
+    _fillTiles(arr) {
         const me = this;
 
-        for (let i = 0; i < arr.length; ++i)
+        for (let i = 0; i < arr.length; ++i) {
+            var tile = arr[i].tile;
+            if (!tile)
+                tile = 2;
+
             me._level.setTile(arr[i].x, arr[i].y, tile);
+        }
+            
     }
 
     _createHandTriggers() {
@@ -853,6 +864,23 @@ export default class Game {
                 me._player.setBusy(false);
             }
         });
+    }
+
+    _trees = [];
+    _createTrees() {
+        const me = this;
+
+        const frame = 2;
+        me._trees.push(
+            Here._.add.sprite(6800, 1150, 'tree', frame)
+                .setScale(2),
+            Here._.add.sprite(7660, 1310, 'tree', frame)
+                .setFlipX(true)
+                .setAngle(10),
+            Here._.add.sprite(700, 1250, 'tree', frame)
+                .setAngle(-15)
+                .setScale(1.5)
+        );
     }
 
     // =levels
@@ -940,7 +968,8 @@ export default class Game {
 
         me._createLight(3500, 1175);
 
-        me._player.setPosition(2625, Consts.Positions.GroundY);
+        // me._player.setPosition(2625, Consts.Positions.GroundY);
+        me._player.setPosition(6000, Consts.Positions.GroundY);
         // me._player.tryTakeLight();
     }
 

@@ -34,9 +34,13 @@ export default class Consts {
 
     static Tiles = {
         UndegroundEnter: [ 
-            { x: 32, y: 29 },
-            { x: 33, y: 29 },
-            { x: 34, y: 29 },
+            { x: 32, y: 28, tile: 12 },
+            { x: 33, y: 28, tile: 12 },
+            { x: 34, y: 28, tile: 12 },
+
+            { x: 32, y: 29, tile: 22 },
+            { x: 33, y: 29, tile: 22 },
+            { x: 34, y: 29, tile: 22 },
         ],
         UndegroundFirstWallUp: [
             { x: 64, y: 36 },
@@ -69,16 +73,25 @@ export default class Consts {
             { x: 119, y: 42 },
         ],
         UndegroundExit: [
-            { x: 138, y: 29 },
-            { x: 139, y: 29 },
-            { x: 140, y: 29 },
-            { x: 141, y: 29 },
+            { x: 138, y: 28, tile: 12 },
+            { x: 139, y: 28, tile: 12 },
+            { x: 140, y: 28, tile: 12 },
+            { x: 141, y: 28, tile: 12 },
+
+            { x: 138, y: 29, tile: 22 },
+            { x: 139, y: 29, tile: 22 },
+            { x: 140, y: 29, tile: 22 },
+            { x: 141, y: 29, tile: 22 },
 
         ],
         FinalUndegroundEnter: [
-            { x: 161, y: 29 },
-            { x: 162, y: 29 },
-            { x: 163, y: 29 },
+            { x: 161, y: 28, tile: 12 },
+            { x: 162, y: 28, tile: 12 },
+            { x: 163, y: 28, tile: 12 },
+
+            { x: 161, y: 29, tile: 22 },
+            { x: 162, y: 29, tile: 22 },
+            { x: 163, y: 29, tile: 22 },
         ],
         FinalUndegroundExit: [  
             { x: 120, y: 43 },
