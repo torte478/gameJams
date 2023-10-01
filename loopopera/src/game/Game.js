@@ -162,6 +162,7 @@ export default class Game {
                     else {
                         const targetPos = me._player.toPos();
                         me._blowParticles(targetPos.x, targetPos.y);
+                        Here.Audio.play('pickup');
                     }
                 }
             });
@@ -251,8 +252,14 @@ export default class Game {
             const targetPos = me._player.toPos();
             me._particleEmitter.setPosition(targetPos.x, targetPos.y);
             me._particleEmitter.on = true;
-            if ((time - me._backBorder._collideTime) > Config.BorderBreakDelayMs)
+            Here.Audio.playIfNotPlaying('pickup', {loop: -1});
+            if ((time - me._backBorder._collideTime) > Config.BorderBreakDelayMs) {
+                Here.Audio.stopAll();
+                Here.Audio.play('light_hit');
                 me._switchLevelTo(7);
+                me._particleEmitter.on = false;
+            }
+                
         }
         else if (me._currentLevel === 6) {
             me._particleEmitter.on = false;
@@ -553,7 +560,9 @@ export default class Game {
         bullet.setDepth(Consts.Depth.Player + 25);
         const targetPos = me._getBulletTargetPos();
         
-        me._player.setBusy(true); // TODO return
+        // me._player.setBusy(true); // TODO return
+
+        Here.Audio.play('pickup', { volume: 0.8 });
 
         Here._.tweens.timeline({
             targets: bullet,
@@ -571,6 +580,7 @@ export default class Game {
                     ease: 'Sine.easeInOut',
                     onComplete: () => {
                         me._blowParticles(targetPos.x, targetPos.y);
+                        Here.Audio.play('light_hit', { volume: 0.8});
                         if (me._currentLevel !== 8) {
                             me._player.setBusy(false);
                             return;
@@ -716,6 +726,7 @@ export default class Game {
 
         me._player.setBusy(true);
         me._player.setDeath(true);
+        Here.Audio.play('death');
         Here._.tweens.timeline({
             targets: me._redScreen,
             tweens: [
@@ -850,13 +861,15 @@ export default class Game {
         const me = this;
 
         me._player.setBusy(true);
+        Here.Audio.play('boss', {loop: -1});
         Here._.add.tween({
             targets: me._boss.toCollider(),
             y: 1150,
             duration: Config.BossAppearanceTimeMs,
             ease: 'Sine.easeInOut',
             onComplete: () => {
-                
+                Here.Audio.stop('boss');
+                Here.Audio.play('light_hit');
                 me._clearTiles(Consts.Tiles.FinalUndegroundEnter);
                 me._clearTiles(Consts.Tiles.FinalUndegroundExit);
                 me._clearTiles(Consts.Tiles.UndegroundExit);
@@ -949,12 +962,16 @@ export default class Game {
         me._particleEmitter.setAngle({min: 150, max: 190});
         me._particleEmitter.on = true;
 
+        Here.Audio.play('boss', { loop: -1});
         Here._.tweens.add({
             targets: me._boss.toCollider(),
             y: 1750,
             duration: Config.BossAppearanceTimeMs,
             ease: 'Sine.easeIn',
             onComplete: () => {
+                Here.Audio.stop('boss');
+                Here.Audio.play('light_hit');
+
                 me._nextCameraBoundY = -1;
                 me._startChangeCameraBoundY(
                     Config.Camera.BoundGroundY, 
@@ -1136,9 +1153,9 @@ export default class Game {
         const me = this;
 
         me._player.setPosition(Consts.Positions.FinalUndergroundX, Consts.Positions.GroundY);
-        // me._player.setPosition(400, 2440);
+        me._player.setPosition(400, 2440);
         // me._player.setPosition(5235, 2940);
-        me._player.setPosition(6925, 1590);
+        // me._player.setPosition(6925, 1590);
         me._isBossAppeared = true;
 
         me._isFinalUndeground = true;

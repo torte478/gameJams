@@ -44,6 +44,21 @@ export default class GameScene extends HereScene {
         Utils.loadImage('pentagram');
         Utils.loadImage('red_screen');
         Utils.loadImage('particle');
+
+        Utils.loadMp3('sound0');
+        Utils.loadMp3('sound1');
+        Utils.loadMp3('sound2');
+        Utils.loadMp3('sound3');
+        Utils.loadMp3('sound4');
+        Utils.loadMp3('sound5');
+
+        Utils.loadWav('boss');
+        Utils.loadWav('death');
+        Utils.loadWav('hand');
+        Utils.loadWav('jump_up');
+        Utils.loadWav('jump_down');
+        Utils.loadWav('light_hit');
+        Utils.loadWav('pickup');
     }
 
     create() {

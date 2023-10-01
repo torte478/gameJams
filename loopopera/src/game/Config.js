@@ -14,12 +14,12 @@ export default class Config {
         DebugY: 1390
     };
 
-    static StartLevel = 5;
+    static StartLevel = 1;
 
     static WorldBorder = 9525;
     static WorldStartX = 400;
     static BackgroundColor = '#0d0d0d';
-    static BossAppearanceTimeMs = 7000;//2000;
+    static BossAppearanceTimeMs = 2000; //10000;//2000;
     static BossHandsDelayMs = 700;
     static BorderBreakDelayMs = 1500
     static LightColor = {

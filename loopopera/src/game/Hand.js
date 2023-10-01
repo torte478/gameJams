@@ -62,6 +62,7 @@ export default class Hand {
         } else {
             me._sprite.play('hand_attack');
             me._isAttack = true;
+            Here.Audio.play('hand', { volume: 0.5});
         }
     }
 }
