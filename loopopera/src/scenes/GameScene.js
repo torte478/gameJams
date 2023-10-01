@@ -48,6 +48,8 @@ export default class GameScene extends HereScene {
         Utils.loadImage('endscreen');
         Utils.loadImage('theend');
         Utils.loadImage('many_hands');
+        Utils.loadImage('tutorial');
+        Utils.loadImage('shirm');
 
         Utils.loadMp3('sound0');
         Utils.loadMp3('sound1');

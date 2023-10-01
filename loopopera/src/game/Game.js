@@ -114,7 +114,7 @@ export default class Game {
 
         me._createTrees();
 
-        const particles = Here._.add.particles('particle').setDepth(Consts.Depth.Player + 100);
+        const particles = Here._.add.particles('particle').setDepth(Consts.Depth.Boss + 100);
         me._particleEmitter = particles.createEmitter();
         me._particleEmitter.setPosition(me._player.toPos().x, me._player.toPos().y);
         me._particleEmitter.setSpeed(400);
@@ -129,6 +129,12 @@ export default class Game {
         me._scareCrow = Here._.add.sprite(8300, 1350, 'scarecrow')
             .setDepth(Consts.Depth.Tiles + 50)
             .play('scarecrow');
+
+        Here._.add.image(3300, 1500, 'tutorial').setDepth(Consts.Depth.Tiles + 100);
+
+        me._shirm = Here._.add.image(me._boss._container.x, 1600, 'shirm')
+            .setDepth(Consts.Depth.Boss + 1)
+            .setVisible(false);
 
         // init
 
@@ -206,8 +212,11 @@ export default class Game {
         const me = this;
 
         if (Here.Controls.isPressedOnce(Enums.Keyboard.RESTART) 
-            && Utils.isDebug(Config.Debug.Global))
+            && Utils.isDebug(Config.Debug.Global)) {
+
+            Here.Audio.stopAll();
             Here._.scene.restart({ isRestart: true });
+        }
 
         me._updateInternal(time);
 
@@ -277,6 +286,7 @@ export default class Game {
         }
         else if (me._currentLevel === 6) {
             me._particleEmitter.on = false;
+            Here.Audio.stop('pickup');
         }
     }
 
@@ -574,7 +584,7 @@ export default class Game {
         bullet.setDepth(Consts.Depth.Player + 25);
         const targetPos = me._getBulletTargetPos();
         
-        // me._player.setBusy(true); // TODO return
+        //me._player.setBusy(true); // TODO return
 
         Here.Audio.play('pickup', { volume: 0.8 });
 
@@ -877,17 +887,24 @@ export default class Game {
             true);
     }
 
+    _shirm;
+
     _onBossAppearance() {
         const me = this;
 
         me._player.setBusy(true);
         Here.Audio.play('boss', {loop: -1});
+        me._shirm.setVisible(true);
+        me._boss._container.setVisible(true);
+
         Here._.add.tween({
             targets: me._boss.toCollider(),
             y: 1150,
             duration: Config.BossAppearanceTimeMs,
             ease: 'Sine.easeInOut',
             onComplete: () => {
+                me._shirm.setVisible(false);
+
                 Here.Audio.stop('boss');
                 Here.Audio.play('light_hit');
 
@@ -1044,6 +1061,8 @@ export default class Game {
 
         me._boss.toCollider().x = 1100;
         me._boss.toCollider().y = 1150;
+        me._shirm.setPosition(me._boss.toCollider().x, me._shirm.y);
+        me._shirm.setVisible(true);
     }
 
     _switchLevelTo(next) {
@@ -1139,10 +1158,7 @@ export default class Game {
         Here.Audio.stop('sound0');
         me._playSound('sound1');
 
-        me._scareCrow.stop();
-        me._scareCrow.setFrame(2);
-
-        me._createLight(5400, 1350);
+        me._createLight(5400, 1400);
     }
 
     _playSound(name) {
@@ -1166,8 +1182,10 @@ export default class Game {
         for (let i = 0; i < me._trees.length; ++i)
             me._trees[i].setFrame(1);
 
+        me._scareCrow.stop();
+        me._scareCrow.setFrame(2);
+
         me._createLight(6250, 1150);
-        me._manyHands.setVisible(true);
 
         me._level.setTile(36, 27, 8);
         me._level.setTile(37, 27, 9);
@@ -1191,6 +1209,8 @@ export default class Game {
 
         for (let i = 0; i < me._trees.length; ++i)
             me._trees[i].setFrame(2);
+
+        me._manyHands.setVisible(true);
 
         me._clearTiles(Consts.Tiles.UndegroundEnter);
         me._level.setTile(31, 29, 23);
@@ -1249,6 +1269,7 @@ export default class Game {
     _initStartFromLevel6() {
         const me = this;
 
+        me._boss._container.setVisible(true);
         me._player.setPosition(Consts.Positions.BossStartX, Consts.Positions.GroundY);
 
         me._initLevel6();
@@ -1288,6 +1309,10 @@ export default class Game {
         }
             
         me._fillHoles();
+        me._level.setTile(36, 27, 3);
+        me._level.setTile(37, 27, 3);
+        me._level.setTile(36, 28, 3);
+        me._level.setTile(37, 28, 3);
 
         me._nextCameraBoundY = -1;
         me._backBorder.reverse();
@@ -1325,6 +1350,8 @@ export default class Game {
 
         Here._.add.image(8800 + Consts.Viewport.Width / 2, 1200, 'endscreen')
             .setDepth(Consts.Depth.Tiles + 100);
+
+        me._boss.resetHands();
 
         me._createTrigger(
             () => {

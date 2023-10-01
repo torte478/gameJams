@@ -27,7 +27,8 @@ export default class Boss {
 
         me._container = Here._.add.container(x, y, [ sprite ])
             .setSize(250, 600)
-            .setDepth(Consts.Depth.Boss);
+            .setDepth(Consts.Depth.Boss)
+            .setVisible(false);
 
         Here._.physics.world.enable(me._container);
         /** @type {Phaser.Physics.Arcade.Body} */
