@@ -21,6 +21,8 @@ export default class Border {
 
     _isReverse = false;
 
+    _lastPlayerX = -1;
+
     /**
      * @param {Player} player 
      */
@@ -43,8 +45,10 @@ export default class Border {
             me._sprite, 
             me._player.toCollider(),
             (b, p) => {
-                if (!me._isCollide)
+                if (!me._isCollide) {
                     me._isCollide = true;
+                    me._lastPlayerX = me._player.toPos().x;
+                }
             });
     }
 
@@ -54,10 +58,14 @@ export default class Border {
         me._resetPosition();
         me._lastX = me._sprite.x;
 
-        if (me._isCollide && !me._collideTime)        
-            me._collideTime = time;
-        else if (!me._isCollide)
-            me._collideTime = null;
+        if (me._isCollide) {
+            if (!me._collideTime)
+                me._collideTime = time;
+            else if (me._player.toPos().x > me._lastPlayerX) {
+                me._collideTime = null;
+                me._isCollide = false;
+            }
+        }
     }
 
     reset() {

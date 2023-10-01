@@ -157,11 +157,12 @@ export default class Game {
                     l.canTaked = false;
                     me._lightPool.killAndHide(l);
 
-                    const targetPos = me._player.toPos();
-                    me._blowParticles(targetPos.x, targetPos.y);
-
                     if (me._currentLevel === 7)
                         me._killBoss();
+                    else {
+                        const targetPos = me._player.toPos();
+                        me._blowParticles(targetPos.x, targetPos.y);
+                    }
                 }
             });
 
@@ -177,8 +178,15 @@ export default class Game {
             me._player.toCollider(),
             me._boss.toCollider(),
             (p, b) => {
-                if (!me._player._isBusy && me._currentLevel == 6)
+                if (!me._player._isBusy 
+                    && (me._currentLevel == 6 
+                        || me._currentLevel == 7 && me._player.toPos().x > 5000)) {
+
+                    if (me._currentLevel == 7)
+                        throw 'TODO';
+
                     me._onBossTouchTrigger();
+                }
             }
         )
     }
@@ -202,7 +210,7 @@ export default class Game {
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `plr: ${me._player._container.x | 0} ${me._player._container.y | 0}\n` +
-                `dbg: ${me._currentLevel} ${me._player._hasLight}`;
+                `dbg: ${me._currentLevel} ${me._player._hasLight} ${me._backBorder._isCollide} ${me._backBorder._lastPlayerX}`;
 
             me._log.setText(text);
         });
@@ -240,9 +248,14 @@ export default class Game {
         me._backBorder.update(time);
 
         if (me._currentLevel === 6 && me._backBorder._isCollide) {
-            Utils.debugLog('effect');
+            const targetPos = me._player.toPos();
+            me._particleEmitter.setPosition(targetPos.x, targetPos.y);
+            me._particleEmitter.on = true;
             if ((time - me._backBorder._collideTime) > Config.BorderBreakDelayMs)
                 me._switchLevelTo(7);
+        }
+        else if (me._currentLevel === 6) {
+            me._particleEmitter.on = false;
         }
     }
 
@@ -265,7 +278,7 @@ export default class Game {
         me._player.teleport(Config.WorldStartX);
         me._teleportCamera.reset();
         me._resetCameraAfterTeleport();
-        console.log('teleport');
+        Utils.debugLog('teleport');
 
         if (me._currentLevel === 1)
            me._switchLevelTo(2);
@@ -930,6 +943,12 @@ export default class Game {
         const me = this;
 
         me._player._isBusy = true;
+
+        const tt = me._player.toPos();
+        me._particleEmitter.setPosition(tt.x, tt.y);
+        me._particleEmitter.setAngle({min: 150, max: 190});
+        me._particleEmitter.on = true;
+
         Here._.tweens.add({
             targets: me._boss.toCollider(),
             y: 1750,
@@ -943,6 +962,10 @@ export default class Game {
                     2000);
                 me._switchLevelTo(8);
                 me._backBorder.reverse();
+
+                me._particleEmitter.on = false;
+                me._particleEmitter.setAngle({min: 0, max: 360});
+
                 me._player.setBusy(false);
             }
         });
@@ -1216,7 +1239,5 @@ export default class Game {
 
     _initLevel8() {
         const me = this;
-
-        console.log(8);
     }
 }
