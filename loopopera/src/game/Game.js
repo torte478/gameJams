@@ -106,8 +106,9 @@ export default class Game {
             .setDepth(Consts.Depth.Foreground)
             .setAlpha(0);
 
-        me._boss = new Boss(8500, 1750);
-        me._handsPool = Here._.physics.add.group();
+        me._handsPool = Here._.physics.add.group()
+            .setDepth(Consts.Depth.Hands);
+        me._boss = new Boss(8500, 1750, me._handsPool);
 
         // init
 
@@ -141,6 +142,13 @@ export default class Game {
             (p, l) => {
                 if (l.visible && me._player.tryTakeLight())
                     me._lightPool.killAndHide(l);
+            });
+
+        Here._.physics.add.overlap(
+            me._player.toCollider(),
+            me._handsPool,
+            (p, h) => {
+                console.log('hit')
             });
     }
 
@@ -646,12 +654,16 @@ export default class Game {
             me._level.setTile(arr[i].x, arr[i].y, tile);
     }
 
-    _createHands(hands) {
+    _createHandTriggers() {
         const me = this;
 
-        // TODO
-        // for (let i = 0; i < hands.length; ++i)
-        //     new Hand(hands[i].x, hands[i].y, hands[i].dir, me._handsPool);
+        me._createTrigger(
+            () => me._boss.startHands(0),
+            650,
+            2425,
+            200,
+            200,
+            true);
     }
 
     // =levels
@@ -776,7 +788,7 @@ export default class Game {
         const me = this;
 
         // me._player.setPosition(Consts.Positions.FinalUndergroundX, Consts.Positions.GroundY);
-        me._player.setPosition(640, 2440);
+        me._player.setPosition(400, 2440);
         me._initLevel5();
     }
 
@@ -793,7 +805,6 @@ export default class Game {
         );
 
         me._createLight(8500, 1375);
-
-        me._createHands(Config.Level5Hands);
+        me._createHandTriggers();
     }
 }

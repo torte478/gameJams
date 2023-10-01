@@ -3,18 +3,18 @@ import Enums from "./Enums.js";
 export default class Config {
 
     static Debug = {
-        Global: false,
+        Global: true,
         Log: true,
         ShowSceneLog: true,
         PlaySound: true,
         Random: false,
-        IsFinalUndeground: false,
+        IsFinalUndeground: true,
         Position: false,
         DebugX: 4800,
         DebugY: 1390
     };
 
-    static StartLevel = 0;
+    static StartLevel = 5;
 
     static WorldBorder = 9525;
     static WorldStartX = 400;
@@ -43,8 +43,5 @@ export default class Config {
         StartOffsetX: -300,
         SecondOffsetX: -100
     }
-
-    static Level5Hands = [
-        { x: 850, y: 2500, dir: Enums.HandDirection.UP }
-    ];
+x
 }

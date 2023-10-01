@@ -9,11 +9,11 @@
     ],
     "fileStates": {
         "level.tmx": {
-            "scale": 0.25,
+            "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 2652,
-                "y": 554
+                "x": 2313,
+                "y": 2589
             }
         },
         "tiles.tsx": {
@@ -35,8 +35,8 @@
     ],
     "project": "level.tiled-project",
     "recentFiles": [
-        "level.tmx",
-        "tiles.tsx"
+        "tiles.tsx",
+        "level.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

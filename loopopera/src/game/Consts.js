@@ -16,6 +16,7 @@ export default class Consts {
         Boss: 50,
         Tiles: 100,
         Player: 1000,
+        Hands: 2000,
         Foreground: 10000,
         Max: 100000
     };
