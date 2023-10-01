@@ -48,6 +48,14 @@ export default class Animation {
             frameRate: 1,
             repeat: -1
         });
+
+        Here._.anims.create({
+            key: 'boss',
+            frames: Animation.getFrames('boss', [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ]),
+            frameRate: 8,
+            repeat: -1,
+            yoyo: true
+        });
     }
 
     static getFrames(texture, frames) {

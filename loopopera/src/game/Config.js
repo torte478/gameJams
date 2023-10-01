@@ -14,12 +14,12 @@ export default class Config {
         DebugY: 1390
     };
 
-    static StartLevel = 5;
+    static StartLevel = 4;
 
     static WorldBorder = 9525;
     static WorldStartX = 400;
     static BackgroundColor = '#0d0d0d';
-    static BossAppearanceTimeMs = 2000; //7000;
+    static BossAppearanceTimeMs = 2000;
     static BossHandsDelayMs = 700;
     static BorderBreakDelayMs = 3000
     static LightColor = {
@@ -29,8 +29,8 @@ export default class Config {
     static Player = {
         StartX: 100,
         StartY: 1390,
-        // Speed: 700, // debug
-        Speed: 300,
+        Speed: 700, // debug
+        // Speed: 300,
         GravityFall: 1000,
         GravityJump: 200,
         JumpForce: -400,

@@ -22,15 +22,18 @@ export default class Boss {
 
         me._handPool = handPool;
 
-        const sprite = Here._.add.image(0, 0, 'boss');
+        const sprite = Here._.add.sprite(0, 0, 'boss', 0)
+            .play('boss');
+
         me._container = Here._.add.container(x, y, [ sprite ])
-            .setSize(500, 600)
+            .setSize(250, 600)
             .setDepth(Consts.Depth.Boss);
 
         Here._.physics.world.enable(me._container);
         /** @type {Phaser.Physics.Arcade.Body} */
         const body = me._container.body;
         body.setImmovable(true);
+        // body.setSize(300, 500);
     }
 
     toCollider() {

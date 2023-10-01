@@ -813,7 +813,16 @@ export default class Game {
             duration: Config.BossAppearanceTimeMs,
             ease: 'Sine.easeInOut',
             onComplete: () => {
+                
                 me._clearTiles(Consts.Tiles.FinalUndegroundEnter);
+                me._clearTiles(Consts.Tiles.FinalUndegroundExit);
+                me._clearTiles(Consts.Tiles.UndegroundExit);
+        
+                me._level.setTile(119, 43, 23);
+                me._level.setTile(125, 43, 21);
+        
+                me._govnoMethod();
+
                 me._isBossAppeared = true;
                 me._player.setBusy(false);
             }
