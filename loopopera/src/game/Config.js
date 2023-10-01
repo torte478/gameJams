@@ -29,8 +29,8 @@ export default class Config {
     static Player = {
         StartX: 100,
         StartY: 1390,
-        Speed: 700, // debug
-        // Speed: 300,
+        // Speed: 700, // debug
+        Speed: 300,
         GravityFall: 1000,
         GravityJump: 200,
         JumpForce: -400,

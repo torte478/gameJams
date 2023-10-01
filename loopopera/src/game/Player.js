@@ -60,12 +60,25 @@ export default class Player {
         /** @type {Phaser.Physics.Arcade.Body} */
         const  body = me._container.body;
 
-        if (!me._isBusy && Here.Controls.isPressing(Enums.Keyboard.RIGHT)) 
+        if (!me._isBusy && Here.Controls.isPressing(Enums.Keyboard.RIGHT))  {
             body.setVelocityX(me._speedX);
-        else if (!me._isBusy && Here.Controls.isPressing(Enums.Keyboard.LEFT))
+            me._sprite.setFlipX(false);
+            
+            if (body.blocked.down)
+                me._sprite.play('player_walk', true);
+        }
+        else if (!me._isBusy && Here.Controls.isPressing(Enums.Keyboard.LEFT)) {
             body.setVelocityX(-me._speedX);
-        else
+            me._sprite.setFlipX(true);
+
+            if (body.blocked.down)
+                me._sprite.play('player_walk', true);
+        }
+        else {
             body.setVelocityX(0);
+            if (body.blocked.down)
+                me._sprite.play('player_idle', true);
+        }
 
         me._processJump(time);
         me._prevY = me._container.y;
@@ -154,6 +167,7 @@ export default class Player {
             body.setVelocityY(Config.Player.JumpForce);
             me._isJump = true;
             me._lastJump = time;
+            me._sprite.play('player_jump_up', true);
             // console.log('jump start');
             return;
         }
@@ -161,6 +175,7 @@ export default class Player {
         if (me._isJump && me._container.y > me._prevY) {
             body.setGravityY(Config.Player.GravityFall);
             me._isJump = false;
+            me._sprite.play('player_jump_down', true);
             // console.log('jump end')
             return;
         }
