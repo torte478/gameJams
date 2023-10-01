@@ -30,7 +30,7 @@ export default class GameScene extends HereScene {
         if (!me._isRestart)
             Utils.runLoadingBar();
 
-        me.load.tilemapCSV('level', `assets/level.csv`);
+        me.load.tilemapCSV('level', `assets/level_Copy of Tile Layer 1.csv`);
 
         Utils.loadSpriteSheet('tiles', Consts.Unit.Normal);
         Utils.loadSpriteSheet('player', Consts.Unit.Big);

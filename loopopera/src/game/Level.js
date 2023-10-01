@@ -18,7 +18,12 @@ export default class Level {
         me._tiles = level.createLayer(0, tileset)
             .setDepth(Consts.Depth.Tiles);
 
-        level.setCollision([0, 1]); 
+        level.setCollision([
+            0, 1, 
+            21, 22, 23, 25, 26, 27,
+            31, 32, 33, 35, 36, 37,
+            41, 42, 43, 45, 46, 47,
+        ]); 
     }
 
     /**

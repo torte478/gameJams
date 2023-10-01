@@ -910,7 +910,7 @@ export default class Game {
     _initStartFromLevel1() {
         const me = this;
 
-        me._player.setPosition(4400, 1390);
+        me._player.setPosition(2625, Consts.Positions.GroundY);
         me._player.tryTakeLight();
     }
 
