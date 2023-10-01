@@ -221,6 +221,10 @@ export default class Game {
         const me = this;
 
         me._player.update(time);
+
+        if (!!me._stopDamnCamera)
+            return;
+
         me._updateCameraBounds();
 
         if (!me._isFinalUndeground) {
@@ -1276,12 +1280,50 @@ export default class Game {
     _initStartFromLevel8() {
         const me = this;
 
-        me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
-        me._player.tryTakeLight();
+        me._player.setPosition(8600, Consts.Positions.GroundY);
+        // me._player.tryTakeLight();
+
+        me._triggers.remove(me._teleportTrigger);
+        me._teleportCamera._camera.setVisible(false);
+
         me._initLevel8();       
     }
 
+    _stopDamnCamera = false;
+
     _initLevel8() {
         const me = this;
+
+        Here._.add.image(8800 + Consts.Viewport.Width / 2, 1200, 'endscreen')
+            .setDepth(Consts.Depth.Tiles + 100);
+
+        me._createTrigger(
+            () => {
+                me._player.setBusy(true);
+                me._stopDamnCamera = true;
+                Here._.cameras.main.stopFollow();
+                Here._.add.tween({
+                    targets: me._player.toCollider(),
+                    x: 9900,
+                    duration: 5500,
+                    onComplete: () => {
+                        const end = Here._.add.image(9600, 1530, 'theend')
+                            .setDepth(Consts.Depth.Foreground)
+                            .setAlpha(0);
+
+                        Here._.add.tween({
+                            targets: end,
+                            alpha: { from: 0, to: 1},
+                            duration: 2000,
+                            ease: 'Sine.easeOut'
+                        })
+                    }
+                })
+            },
+            9125,
+            1200,
+            200,
+            8000,
+            true);
     }
 }

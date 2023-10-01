@@ -44,6 +44,8 @@ export default class GameScene extends HereScene {
         Utils.loadImage('pentagram');
         Utils.loadImage('red_screen');
         Utils.loadImage('particle');
+        Utils.loadImage('endscreen');
+        Utils.loadImage('theend');
 
         Utils.loadMp3('sound0');
         Utils.loadMp3('sound1');
