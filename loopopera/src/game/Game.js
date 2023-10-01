@@ -12,7 +12,6 @@ import Triggers from './Triggers.js';
 import TeleportCamera from './TeleportCamera.js';
 import Border from './Border.js';
 import Boss from './Boss.js';
-import Hand from './Hand.js';
 
 export default class Game {
 
@@ -151,6 +150,15 @@ export default class Game {
                 if (!me._player._isBusy)
                     me._onHandTrigger();
             });
+
+        Here._.physics.add.overlap(
+            me._player.toCollider(),
+            me._boss.toCollider(),
+            (p, b) => {
+                if (!me._player._isBusy)
+                    me._onBossTouchTrigger();
+            }
+        )
     }
 
     update(time) {
@@ -278,6 +286,8 @@ export default class Game {
                            + (me._nextCameraOffsetX - me._oldCameraOffsetX) * progress;
     }
 
+    _undegroundExitTrigger;
+
     _createCameraBoundYTriggers() {
         const me = this;
 
@@ -305,7 +315,7 @@ export default class Game {
             100,
             false);
 
-        me._createTrigger(
+        me._undegroundExitTrigger = me._createTrigger(
             me._onGroundTrigger,
             7250,
             1350,
@@ -334,10 +344,14 @@ export default class Game {
     _onGroundTrigger() {
         const me = this;
 
+        me._isFinalUndeground = false;
         me._startChangeCameraBoundY(
             Config.Camera.BoundGroundY, 
             Config.Camera.StartOffsetX, 
             1000);
+
+        if (me._currentLevel === 5)
+            me._switchLevelTo(6);
     }
 
     _onUndergroundTrigger() {
@@ -418,6 +432,9 @@ export default class Game {
 
         if (me._currentLevel === 5)
             return me._initStartFromLevel5();
+
+        if (me._currentLevel === 6)
+            return me._initStartFromLevel6();
 
         throw `unknown level ${me._currentLevel}`;
     }
@@ -517,6 +534,25 @@ export default class Game {
             me._resetHands,
             me
         );
+    }
+
+    _onBossTouchTrigger() {
+        const me = this;
+
+        me._onPlayerDeath(
+            Consts.Positions.BossStartX,
+            Consts.Positions.GroundY,
+            me._resetBoss,
+            me
+        );
+    }
+
+    _resetBoss() {
+        const me = this;
+
+        me._bossAttackTween.pause();
+
+        me._onFinalUndegroundExit();
     }
 
     _resetHands() {
@@ -708,6 +744,24 @@ export default class Game {
             true);
     }
 
+    /** @type {Phaser.Tweens.Tween} */
+    _bossAttackTween;
+
+    _onFinalUndegroundExit() {
+        const me = this;
+
+        me._fillTiles(
+            Consts.Tiles.UndegroundExit,
+            0);
+        
+        me._boss.toCollider().y = 1150;
+        me._bossAttackTween = Here._.tweens.add({
+            targets: me._boss.toCollider(),
+            x: { from: 8400, to: 7000 },
+            duration: 20000
+        });
+    }
+
     // =levels
 
     _switchLevelTo(next) {
@@ -729,6 +783,9 @@ export default class Game {
 
         if (next == 5)
             return me._initLevel5();
+
+        if (next == 6)
+            return me._initLevel6();
 
         throw `unknown level ${next}`;
     }
@@ -832,7 +889,9 @@ export default class Game {
         me._player.setPosition(Consts.Positions.FinalUndergroundX, Consts.Positions.GroundY);
         // me._player.setPosition(400, 2440);
         // me._player.setPosition(5235, 2940);
-        // me._player.setPosition(6925, 1590);
+        me._player.setPosition(6925, 1590);
+
+        me._isFinalUndeground = true;
         me._fillTiles(Consts.Tiles.FinalUndegroundExit, 2);
         me._fillTiles(Consts.Tiles.UndegroundExit, 2);
         me._initLevel5();
@@ -851,6 +910,28 @@ export default class Game {
         );
 
         me._createLight(8500, 1375);
+        me._nextCameraBoundY = -1;           
+
         me._createHandTriggers();
+    }
+
+    _initStartFromLevel6() {
+        const me = this;
+
+        me._player.setPosition(Consts.Positions.BossStartX, Consts.Positions.GroundY);
+
+        me._initLevel6();
+    }
+
+    _initLevel6() {
+        const me = this;
+
+        me._createTrigger(
+            me._onFinalUndegroundExit,
+            7300,
+            1350,
+            200,
+            200,
+            true);
     }
 }

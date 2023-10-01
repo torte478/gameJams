@@ -28,7 +28,8 @@ export default class Consts {
         GroundY: 1390,
         FinalUndergroundX: 7800,
         HandsStartX: 400, 
-        HandsStartY: 2440
+        HandsStartY: 2440,
+        BossStartX: 7200,
     }
 
     static Tiles = {

@@ -14,7 +14,7 @@ export default class Config {
         DebugY: 1390
     };
 
-    static StartLevel = 5;
+    static StartLevel = 6;
 
     static WorldBorder = 9525;
     static WorldStartX = 400;
