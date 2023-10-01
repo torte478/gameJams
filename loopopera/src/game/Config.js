@@ -22,6 +22,9 @@ export default class Config {
     static BossAppearanceTimeMs = 2000; //7000;
     static BossHandsDelayMs = 700;
     static BorderBreakDelayMs = 3000
+    static LightColor = {
+        R: 193, B: 252, G: 250
+    };
 
     static Player = {
         StartX: 100,

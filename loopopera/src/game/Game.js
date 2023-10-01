@@ -139,7 +139,9 @@ export default class Game {
             me._player.toCollider(),
             me._lightPool,
             (p, l) => {
-                if (l.visible && me._player.tryTakeLight()) {
+                if (l.canTaked && me._player.tryTakeLight()) {
+                    l.tween.pause();
+                    l.light.setVisible(false);
                     me._lightPool.killAndHide(l);
                     if (me._currentLevel === 7)
                         me._killBoss();
@@ -179,7 +181,7 @@ export default class Game {
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `plr: ${me._player._container.x | 0} ${me._player._container.y | 0}\n` +
-                `dbg: ${me._currentLevel} ${(time - me._backBorder._collideTime) / 1000 | 0}`;
+                `dbg: ${me._currentLevel} ${me._player._hasLight}`;
 
             me._log.setText(text);
         });
@@ -555,7 +557,32 @@ export default class Game {
     _createLight(x, y) {
         const me = this;
 
-        return me._lightPool.create(x, y, 'items', 0);
+        const light = Here._.add.pointlight(x, y, 0, 40, 0.25)
+            .setDepth(Consts.Depth.Player);
+
+        light.color.setTo(Config.LightColor.R, Config.LightColor.G, Config.LightColor.B);
+
+        const sprite = me._lightPool.create(x, y, 'items', 0)
+            .setDepth(Consts.Depth.Player)
+            .setVisible(false);
+
+        sprite.light = light;
+        sprite.tween = Here._.add.tween({
+            targets: light,
+            y: y - 25,
+            intensity: 1,
+            yoyo: true,
+            repeat: -1,
+            duration: 1000
+        });
+        sprite.canTaked = true;
+
+        return sprite;
+    }
+
+    _interpolate(x, y, t) {
+        let t1 = t > 1 ? 2 - t : t;
+        return (1 - t1) * x + t1 * y;
     }
 
     _onDeadEndTrigger() {
@@ -910,8 +937,10 @@ export default class Game {
     _initStartFromLevel1() {
         const me = this;
 
+        me._createLight(3500, 1175);
+
         me._player.setPosition(2625, Consts.Positions.GroundY);
-        me._player.tryTakeLight();
+        // me._player.tryTakeLight();
     }
 
     _initStartFromLevel2() {
