@@ -482,8 +482,9 @@ export default class Game {
             return;
 
         const playerPos = me._player.toPos();
-        /** @type {Phaser.GameObjects.Image} */
-        const bullet = me._lightBulletPool.create(playerPos.x, playerPos.y, 'items', 0);
+        const bullet = Here._.add.pointlight(playerPos.x, playerPos.y, 0, 50, 0.25);
+        bullet.color.setTo(Config.LightColor.R, Config.LightColor.G, Config.LightColor.B);
+
         me._bullets.push(bullet);
         bullet.setDepth(Consts.Depth.Player + 25);
         const targetPos = me._getBulletTargetPos();
@@ -495,7 +496,7 @@ export default class Game {
             tweens: [
                 {
                     x: 5000,
-                    y: 1150,
+                    y: 1125,
                     duration: 1500,
                     ease: 'Sine.easeInOut'
                 },
@@ -537,19 +538,19 @@ export default class Game {
         const me = this;
 
         if (me._currentLevel <= 1)
-            return Utils.buildPoint(4861, 1099);
+            return Utils.buildPoint(4902, 1105);
 
         if (me._currentLevel == 2)
-            return Utils.buildPoint(4927, 990);
+            return Utils.buildPoint(4960, 1002);
 
         if (me._currentLevel == 3)
-            return Utils.buildPoint(5000, 963);
+            return Utils.buildPoint(5002, 994);
 
         if (me._currentLevel == 4)
-            return Utils.buildPoint(5080, 995);
+            return Utils.buildPoint(5048, 1012);
 
         if (me._currentLevel == 8)
-            return Utils.buildPoint(5130, 1085);
+            return Utils.buildPoint(5072, 1039);
 
         throw `unknown level ${me._currentLevel}`;
     }
