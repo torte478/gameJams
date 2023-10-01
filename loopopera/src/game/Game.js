@@ -190,10 +190,11 @@ export default class Game {
             (p, b) => {
                 if (!me._player._isBusy 
                     && (me._currentLevel == 6 
-                        || me._currentLevel == 7 && me._player.toPos().x > 5000)) {
+                        || (me._currentLevel == 7 && me._player.toPos().x > 5000))) {
 
-                    if (me._currentLevel == 7)
-                        throw 'TODO';
+                    if (me._currentLevel == 7) {
+                        
+                    }
 
                     me._onBossTouchTrigger();
                 }
@@ -220,7 +221,7 @@ export default class Game {
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + 
                 `plr: ${me._player._container.x | 0} ${me._player._container.y | 0}\n` +
-                `dbg: ${me._currentLevel} ${me._player._hasLight} ${me._backBorder._isCollide} ${me._backBorder._lastPlayerX}`;
+                `dbg: ${Here._.cameras.main.scrollX}`;
 
             me._log.setText(text);
         });
@@ -754,6 +755,10 @@ export default class Game {
                         me._resetCameraAfterTeleport();
                         me._cameraBoundY = Config.Camera.BoundGroundY;
                         me._nextCameraBoundY = -100;
+                        if (me._currentLevel == 7) {
+                            me._backBorder.reverse();
+                            me._currentLevel = 6;
+                        }
                         me._player.setDeath(false);
                         callback.call(context);
                     }
@@ -1202,9 +1207,9 @@ export default class Game {
         const me = this;
 
         me._player.setPosition(Consts.Positions.FinalUndergroundX, Consts.Positions.GroundY);
-        me._player.setPosition(400, 2440);
+        // me._player.setPosition(400, 2440);
         // me._player.setPosition(5235, 2940);
-        // me._player.setPosition(6925, 1590);
+        me._player.setPosition(6925, 1590);
         me._isBossAppeared = true;
 
         me._isFinalUndeground = true;

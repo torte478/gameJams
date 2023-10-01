@@ -13,8 +13,8 @@ export default class Consts {
 
     static Depth = {
         Background: -100,
-        Boss: 50,
         Tiles: 100,
+        Boss: 500,
         Player: 1000,
         Hands: 2000,
         Foreground: 10000,

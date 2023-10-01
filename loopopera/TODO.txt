@@ -1,7 +1,4 @@
-WASD + arrows
 movement particles and angle
-#0D0D0D
-облака руки
 окошки
 tutorial
 cinema frames
@@ -10,6 +7,5 @@ movement controller
 back collider animation
 restart by button for player
 
-arrows
 bug at 7
 beaty
