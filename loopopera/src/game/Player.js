@@ -68,14 +68,16 @@ export default class Player {
         /** @type {Phaser.Physics.Arcade.Body} */
         const  body = me._container.body;
 
-        if (!me._isBusy && Here.Controls.isPressing(Enums.Keyboard.RIGHT))  {
+        if (!me._isBusy 
+            && (Here.Controls.isPressing(Enums.Keyboard.RIGHT) || Here.Controls.isPressing(Enums.Keyboard.RIGHT1)))  {
             body.setVelocityX(me._speedX);
             me._sprite.setFlipX(false);
 
             if (body.blocked.down)
                 me._sprite.play('player_walk', true);
         }
-        else if (!me._isBusy && Here.Controls.isPressing(Enums.Keyboard.LEFT)) {
+        else if (!me._isBusy 
+            && (Here.Controls.isPressing(Enums.Keyboard.LEFT) || Here.Controls.isPressing(Enums.Keyboard.LEFT1)))  {
             body.setVelocityX(-me._speedX);
             me._sprite.setFlipX(true);
 
@@ -180,7 +182,9 @@ export default class Player {
         /** @type {Phaser.Physics.Arcade.Body} */
         const  body = me._container.body;
 
-        if (!me._isBusy && Here.Controls.isPressedOnce(Enums.Keyboard.UP) && body.blocked.down) {
+        if (!me._isBusy 
+            && (Here.Controls.isPressedOnce(Enums.Keyboard.UP) || Here.Controls.isPressedOnce(Enums.Keyboard.UP1)) 
+            && body.blocked.down) {
             body.setGravityY(Config.Player.GravityJump);
             body.setVelocityY(Config.Player.JumpForce);
             me._isJump = true;

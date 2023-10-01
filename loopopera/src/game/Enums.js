@@ -4,8 +4,11 @@ export default class Enums {
         LEFT: 0,
         RIGHT: 1,
         UP: 2,
+        LEFT1: 3,
+        RIGHT1: 4,
+        UP1: 5,
 
-        RESTART: 3
+        RESTART: 6
     };
 
     static HandDirection = {

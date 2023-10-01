@@ -7,6 +7,9 @@ export default class Controls {
         { key: Enums.Keyboard.LEFT, value: Phaser.Input.Keyboard.KeyCodes.A },
         { key: Enums.Keyboard.RIGHT, value: Phaser.Input.Keyboard.KeyCodes.D },
         { key: Enums.Keyboard.UP, value: Phaser.Input.Keyboard.KeyCodes.W },
+        { key: Enums.Keyboard.LEFT1, value: Phaser.Input.Keyboard.KeyCodes.LEFT },
+        { key: Enums.Keyboard.RIGHT1, value: Phaser.Input.Keyboard.KeyCodes.RIGHT },
+        { key: Enums.Keyboard.UP1, value: Phaser.Input.Keyboard.KeyCodes.UP },
         { key: Enums.Keyboard.RESTART, value: Phaser.Input.Keyboard.KeyCodes.R }
     ];
 

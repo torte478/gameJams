@@ -38,6 +38,7 @@ export default class GameScene extends HereScene {
         Utils.loadSpriteSheet('hand', 100, 200);
         Utils.loadSpriteSheet('tree', 300, 300);
         Utils.loadSpriteSheet('boss', 500, 600);
+        Utils.loadSpriteSheet('scarecrow', 200, 200);
 
         Utils.loadImage('border');
         Utils.loadImage('start_screen');
@@ -46,6 +47,7 @@ export default class GameScene extends HereScene {
         Utils.loadImage('particle');
         Utils.loadImage('endscreen');
         Utils.loadImage('theend');
+        Utils.loadImage('many_hands');
 
         Utils.loadMp3('sound0');
         Utils.loadMp3('sound1');

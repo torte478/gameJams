@@ -121,6 +121,15 @@ export default class Game {
         me._particleEmitter.setBlendMode(Phaser.BlendModes.ADD);
         me._particleEmitter.on = false;
 
+        me._manyHands = Here._.add.image(2800, 1200, 'many_hands')
+            .setDepth(Consts.Depth.Tiles + 50)
+            .setAlpha(0.5)
+            .setVisible(false);
+
+        me._scareCrow = Here._.add.sprite(8300, 1350, 'scarecrow')
+            .setDepth(Consts.Depth.Tiles + 50)
+            .play('scarecrow');
+
         // init
 
         me._teleportTrigger = me._createTrigger(
@@ -589,7 +598,9 @@ export default class Game {
                             me._player.setBusy(false);
                             return;
                         }
-                            
+
+                        for (let i = 0; i < me._trees.length; ++i)
+                            me._trees[i].setFrame(0);
                         me._bullets.push(me._pentagram);
                         Here._.tweens.add({
                             targets: me._bullets,
@@ -1012,7 +1023,9 @@ export default class Game {
                 .setAngle(10),
             Here._.add.sprite(700, 1250, 'tree', frame)
                 .setAngle(-15)
-                .setScale(1.5)
+                .setScale(1.5),
+            Here._.add.sprite(8900, 1150, 'tree', frame)
+                .setScale(2),
         );
     }
 
@@ -1121,6 +1134,9 @@ export default class Game {
         Here.Audio.stop('sound0');
         me._playSound('sound1');
 
+        me._scareCrow.stop();
+        me._scareCrow.setFrame(2);
+
         me._createLight(5400, 1350);
     }
 
@@ -1131,7 +1147,7 @@ export default class Game {
     _initStartFromLevel3() {
         const me = this;
 
-        me._player.setPosition(Consts.Positions.PentagramX, Consts.Positions.GroundY);
+        me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
         me._player.tryTakeLight();
         me._initLevel3();
     }
@@ -1142,7 +1158,11 @@ export default class Game {
         Here.Audio.stop('sound1');
         me._playSound('sound2');
 
+        for (let i = 0; i < me._trees.length; ++i)
+            me._trees[i].setFrame(1);
+
         me._createLight(6250, 1150);
+        me._manyHands.setVisible(true);
 
         me._level.setTile(36, 27, 8);
         me._level.setTile(37, 27, 9);
@@ -1163,6 +1183,9 @@ export default class Game {
 
         Here.Audio.stop('sound2');
         me._playSound('sound3');
+
+        for (let i = 0; i < me._trees.length; ++i)
+            me._trees[i].setFrame(2);
 
         me._clearTiles(Consts.Tiles.UndegroundEnter);
         me._level.setTile(31, 29, 23);
@@ -1254,6 +1277,7 @@ export default class Game {
 
         if (!!me._fakeLight) {
             me._fakeLight.tween.pause();
+            me._fakeLight.canTaked = false;
             me._fakeLight.light.setVisible(false);
             me._lightPool.killAndHide(me._fakeLight);
         }

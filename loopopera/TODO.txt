@@ -10,10 +10,6 @@ movement controller
 back collider animation
 restart by button for player
 
-start screen
-end screen
-hands
-scarecrow
 arrows
 bug at 7
 beaty

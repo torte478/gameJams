@@ -56,6 +56,13 @@ export default class Animation {
             repeat: -1,
             yoyo: true
         });
+
+        Here._.anims.create({
+            key: 'scarecrow',
+            frames: Animation.getFrames('scarecrow', [ 0, 1]),
+            frameRate: 4,
+            repeat: -1
+        });
     }
 
     static getFrames(texture, frames) {

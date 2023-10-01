@@ -6,7 +6,7 @@ export default class Config {
         Global: true,
         Log: true,
         ShowSceneLog: true,
-        PlaySound: true,
+        PlaySound: false,
         Random: true,
         IsFinalUndeground: false,
         Position: false,
@@ -14,13 +14,13 @@ export default class Config {
         DebugY: 1390
     };
 
-    static StartLevel = 0;
+    static StartLevel = 1;
 
     static WorldBorder = 9525;
     static WorldStartX = 400;
     static BackgroundColor = '#0d0d0d';
     static BossAppearanceTimeMs = 2000; //10000;//2000;
-    static BossHandsDelayMs = 700;
+    static BossHandsDelayMs = 1000;
     static BorderBreakDelayMs = 1500
     static LightColor = {
         R: 193, B: 252, G: 250
@@ -29,8 +29,8 @@ export default class Config {
     static Player = {
         StartX: 100,
         StartY: 1390,
-        // Speed: 700, // debug
-        Speed: 300,
+        Speed: 700, // debug
+        // Speed: 300,
         GravityFall: 1000,
         GravityJump: 200,
         JumpForce: -400,
