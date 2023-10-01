@@ -693,6 +693,22 @@ export default class Game {
             200,
             200,
             true);
+
+        me._createTrigger(
+            () => me._boss.startHands(1),
+            2625,
+            2660,
+            200,
+            100,
+            true);
+
+        me._createTrigger(
+            () => me._boss.startHands(2),
+            4315,
+            2925,
+            100,
+            200,
+            true);
     }
 
     // =levels

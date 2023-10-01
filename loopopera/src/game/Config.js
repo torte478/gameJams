@@ -20,6 +20,7 @@ export default class Config {
     static WorldStartX = 400;
     static BackgroundColor = '#0d0d0d';
     static BossAppearanceTimeMs = 2000; //7000;
+    static BossHandsDelayMs = 700;
 
     static Player = {
         StartX: 100,
