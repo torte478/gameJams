@@ -870,6 +870,10 @@ export default class Game {
             onComplete: () => {
                 Here.Audio.stop('boss');
                 Here.Audio.play('light_hit');
+
+                Here.Audio.stop('sound3');
+                me._playSound('sound4');
+
                 me._clearTiles(Consts.Tiles.FinalUndegroundEnter);
                 me._clearTiles(Consts.Tiles.FinalUndegroundExit);
                 me._clearTiles(Consts.Tiles.UndegroundExit);
@@ -972,6 +976,9 @@ export default class Game {
                 Here.Audio.stop('boss');
                 Here.Audio.play('light_hit');
 
+                Here.Audio.stop('sound4');
+                me._playSound('sound5');
+
                 me._nextCameraBoundY = -1;
                 me._startChangeCameraBoundY(
                     Config.Camera.BoundGroundY, 
@@ -1052,6 +1059,8 @@ export default class Game {
     _initStartFromLevel0() {
         const me = this;
 
+        Here.Audio.play('sound0', { loop: -1, volume: 0.5});
+
         me._startScreenHiding = false;
         me._startScreen.setVisible(true);
 
@@ -1105,7 +1114,14 @@ export default class Game {
     _initLevel2() {
         const me = this;
 
+        Here.Audio.stop('sound0');
+        me._playSound('sound1');
+
         me._createLight(5400, 1350);
+    }
+
+    _playSound(name) {
+        Here.Audio.play(name, { loop: -1, volume: 0.3});
     }
 
     _initStartFromLevel3() {
@@ -1118,6 +1134,9 @@ export default class Game {
 
     _initLevel3() {
         const me = this;
+
+        Here.Audio.stop('sound1');
+        me._playSound('sound2');
 
         me._createLight(6250, 1150);
 
@@ -1137,6 +1156,9 @@ export default class Game {
 
     _initLevel4() {
         const me = this;
+
+        Here.Audio.stop('sound2');
+        me._playSound('sound3');
 
         me._clearTiles(Consts.Tiles.UndegroundEnter);
         me._level.setTile(31, 29, 23);
