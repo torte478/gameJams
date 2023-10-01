@@ -373,6 +373,28 @@ export default class Game {
     _onUndergroundTrigger() {
         const me = this;
 
+        me._clearTiles(Consts.Tiles.UndegroundExit);
+
+        me._level.setTile(128, 31, 43);
+        me._level.setTile(128, 30, 33);
+
+        me._level.setTile(129, 29, 48);
+        me._level.setTile(130, 29, 48);
+        me._level.setTile(131, 29, 48);
+        me._level.setTile(132, 29, 48);
+        me._level.setTile(133, 29, 48);
+        me._level.setTile(134, 29, 48);
+        me._level.setTile(135, 29, 48);
+        me._level.setTile(136, 29, 48);
+        me._level.setTile(137, 29, 49);
+
+        me._level.setTile(140, 32, 31);
+        me._level.setTile(140, 31, 21);
+        me._level.setTile(141, 31, 22);
+
+        me._level.setTile(142, 29, 21);
+        me._level.setTile(142, 30, 31);
+
         me._startChangeCameraBoundY(
             Config.Camera.BoundUndergroundY, 
             Config.Camera.SecondOffsetX, 
@@ -642,6 +664,7 @@ export default class Game {
         const me = this;
 
         me._player.setBusy(true);
+        me._player.setDeath(true);
         Here._.tweens.timeline({
             targets: me._redScreen,
             tweens: [
@@ -654,6 +677,7 @@ export default class Game {
                         me._resetCameraAfterTeleport();
                         me._cameraBoundY = Config.Camera.BoundGroundY;
                         me._nextCameraBoundY = -100;
+                        me._player.setDeath(false);
                         callback.call(context);
                     }
                 },
@@ -694,7 +718,7 @@ export default class Game {
             Consts.Tiles.UndegroundThirdWallDown,
         ];
         for (let index = 0; index < positions.length; ++index)
-            me._fillTiles(positions[index], 2);
+            me._clearTiles(positions[index]);
 
         me._createDeadEndsWithTriggersAndLight();
     }
@@ -708,35 +732,37 @@ export default class Game {
 
         me._fillTiles(me._isFirstWallUp
             ? Consts.Tiles.UndegroundFirstWallUp
-            : Consts.Tiles.UndegroundFirstWallUp,
-            0);
+            : Consts.Tiles.UndegroundFirstWallDown);
 
         me._isSecondWallUp = me._firstDeadEndTrigger == -1 
             ? Utils.getRandom(0, 1, 0) == 0 
             : !me._isSecondWallUp;
+
         me._fillTiles(me._isSecondWallUp
             ? Consts.Tiles.UndegroundSecondWallUp
-            : Consts.Tiles.UndegroundSecondWallDown,
-            0);
+            : Consts.Tiles.UndegroundSecondWallDown);
 
         me._isThirdWallUp = me._firstDeadEndTrigger == -1 
             ? Utils.getRandom(0, 1, 0) == 0 
             : !me._isThirdWallUp;
+
         if (me._isFirstWallUp === me._isSecondWallUp && me._isThirdWallUp == me._isSecondWallUp)
             me._isThirdWallUp = !me._isThirdWallUp;
 
-        me._fillTiles(me.thirdWall
+        me._fillTiles(me._isThirdWallUp
             ? Consts.Tiles.UndegroundThirdWallUp
-            : Consts.Tiles.UndegroundThirdWallDown,
-            0);
+            : Consts.Tiles.UndegroundThirdWallDown);
 
-        if (!me._deadEndLight)
-            me._deadEndLight = me._createLight(5825, 1875);
-
-        me._deadEndLight.setPosition(
-            me._deadEndLight.x, 
+        if (!!me._deadEndLight) {
+            me._deadEndLight.tween.pause();
+            me._deadEndLight.light.setVisible(false);
+            me._deadEndLight.canTaked = false;
+            me._lightPool.killAndHide(me._deadEndLight);
+        }
+            
+        me._deadEndLight = me._createLight(
+            5825, 
             me._isThirdWallUp ? 2075 : 1875);
-        me._deadEndLight.refreshBody();
 
         me._createGroundTriggers(me._isFirstWallUp, me._isSecondWallUp, me._isThirdWallUp);
     }
@@ -796,6 +822,14 @@ export default class Game {
             me._level.setTile(arr[i].x, arr[i].y, tile);
         }
             
+    }
+
+    _clearTiles(arr) {
+        const me = this;
+
+        for (let i = 0; i < arr.length; ++i) {
+            me._level.setTile(arr[i].x, arr[i].y, 3);
+        }
     }
 
     _createHandTriggers() {
@@ -989,7 +1023,7 @@ export default class Game {
     _initStartFromLevel3() {
         const me = this;
 
-        me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
+        me._player.setPosition(Consts.Positions.PentagramX, Consts.Positions.GroundY);
         me._player.tryTakeLight();
         me._initLevel3();
     }
@@ -1009,16 +1043,20 @@ export default class Game {
         const me = this;
 
         me._player.tryTakeLight();
-        me._player.setPosition(Consts.Positions.GraveX, Consts.Positions.GroundY);
+        me._player.setPosition(Consts.Positions.PentagramX, Consts.Positions.GroundY);
         me._initLevel4();
     }
 
     _initLevel4() {
         const me = this;
 
-        const tile = 2;
-        me._fillTiles(Consts.Tiles.UndegroundEnter, tile);
-        me._fillTiles(Consts.Tiles.UndegroundExit, tile);
+        me._clearTiles(Consts.Tiles.UndegroundEnter);
+        me._level.setTile(31, 29, 23);
+        me._level.setTile(31, 30, 33);
+        me._level.setTile(31, 31, 33);
+        me._level.setTile(35, 29, 21);
+        me._level.setTile(35, 30, 31);
+        me._level.setTile(35, 31, 41);
 
         me._createDeadEndsWithTriggersAndLight();
     }

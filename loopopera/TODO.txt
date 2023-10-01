@@ -1,6 +1,3 @@
-deadend bugs
-open underground later
-
 WASD + arrows
 movement particles and angle
 #0D0D0D
@@ -12,3 +9,13 @@ deadend timeout
 movement controller
 back collider animation
 restart by button for player
+
+graphics
+particles
+sound
+start screen
+end screen
+deadend bugs
+hands
+scarecrow
+beaty

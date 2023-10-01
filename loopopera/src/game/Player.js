@@ -20,6 +20,8 @@ export default class Player {
 
     _speedX;
 
+    _isDeath = false;
+
     /**
      * @param {Number} x 
      * @param {Number} y 
@@ -63,7 +65,7 @@ export default class Player {
         if (!me._isBusy && Here.Controls.isPressing(Enums.Keyboard.RIGHT))  {
             body.setVelocityX(me._speedX);
             me._sprite.setFlipX(false);
-            
+
             if (body.blocked.down)
                 me._sprite.play('player_walk', true);
         }
@@ -76,13 +78,21 @@ export default class Player {
         }
         else {
             body.setVelocityX(0);
-            if (body.blocked.down)
+            if (body.blocked.down &&!me._isDeath)
                 me._sprite.play('player_idle', true);
         }
 
         me._processJump(time);
         me._prevY = me._container.y;
         me._prevGrounded = body.blocked.down;
+    }
+
+    setDeath(isDeath) {
+        const me = this;
+
+        me._isDeath = isDeath;
+        if (!!me._isDeath)
+            me._sprite.play('player_death');
     }
 
     /**
@@ -175,7 +185,8 @@ export default class Player {
         if (me._isJump && me._container.y > me._prevY) {
             body.setGravityY(Config.Player.GravityFall);
             me._isJump = false;
-            me._sprite.play('player_jump_down', true);
+            if (!me._isDeath)
+                me._sprite.play('player_jump_down', true);
             // console.log('jump end')
             return;
         }

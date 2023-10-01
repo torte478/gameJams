@@ -7,14 +7,14 @@ export default class Config {
         Log: true,
         ShowSceneLog: true,
         PlaySound: true,
-        Random: false,
+        Random: true,
         IsFinalUndeground: false,
         Position: false,
         DebugX: 4800,
         DebugY: 1390
     };
 
-    static StartLevel = 3;
+    static StartLevel = 4;
 
     static WorldBorder = 9525;
     static WorldStartX = 400;
