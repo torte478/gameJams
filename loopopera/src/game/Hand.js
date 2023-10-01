@@ -1,5 +1,6 @@
 import Here from "../framework/Here.js";
 import Consts from "./Consts.js";
+import Enums from "./Enums.js";
 
 export default class Hand {
 
@@ -25,11 +26,21 @@ export default class Hand {
         me._sprite = pool.create(x, y, 'hand', 3);
         me._sprite
             .disableBody()
-            .setOrigin(0.5, 1)
             .setDepth(Consts.Depth.Hands)
             .play('hand_start');
 
-        me._sprite.body.setSize(40, 120);
+        me._dir = direction;
+        if (direction == Enums.HandDirection.DOWN) 
+            me._sprite.setAngle(180);
+        else if (direction == Enums.HandDirection.LEFT)
+            me._sprite.setAngle(270);
+        else if (direction == Enums.HandDirection.RIGHT)
+            me._sprite.setAngle(90);
+        
+        if (direction == Enums.HandDirection.UP || direction == Enums.HandDirection.DOWN)
+            me._sprite.body.setSize(40, 120);
+        else
+            me._sprite.body.setSize(120, 40);
 
         me._isAttack = false;
         me._sprite.on(Phaser.Animations.Events.ANIMATION_COMPLETE, me._onAnimationStop, me)
@@ -39,8 +50,8 @@ export default class Hand {
         const me = this;
 
         if (me._isAttack) {
-            me._sprite.enableBody();
             me._sprite.refreshBody();
+            me._sprite.enableBody();
         } else {
             me._sprite.play('hand_attack');
             me._isAttack = true;

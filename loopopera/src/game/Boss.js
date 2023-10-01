@@ -33,17 +33,32 @@ export default class Boss {
     startHands(index) {
         const me = this;
 
-        for (let i = 0; i < Boss._handPositions[index].length; ++i) {
-            const pos = Boss._handPositions[index][i];
-            const hand = new Hand(pos.x, pos.y, pos.dir, me._handPool);
-            me._hands.push(hand);
-        }
+        const event = Here._.time.addEvent({
+            delay: 500,
+            callback: () => me._createHand(index, event),
+            callbackScope: me,
+            repeat: Boss._handPositions[index].length});
+    }
+
+    _createHand(index, event) {
+        const me = this;
+
+        const arr = Boss._handPositions[index];
+        if (event.repeatCount === 0)
+            return;
+
+        const pos = arr[arr.length - event.repeatCount];
+        const hand = new Hand(pos.x, pos.y, pos.dir, me._handPool);
+        me._hands.push(hand);
     }
 
     static _handPositions = [
         // 0
         [
-            { x: 600, y: 2525, dir: Enums.HandDirection.UP }
+            { x: 600, y: 2400, dir: Enums.HandDirection.UP },
+            { x: 800, y: 2425, dir: Enums.HandDirection.DOWN },
+            { x: 1840, y: 2550, dir: Enums.HandDirection.RIGHT },
+            { x: 1875, y: 2650, dir: Enums.HandDirection.LEFT },
         ]
     ]
 }
