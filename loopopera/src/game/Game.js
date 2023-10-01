@@ -668,9 +668,6 @@ export default class Game {
             ease: 'Sine.easeInOut',
             onComplete: () => {
                 me._fillTiles(Consts.Tiles.FinalUndegroundEnter, 2);
-                me._fillTiles(Consts.Tiles.FinalUndegroundExit, 2);
-                me._fillTiles(Consts.Tiles.UndegroundExit, 2);
-                me._player.setSpeedX(Config.Player.SpeedFast);
                 me._player.setBusy(false);
             }
         });
@@ -704,10 +701,10 @@ export default class Game {
 
         me._createTrigger(
             () => me._boss.startHands(2),
-            4315,
+            5375,
             2925,
             100,
-            200,
+            300,
             true);
     }
 
@@ -832,8 +829,12 @@ export default class Game {
     _initStartFromLevel5() {
         const me = this;
 
-        // me._player.setPosition(Consts.Positions.FinalUndergroundX, Consts.Positions.GroundY);
-        me._player.setPosition(400, 2440);
+        me._player.setPosition(Consts.Positions.FinalUndergroundX, Consts.Positions.GroundY);
+        // me._player.setPosition(400, 2440);
+        // me._player.setPosition(5235, 2940);
+        // me._player.setPosition(6925, 1590);
+        me._fillTiles(Consts.Tiles.FinalUndegroundExit, 2);
+        me._fillTiles(Consts.Tiles.UndegroundExit, 2);
         me._initLevel5();
     }
 

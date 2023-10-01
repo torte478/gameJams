@@ -8,7 +8,7 @@ export default class Config {
         ShowSceneLog: true,
         PlaySound: true,
         Random: false,
-        IsFinalUndeground: true,
+        IsFinalUndeground: false,
         Position: false,
         DebugX: 4800,
         DebugY: 1390
@@ -27,7 +27,6 @@ export default class Config {
         StartY: 1390,
         // Speed: 700, // debug
         Speed: 300,
-        SpeedFast: 450,
         GravityFall: 1000,
         GravityJump: 200,
         JumpForce: -400,

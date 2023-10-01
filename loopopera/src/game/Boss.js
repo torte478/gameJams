@@ -95,7 +95,7 @@ export default class Boss {
             { x: 2850, y: 2800, dir: Enums.HandDirection.DOWN },
             { x: 3005, y: 2800, dir: Enums.HandDirection.UP },
             { x: 3400, y: 2650, dir: Enums.HandDirection.LEFT },
-            { x: 3105, y: 2600, dir: Enums.HandDirection.UP },
+            { x: 3105, y: 2590, dir: Enums.HandDirection.UP },
             { x: 3350, y: 2375, dir: Enums.HandDirection.DOWN },
             { x: 3550, y: 2375, dir: Enums.HandDirection.DOWN },
             { x: 3725, y: 2650, dir: Enums.HandDirection.LEFT },
@@ -109,7 +109,23 @@ export default class Boss {
         ],
         // 2
         [
-            
+            { x: 5495, y: 2875, dir: Enums.HandDirection.UP },
+            { x: 5595, y: 2800, dir: Enums.HandDirection.LEFT },
+            { x: 5565, y: 2600, dir: Enums.HandDirection.RIGHT },
+            { x: 5695, y: 2675, dir: Enums.HandDirection.UP },
+            { x: 5795, y: 2600, dir: Enums.HandDirection.LEFT },
+            { x: 5895, y: 2475, dir: Enums.HandDirection.UP },
+            { x: 5995, y: 2400, dir: Enums.HandDirection.LEFT },
+            { x: 5950, y: 2075, dir: Enums.HandDirection.DOWN },
+            { x: 6095, y: 2275, dir: Enums.HandDirection.UP },
+            { x: 6150, y: 2075, dir: Enums.HandDirection.DOWN },
+            { x: 6350, y: 2050, dir: Enums.HandDirection.LEFT },
+            { x: 6200, y: 1875, dir: Enums.HandDirection.DOWN },
+            { x: 6300, y: 1675, dir: Enums.HandDirection.DOWN },
+            { x: 6500, y: 1850, dir: Enums.HandDirection.UP },
+            { x: 6600, y: 1750, dir: Enums.HandDirection.UP },
+            { x: 6650, y: 1565, dir: Enums.HandDirection.DOWN },
+            { x: 6800, y: 1565, dir: Enums.HandDirection.UP },
         ]
     ]
 }
