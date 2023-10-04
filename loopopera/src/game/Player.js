@@ -168,6 +168,7 @@ export default class Player {
         /** @type {Phaser.Physics.Arcade.Body} */
         const body = me._container.body;
         body.setGravityY(Config.Player.GravityFall);
+        body.setMaxVelocityY(1000);
     }
 
     _isFalling = true;
