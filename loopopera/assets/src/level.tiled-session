@@ -1,0 +1,46 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "level.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "level.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2313,
+                "y": 2589
+            }
+        },
+        "tiles.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.exportedFilePath": "D:/Work/gameJams/loopopera/assets",
+    "last.imagePath": "D:/Work/gameJams/loopopera/assets",
+    "map.height": 16,
+    "map.lastUsedExportFilter": "CSV files (*.csv)",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 50,
+    "map.tileWidth": 50,
+    "map.width": 20,
+    "openFiles": [
+        "tiles.tsx",
+        "level.tmx"
+    ],
+    "project": "level.tiled-project",
+    "recentFiles": [
+        "tiles.tsx",
+        "level.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 50,
+        "width": 50
+    }
+}

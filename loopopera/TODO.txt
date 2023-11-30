@@ -1,0 +1,11 @@
+movement particles and angle
+окошки
+tutorial
+cinema frames
+deadend timeout
+movement controller
+back collider animation
+restart by button for player
+
+bug at 7
+beaty
