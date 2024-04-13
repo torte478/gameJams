@@ -1,6 +1,7 @@
 import Here from '../framework/Here.js';
 import Utils from '../framework/Utils.js';
 import Phaser from '../lib/phaser.js';
+import Components from './Components.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Node from './Node.js';
@@ -18,6 +19,9 @@ export default class InteriorComponent {
         delta: 0,
         lastActivationChange: 0
     }
+
+    /** @type {Components} */
+    _components;
 
     _center = Utils.buildPoint(2180, 300);
 

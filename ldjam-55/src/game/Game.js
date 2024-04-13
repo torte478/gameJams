@@ -8,17 +8,15 @@ import Consts from './Consts.js';
 import Enums from './Enums.js';
 import RoadComponent from './RoadComponent.js';
 import InteriorComponent from './InteriorComponent.js';
+import Components from './Components.js';
 
 export default class Game {
 
     /** @type {Phaser.GameObjects.Text} */
     _log;
 
-    /** @type {RoadComponent} */
-    _roadComponent;
-
-    /** @type {InteriorComponent} */
-    _interiorComponent;
+    /** @type {Components} */
+    _components;
 
     constructor() {
         const me = this;
@@ -30,8 +28,12 @@ export default class Game {
         const stratagemCamera = Here._.cameras.add(0, 0, 100, 800).setScroll(4000, 0);
 
         const events = new Phaser.Events.EventEmitter();
-        me._roadComponent = new RoadComponent(events);
-        me._interiorComponent = new InteriorComponent(events);
+        me._components = new Components();
+        me._components.road = new RoadComponent(events);
+        me._components.interior = new InteriorComponent(events);
+
+        me._components.road._components = me._components;
+        me._components.interior._components = me._components;
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 18, backgroundColor: '#000' })
@@ -39,7 +41,7 @@ export default class Game {
                 .setDepth(Consts.Depth.Max);
 
             moneyCamera.ignore(me._log);
-            me._interiorComponent._camera.ignore(me._log);
+            me._components.interior._camera.ignore(me._log);
             stratagemCamera.ignore(me._log);
         });
     }
@@ -51,17 +53,13 @@ export default class Game {
             && Utils.isDebug(Config.Debug.Global))
             Here._.scene.restart({ isRestart: true });
 
-        me._roadComponent.update(delta);
-        me._interiorComponent.update(delta);
+        me._components.update(delta);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
 
             let text = 
-                `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-                `spd: ${me._roadComponent._state.speed | 0}\n` +
-                `pos: ${me._roadComponent._state.position | 0} ${me._roadComponent._bus.x | 0}\n` +
-                `int: ${me._interiorComponent.state.isActive}\n`;
+                `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}`;
 
             me._log.setText(text);
         });

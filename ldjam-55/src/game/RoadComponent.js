@@ -1,6 +1,7 @@
 import Here from '../framework/Here.js';
 import Utils from '../framework/Utils.js';
 import Phaser from '../lib/phaser.js';
+import Components from './Components.js';
 import Enums from './Enums.js';
 
 export default class RoadComponent {
@@ -30,6 +31,9 @@ export default class RoadComponent {
         position: 0,
         delta: 0,
     }
+
+    /** @type {Components} */
+    _components;
 
     /** @type {Phaser.Cameras.Scene2D.Camera} */
     _camera;
@@ -73,7 +77,7 @@ export default class RoadComponent {
 
         me._events.on('componentActivated', me._onComponentActivated, me);
 
-        me._createBusStop(650);
+        me._createBusStop(300);
     }
 
     update(delta) {
@@ -96,15 +100,24 @@ export default class RoadComponent {
 
         me._busStop = me._spritePool.create(600, busStopY, 'busStop').setDepth(me._consts.depth.busStop);
 
-            for (let i = 0; i < Utils.getRandom(3, 3, 1); ++i) {
-                const passenger = me._spritePool.create(
-                    me._busStop.x + 20,
-                    me._busStop.y + i * 30,
-                    'passengerOutside')
-                    .setDepth(me._consts.depth.passengers);
+        let positions = Utils
+            .buildArray(
+                Utils.getRandom(3, 3, 24), 0)
+            .map((_, i) => Utils.buildPoint(
+                me._busStop.x + Math.floor(i / 12) * 50 + 10 + Utils.getRandom(0, 15),
+                me._busStop.y  - (me._busStop.height / 2) + 25 + (i % 12 * 50) + Utils.getRandom(0, 10)));
 
-                me._passengers.push(passenger);
-            };
+        positions = Utils.shuffle(positions);
+
+        for (let i = 0; i < 24; ++i) {
+            const passenger = me._spritePool.create(
+                positions[i].x,
+                positions[i].y,
+                'passengerOutside')
+                .setDepth(me._consts.depth.passengers);
+
+            me._passengers.push(passenger);
+        };
     }
 
     _onComponentActivated(component, isActive, percentage) {
