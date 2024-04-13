@@ -38,6 +38,8 @@ export default class GameScene extends HereScene {
         Utils.loadImage('bus');
         Utils.loadImage('busStop');
         Utils.loadImage('passenger');
+
+        Utils.loadImage('busInterior');
     }
 
     create() {

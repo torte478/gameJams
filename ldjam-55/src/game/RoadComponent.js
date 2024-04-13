@@ -26,10 +26,13 @@ export default class RoadComponent {
         }
     }
     _state = {
-        speed: 200,
+        speed: 0,
         position: 1000,
         delta: 0,
     }
+
+    /** @type {Phaser.Cameras.Scene2D.Camera} */
+    _camera;
 
     /** @type {Phaser.GameObjects.Group} */
     _spritePool;
@@ -40,8 +43,16 @@ export default class RoadComponent {
     /** @type {Phaser.GameObjects.Image[]} */
     _passengers = [];
 
-    constructor() {
+    /** @type {{Phaser.Events.EventEmitter} */
+    _events;
+
+    constructor(events) {
         const me = this;
+
+        me._events = events;
+
+        me._camera = Here._.cameras.main;
+        me._camera.setViewport(0, 0, 700 - 20, 800).setPosition(110, 0);
 
         me._spritePool = Here._.add.group();
         me._roadTiles = [];
@@ -56,6 +67,8 @@ export default class RoadComponent {
         me._bus = Here._.add.container(400, 700, [ busSprite ])
             .setDepth(me._consts.depth.bus);
         Here._.physics.world.enable(me._bus);
+
+        me._events.on('componentActivated', me._onComponentActivated, me);
     }
 
     update(delta) {
@@ -82,6 +95,12 @@ export default class RoadComponent {
 
         me._processBusStop();
         me._shiftTiles();
+    }
+
+    _onComponentActivated(component, percentage) {
+        const me = this;
+
+        console.log(component, percentage);
     }
 
     _processBusStop() {

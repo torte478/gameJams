@@ -7,6 +7,7 @@ import Config from './Config.js';
 import Consts from './Consts.js';
 import Enums from './Enums.js';
 import RoadComponent from './RoadComponent.js';
+import InteriorComponent from './InteriorComponent.js';
 
 export default class Game {
 
@@ -16,20 +17,21 @@ export default class Game {
     /** @type {RoadComponent} */
     _roadComponent;
 
+    /** @type {InteriorComponent} */
+    _interiorComponent;
+
     constructor() {
         const me = this;
 
-        Here._.add.image(500, 400, 'back01');
-        Here._.add.image(2500, 400, 'back02');
         Here._.add.image(3500, 400, 'back03');
         Here._.add.image(4500, 400, 'back04');
 
-        Here._.cameras.main.setViewport(0, 0, 700 - 20, 800).setPosition(110, 0);
         const moneyCamera = Here._.cameras.add(800, 0, 200, 200).setScroll(3000, 0);
-        const busCamera = Here._.cameras.add(800, 200, 200, 600).setScroll(2000, 0);
         const stratagemCamera = Here._.cameras.add(0, 0, 100, 800).setScroll(4000, 0);
 
-        me._roadComponent = new RoadComponent();
+        const events = new Phaser.Events.EventEmitter();
+        me._roadComponent = new RoadComponent(events);
+        me._interiorComponent = new InteriorComponent(events);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 18, backgroundColor: '#000' })
@@ -37,7 +39,7 @@ export default class Game {
                 .setDepth(Consts.Depth.Max);
 
             moneyCamera.ignore(me._log);
-            busCamera.ignore(me._log);
+            me._interiorComponent._camera.ignore(me._log);
             stratagemCamera.ignore(me._log);
         });
     }
@@ -50,6 +52,7 @@ export default class Game {
             Here._.scene.restart({ isRestart: true });
 
         me._roadComponent.update(delta);
+        me._interiorComponent.update(delta);
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             const mouse = Here._.input.activePointer;
@@ -57,7 +60,8 @@ export default class Game {
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
                 `spd: ${me._roadComponent._state.speed | 0}\n` +
-                `pos: ${me._roadComponent._state.position | 0} ${me._roadComponent._bus.x | 0}`;
+                `pos: ${me._roadComponent._state.position | 0} ${me._roadComponent._bus.x | 0}\n` +
+                `int: ${me._interiorComponent.state.isActive}`;
 
             me._log.setText(text);
         });

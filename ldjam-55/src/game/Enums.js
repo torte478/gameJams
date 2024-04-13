@@ -10,4 +10,11 @@ export default class Enums {
 
         RESTART: 6
     }
+
+    static Components = {
+        ROAD: 0,
+        INTERIOR: 1,
+        MONEY: 2,
+        STRATEGEMS: 3
+    }
 }
