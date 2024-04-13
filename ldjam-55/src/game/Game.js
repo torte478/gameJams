@@ -57,7 +57,7 @@ export default class Game {
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
                 `spd: ${me._roadComponent._state.speed | 0}\n` +
-                `pos: ${me._roadComponent._state.position | 0}`;
+                `pos: ${me._roadComponent._state.position | 0} ${me._roadComponent._bus.x | 0}`;
 
             me._log.setText(text);
         });

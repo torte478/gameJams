@@ -1,4 +1,5 @@
 import Here from '../framework/Here.js';
+import Utils from '../framework/Utils.js';
 import Phaser from '../lib/phaser.js';
 import Enums from './Enums.js';
 
@@ -15,27 +16,37 @@ export default class RoadComponent {
 
         busStopInterval: 1000,
 
+        passengerSpeed: 50,
+
         depth: {
             road: 0,
             busStop: 100,
-            bus: 500
+            passengers: 200,
+            bus: 500,
         }
     }
     _state = {
         speed: 200,
-        position: 1000
+        position: 1000,
+        delta: 0,
     }
+
+    /** @type {Phaser.GameObjects.Group} */
+    _spritePool;
 
     /** @type {Phaser.GameObjects.Image} */
     _busStop;
 
+    /** @type {Phaser.GameObjects.Image[]} */
+    _passengers = [];
+
     constructor() {
         const me = this;
 
-        me._roadTilesGroup = Here._.add.group();
+        me._spritePool = Here._.add.group();
         me._roadTiles = [];
-        for (let i = -2; i < 4; ++i){
-            const tile = me._roadTilesGroup.create(350, 100 + i * 200, 'road')
+        for (let i = -4; i < 4; ++i){
+            const tile = me._spritePool.create(350, 100 + i * 200, 'road')
             tile.setDepth(me._consts.depth.road);
             me._roadTiles.push(tile);
         }
@@ -50,41 +61,126 @@ export default class RoadComponent {
     update(delta) {
         const me = this;
 
-        me._processControls(delta);
+        me._state.delta = delta;
+        me._processControls();
 
-        me._state.position += me._state.speed * delta;
+        me._state.position += me._state.speed * me._state.delta;
 
         if (!me._busStop && me._state.position >= me._consts.busStopInterval) {
-            me._busStop = Here._.add.image(600, -300, 'busStop').setDepth(me._consts.depth.busStop);
+            me._busStop = me._spritePool.create(600, -300, 'busStop').setDepth(me._consts.depth.busStop);
+
+            for (let i = 0; i < Utils.getRandom(3, 3); ++i) {
+                const passenger = me._spritePool.create(
+                    me._busStop.x + 20,
+                    me._busStop.y + i * 30,
+                    'passenger')
+                    .setDepth(me._consts.depth.passengers);
+
+                me._passengers.push(passenger);
+            };
         }
 
-        for (let i = 0; i < me._roadTiles.length; ++i) {
-            /** @type {Phaser.GameObjects.Image} */
-            const tile = me._roadTiles[i];
+        me._processBusStop();
+        me._shiftTiles();
+    }
 
-            tile.setY(tile.y + me._state.speed * delta);
-            if (tile.y >= me._consts.lowerBound)
-                tile.setY(tile.y - me._roadTiles.length * 200);
+    _processBusStop() {
+        const me = this;
+
+        if (!(me._busStop && me._isStopped()))
+            return;
+
+        if (me._bus.x < 530 || Math.abs(me._bus.y - me._busStop.y) > 200)
+            return;
+
+        const doorPos = Utils.buildPoint(me._bus.x + 25, me._bus.y);
+        const shift = me._consts.passengerSpeed * me._state.delta;
+        for (let i = 0; i < me._passengers.length; ++i) {
+            const passenger = me._passengers[i];
+            
+            const shiftX = Math.sign(doorPos.x - passenger.x) * shift;
+            const shiftY = Math.sign(doorPos.y - passenger.y) * shift;
+
+            passenger.setPosition(passenger.x + shiftX, passenger.y + shiftY);
+
+            if (Phaser.Math.Distance.BetweenPoints(doorPos, Utils.toPoint(passenger)) < 5) {
+                me._spritePool.killAndHide(passenger);
+            }
         }
+
+        me._passengers = me._passengers.filter(x => x.active);
+        console.log(me._passengers.length);
+    }
+
+    _isStopped() {
+        const me = this;
+
+        return Math.abs(me._state.speed) <= 0.01;
+    }
+
+    _shiftTiles() {
+        const me = this;
+
+        if (me._isStopped())
+            return;
+
+        for (let i = 0; i < me._roadTiles.length; ++i)
+            me._shiftTile(
+                me._roadTiles[i], 
+                tile => tile.setY(tile.y - me._roadTiles.length * 200))
         
         if (!!me._busStop) {
-            me._busStop.setY(me._busStop.y + me._state.speed * delta);
+            me._shiftTile(me._busStop, _ => {
+                me._spritePool.killAndHide(me._busStop);
+                me._busStop = null;
+                me._state.position = 0;
+            });
+
+            for (let i = 0; i < me._passengers.length; ++i)
+                me._shiftTile(me._passengers[i], tile => {
+                    me._spritePool.killAndHide(tile);
+                    me._passengers = me._passengers.filter(x => x.active);
+            });
         }
     }
 
-    _processControls(delta) {
+    /**
+     * 
+     * @param {Phaser.GameObjects.Image} tile 
+     * @param {Function} onBound 
+     */
+    _shiftTile(tile, onBound) {
+        const me = this;
+
+        tile.setY(tile.y + me._state.speed * me._state.delta);
+
+        if (!!onBound && (tile.y - tile.width / 2) >= me._consts.lowerBound)
+            onBound.call(me, tile);
+    }
+
+    _processControls() {
         const me = this;
 
         if (Here.Controls.isPressing(Enums.Keyboard.UP)) {
-            me._state.speed = Math.min(me._consts.maxSpeedY, me._state.speed + me._consts.speedYUpChange * delta)
+            me._state.speed = Math.min(
+                me._consts.maxSpeedY, 
+                me._state.speed + me._consts.speedYUpChange * me._state.delta)
         }
         else if (Here.Controls.isPressing(Enums.Keyboard.DOWN)) {
-            me._state.speed = Math.max(0, me._state.speed - me._consts.speedYDownChange * delta)
+            me._state.speed = Math.max(
+                0,
+                 me._state.speed - me._consts.speedYDownChange * me._state.delta)
         }
 
         /** @type {Phaser.Physics.Arcade.Body} */
         const body = me._bus.body;
-        const speedXChange = Math.min(500, Math.max(50, me._consts.speedXChange * me._state.speed * delta));
+        const minShiftX = me._isStopped() ? 0 : 50;
+        const speedXChange = Math.min(
+            500, 
+            Math.max(
+                minShiftX, 
+                me._consts.speedXChange * me._state.speed * me._state.delta));
+
         if (Here.Controls.isPressing(Enums.Keyboard.LEFT))
             body.setVelocityX(-speedXChange);
         else if (Here.Controls.isPressing(Enums.Keyboard.RIGHT))
