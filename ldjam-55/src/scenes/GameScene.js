@@ -29,19 +29,17 @@ export default class GameScene extends HereScene {
         if (!me._isRestart)
             Utils.runLoadingBar();
 
-        Utils.loadImage('back01');
-        Utils.loadImage('back02');
-        Utils.loadImage('back03');
         Utils.loadImage('back04');
 
         Utils.loadImage('road');
         Utils.loadImage('bus');
         Utils.loadImage('busStop');
         Utils.loadImage('passengerOutside');
-        Utils.loadSpriteSheet('passengerInside', 50);
 
         Utils.loadImage('busInterior');
+        Utils.loadSpriteSheet('passengerInside', 50);
 
+        Utils.loadImage('moneyBox');
     }
 
     create() {
