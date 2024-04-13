@@ -29,7 +29,14 @@ export default class GameScene extends HereScene {
         if (!me._isRestart)
             Utils.runLoadingBar();
 
-        Utils.loadWav('button_click');
+        Utils.loadImage('back01');
+        Utils.loadImage('back02');
+        Utils.loadImage('back03');
+        Utils.loadImage('back04');
+
+        Utils.loadImage('road');
+        Utils.loadImage('bus');
+        Utils.loadImage('busStop');
     }
 
     create() {
@@ -40,11 +47,11 @@ export default class GameScene extends HereScene {
         me._game = new Game();
     }
 
-    update() {
+    update(time, delta) {
         super.update();
 
         const me = this;
 
-        me._game.update();
+        me._game.update(delta / 1000.0);
     }
 }
