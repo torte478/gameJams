@@ -2,22 +2,21 @@ import Here from '../framework/Here.js';
 import Utils from '../framework/Utils.js';
 import Phaser from '../lib/phaser.js';
 import Components from './Components.js';
-import Consts from './Consts.js';
 import Enums from './Enums.js';
 import Node from './Node.js';
 
 export default class InteriorComponent {
     
     consts = {
-        pos: Utils.buildPoint(2055, 75),
+        pos: Utils.buildPoint(2000, 80),
         doorIndex: 7,
-        paymentIndex: 6
+        paymentIndex: 6,
+        speed: 100,
     }
 
     state = {
         isActive: false,
         delta: 0,
-        lastActivationChange: 0
     }
 
     /** @type {Components} */
@@ -46,9 +45,6 @@ export default class InteriorComponent {
         me._events = events;
         me._spritePool = Here._.add.group();
 
-        for (let i = 0; i < me._graph.length; ++i)
-            me._graph[i].index = i;
-
         me._camera = Here._.cameras.add(800, 210, 200, 600)
             .setBackgroundColor('#9badb7')
             .setZoom(0.5)
@@ -66,37 +62,12 @@ export default class InteriorComponent {
         me.state.delta = delta;
 
         me._checkActivation();
-        me._movePassengers();
     }
 
     isDoorFree() {
         const me = this;
 
-        return me._isFree(me.consts.doorIndex);
-    }
-
-    _movePassengers() {
-        const me = this;
-
-        for (let i = 0; i < me._passengers.length; ++i) {
-            const passenger = me._passengers[i];
-            if (passenger.path.length == 0)
-                continue;
-
-            if (!!passenger.moveTween)
-                continue;
-
-            const target = me._getWorldPos(passenger.path.shift());
-            passenger.moveTween = Here._.add.tween({
-                targets: passenger,
-                x: target.x,
-                y: target.y,
-                duration: 500,
-                onComplete: () => {
-                    passenger.moveTween = null;
-                }
-            });
-        }
+        throw `not implemented`;
     }
 
     _checkActivation() {
@@ -137,14 +108,7 @@ export default class InteriorComponent {
     _onPassengerIn() {
         const me = this;
 
-        const freePlace = me._findFreePlace();
-
-        const pos = me._getWorldPos(me.consts.doorIndex);
-        const passenger = me._spritePool.create(pos.x, pos.y, 'passengerInside');
-        me._passengers.push(passenger);
-        
-        passenger.path = me._findPath(me.consts.doorIndex, freePlace.index).slice(1);
-        console.log(passenger.path);
+        throw 'not implemented';
     }
 
     /**
@@ -179,9 +143,9 @@ export default class InteriorComponent {
                 return path.map(x => Number(x));
             }
     
-            for (let i = 0; i < me._graph[currentNode].neighbours.length; ++i) {
+            for (let i = 0; i < me._graph[currentNode].paths.length; ++i) {
                 const neighbor = me._graph[currentNode].neighbours[i];
-                const totalDistance = distances[currentNode] + 1; //graph[currentNode][neighbor];
+                const totalDistance = distances[currentNode] + 1; // TODO ?
                 if (totalDistance < distances[neighbor]) {
                     distances[neighbor] = totalDistance;
                     previous[neighbor] = currentNode;
@@ -190,212 +154,42 @@ export default class InteriorComponent {
         }
     }
 
-    _findFreePlace() {
-        const me = this;
+    /** @type {Number[][]} */
+    _graphInput = [
+        [0, 1], [0, 2], [1, 12], [1, 13], //0
+        [2, 3], //2
 
-        const freePlaces = me._graph
-                            .filter((x, i) => me._isFree(i), me);
+        [4, 5], [4, 6], [5, 7], [6, 7], [5, 8], [6, 19], [7, 10], [7, 20], //3
+        [8, 9], [8, 10], [9, 11], [10, 11], [9, 12], [10, 23], [11, 14], [11, 24], //4
+        [12, 13], [12, 14], [13, 15], [14, 15], [13, 16], [14, 27], [15, 17], [15, 29], //5
+        [16, 17], [16, 18], [17, 18], [17, 31], //6
 
-        const place = Utils.getRandomEl(freePlaces);
+        [19, 20], [19, 21], [20, 22], [21, 22], [20, 23], [21, 33], [22, 25], [22, 33], //7
+        [23, 24], [23, 25], [24, 26], [25, 26], [24, 27], [25, 35], [26, 29], [26, 35], //8
+        [27, 28], [27, 29], [28, 30], [29, 30], [28, 31], [29, 37], [30, 38], //9
+        [31, 32], //10
 
-        return place;
-    }
+        [33, 34], [33, 35], //11
+        [35, 36], [35, 37], //12
+        [37, 38], [37, 39], [38, 40], [39, 40], [38, 41], [39, 47], [40, 48], //13
+        [41, 42], //14
 
-    /**
-     * @param {Phaser.GameObjects.Image} passenger 
-     */
-    _getGraphIndex(passenger) {
-        const me = this;
+        [43, 44], [43, 45], //15
+        [45, 46], [45, 47], //16
+        [47, 48], [47, 49], [48, 50], [49, 50], [48, 51], [49, 57], [50, 58], //17
+        [51, 52], //18
 
-        const x = Math.floor((passenger.x - me.consts.pos.x) / 75);
-        const y = Math.floor((passenger.y - me.consts.pos.y) / 75);
+        [53, 54], [53, 55], //19
+        [55, 56], [55, 57], //20
+        [57, 58], [57, 59], [58, 60], [59, 60], [58, 61], [59, 69], [60, 63], [60, 69], //21
+        [61, 62], [61, 63], [62, 64], [63, 64], [63, 71], [64, 71], //22
 
-        return y * 4 + x;
-    }
-
-    _isFree(index) {
-        const me = this;
-
-        const count = me._passengers
-            .map(me._getGraphIndex, me)
-            .filter(x => x == index);
-
-        const capacity = me._getNodeCapacity(index);
-        return count < capacity;
-    }
-
-    _getNodeCapacity(index) {
-        const me = this;
-
-        const type = me._graph[index].type;
-
-        if (type == Enums.NodeType.Unavailable)
-            return null;
-        if (type == Enums.NodeType.Seat)
-            return 1;
-        if (type == Enums.NodeType.Pass)
-            return 4;
-
-        throw `unknown node type ${type}`;
-    }
-
-    _getWorldPos(index) {
-        const me = this;
-
-        return Utils.buildPoint(
-            me.consts.pos.x + index % 4 * 75 + (75/2),
-            me.consts.pos.y + Math.floor(index / 4) * 75 + (75/2)
-        );
-    }
+        [65, 66], [65, 67], //23
+        [67, 68], [67, 69], //24
+        [69, 70], [69, 71], //25
+        [71, 72]
+    ]
 
     /** @type {Node[]} */
-    _graph = [
-        // 0
-        {
-            // 0
-            type: Enums.NodeType.Unavailable,
-            neighbours: []
-        },
-        {
-            // 1
-            type: Enums.NodeType.Unavailable,
-            neighbours: []
-        },
-        {
-            // 2
-            type: Enums.NodeType.Pass,
-            neighbours: [ 3, 6 ]
-        },
-        {
-            // 3
-            type: Enums.NodeType.Seat,
-            neighbours: [ 2 ]
-        },
-        // 1
-        {
-            // 4
-            type: Enums.NodeType.Pass,
-            neighbours: [ 5, 8]
-        },
-        {
-            // 5
-            type: Enums.NodeType.Pass,
-            neighbours: [ 4, 6, 9 ]
-        },
-        {
-            // 6
-            type: Enums.NodeType.Pass,
-            neighbours: [ 2, 5, 7, 10 ]
-        },
-        {
-            // 7
-            type: Enums.NodeType.Pass,
-            neighbours: [ 6, 11 ]
-        },
-        // 2
-        {
-            // 8
-            type: Enums.NodeType.Pass,
-            neighbours: [ 4, 9, 12]
-        },
-        {
-            // 9
-            type: Enums.NodeType.Pass,
-            neighbours: [ 5, 8, 10, 13 ]
-        },
-        {
-            // 10
-            type: Enums.NodeType.Pass,
-            neighbours: [ 6, 9, 11, 14 ]
-        },
-        {
-            // 11
-            type: Enums.NodeType.Seat,
-            neighbours: [ 7, 10 ]
-        },
-        // 3
-        {
-            // 12
-            type: Enums.NodeType.Seat,
-            neighbours: [ 8, 13 ]
-        },
-        {
-            // 13
-            type: Enums.NodeType.Seat,
-            neighbours: [ 9, 12, 14 ]
-        },
-        {
-            // 14
-            type: Enums.NodeType.Pass,
-            neighbours: [ 10, 13, 15, 18 ]
-        },
-        {
-            // 15
-            type: Enums.NodeType.Seat,
-            neighbours: [ 14 ]
-        },
-        // 4
-        {
-            // 16
-            type: Enums.NodeType.Seat,
-            neighbours: [ 17 ]
-        },
-        {
-            // 17
-            type: Enums.NodeType.Seat,
-            neighbours: [ 16, 18 ]
-        },
-        {
-            // 18
-            type: Enums.NodeType.Pass,
-            neighbours: [ 14, 17, 19, 22 ]
-        },
-        {
-            // 19
-            type: Enums.NodeType.Seat,
-            neighbours: [ 18 ]
-        },
-        // 5
-        {
-            // 20
-            type: Enums.NodeType.Seat,
-            neighbours: [ 21 ]
-        },
-        {
-            // 21
-            type: Enums.NodeType.Seat,
-            neighbours: [ 20, 22 ]
-        },
-        {
-            // 22
-            type: Enums.NodeType.Pass,
-            neighbours: [ 18, 21, 23, 26 ]
-        },
-        {
-            // 23
-            type: Enums.NodeType.Pass,
-            neighbours: [ 22, 27 ]
-        },
-        // 6
-        {
-            // 24
-            type: Enums.NodeType.Seat,
-            neighbours: [ 25 ]
-        },
-        {
-            // 25
-            type: Enums.NodeType.Seat,
-            neighbours: [ 24, 26 ]
-        },
-        {
-            // 26
-            type: Enums.NodeType.Seat,
-            neighbours: [ 22, 25, 27 ]
-        },
-        {
-            // 27
-            type: Enums.NodeType.Seat,
-            neighbours: [ 26, 27 ]
-        }
-    ]
+    _graph = [];
 }

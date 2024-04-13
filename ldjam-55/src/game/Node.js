@@ -1,8 +1,14 @@
 export default class Node {
-    
+
     /** @type {Number} */
-    type;
+    cell;
+
+    /** @type {Number} */
+    x;
+
+    /** @type {Number} */
+    y;
 
     /** @type {Number[]} */
-    neighbours;
+    paths;
 }
