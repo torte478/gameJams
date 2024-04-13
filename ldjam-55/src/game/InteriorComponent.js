@@ -52,6 +52,8 @@ export default class InteriorComponent {
 
         Here._.add.image(me._center.x, me._center.y, 'busInterior');
         me._camera.centerOn(me._center.x, me._center.y);
+
+        me._buildGraph();
         
         me._events.on('passengerIn', me._onPassengerIn, me);
     }
@@ -154,6 +156,87 @@ export default class InteriorComponent {
         }
     }
 
+    _buildGraph() {
+        const me = this;
+
+        for (let i = 0; i <= 72; ++i)
+            me._graph.push(new Node());
+
+        me._graph[0].x =  +0; me._graph[0].y =  -1;
+        me._graph[1].x =  +0; me._graph[1].y =  +1;
+        me._graph[2].x =  +0; me._graph[2].y =  -1;
+        me._graph[3].x =  +0; me._graph[3].y =  +1;
+        me._graph[4].x =  -1; me._graph[4].y =  -1;
+        me._graph[5].x =  +1; me._graph[5].y =  -1;
+        me._graph[6].x =  -1; me._graph[6].y =  +1;
+        me._graph[7].x =  +1; me._graph[7].y =  +1;
+        me._graph[8].x =  -1; me._graph[8].y =  -1;
+        me._graph[9].x =  +1; me._graph[9].y =  -1;
+        me._graph[10].x = -1; me._graph[10].y = +1;
+        me._graph[11].x = +1; me._graph[11].y = +1;
+        me._graph[12].x = -1; me._graph[12].y = -1;
+        me._graph[13].x = +1; me._graph[13].y = -1;
+        me._graph[14].x = -1; me._graph[14].y = +1;
+        me._graph[15].x = +1; me._graph[15].y = +1;
+        me._graph[16].x = -1; me._graph[16].y = -1;
+        me._graph[17].x = -1; me._graph[17].y = +1;
+        me._graph[18].x = +1; me._graph[18].y = +0;
+        me._graph[19].x = -1; me._graph[19].y = -1;
+        me._graph[20].x = +1; me._graph[20].y = -1;
+        me._graph[21].x = -1; me._graph[21].y = +1;
+        me._graph[22].x = +1; me._graph[22].y = +1;
+        me._graph[23].x = -1; me._graph[23].y = -1;
+        me._graph[24].x = +1; me._graph[24].y = -1;
+        me._graph[25].x = -1; me._graph[25].y = +1;
+        me._graph[26].x = +1; me._graph[26].y = +1;
+        me._graph[27].x = -1; me._graph[27].y = -1;
+        me._graph[28].x = +1; me._graph[28].y = -1;
+        me._graph[29].x = -1; me._graph[29].y = +1;
+        me._graph[30].x = +1; me._graph[30].y = +1;
+        me._graph[31].x = +0; me._graph[31].y = -1;
+        me._graph[32].x = +0; me._graph[32].y = +1;
+        me._graph[33].x = +0; me._graph[33].y = -1;
+        me._graph[34].x = +0; me._graph[34].y = +1;
+        me._graph[35].x = +0; me._graph[35].y = -1;
+        me._graph[36].x = +0; me._graph[36].y = +1;
+        me._graph[37].x = -1; me._graph[37].y = -1;
+        me._graph[38].x = +1; me._graph[38].y = -1;
+        me._graph[39].x = -1; me._graph[39].y = +1;
+        me._graph[40].x = +1; me._graph[40].y = +1;
+        me._graph[41].x = +0; me._graph[41].y = -1;
+        me._graph[42].x = +0; me._graph[42].y = +1;
+        me._graph[43].x = +0; me._graph[43].y = -1;
+        me._graph[44].x = +0; me._graph[44].y = +1;
+        me._graph[45].x = +0; me._graph[45].y = -1;
+        me._graph[46].x = +0; me._graph[46].y = +1;
+        me._graph[47].x = -1; me._graph[47].y = -1
+        me._graph[48].x = +1; me._graph[48].y = -1;
+        me._graph[49].x = -1; me._graph[49].y = +1;
+        me._graph[50].x = +1; me._graph[50].y = +1;
+        me._graph[51].x = +0; me._graph[51].y = -1;
+        me._graph[52].x = +0; me._graph[52].y = +1;
+        me._graph[53].x = +0; me._graph[53].y = -1;
+        me._graph[54].x = +0; me._graph[54].y = +1;
+        me._graph[55].x = +0; me._graph[55].y = -1;
+        me._graph[56].x = +0; me._graph[56].y = +1;
+        me._graph[57].x = -1; me._graph[57].y = -1
+        me._graph[58].x = +1; me._graph[58].y = -1;
+        me._graph[59].x = -1; me._graph[59].y = +1;
+        me._graph[60].x = +1; me._graph[60].y = +1;
+        me._graph[61].x = -1; me._graph[61].y = -1;
+        me._graph[62].x = +1; me._graph[62].y = -1;
+        me._graph[63].x = -1; me._graph[63].y = +1;
+        me._graph[64].x = +1; me._graph[64].y = +1;
+        me._graph[65].x = +0; me._graph[65].y = -1;
+        me._graph[66].x = +0; me._graph[66].y = +1;
+        me._graph[67].x = +0; me._graph[67].y = -1;
+        me._graph[68].x = +0; me._graph[68].y = +1;
+        me._graph[69].x = +0; me._graph[69].y = -1;
+        me._graph[70].x = +0; me._graph[70].y = +1;
+        me._graph[71].x = +0; me._graph[71].y = -1;
+        me._graph[72].x = +0; me._graph[72].y = +1;            
+    }
+
     /** @type {Number[][]} */
     _graphInput = [
         [0, 1], [0, 2], [1, 12], [1, 13], //0
@@ -187,7 +270,7 @@ export default class InteriorComponent {
         [65, 66], [65, 67], //23
         [67, 68], [67, 69], //24
         [69, 70], [69, 71], //25
-        [71, 72]
+        [71, 72] //26
     ]
 
     /** @type {Node[]} */
