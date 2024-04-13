@@ -15,9 +15,10 @@ export default class RoadComponent {
         speedYUpChange: 200,
         speedYDownChange: 400,
 
-        busStopInterval: 1000,
+        busStopPrepare: 1000,
+        busStopCreate: 2000,
 
-        passengerSpeed: 50,
+        passengerSpeed: 50 * 4,
 
         depth: {
             road: 0,
@@ -30,6 +31,7 @@ export default class RoadComponent {
         speed: 0,
         position: 0,
         delta: 0,
+        status: Enums.BusStatus.ENTER
     }
 
     /** @type {Components} */
@@ -88,7 +90,11 @@ export default class RoadComponent {
 
         me._state.position += me._state.speed * me._state.delta;
 
-        if (!me._busStop && me._state.position >= me._consts.busStopInterval)
+        if (me._state.status == Enums.BusStatus.DEPARTURE
+            && me._state.position >= me._consts.busStopPrepare)
+            me._changeStatus(Enums.BusStatus.PREPARE_TO_EXIT);
+
+        if (!me._busStop && me._state.position >= me._consts.busStopCreate)
             me._createBusStop(-300);
 
         me._processBusStop();
@@ -151,7 +157,11 @@ export default class RoadComponent {
         if (!(me._busStop && me._isStopped()))
             return;
 
-        if (me._bus.x < 515 || Math.abs(me._bus.y - me._busStop.y) > 200)
+        const insideBusStopArea = me._bus.x >= 515 && Math.abs(me._bus.y - me._busStop.y) <= 300
+        if (!insideBusStopArea)
+            return;
+
+        if (me._state.status != Enums.BusStatus.ENTER)
             return;
 
         if (!me._components.interior.isDoorFree())
@@ -198,6 +208,8 @@ export default class RoadComponent {
                 me._spritePool.killAndHide(me._busStop);
                 me._busStop = null;
                 me._state.position = 0;
+
+                me._changeStatus(Enums.BusStatus.DEPARTURE);
             });
 
             for (let i = 0; i < me._passengers.length; ++i)
@@ -206,6 +218,13 @@ export default class RoadComponent {
                     me._passengers = me._passengers.filter(x => x.active);
             });
         }
+    }
+
+    _changeStatus(status) {
+        const me = this;
+        Utils.debugLog(`Status: ${me._state.status} => ${status}`);
+        me._state.status = status;
+        me._events.emit('busStatusChanged', status);
     }
 
     /**

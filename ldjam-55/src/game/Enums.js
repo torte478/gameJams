@@ -19,8 +19,15 @@ export default class Enums {
     }
 
     static NodeType = {
-        Unavailable: 0,
-        Pass: 1,
-        Seat: 2
+        UNAVAILABLE: 0,
+        PASS: 1,
+        SEAT: 2
+    }
+
+    static BusStatus = {
+        DEPARTURE: 0,
+        PREPARE_TO_EXIT: 1,
+        EXIT: 2,
+        ENTER: 3
     }
 }

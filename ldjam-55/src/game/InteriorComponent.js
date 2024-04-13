@@ -10,7 +10,8 @@ export default class InteriorComponent {
     consts = {
         pos: Utils.buildPoint(2025, 20),
         doorIndex: 18,
-        speed: 100,
+        paymentIndicies: [12, 13, 14, 15],
+        speed: 100 * 2,
     }
 
     state = {
@@ -53,6 +54,7 @@ export default class InteriorComponent {
         me._buildGraph();
         
         me._events.on('passengerIn', me._onPassengerIn, me);
+        me._events.on('busStatusChanged', me._onBusStatusChanged, me);
     }
 
     update(delta) {
@@ -68,6 +70,40 @@ export default class InteriorComponent {
         const me = this;
 
         return !me._graph[me.consts.doorIndex].passenger;
+    }
+
+    _onBusStatusChanged(status) {
+        const me = this;
+
+        const passengers = me._enumeratePassengers();
+        if (status == Enums.BusStatus.DEPARTURE) {
+            for (let i = 0; i < passengers.length; ++i) {
+                const passenger = passengers[i].passenger;
+                passenger.destination--;
+            }
+        }
+
+        if (status == Enums.BusStatus.PREPARE_TO_EXIT) {
+            for (let i = 0; i < passengers.length; ++i) {
+                const passenger = passengers[i].passenger;
+                if (passenger.destination > 0)
+                    continue;
+
+                me._startMoving(passenger, passengers[i].index, Utils.getRandomEl(me.consts.paymentIndicies));
+            }
+        }
+    }
+
+    _enumeratePassengers() {
+        const me = this;
+
+        const result = [];
+        for (let i = 0; i < me._graph.length; ++i) {
+            const passenger = me._graph[i].passenger;
+            if (!!passenger)
+                result.push({index: i, passenger: passenger});
+        }
+        return result;
     }
 
     _checkActivation() {
@@ -147,7 +183,7 @@ export default class InteriorComponent {
                     if (target == me.consts.doorIndex) {
                         const freeNode = me._findFreeNode();
                         if (!!freeNode)
-                            me._startMoving(passenger, freeNode);
+                            me._startMoving(passenger, target, freeNode);
                     }
                 }
             }
@@ -157,22 +193,25 @@ export default class InteriorComponent {
     _onPassengerIn() {
         const me = this;
 
+        const freeNode = me._findFreeNode();
+        if (!freeNode) {
+            Utils.debugLog("CAN'T ENTER!!!");
+            return;
+        }
+
         const pos = me._toWorldPosition(me.consts.doorIndex);
         const passenger = me._spritePool.create(pos.x + 40, pos.y, 'passengerInside');
         passenger.iid = me.state.iid++;
+        passenger.destination = Utils.getRandom(1, 5, 1);
         me._graph[me.consts.doorIndex].passenger = passenger;
 
-        const freeNode = me._findFreeNode();
-        if (!freeNode)
-            throw `can't enter`;
-
-        me._startMoving(passenger, freeNode);
+        me._startMoving(passenger, me.consts.doorIndex, freeNode);
     }
 
-    _startMoving(passenger, target) {
+    _startMoving(passenger, from, to) {
         const me = this;
 
-        const path = me._findPath(me.consts.doorIndex, target);
+        const path = me._findPath(from, to);
         passenger.path = path;
         passenger.isBusy = true;
 
