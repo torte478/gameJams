@@ -27,7 +27,7 @@ export default class RoadComponent {
     }
     _state = {
         speed: 0,
-        position: 1000,
+        position: 0,
         delta: 0,
     }
 
@@ -43,14 +43,11 @@ export default class RoadComponent {
     /** @type {Phaser.GameObjects.Image[]} */
     _passengers = [];
 
-    /** @type {{Phaser.Events.EventEmitter} */
+    /** @type {Phaser.Events.EventEmitter} */
     _events;
 
     /** @type {Phaser.Tweens.Tween} */
     _resizeTween;
-
-    /** @type {Phaser.Geom.Point} */
-    _cameraCenter;
 
     constructor(events) {
         const me = this;
@@ -59,11 +56,10 @@ export default class RoadComponent {
 
         me._camera = Here._.cameras.main;
         me._camera.setViewport(0, 0, 700 - 20, 800).setPosition(110, 0).setScroll(0, 0);
-        me._cameraCenter = Utils.buildPoint(me._camera.centerX, me._camera.centerY);
 
         me._spritePool = Here._.add.group();
         me._roadTiles = [];
-        for (let i = -4; i < 4; ++i){
+        for (let i = -6; i < 4; ++i){
             const tile = me._spritePool.create(350, 100 + i * 200, 'road')
             tile.setDepth(me._consts.depth.road);
             me._roadTiles.push(tile);
@@ -71,11 +67,13 @@ export default class RoadComponent {
 
         const busSprite = Here._.add.image(0, 0, 'bus');
 
-        me._bus = Here._.add.container(400, 700, [ busSprite ])
+        me._bus = Here._.add.container(550, 700, [ busSprite ])
             .setDepth(me._consts.depth.bus);
         Here._.physics.world.enable(me._bus);
 
         me._events.on('componentActivated', me._onComponentActivated, me);
+
+        me._createBusStop(650);
     }
 
     update(delta) {
@@ -86,22 +84,27 @@ export default class RoadComponent {
 
         me._state.position += me._state.speed * me._state.delta;
 
-        if (!me._busStop && me._state.position >= me._consts.busStopInterval) {
-            me._busStop = me._spritePool.create(600, -300, 'busStop').setDepth(me._consts.depth.busStop);
+        if (!me._busStop && me._state.position >= me._consts.busStopInterval)
+            me._createBusStop(-300);
 
-            for (let i = 0; i < Utils.getRandom(3, 3); ++i) {
+        me._processBusStop();
+        me._shiftTiles();
+    }
+
+    _createBusStop(busStopY) {
+        const me = this;
+
+        me._busStop = me._spritePool.create(600, busStopY, 'busStop').setDepth(me._consts.depth.busStop);
+
+            for (let i = 0; i < Utils.getRandom(3, 3, 1); ++i) {
                 const passenger = me._spritePool.create(
                     me._busStop.x + 20,
                     me._busStop.y + i * 30,
-                    'passenger')
+                    'passengerOutside')
                     .setDepth(me._consts.depth.passengers);
 
                 me._passengers.push(passenger);
             };
-        }
-
-        me._processBusStop();
-        me._shiftTiles();
     }
 
     _onComponentActivated(component, isActive, percentage) {
@@ -123,8 +126,7 @@ export default class RoadComponent {
                 scrollX: targetScrollX,
                 scrollY: targetScrollY,
                 duration: 1000 * percentage,
-                ease: 'Sine.easeOut',
-                // onUpdate: () => me._camera.centerOn(me._cameraCenter.x, me._cameraCenter.y)
+                ease: 'Sine.easeOut'
             });
         }
     }
@@ -135,7 +137,7 @@ export default class RoadComponent {
         if (!(me._busStop && me._isStopped()))
             return;
 
-        if (me._bus.x < 530 || Math.abs(me._bus.y - me._busStop.y) > 200)
+        if (me._bus.x < 515 || Math.abs(me._bus.y - me._busStop.y) > 200)
             return;
 
         const doorPos = Utils.buildPoint(me._bus.x + 25, me._bus.y);
@@ -150,11 +152,11 @@ export default class RoadComponent {
 
             if (Phaser.Math.Distance.BetweenPoints(doorPos, Utils.toPoint(passenger)) < 5) {
                 me._spritePool.killAndHide(passenger);
+                me._events.emit('passengerIn');
             }
         }
 
         me._passengers = me._passengers.filter(x => x.active);
-        console.log(me._passengers.length);
     }
 
     _isStopped() {

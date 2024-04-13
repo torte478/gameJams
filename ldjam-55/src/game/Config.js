@@ -5,6 +5,6 @@ export default class Config {
         Log: true,
         ShowSceneLog: true,
         PlaySound: true,
-        Random: false
+        Random: true
     };
 }

@@ -17,4 +17,10 @@ export default class Enums {
         MONEY: 2,
         STRATEGEMS: 3
     }
+
+    static NodeType = {
+        Unavailable: 0,
+        Pass: 1,
+        Seat: 2
+    }
 }

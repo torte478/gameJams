@@ -19,5 +19,7 @@ export default class Here {
         me._ = scene;
         me.Audio = new Audio();
         me.Controls = new Controls(scene);
+
+        scene.input.mouse.disableContextMenu();
     }
 }
