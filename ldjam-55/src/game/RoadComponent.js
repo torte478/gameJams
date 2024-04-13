@@ -77,7 +77,7 @@ export default class RoadComponent {
 
         me._events.on('componentActivated', me._onComponentActivated, me);
 
-        me._createBusStop(300);
+        me._createBusStop(600);
     }
 
     update(delta) {
@@ -109,7 +109,8 @@ export default class RoadComponent {
 
         positions = Utils.shuffle(positions);
 
-        for (let i = 0; i < 24; ++i) {
+        const passengerCount = 10;
+        for (let i = 0; i < passengerCount; ++i) {
             const passenger = me._spritePool.create(
                 positions[i].x,
                 positions[i].y,

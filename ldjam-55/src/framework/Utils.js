@@ -360,7 +360,7 @@ export default class Utils {
      */
     static debugLog(msg) {
         Utils.ifDebug(Config.Debug.Log, () => {
-            console.log(msg);
+            console.log(`DEBUG::${msg}`);
         })  
     }
 

@@ -14,4 +14,8 @@ export default class Node {
 
     /** @type {Phaser.GameObjects.Image} */
     passenger = null;
+
+    isFree() {
+        return !this.passenger;
+    }
 }

@@ -16,6 +16,7 @@ export default class InteriorComponent {
     state = {
         isActive: false,
         delta: 0,
+        iid: 1,
     }
 
     /** @type {Components} */
@@ -60,6 +61,7 @@ export default class InteriorComponent {
         me.state.delta = delta;
 
         me._checkActivation();
+        me._movePassengers(delta);
     }
 
     isDoorFree() {
@@ -103,17 +105,78 @@ export default class InteriorComponent {
         me.state.isActive = isActive;
     }
 
+    _movePassengers(delta) {
+        const me = this;
+
+        for (let i = 0; i < me._graph.length; ++i) {
+            const passenger = me._graph[i].passenger;
+            if (!passenger || passenger.path.length == 0)
+                continue;
+
+            const target = passenger.path[0];
+            if (!me._graph[target].isFree()) {
+                const other = me._graph[target].passenger;
+                if (other.iid != passenger.iid) {
+                    if (other.isBusy)
+                        continue;
+
+                    Utils.debugLog(`switch ${i} <> ${target} (${passenger.iid}, ${other.iid})`);
+
+                    me._graph[target].passenger = passenger;
+                    me._graph[i].passenger = other;
+                    other.path = [i];
+                    other.isBusy = true;
+                }
+            }
+
+            const pos = me._toWorldPosition(target);
+            passenger.setPosition(
+                passenger.x + delta * me.consts.speed * Math.sign(pos.x - passenger.x),
+                passenger.y + delta * me.consts.speed * Math.sign(pos.y - passenger.y),
+            );
+
+            if (Phaser.Math.Distance.BetweenPoints(passenger, pos) < 5) {
+                passenger.path.shift();
+            
+                passenger.isBusy = passenger.path.length > 0;
+                me._graph[i].passenger = null;
+                me._graph[target].passenger = passenger;
+
+                if (!passenger.isBusy) {
+                    Utils.debugLog(`${passenger.iid} finish at ${target}`);
+                    if (target == me.consts.doorIndex) {
+                        const freeNode = me._findFreeNode();
+                        if (!!freeNode)
+                            me._startMoving(passenger, freeNode);
+                    }
+                }
+            }
+        }
+    }
+
     _onPassengerIn() {
         const me = this;
 
         const pos = me._toWorldPosition(me.consts.doorIndex);
-        const passenger = me._spritePool.create(pos.x, pos.y, 'passengerInside');
+        const passenger = me._spritePool.create(pos.x + 40, pos.y, 'passengerInside');
+        passenger.iid = me.state.iid++;
         me._graph[me.consts.doorIndex].passenger = passenger;
 
         const freeNode = me._findFreeNode();
-        const path = me._findPath(me.consts.doorIndex, freeNode);
+        if (!freeNode)
+            throw `can't enter`;
 
-        console.log(path);
+        me._startMoving(passenger, freeNode);
+    }
+
+    _startMoving(passenger, target) {
+        const me = this;
+
+        const path = me._findPath(me.consts.doorIndex, target);
+        passenger.path = path;
+        passenger.isBusy = true;
+
+        Utils.debugLog(`${passenger.iid}: ${path[0]} => ${path[path.length - 1]}`);
     }
 
     _toWorldPosition(index) {
@@ -122,15 +185,13 @@ export default class InteriorComponent {
         const node = me._graph[index];
 
         return Utils.buildPoint(
-            me.consts.pos.x + (node.cell % 4) * 80 + node.x * 40 + 20,
-            me.consts.pos.y + (node.cell / 4) * 80 + node.y * 40 + 20,
+            me.consts.pos.x + (node.cell % 4) * 80 + 40 + node.x * 20,
+            me.consts.pos.y + Math.floor(node.cell / 4) * 80 + 40 + node.y * 20,
         );
     }
 
     _findFreeNode() {
         const me = this;
-
-        return 0;
 
         const freeSpaces = [];
         for (let i = 0; i < me._graph.length; ++i) {
@@ -139,7 +200,7 @@ export default class InteriorComponent {
         }
 
         if (freeSpaces.length == 0)
-            throw 'no free space';
+            return null;
         
         return Utils.getRandomEl(freeSpaces);
     }
@@ -182,7 +243,7 @@ export default class InteriorComponent {
     
             for (let i = 0; i < me._graph[currentNode].paths.length; ++i) {
                 const neighbor = me._graph[currentNode].paths[i];
-                const totalDistance = distances[currentNode] + 1; // TODO ?
+                const totalDistance = distances[currentNode] + (!!me._graph[neighbor].passenger ? 5 : 1);
                 if (totalDistance < distances[neighbor]) {
                     distances[neighbor] = totalDistance;
                     previous[neighbor] = currentNode;
