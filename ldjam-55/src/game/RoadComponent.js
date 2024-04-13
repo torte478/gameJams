@@ -46,13 +46,20 @@ export default class RoadComponent {
     /** @type {{Phaser.Events.EventEmitter} */
     _events;
 
+    /** @type {Phaser.Tweens.Tween} */
+    _resizeTween;
+
+    /** @type {Phaser.Geom.Point} */
+    _cameraCenter;
+
     constructor(events) {
         const me = this;
 
         me._events = events;
 
         me._camera = Here._.cameras.main;
-        me._camera.setViewport(0, 0, 700 - 20, 800).setPosition(110, 0);
+        me._camera.setViewport(0, 0, 700 - 20, 800).setPosition(110, 0).setScroll(0, 0);
+        me._cameraCenter = Utils.buildPoint(me._camera.centerX, me._camera.centerY);
 
         me._spritePool = Here._.add.group();
         me._roadTiles = [];
@@ -97,10 +104,29 @@ export default class RoadComponent {
         me._shiftTiles();
     }
 
-    _onComponentActivated(component, percentage) {
+    _onComponentActivated(component, isActive, percentage) {
         const me = this;
 
-        console.log(component, percentage);
+        if (component == Enums.Components.INTERIOR) {
+            if (!!me._resizeTween)
+                me._resizeTween.stop();
+
+            const targetWidth = (isActive ? 500 : 700) - 20;
+            const targetZoom = isActive ? 0.72 : 1;
+            const targetScrollX = isActive ? 100 : 0;
+            const targetScrollY = isActive ? -150 : 0;
+
+            me._resizeTween = Here._.add.tween({
+                targets: me._camera,
+                width: targetWidth,
+                zoom: targetZoom,
+                scrollX: targetScrollX,
+                scrollY: targetScrollY,
+                duration: 1000 * percentage,
+                ease: 'Sine.easeOut',
+                // onUpdate: () => me._camera.centerOn(me._cameraCenter.x, me._cameraCenter.y)
+            });
+        }
     }
 
     _processBusStop() {

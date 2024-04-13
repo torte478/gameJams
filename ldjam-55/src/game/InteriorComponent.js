@@ -64,8 +64,7 @@ export default class InteriorComponent {
                 onUpdate: () => me._camera.centerOn(me._center.x, me._center.y)
             });
 
-            if (isActive)
-                me._events.emit('componentActivated', Enums.Components.INTERIOR, percentage);
+            me._events.emit('componentActivated', Enums.Components.INTERIOR, isActive, percentage);
         }
 
         me.state.isActive = isActive;
