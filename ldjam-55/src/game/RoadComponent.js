@@ -129,7 +129,7 @@ export default class RoadComponent {
     _createBusStop(busStopY) {
         const me = this;
 
-        me._busStop = me._spritePool.create(600, busStopY, 'busStop').setDepth(me._consts.depth.busStop);
+        me._busStop = me._spritePool.create(595, busStopY, 'busStop').setDepth(me._consts.depth.busStop);
 
         let positions = Utils
             .buildArray(
