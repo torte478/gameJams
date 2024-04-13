@@ -38,7 +38,7 @@ export default class GameScene extends HereScene {
         Utils.loadImage('bus');
         Utils.loadImage('busStop');
         Utils.loadImage('passengerOutside');
-        Utils.loadImage('passengerInside');
+        Utils.loadSpriteSheet('passengerInside', 50);
 
         Utils.loadImage('busInterior');
 

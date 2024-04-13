@@ -11,7 +11,11 @@ export default class InteriorComponent {
         pos: Utils.buildPoint(2025, 20),
         doorIndex: 18,
         paymentIndicies: [13],
-        speed: 100 * 2,
+        speed: 100,
+
+        depth: {
+            selection: 1000
+        }
     }
 
     state = {
@@ -37,6 +41,20 @@ export default class InteriorComponent {
     /** @type {Phaser.GameObjects.Group} */
     _spritePool;
 
+    /** @type {Phaser.Geom.Rectangle} */
+    _interiorRectangle;
+
+    _selection = {
+        /** @type {Phaser.GameObjects.Image} */
+        aim: null,
+        /** @type {Phaser.GameObjects.Image} */
+        passenger: null,
+        /** @type {Phaser.GameObjects.Image} */
+        tile: null,
+        /** @type {Number} */
+        nodeIndex: 0
+    }
+
     constructor(events) {
         const me = this;
 
@@ -50,8 +68,15 @@ export default class InteriorComponent {
 
         Here._.add.image(me._center.x, me._center.y, 'busInterior');
         me._camera.centerOn(me._center.x, me._center.y);
+        me._interiorRectangle = new Phaser.Geom.Rectangle(me.consts.pos.x, me.consts.pos.y, 320, 560);
 
         me._buildGraph();
+
+        me._selection.aim = me._spritePool.create(me._center.x, me._center.y, 'passengerInside', 0);
+        me._selection.aim.setVisible(false).setDepth(me.consts.depth.selection);
+        me._selection.tile = me._spritePool.create(me._center.x, me._center.y, 'passengerInside', 2);
+        me._selection.tile.setVisible(false).setDepth(me.consts.depth.selection);
+        Here._.input.on('pointerdown', me._onPointerDown, me);
         
         me._events.on('passengerIn', me._onPassengerIn, me);
         me._events.on('busStatusChanged', me._onBusStatusChanged, me);
@@ -65,12 +90,107 @@ export default class InteriorComponent {
 
         me._checkActivation();
         me._movePassengers(delta);
+        me._processSelection();
     }
 
     isDoorFree() {
         const me = this;
 
-        return me._graph[me.consts.doorIndex].isFree(Infinity);r
+        return me._graph[me.consts.doorIndex].isFree(Infinity);
+    }
+
+    _onPointerDown(pointer) {
+        const me = this;
+
+        if (me._selection.passenger == null)
+            me._trySelectPassenger(pointer);        
+        else
+            me._tryRedirectPassenger();
+    }
+
+    _tryRedirectPassenger() {
+        const me = this;
+
+        if (me._selection.passenger == null || !me._selection.tile.visible)
+            return;
+
+        me._selection.passenger.playerCommand = me._selection.nodeIndex;
+        me._clearSelection();
+    }
+
+    _clearSelection() {
+        const me = this;
+
+        me._selection.aim.setVisible(false);
+        me._selection.nodeIndex = -1;
+        me._selection.tile.setVisible(false);
+        me._selection.passenger = null;
+    }
+
+    _trySelectPassenger(pointer) {
+        const me = this;
+
+        const selected = Utils.firstOrNull(
+            me._enumeratePassengers(),
+            p => Phaser.Geom.Rectangle.Contains(
+                p.passenger.getBounds(),
+                pointer.worldX,
+                pointer.worldY));
+
+        if (selected == null)
+            return;
+
+        me._selection.passenger = selected.passenger;
+        me._selection.aim.setVisible(true);
+        me._selection.tile.setVisible(true);
+    }
+
+    _processSelection() {
+        const me = this;
+
+        if (!!me._selection.passenger) {
+            me._moveAimAndTile();
+        }
+    }
+
+    _moveAimAndTile() {
+        const me = this;
+
+        me._selection.aim.setPosition(me._selection.passenger.x, me._selection.passenger.y);
+
+        const mousePos = Utils.buildPoint(
+            Here._.input.activePointer.worldX, 
+            Here._.input.activePointer.worldY);
+
+        if (!Phaser.Geom.Rectangle.ContainsPoint(me._interiorRectangle, mousePos)) {
+            me._selection.tile.setVisible(false);
+            return;
+        } 
+
+        me._selection.tile.setVisible(true);
+        const closest = me._getClosestNode(mousePos);
+        me._selection.nodeIndex = closest.index;
+        me._selection.tile.setPosition(closest.x, closest.y);
+    }
+
+    _getClosestNode(mousePos) {
+        const me = this;
+
+        let minDist = Infinity;
+        let pos = null;
+        let minIndex = -1;
+        for (let i = 0; i < me._graph.length; ++i) {
+            const nodePos = me._toWorldPosition(i);
+            const dist = Phaser.Math.Distance.BetweenPoints(mousePos, nodePos);
+
+            if (dist < minDist) {
+                minDist = dist;
+                pos = nodePos;
+                minIndex = i;
+            }
+        }
+
+        return {index: minIndex, x: pos.x, y: pos.y};
     }
 
     _onPaymentComplete(index) {
@@ -162,9 +282,14 @@ export default class InteriorComponent {
             if (!passenger)
                 continue;
 
+            if (passenger.playerCommand != null && !passenger.isBusy) {
+                me._startMoving(passenger, i, passenger.playerCommand);
+                passenger.playerCommand = null;
+            }
+
             if (passenger.path.length == 0) {
                 if (me._components.road.isStoppedInsideBusArea() && passenger.isReadyToExit)
-                    me._processPesengerExit(i, passenger);
+                    me._processPasengerExit(i, passenger);
                 continue;
             }
 
@@ -182,7 +307,7 @@ export default class InteriorComponent {
         }
     }
 
-    _processPesengerExit(index, passenger) {
+    _processPasengerExit(index, passenger) {
         const me = this;
 
         me._graph[index].passenger = null;
@@ -284,10 +409,13 @@ export default class InteriorComponent {
         }
 
         const pos = me._toWorldPosition(me.consts.doorIndex);
-        const passenger = me._spritePool.create(pos.x + 40, pos.y, 'passengerInside');
+        const passenger = me._spritePool.create(pos.x + 40, pos.y, 'passengerInside', 1);
+
         passenger.isReadyToExit = false;
         passenger.iid = me.state.iid++;
         passenger.destination = Utils.getRandom(1, 5);
+        passenger.playerCommand = null;
+
         me._graph[me.consts.doorIndex].passenger = passenger;
         me._graph[me.consts.doorIndex].lease(passenger);
 
