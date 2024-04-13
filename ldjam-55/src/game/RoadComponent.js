@@ -153,6 +153,9 @@ export default class RoadComponent {
         if (me._bus.x < 515 || Math.abs(me._bus.y - me._busStop.y) > 200)
             return;
 
+        if (!me._components.interior.isDoorFree())
+            return;
+
         const doorPos = Utils.buildPoint(me._bus.x + 25, me._bus.y);
         const shift = me._consts.passengerSpeed * me._state.delta;
         for (let i = 0; i < me._passengers.length; ++i) {

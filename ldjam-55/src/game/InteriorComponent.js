@@ -10,7 +10,7 @@ export default class InteriorComponent {
     
     consts = {
         pos: Utils.buildPoint(2055, 75),
-        exitIndex: 7,
+        doorIndex: 7,
         paymentIndex: 6
     }
 
@@ -67,6 +67,12 @@ export default class InteriorComponent {
 
         me._checkActivation();
         me._movePassengers();
+    }
+
+    isDoorFree() {
+        const me = this;
+
+        return me._isFree(me.consts.doorIndex);
     }
 
     _movePassengers() {
@@ -133,11 +139,11 @@ export default class InteriorComponent {
 
         const freePlace = me._findFreePlace();
 
-        const pos = me._getWorldPos(me.consts.exitIndex);
+        const pos = me._getWorldPos(me.consts.doorIndex);
         const passenger = me._spritePool.create(pos.x, pos.y, 'passengerInside');
         me._passengers.push(passenger);
         
-        passenger.path = me._findPath(me.consts.exitIndex, freePlace.index).slice(1);
+        passenger.path = me._findPath(me.consts.doorIndex, freePlace.index).slice(1);
         console.log(passenger.path);
     }
 
@@ -210,7 +216,27 @@ export default class InteriorComponent {
     _isFree(index) {
         const me = this;
 
-        return true; // TODO
+        const count = me._passengers
+            .map(me._getGraphIndex, me)
+            .filter(x => x == index);
+
+        const capacity = me._getNodeCapacity(index);
+        return count < capacity;
+    }
+
+    _getNodeCapacity(index) {
+        const me = this;
+
+        const type = me._graph[index].type;
+
+        if (type == Enums.NodeType.Unavailable)
+            return null;
+        if (type == Enums.NodeType.Seat)
+            return 1;
+        if (type == Enums.NodeType.Pass)
+            return 4;
+
+        throw `unknown node type ${type}`;
     }
 
     _getWorldPos(index) {
