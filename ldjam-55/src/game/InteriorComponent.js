@@ -16,6 +16,7 @@ export default class InteriorComponent {
     state = {
         isActive: false,
         delta: 0,
+        lastActivationChange: 0
     }
 
     _center = Utils.buildPoint(2180, 300);
@@ -46,7 +47,8 @@ export default class InteriorComponent {
 
         me._camera = Here._.cameras.add(800, 210, 200, 600)
             .setBackgroundColor('#9badb7')
-            .setZoom(0.5);
+            .setZoom(0.5)
+            .setRoundPixels(false);
 
         Here._.add.image(me._center.x, me._center.y, 'busInterior');
         me._camera.centerOn(me._center.x, me._center.y);
@@ -91,11 +93,12 @@ export default class InteriorComponent {
         const me = this;
 
         const isActive = Phaser.Geom.Rectangle.Contains(
-            me._camera.worldView,
-            Here._.input.activePointer.worldX,
-            Here._.input.activePointer.worldY);
+            new Phaser.Geom.Rectangle(me._camera.x, me._camera.y, me._camera.width, me._camera.height),
+            Here._.input.activePointer.x,
+            Here._.input.activePointer.y);
 
         if (me.state.isActive != isActive) {
+
             if (!!me._resizeTween) 
                 me._resizeTween.stop();
                 

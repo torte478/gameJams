@@ -61,7 +61,7 @@ export default class Game {
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
                 `spd: ${me._roadComponent._state.speed | 0}\n` +
                 `pos: ${me._roadComponent._state.position | 0} ${me._roadComponent._bus.x | 0}\n` +
-                `int: ${me._interiorComponent.state.isActive}`;
+                `int: ${me._interiorComponent.state.isActive}\n`;
 
             me._log.setText(text);
         });
