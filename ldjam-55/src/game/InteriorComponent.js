@@ -12,6 +12,7 @@ export default class InteriorComponent {
         doorIndex: 18,
         paymentIndicies: [13],
         speed: 100,
+        zoom: 0.4,
 
         depth: {
             selection: 1000
@@ -62,8 +63,8 @@ export default class InteriorComponent {
         me._spritePool = Here._.add.group();
 
         me._camera = Here._.cameras.add(800, 210, 200, 600)
-            .setBackgroundColor('#9badb7')
-            .setZoom(0.5)
+            .setBackgroundColor('#00A3C4')
+            .setZoom(me.consts.zoom)
             .setRoundPixels(false);
 
         Here._.add.image(me._center.x, me._center.y, 'busInterior');
@@ -254,7 +255,7 @@ export default class InteriorComponent {
                 
             const targetX = isActive ? 600 : 800;
             const targetWidth = isActive ? 400 : 200;
-            const targetZoom = isActive ? 1 : 0.5;
+            const targetZoom = isActive ? 1 : me.consts.zoom;
 
             const percentage = Math.abs(me._camera.x - targetX) / 200
 
