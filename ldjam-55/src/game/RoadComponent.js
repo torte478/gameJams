@@ -40,6 +40,9 @@ export default class RoadComponent {
     /** @type {Phaser.Cameras.Scene2D.Camera} */
     _camera;
 
+    /** @type {Phaser.Events.EventEmitter} */
+    _events;
+
     /** @type {Phaser.GameObjects.Group} */
     _spritePool;
 
@@ -48,9 +51,6 @@ export default class RoadComponent {
 
     /** @type {Phaser.GameObjects.Image[]} */
     _passengers = [];
-
-    /** @type {Phaser.Events.EventEmitter} */
-    _events;
 
     /** @type {Phaser.Tweens.Tween} */
     _resizeTween;
@@ -78,6 +78,7 @@ export default class RoadComponent {
         Here._.physics.world.enable(me._bus);
 
         me._events.on('componentActivated', me._onComponentActivated, me);
+        me._events.on('exitComplete', me._onExitComplete, me);
 
         me._createBusStop(600);
     }
@@ -101,6 +102,30 @@ export default class RoadComponent {
         me._shiftTiles();
     }
 
+    isStoppedInsideBusArea() {
+        const me = this;
+
+        if (!me._busStop)
+            return false;
+
+        if (!me._isStopped())
+            return false;
+
+        return me._bus.x >= 515 && Math.abs(me._bus.y - me._busStop.y) <= 300;
+    }
+
+    _isStopped() {
+        const me = this;
+
+        return Math.abs(me._state.speed) <= 0.01;
+    }
+
+    _onExitComplete() {
+        const me = this;
+
+        me._changeStatus(Enums.BusStatus.ENTER);
+    }
+
     _createBusStop(busStopY) {
         const me = this;
 
@@ -115,7 +140,7 @@ export default class RoadComponent {
 
         positions = Utils.shuffle(positions);
 
-        const passengerCount = 10;
+        const passengerCount = Utils.getRandom(1, 10);
         for (let i = 0; i < passengerCount; ++i) {
             const passenger = me._spritePool.create(
                 positions[i].x,
@@ -151,6 +176,8 @@ export default class RoadComponent {
         }
     }
 
+    
+
     _processBusStop() {
         const me = this;
 
@@ -161,15 +188,21 @@ export default class RoadComponent {
         if (!insideBusStopArea)
             return;
 
+        if (me._state.status == Enums.BusStatus.PREPARE_TO_EXIT)
+            me._changeStatus(Enums.BusStatus.EXIT);
+
         if (me._state.status != Enums.BusStatus.ENTER)
             return;
 
         if (!me._components.interior.isDoorFree())
             return;
 
-        const doorPos = Utils.buildPoint(me._bus.x + 25, me._bus.y);
+        const doorPos = Utils.buildPoint(me._bus.x + 40, me._bus.y);
         const shift = me._consts.passengerSpeed * me._state.delta;
         for (let i = 0; i < me._passengers.length; ++i) {
+            if (!me._components.interior.isDoorFree())
+                break;
+
             const passenger = me._passengers[i];
             
             const shiftX = Math.sign(doorPos.x - passenger.x) * shift;
@@ -184,12 +217,6 @@ export default class RoadComponent {
         }
 
         me._passengers = me._passengers.filter(x => x.active);
-    }
-
-    _isStopped() {
-        const me = this;
-
-        return Math.abs(me._state.speed) <= 0.01;
     }
 
     _shiftTiles() {

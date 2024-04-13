@@ -1,4 +1,3 @@
-import Phaser from '../../lib/phaser.js';
 import Here from './Here.js';
 
 import ButtonConfig from "./ButtonConfig.js";

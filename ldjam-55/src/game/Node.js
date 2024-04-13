@@ -15,7 +15,22 @@ export default class Node {
     /** @type {Phaser.GameObjects.Image} */
     passenger = null;
 
-    isFree() {
-        return !this.passenger;
+    /** @type {Number} */
+    _lease = null;
+
+    isFree(index) {
+        return !this.passenger && (!this._lease || this._lease == index);
+    }
+
+    lease(id) {
+        const me = this;
+
+        me._lease = id;
+    }
+
+    release() {
+        const me = this;
+
+        me._lease = null;
     }
 }

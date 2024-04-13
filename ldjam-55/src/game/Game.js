@@ -9,6 +9,7 @@ import Enums from './Enums.js';
 import RoadComponent from './RoadComponent.js';
 import InteriorComponent from './InteriorComponent.js';
 import Components from './Components.js';
+import MoneyComponent from './MoneyComponent.js';
 
 export default class Game {
 
@@ -24,23 +25,24 @@ export default class Game {
         Here._.add.image(3500, 400, 'back03');
         Here._.add.image(4500, 400, 'back04');
 
-        const moneyCamera = Here._.cameras.add(800, 0, 200, 200).setScroll(3000, 0);
         const stratagemCamera = Here._.cameras.add(0, 0, 100, 800).setScroll(4000, 0);
 
         const events = new Phaser.Events.EventEmitter();
         me._components = new Components();
         me._components.road = new RoadComponent(events);
         me._components.interior = new InteriorComponent(events);
+        me._components.money = new MoneyComponent(events);
 
         me._components.road._components = me._components;
         me._components.interior._components = me._components;
+        me._components.money._components = me._components;
 
         Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
             me._log = Here._.add.text(10, 10, '', { fontSize: 18, backgroundColor: '#000' })
                 .setScrollFactor(0)
                 .setDepth(Consts.Depth.Max);
 
-            moneyCamera.ignore(me._log);
+            me._components.money._camera.ignore(me._log);
             me._components.interior._camera.ignore(me._log);
             stratagemCamera.ignore(me._log);
         });
@@ -59,7 +61,8 @@ export default class Game {
             const mouse = Here._.input.activePointer;
 
             let text = 
-                `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}`;
+                `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
+                `que: ${me._components.money._paymentQueue}`;
 
             me._log.setText(text);
         });
