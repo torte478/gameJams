@@ -45,7 +45,10 @@ export default class RoadComponent {
         status: Enums.BusStatus.ENTER,
 
         shieldActiveTo: new Date().getTime(),
-        gunActiveTo: new Date().getTime()
+        gunActiveTo: new Date().getTime(),
+
+        isMoreDriversStratagem: false,
+        isMoreDriversStratagemActiveTo: new Date().getTime(),
     }
 
     /** @type {Components} */
@@ -288,6 +291,11 @@ export default class RoadComponent {
             me._gunSprite.setVisible(true);
             me._state.gunActiveTo = new Date().getTime() + 15 * 1000;
         }
+
+        if (stratagem == Enums.StratagemType.MORE_DIVERS) {
+            me._state.isMoreDriversStratagem = true;
+            me._state.isMoreDriversStratagemActiveTo = new Date().getTime() + 50 * 1000;
+        }
     }
 
     _activateShield() {
@@ -324,7 +332,9 @@ export default class RoadComponent {
 
         positions = Utils.shuffle(positions);
 
-        const passengerCount = Utils.getRandom(1, 10, 12);
+        const minCount = me._state.isMoreDriversStratagem ? 10 : 1;
+        const maxCount = me._state.isMoreDriversStratagem ? 12 : 5;
+        const passengerCount = Utils.getRandom(minCount, maxCount);
         for (let i = 0; i < passengerCount; ++i) {
             const passenger = me._spritePool.create(
                 positions[i].x,

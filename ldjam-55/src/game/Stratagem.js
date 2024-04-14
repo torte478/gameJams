@@ -143,7 +143,7 @@ export default class Stratagem {
             me._initInternal(
                 "MORE DIVERS", 
                 100,
-                30,
+                60,
                 [Enums.Arrow.DOWN, Enums.Arrow.DOWN, Enums.Arrow.UP, Enums.Arrow.LEFT]);
 
         if (index == Enums.StratagemType.WITHOUT_CHANGE)

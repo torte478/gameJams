@@ -161,8 +161,10 @@ export default class StratagemComponent {
 
         if (component == Enums.Components.STRATEGEM)
             me._resizeComponent(0);
-        else
+        else {
             me._resizeComponent(-200);
+            me._resetStratagems(me.state.money);
+        }
     }
 
     _resizeComponent(x) {
