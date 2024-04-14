@@ -16,9 +16,9 @@ export default class RoadComponent {
         speedYDownChange: 400,
 
         busStopPrepare: 1000,
-        busStopCreate: 10000,
+        busStopCreate: 1000,
 
-        passengerSpeed: 100,
+        passengerSpeed: 100 * 3,
 
         startX: 575, //350,
         startY: 700,

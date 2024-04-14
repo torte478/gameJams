@@ -397,8 +397,14 @@ export default class InteriorComponent {
         
         Utils.debugLog(`${passenger.iid} finish at ${target}`);
 
-        if (me._isPaymentPosition(target))
+        if (me._isPaymentPosition(target)) {
+            if (passenger.isOnPayment)
+                return;
+
             me._events.emit('paymentStart', target);
+            passenger.isOnPayment = true;
+            return;
+        }
 
         if (target != me.consts.doorIndex)
             return;
@@ -462,9 +468,10 @@ export default class InteriorComponent {
         const pos = me._toWorldPosition(me.consts.doorIndex);
         const passenger = me._spritePool.create(pos.x + 40, pos.y, 'passengerInside', 1);
 
+        passenger.isOnPayment = false;
         passenger.isReadyToExit = false;
         passenger.iid = me.state.iid++;
-        passenger.destination = Utils.getRandom(1, 5);
+        passenger.destination = Utils.getRandom(1, 5, 1);
         passenger.playerCommand = null;
         passenger.isSwap = false;
 
@@ -570,8 +577,8 @@ export default class InteriorComponent {
             me._graph[to].paths.push(from);
         }
 
-        me._graph[0].x =  +0; me._graph[0].y =  -1; me._graph[0].cell = 2;
-        me._graph[1].x =  +0; me._graph[1].y =  +1; me._graph[1].cell = 2;
+        me._graph[0].x =  +1; me._graph[0].y =  -1; me._graph[0].cell = 2;
+        me._graph[1].x =  +1; me._graph[1].y =  +1; me._graph[1].cell = 2;
         me._graph[2].x =  +0; me._graph[2].y =  -1; me._graph[2].cell = 3;
         me._graph[3].x =  +0; me._graph[3].y =  +1; me._graph[3].cell = 3;
         me._graph[4].x =  -1; me._graph[4].y =  -1; me._graph[4].cell = 4;
