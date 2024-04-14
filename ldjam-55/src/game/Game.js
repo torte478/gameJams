@@ -23,9 +23,6 @@ export default class Game {
     constructor() {
         const me = this;
 
-        Here._.add.image(3500, 400, 'back03');
-        Here._.add.image(4500, 400, 'back04');
-
         const events = new Phaser.Events.EventEmitter();
         me._components = new Components();
         me._components.road = new RoadComponent(events);

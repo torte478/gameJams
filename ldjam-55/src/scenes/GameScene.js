@@ -29,8 +29,6 @@ export default class GameScene extends HereScene {
         if (!me._isRestart)
             Utils.runLoadingBar();
 
-        Utils.loadImage('back04');
-
         Utils.loadImage('road');
         Utils.loadImage('bus');
         Utils.loadImage('busStop');
@@ -40,6 +38,10 @@ export default class GameScene extends HereScene {
         Utils.loadSpriteSheet('passengerInside', 50);
 
         Utils.loadImage('moneyBox');
+
+        Utils.loadImage('panel');
+        Utils.loadSpriteSheet('stratagems', 80);
+        Utils.loadSpriteSheet('arrows', 40);
     }
 
     create() {

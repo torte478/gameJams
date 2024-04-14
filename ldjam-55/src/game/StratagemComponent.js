@@ -3,6 +3,7 @@ import Utils from '../framework/Utils.js';
 import Phaser from '../lib/phaser.js';
 import Components from './Components.js';
 import Enums from './Enums.js';
+import Stratagem from './Stratagem.js';
 
 export default class StratagemComponent {
 
@@ -12,6 +13,7 @@ export default class StratagemComponent {
 
     state = {
         isActive: true,
+        money: 0
     }
 
     /** @type {Components} */
@@ -26,21 +28,45 @@ export default class StratagemComponent {
     /** @type {Phaser.Events.EventEmitter} */
     _events;
 
+    /** @type {Phaser.GameObjects.Text} */
+    _totalText;
+
+    /** @type {Stratagem[]} */
+    _stratagems = [];
+
     constructor(events) {
         const me = this;
 
         me._events = events;
 
         me._camera = Here._.cameras.add(-200, 0, 300, 800)
-            .setScroll(4000, 0);
+            .setScroll(4000, 0)
+            .setBackgroundColor('#007665');
+
+        me._totalText = Here._.add.text(4295, 20, `${me.state.money}¤`, { fontSize: 28, fontStyle: 'bold'})
+            .setOrigin(1, 0.5);
+
+        const stratagemCount = 2;
+        for (let i = 0; i < stratagemCount; ++i) {
+            const stratagem = new Stratagem(i);
+            me._stratagems.push(stratagem);
+        }
 
         me._events.on('componentActivated', me._onComponentActivated, me);
+        me._events.on('paymentComplete', me._onPaymentComplete, me);
     }
 
     update(delta) {
         const me = this;
 
         me._checkActivation();
+    }
+
+    _onPaymentComplete(index, money) {
+        const me = this;
+
+        me.state.money += money;
+        me._totalText.setText(`${me.state.money}¤`);
     }
 
     _checkActivation() {

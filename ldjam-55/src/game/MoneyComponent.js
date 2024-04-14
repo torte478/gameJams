@@ -41,19 +41,19 @@ export default class MoneyComponent {
 
         Here._.add.image(me._center.x, me._center.y, 'moneyBox');
 
-        // new Button({
-        //     x: 3100,
-        //     y: 90,
-        //     texture: 'bus',
-        //     frameIdle: 0,
-        //     frameSelected: 0,
-        //     text: 'PAY',
-        //     textStyle: { fontSize: 32 },
-        //     callbackScope: me,
-        //     callback: () => {
-        //         me._completePayment();
-        //     }
-        // });
+        new Button({
+            x: 3100,
+            y: 90,
+            texture: 'bus',
+            frameIdle: 0,
+            frameSelected: 0,
+            text: 'PAY',
+            textStyle: { fontSize: 32 },
+            callbackScope: me,
+            callback: () => {
+                me._completePayment();
+            }
+        });
 
         me._events.on('paymentStart', me._onPaymentStart, me);
         me._events.on('componentActivated', me._onComponentActivated, me);
@@ -125,6 +125,7 @@ export default class MoneyComponent {
             return;
         
         const index = me._paymentQueue.shift();
-        me._events.emit('paymentComplete', index);
+        const money = Utils.getRandom(10, 100);
+        me._events.emit('paymentComplete', index, money);
     }
 }

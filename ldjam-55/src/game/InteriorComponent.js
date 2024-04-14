@@ -428,7 +428,7 @@ export default class InteriorComponent {
 
         passenger.isReadyToExit = false;
         passenger.iid = me.state.iid++;
-        passenger.destination = Utils.getRandom(1, 5);
+        passenger.destination = Utils.getRandom(1, 5, 1);
         passenger.playerCommand = null;
 
         me._graph[me.consts.doorIndex].passenger = passenger;
