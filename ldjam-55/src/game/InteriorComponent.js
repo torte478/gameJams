@@ -86,6 +86,7 @@ export default class InteriorComponent {
         me._events.on('paymentComplete', me._onPaymentComplete, me);
         me._events.on('componentActivated', me._onComponentActivated, me);
         me._events.on('stratagemSummon', me._onStratagemSummon, me);
+        me._events.on('dismorale', me._onDismorale, me);
     }
 
     update(delta) {
@@ -222,6 +223,26 @@ export default class InteriorComponent {
         me._startMoving(passenger, index, me.consts.doorIndex);
     }
 
+    _makeBadFeelengs(passenger, index) {
+        const me = this;
+
+        const old = passenger.destination;
+        passenger.destination--;
+
+        const tint = me._getTint(passenger.destination);
+        if (tint != null){
+            passenger.clearTint();
+            passenger.setTint(tint);
+        }
+
+        if (passenger.destination < 0 && old >= 0) {
+            me._changeState(passenger, Enums.PassengerState.EXIT);
+            me._startMoving(passenger, index, me.consts.doorIndex);
+            if (me._components.money._paymentIid == passenger.iid)
+                me._components.money._paymentIid = null;
+        }
+    }
+
     _onBusStatusChanged(status) {
         const me = this;
 
@@ -229,21 +250,7 @@ export default class InteriorComponent {
         if (status == Enums.BusStatus.DEPARTURE) {
             for (let i = 0; i < passengers.length; ++i) {
                 const passenger = passengers[i].passenger;
-                const old = passenger.destination;
-                passenger.destination--;
-
-                const tint = me._getTint(passenger.destination);
-                if (tint != null){
-                    passenger.clearTint();
-                    passenger.setTint(tint);
-                }
-
-                if (passenger.destination < 0 && old >= 0) {
-                    me._changeState(passenger, Enums.PassengerState.EXIT);
-                    me._startMoving(passenger, passengers[i].index, me.consts.doorIndex);
-                    if (me._components.money._paymentIid == passenger.iid)
-                        me._components.money._paymentIid = null;
-                }
+                me._makeBadFeelengs(passenger, passengers[i].index);
             }
         }
 
@@ -743,6 +750,17 @@ export default class InteriorComponent {
             me._components.money._paymentIid = null;
             me._components.money._showText(false);
             me._checkExitComplete();
+        }
+    }
+
+    _onDismorale() {
+        const me = this;
+
+        for (let i = 0; i < me._graph.length; ++i) {
+            const passenger = me._graph[i].passenger;
+
+            if (!!passenger)
+                me._makeBadFeelengs(passenger, i);
         }
     }
 }

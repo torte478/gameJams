@@ -16,11 +16,11 @@ export default class RoadComponent {
         speedYDownChange: 400,
 
         busStopPrepare: 1000,
-        busStopCreate: 1000,
+        busStopCreate: 10000,
 
-        passengerSpeed: 100 * 3,
+        passengerSpeed: 100, //* 3,
 
-        startX: 575, //350,
+        startX: 350, //575, //350,
         startY: 700,
 
         depth: {
@@ -31,8 +31,8 @@ export default class RoadComponent {
             bus: 500,
         },
 
-        smallInsectPeriod: 100,
-        bigInsectPeriod: 1000
+        smallInsectPeriod: 390,
+        bigInsectPeriod: 900
     }
     _state = {
         isActive: true,
@@ -121,14 +121,14 @@ export default class RoadComponent {
         me._events.on('exitComplete', me._onExitComplete, me);
         me._events.on('stratagemSummon', me._onStratagemSummon, me);
 
-        me._createBusStop(600);
-
         Here._.physics.add.overlap(
             me._bus, 
             me._insectPool, 
             (b, i) => me._onInsectCollde(i), 
             null, 
             me);
+
+        me._createBusStop(600);
     }
 
     update(delta) {
@@ -187,13 +187,11 @@ export default class RoadComponent {
         if (canCollide) {
             insect.stop();
             insect.setFrame(2);
-            
+            me._events.emit('moneyIncome', isBigInsect ? 100 : 1);    
         } else {
             me._state.speed = Math.max(me._state.speed - 500, 0);
+            me._events.emit('dismorale');
         }
-
-        //TODO: money
-        //TODO: dismorale
     }
 
     _tryCreateInsects() {
