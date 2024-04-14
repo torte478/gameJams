@@ -143,7 +143,12 @@ export default class RoadComponent {
             me);
 
         me._createBusStop(600);
+        
+        me._engineSound = Here._.sound.add('engine', { volume: 0.02, loop: -1});
     }
+
+    /** @type {Phaser.Sound.BaseSound} */
+    _engineSound;
 
     update(delta) {
         const me = this;
@@ -210,6 +215,7 @@ export default class RoadComponent {
                 me._lastGunShot = now;
 
                 me._gunSprite.play('gun');
+                Here.Audio.play('shot', { volume: 0.5 });
 
                 me._gunSprite.setRotation(Phaser.Math.Angle.Between(
                     me._bus.x,
@@ -557,6 +563,11 @@ export default class RoadComponent {
         }
 
         const stopped = me._isStopped();
+        if (!stopped && !me._engineSound.isPlaying)
+            me._engineSound.play();
+        if (stopped && me._engineSound.isPlaying)
+            me._engineSound.pause();
+
         me._smokeSprite.setVisible(!stopped);
 
         const minShiftX = stopped ? 0 : 50;

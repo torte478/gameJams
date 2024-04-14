@@ -13,7 +13,7 @@ export default class StratagemComponent {
 
     state = {
         isActive: true,
-        money: 1000,
+        money: 9000,
         arrowIndex: 0,
     }
 
@@ -71,6 +71,18 @@ export default class StratagemComponent {
 
         me._onMoneyIncome(-me._stratagems[stratagem]._cost);
         me._resetStratagems();
+        Here.Audio.play('summon', { volume: 0.5});
+
+        if (stratagem == Enums.StratagemType.WIN_THE_GAME) {
+            Here._.time.delayedCall(
+                500,
+                () => {
+                    Here.Audio.stopAll();
+                    Here._.scene.start('endScene');
+                },
+                null,
+                me);
+        }
     }
 
     _updateStratagems() {
@@ -104,8 +116,11 @@ export default class StratagemComponent {
 
         if (result == Enums.StratagemResult.MISS)
             me._resetStratagems();
-        else if (result == Enums.StratagemResult.HIT)
+        else if (result == Enums.StratagemResult.HIT) {
             me.state.arrowIndex += 1;
+            me._components.specEffects.doSelect();
+        }
+            
     }
 
     _resetStratagems() {

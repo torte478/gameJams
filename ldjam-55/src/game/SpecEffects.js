@@ -32,19 +32,24 @@ export default class SpecEffects {
     addMoney(money) {
         const me = this;
 
+        if (money <= 0)
+            return;
+
         const frame = money == 1 ? 0 : (money == 100 ? 1 : 2);
         const sprite = me._pool.create(4245, 25, 'moneyEffect', frame);
         sprite.tween = Here._.tweens.add({
             targets: sprite,
             y: 125,
             duration: 1000,
-            alpha: { from: 0.5, to: 1 },
+            alpha: { from: 1, to: 0.5 },
             ease: 'Sine.easeIn',
             onComplete: () => {
                 sprite.tween = null;
                 me._pool.killAndHide(sprite);
             }
         });
+
+        Here.Audio.play('income', { volume: 0.4 });
     }
 
     doDismorale() {
@@ -62,5 +67,13 @@ export default class SpecEffects {
                 me._pool.killAndHide(sprite);
             }
         });
+
+        Here.Audio.play('dismorale', { volume: 0.4 });
+    }
+
+    doSelect() {
+        const me = this;
+
+        Here.Audio.play('select', { volume: 0.5 });
     }
 }

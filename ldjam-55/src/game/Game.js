@@ -44,14 +44,19 @@ export default class Game {
             me._components.interior._camera.ignore(me._log);
             me._components.stratagem._camera.ignore(me._log);
         });
+
+        Here.Audio.play('theme', { volume: 0.1 , loop: -1});
     }
 
     update(delta) {
         const me = this;
 
         if (Here.Controls.isPressedOnce(Enums.Keyboard.RESTART) 
-            && Utils.isDebug(Config.Debug.Global))
+            && Utils.isDebug(Config.Debug.Global)) {
+            Here.Audio.stopAll();
             Here._.scene.restart({ isRestart: true });
+        }
+        
 
         me._components.update(delta);
 

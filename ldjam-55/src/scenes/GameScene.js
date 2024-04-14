@@ -53,6 +53,14 @@ export default class GameScene extends HereScene {
         Utils.loadSpriteSheet('stratagems', 80);
         Utils.loadSpriteSheet('arrows', 40);
         Utils.loadSpriteSheet('moneyEffect', 100, 50);
+
+        Utils.loadMp3('theme');
+        Utils.loadWav('engine');
+        Utils.loadWav('income');
+        Utils.loadWav('dismorale');
+        Utils.loadWav('shot');
+        Utils.loadWav('select');
+        Utils.loadWav('summon');
     }
 
     create() {

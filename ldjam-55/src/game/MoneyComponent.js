@@ -168,6 +168,7 @@ export default class MoneyComponent {
                 : me._currentString.substring(0, me._currentString.length - 1);
 
         me._currentText.setText(`= ${me._currentString}¤`);
+        me._components.specEffects.doSelect();
     }
 
     _checkActivation() {
@@ -248,6 +249,8 @@ export default class MoneyComponent {
 
         const current = Number(me._currentString);
         const success = me._state.income - money === current;
+        if (!success)
+            Here.Audio.play('dismorale', { volume: 0.5 });
 
         me._events.emit('paymentComplete', iid, success);
         if (success)
