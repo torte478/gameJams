@@ -125,6 +125,13 @@ export default class Stratagem {
                 "SHIELD", 
                 100,
                 5,
+                [Enums.Arrow.RIGHT, Enums.Arrow.RIGHT, Enums.Arrow.DOWN]);
+
+        if (index == 2)
+            me._initInternal(
+                "FIX BUGS =)",
+                0,
+                3,
                 [Enums.Arrow.RIGHT, Enums.Arrow.RIGHT, Enums.Arrow.UP]);
     }
 

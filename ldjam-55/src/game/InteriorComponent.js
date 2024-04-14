@@ -85,6 +85,7 @@ export default class InteriorComponent {
         me._events.on('busStatusChanged', me._onBusStatusChanged, me);
         me._events.on('paymentComplete', me._onPaymentComplete, me);
         me._events.on('componentActivated', me._onComponentActivated, me);
+        me._events.on('stratagemSummon', me._onStratagemSummon, me);
     }
 
     update(delta) {
@@ -726,6 +727,22 @@ export default class InteriorComponent {
             const freeNode = me._findFreeNode();
             if (!!freeNode)
                 me._startMoving(passenger, target, freeNode);
+        }
+    }
+
+    _onStratagemSummon(stratagem) {
+        const me = this;
+
+        if (stratagem == Enums.StratagemType.FIX_BUGS) {
+            for (let i = 0; i < me._graph.length; ++i) {
+                const passenger = me._graph[i].passenger;
+                me._graph[i].release();
+                me._graph[i].passenger = null;
+                me._spritePool.killAndHide(passenger);
+            }
+            me._components.money._paymentIid = null;
+            me._components.money._showText(false);
+            me._checkExitComplete();
         }
     }
 }

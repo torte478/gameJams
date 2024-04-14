@@ -47,7 +47,7 @@ export default class StratagemComponent {
         me._totalText = Here._.add.text(4295, 20, `${me.state.money}¤`, { fontSize: 28, fontStyle: 'bold'})
             .setOrigin(1, 0.5);
 
-        const stratagemCount = 2;
+        const stratagemCount = 3;
         for (let i = 0; i < stratagemCount; ++i) {
             const stratagem = new Stratagem(i, me._events);
             me._stratagems.push(stratagem);
