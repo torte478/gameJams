@@ -74,6 +74,9 @@ export default class StratagemComponent {
     _updateControls() {
         const me = this;
 
+        if (!me.state.isActive)
+            return;
+
         const arrow = me._getArrowFromControl();
         if (arrow == null)
             return;

@@ -16,14 +16,18 @@ export default class RoadComponent {
         speedYDownChange: 400,
 
         busStopPrepare: 1000,
-        busStopCreate: 2000,
+        busStopCreate: 10000,
 
-        passengerSpeed: 50 * 4,
+        passengerSpeed: 100,
+
+        startX: 575, //350,
+        startY: 700,
 
         depth: {
             road: 0,
             busStop: 100,
             passengers: 200,
+            lattern: 400,
             bus: 500,
         }
     }
@@ -56,6 +60,14 @@ export default class RoadComponent {
     /** @type {Phaser.Tweens.Tween} */
     _resizeTween;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    _smokeSprite;
+
+    /** @type {Phaser.GameObjects.Text} */
+    _signText;
+
+    _signPanel;
+
     constructor(events) {
         const me = this;
 
@@ -72,11 +84,15 @@ export default class RoadComponent {
             me._roadTiles.push(tile);
         }
 
+        me._smokeSprite = Here._.add.sprite(0, 35, 'smoke').play('smoke').setOrigin(0.5, 0).setVisible(false);
         const busSprite = Here._.add.image(0, 0, 'bus');
 
-        me._bus = Here._.add.container(550, 700, [ busSprite ])
+        me._bus = Here._.add.container(me._consts.startX, me._consts.startY, [ me._smokeSprite, busSprite ])
             .setDepth(me._consts.depth.bus);
         Here._.physics.world.enable(me._bus);
+
+        me._signPanel = Here._.add.image(65, 750, 'sign');
+        me._signText = Here._.add.text(110, 750, '1000m', {fontSize: 24, fontStyle: 'bold'}).setOrigin(1, 0.5);
 
         me._events.on('componentActivated', me._onComponentActivated, me);
         me._events.on('exitComplete', me._onExitComplete, me);
@@ -97,11 +113,12 @@ export default class RoadComponent {
             me._changeStatus(Enums.BusStatus.PREPARE_TO_EXIT);
 
         if (!me._busStop && me._state.position >= me._consts.busStopCreate)
-            me._createBusStop(-300);
+            me._createBusStop(-610);
 
         me._processBusStop();
         me._shiftTiles();
         me._checkActivation();
+        me._updateSign();
     }
 
     isStoppedInsideBusArea() {
@@ -114,6 +131,16 @@ export default class RoadComponent {
             return false;
 
         return me._bus.x >= 515 && Math.abs(me._bus.y - me._busStop.y) <= 300;
+    }
+
+    _updateSign() {
+        const me = this;
+
+        const distance = (me._consts.busStopCreate - me._state.position + 1000) / 100;
+        const visible = distance > 0 && distance < 1000;
+        me._signText.setVisible(visible);
+        me._signPanel.setVisible(visible);
+        me._signText.setText(`${distance|0}m`);
     }
 
     _isStopped() {
@@ -132,6 +159,7 @@ export default class RoadComponent {
         const me = this;
 
         me._busStop = me._spritePool.create(595, busStopY, 'busStop').setDepth(me._consts.depth.busStop);
+        me._busStop.lattern = me._spritePool.create(600, busStopY + 400, 'lattern').setDepth(me._consts.depth.lattern).play('lattern');
 
         let positions = Utils
             .buildArray(
@@ -142,7 +170,7 @@ export default class RoadComponent {
 
         positions = Utils.shuffle(positions);
 
-        const passengerCount = Utils.getRandom(1, 10);
+        const passengerCount = Utils.getRandom(1, 10, 12);
         for (let i = 0; i < passengerCount; ++i) {
             const passenger = me._spritePool.create(
                 positions[i].x,
@@ -254,8 +282,11 @@ export default class RoadComponent {
                 tile => tile.setY(tile.y - me._roadTiles.length * 200))
         
         if (!!me._busStop) {
+            me._shiftTile(me._busStop.lattern);
+
             me._shiftTile(me._busStop, _ => {
                 me._spritePool.killAndHide(me._busStop);
+                me._spritePool.killAndHide(me._busStop.lattern);
                 me._busStop = null;
                 me._state.position = 0;
 
@@ -305,26 +336,40 @@ export default class RoadComponent {
         if (Here.Controls.isPressing(Enums.Keyboard.UP)) {
             me._state.speed = Math.min(
                 me._consts.maxSpeedY, 
-                me._state.speed + me._consts.speedYUpChange * me._state.delta)
+                me._state.speed + me._consts.speedYUpChange * me._state.delta);
+            me._smokeSprite.setScale(1.5);
         }
         else if (Here.Controls.isPressing(Enums.Keyboard.DOWN)) {
             me._state.speed = Math.max(
                 0,
                  me._state.speed - me._consts.speedYDownChange * me._state.delta)
+            me._smokeSprite.setScale(0.5);
+        } else {
+            me._smokeSprite.setScale(1);
         }
 
-        const minShiftX = me._isStopped() ? 0 : 50;
+        const stopped = me._isStopped();
+        me._smokeSprite.setVisible(!stopped);
+
+        const minShiftX = stopped ? 0 : 50;
         const speedXChange = Math.min(
             500, 
             Math.max(
                 minShiftX, 
                 me._consts.speedXChange * me._state.speed * me._state.delta));
 
-        if (Here.Controls.isPressing(Enums.Keyboard.LEFT))
+        if (Here.Controls.isPressing(Enums.Keyboard.LEFT)) {
+            me._bus.setAngle(-10);
             body.setVelocityX(-speedXChange);
-        else if (Here.Controls.isPressing(Enums.Keyboard.RIGHT))
+        }
+        else if (Here.Controls.isPressing(Enums.Keyboard.RIGHT)) {
+            me._bus.setAngle(10);
             body.setVelocityX(speedXChange);
-        else
+        }
+        else {
+            me._bus.setAngle(0);
             body.setVelocityX(0);
+        }
+            
     }
 }

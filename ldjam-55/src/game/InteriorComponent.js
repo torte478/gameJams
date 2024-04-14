@@ -8,10 +8,11 @@ import Node from './Node.js';
 export default class InteriorComponent {
     
     consts = {
-        pos: Utils.buildPoint(2025, 20),
+        gridPos: Utils.buildPoint(2030, 85),
         doorIndex: 18,
         paymentIndicies: [13],
-        speed: 100,
+        speed: 100 * 2,
+        swapSpeed: 25,
         zoom: 0.4,
 
         depth: {
@@ -69,7 +70,7 @@ export default class InteriorComponent {
 
         Here._.add.image(me._center.x, me._center.y - 20, 'busInterior');
         me._camera.centerOn(me._center.x, me._center.y);
-        me._interiorRectangle = new Phaser.Geom.Rectangle(me.consts.pos.x, me.consts.pos.y, 320, 560);
+        me._interiorRectangle = new Phaser.Geom.Rectangle(me.consts.gridPos.x, me.consts.gridPos.y, 320, 560);
 
         me._buildGraph();
 
@@ -103,6 +104,11 @@ export default class InteriorComponent {
 
     _onPointerDown(pointer) {
         const me = this;
+
+        if (pointer.rightButtonDown()) {
+            me._clearSelection();
+            return;
+        }
 
         if (me._selection.passenger == null)
             me._trySelectPassenger(pointer);        
@@ -211,6 +217,12 @@ export default class InteriorComponent {
             for (let i = 0; i < passengers.length; ++i) {
                 const passenger = passengers[i].passenger;
                 passenger.destination--;
+
+                const tint = me._getTint(passenger.destination);
+                if (tint != null){
+                    passenger.clearTint();
+                    passenger.setTint(tint);
+                }
             }
         }
 
@@ -227,6 +239,24 @@ export default class InteriorComponent {
         if (status == Enums.BusStatus.EXIT) {
             me._chechExitComplete();
         }
+    }
+
+    _getTint(destination) {
+        const me = this;
+
+        if (destination < 0)
+            return 0xFF0000;
+
+        if (destination == 0)
+            return 0x00FF00;
+
+        if (destination == 1)
+            return 0xdcff00;
+
+        if (destination == 2)
+            return 0xe7f684;
+
+        return null;
     }
 
     _enumeratePassengers() {
@@ -297,6 +327,8 @@ export default class InteriorComponent {
             if (!passenger)
                 continue;
 
+            passenger.setDepth(passenger.y - me.consts.gridPos.y);
+
             if (passenger.playerCommand != null && !passenger.isBusy) {
                 me._startMoving(passenger, i, passenger.playerCommand);
                 passenger.playerCommand = null;
@@ -313,9 +345,10 @@ export default class InteriorComponent {
                 continue;
 
             const pos = me._toWorldPosition(target);
+            const speed = passenger.isSwap ? me.consts.swapSpeed : me.consts.speed;
             passenger.setPosition(
-                passenger.x + delta * me.consts.speed * Math.sign(pos.x - passenger.x),
-                passenger.y + delta * me.consts.speed * Math.sign(pos.y - passenger.y),
+                passenger.x + delta * speed * Math.sign(pos.x - passenger.x),
+                passenger.y + delta * speed * Math.sign(pos.y - passenger.y),
             );
 
             me._checkOnTarget(i, passenger, pos, target);
@@ -357,6 +390,7 @@ export default class InteriorComponent {
         me._graph[index].passenger = null;
         me._graph[target].passenger = passenger;
         me._graph[target].release();
+        passenger.isSwap = false;
 
         if (passenger.isBusy)
             return;
@@ -408,6 +442,8 @@ export default class InteriorComponent {
 
         me._graph[target].passenger = passenger;
         me._graph[index].passenger = other;
+        passenger.isSwap = true;
+        other.isSwap = true;
         other.path = [index];
         other.isBusy = true;
 
@@ -428,8 +464,9 @@ export default class InteriorComponent {
 
         passenger.isReadyToExit = false;
         passenger.iid = me.state.iid++;
-        passenger.destination = Utils.getRandom(1, 5, 1);
+        passenger.destination = Utils.getRandom(1, 5);
         passenger.playerCommand = null;
+        passenger.isSwap = false;
 
         me._graph[me.consts.doorIndex].passenger = passenger;
         me._graph[me.consts.doorIndex].lease(passenger);
@@ -453,8 +490,8 @@ export default class InteriorComponent {
         const node = me._graph[index];
 
         return Utils.buildPoint(
-            me.consts.pos.x + (node.cell % 4) * 80 + 40 + node.x * 20,
-            me.consts.pos.y + Math.floor(node.cell / 4) * 80 + 40 + node.y * 20,
+            me.consts.gridPos.x + (node.cell % 4) * 80 + 40 + node.x * 20,
+            me.consts.gridPos.y + Math.floor(node.cell / 4) * 80 + 40 + node.y * 20,
         );
     }
 
