@@ -25,8 +25,8 @@ export default class MoneyComponent {
     /** @type {Phaser.Events.EventEmitter} */
     _events;
 
-    /** @type {Number[]} */
-    _paymentQueue = [];
+    /** @type {Number} */
+    _paymentIid = null;
 
     /** @type {Phaser.Geom.Point} */
     _center = Utils.buildPoint(3100, 85);
@@ -199,7 +199,10 @@ export default class MoneyComponent {
     _onPaymentStart(iid) {
         const me = this;
 
-        me._paymentQueue.push(iid);
+        if (me._paymentIid != null)
+            throw 'payment queue!!!';
+
+        me._paymentIid = iid;
 
         me._state.income = Utils.getRandomEl(me._consts.incomes);
 
@@ -213,10 +216,11 @@ export default class MoneyComponent {
     _completePayment() {
         const me = this;
 
-        if (me._paymentQueue.length == 0)
+        if (me._paymentIid == null)
             return;
         
-        const iid = me._paymentQueue.shift();
+        const iid = me._paymentIid;
+        me._paymentIid = null;
         const money = 17;
 
         const current = Number(me._currentString);

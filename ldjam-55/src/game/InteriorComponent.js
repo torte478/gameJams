@@ -11,7 +11,7 @@ export default class InteriorComponent {
         gridPos: Utils.buildPoint(2030, 85),
         doorIndex: 18,
         paymentIndicies: [13],
-        speed: 100 * 2,
+        speed: 100,
         swapSpeed: 25,
         zoom: 0.4,
         badTint: 0xFF0000,
@@ -149,6 +149,9 @@ export default class InteriorComponent {
         if (selected == null)
             return;
 
+        if (selected.passenger.state != Enums.PassengerState.NORMAL)
+            return;
+
         me._selection.passenger = selected.passenger;
         me._selection.aim.setVisible(true);
         me._selection.tile.setVisible(true);
@@ -208,13 +211,12 @@ export default class InteriorComponent {
         const index = Utils.firstIndexOrNull(me._graph, n => !!n.passenger && n.passenger.iid == iid);
 
         const passenger = me._graph[index].passenger;
-        passenger.isReadyToExit = true;
+        me._changeState(passenger, Enums.PassengerState.EXIT);
 
         if (!success) {
             passenger.clearTint();
             passenger.setTint(me.consts.badTint)
         }
-            
 
         me._startMoving(passenger, index, me.consts.doorIndex);
     }
@@ -226,12 +228,20 @@ export default class InteriorComponent {
         if (status == Enums.BusStatus.DEPARTURE) {
             for (let i = 0; i < passengers.length; ++i) {
                 const passenger = passengers[i].passenger;
+                const old = passenger.destination;
                 passenger.destination--;
 
                 const tint = me._getTint(passenger.destination);
                 if (tint != null){
                     passenger.clearTint();
                     passenger.setTint(tint);
+                }
+
+                if (passenger.destination < 0 && old >= 0) {
+                    me._changeState(passenger, Enums.PassengerState.EXIT);
+                    me._startMoving(passenger, passengers[i].index, me.consts.doorIndex);
+                    if (me._components.money._paymentIid == passenger.iid)
+                        me._components.money._paymentIid = null;
                 }
             }
         }
@@ -242,12 +252,16 @@ export default class InteriorComponent {
                 if (passenger.destination > 0)
                     continue;
 
+                if (passenger.state >= Enums.PassengerState.PAYMENT)
+                    continue;
+
+                me._changeState(passenger, Enums.PassengerState.READY_TO_PAYMENT);
                 me._startMoving(passenger, passengers[i].index, Utils.getRandomEl(me.consts.paymentIndicies));
             }
         }
 
         if (status == Enums.BusStatus.EXIT) {
-            me._chechExitComplete();
+            me._checkExitComplete();
         }
     }
 
@@ -329,55 +343,7 @@ export default class InteriorComponent {
         });
     }
 
-    _movePassengers(delta) {
-        const me = this;
-
-        for (let i = 0; i < me._graph.length; ++i) {
-            const passenger = me._graph[i].passenger;
-            if (!passenger)
-                continue;
-
-            passenger.setDepth(passenger.y - me.consts.gridPos.y);
-
-            if (passenger.playerCommand != null && !passenger.isBusy) {
-                me._startMoving(passenger, i, passenger.playerCommand);
-                passenger.playerCommand = null;
-            }
-
-            if (passenger.path.length == 0) {
-                if (me._components.road.isStoppedInsideBusArea() && passenger.isReadyToExit)
-                    me._processPasengerExit(i, passenger);
-                continue;
-            }
-
-            const target = passenger.path[0];
-            if (!me._tryMoveThrough(i, passenger, target))
-                continue;
-
-            const pos = me._toWorldPosition(target);
-            const speed = passenger.isSwap ? me.consts.swapSpeed : me.consts.speed;
-            passenger.setPosition(
-                passenger.x + delta * speed * Math.sign(pos.x - passenger.x),
-                passenger.y + delta * speed * Math.sign(pos.y - passenger.y),
-            );
-
-            me._checkOnTarget(i, passenger, pos, target);
-        }
-    }
-
-    _processPasengerExit(index, passenger) {
-        const me = this;
-
-        me._graph[index].passenger = null;
-        me._graph[index].release();
-        me._spritePool.killAndHide(passenger);
-        
-        me._events.emit('onPasangerExit');
-
-        me._chechExitComplete();
-    }
-
-    _chechExitComplete() {
+    _checkExitComplete() {
         const me = this;
 
         const exitingPasengers = me._enumeratePassengers()
@@ -388,117 +354,10 @@ export default class InteriorComponent {
             me._events.emit('exitComplete');
     }
 
-    _checkOnTarget(index, passenger, pos, target) {
-        const me = this;
-
-        if (Phaser.Math.Distance.BetweenPoints(passenger, pos) > 5)
-            return;
-        
-        passenger.path.shift();
-    
-        passenger.isBusy = passenger.path.length > 0;
-        me._graph[index].passenger = null;
-        me._graph[target].passenger = passenger;
-        me._graph[target].release();
-        passenger.isSwap = false;
-
-        if (passenger.isBusy)
-            return;
-        
-        Utils.debugLog(`${passenger.iid} finish at ${target}`);
-
-        if (me._isPaymentPosition(target)) {
-            if (passenger.isOnPayment)
-                return;
-
-            me._events.emit('paymentStart', passenger.iid);
-            passenger.isOnPayment = true;
-            return;
-        }
-
-        if (target != me.consts.doorIndex)
-            return;
-
-        if (!!passenger.isReadyToExit)
-            return;
-        
-        const freeNode = me._findFreeNode();
-        if (!!freeNode)
-            me._startMoving(passenger, target, freeNode);
-    }
-
     _isPaymentPosition(index) {
         const me = this;
 
         return Utils.contains(me.consts.paymentIndicies, index);
-    }
-
-    _tryMoveThrough(index, passenger, target) {
-        const me = this;
-
-        if (me._graph[target].isFree(passenger.iid)) {
-            me._graph[target].lease(passenger.iid);    
-            return true;
-        }
-        
-        const other = me._graph[target].passenger;
-        if (!other)
-            return false;
-
-        if (other.iid == passenger.iid)
-            return true;
-
-        if (other.isBusy)
-            return false;
-
-        if (other.destination <= 0 && (me._isPaymentPosition(target) || !!other.isReadyToExit))
-            return false;
-
-        Utils.debugLog(`swap ${index} <> ${target} (${passenger.iid}, ${other.iid})`);
-
-        me._graph[target].passenger = passenger;
-        me._graph[index].passenger = other;
-        passenger.isSwap = true;
-        other.isSwap = true;
-        other.path = [index];
-        other.isBusy = true;
-
-        return true;
-    }
-
-    _onPassengerIn() {
-        const me = this;
-
-        const freeNode = me._findFreeNode();
-        if (!freeNode) {
-            Utils.debugLog("CAN'T ENTER!!!");
-            return;
-        }
-
-        const pos = me._toWorldPosition(me.consts.doorIndex);
-        const passenger = me._spritePool.create(pos.x + 40, pos.y, 'passengerInside', 1);
-
-        passenger.isOnPayment = false;
-        passenger.isReadyToExit = false;
-        passenger.iid = me.state.iid++;
-        passenger.destination = Utils.getRandom(1, 5, 1);
-        passenger.playerCommand = null;
-        passenger.isSwap = false;
-
-        me._graph[me.consts.doorIndex].passenger = passenger;
-        me._graph[me.consts.doorIndex].lease(passenger);
-
-        me._startMoving(passenger, me.consts.doorIndex, freeNode);
-    }
-
-    _startMoving(passenger, from, to) {
-        const me = this;
-
-        const path = me._findPath(from, to);
-        passenger.path = path;
-        passenger.isBusy = true;
-
-        Utils.debugLog(`${passenger.iid}: ${path[0]} => ${path[path.length - 1]}`);
     }
 
     _toWorldPosition(index) {
@@ -700,4 +559,173 @@ export default class InteriorComponent {
 
     /** @type {Node[]} */
     _graph = [];
+
+    _onPassengerIn() {
+        const me = this;
+
+        const freeNode = me._findFreeNode();
+        if (!freeNode) {
+            Utils.debugLog("CAN'T ENTER!!!");
+            return;
+        }
+
+        const pos = me._toWorldPosition(me.consts.doorIndex);
+        const passenger = me._spritePool.create(pos.x + 40, pos.y, 'passengerInside', 1);
+
+        passenger.state = Enums.PassengerState.NORMAL;
+        passenger.iid = me.state.iid++;
+        passenger.destination = Utils.getRandom(1, 5, 1);
+        passenger.playerCommand = null;
+        passenger.isSwap = false;
+
+        me._graph[me.consts.doorIndex].passenger = passenger;
+        me._graph[me.consts.doorIndex].lease(passenger);
+
+        me._startMoving(passenger, me.consts.doorIndex, freeNode);
+    }
+
+    _startMoving(passenger, from, to) {
+        const me = this;
+
+        const path = me._findPath(from, to);
+        passenger.path = path;
+        passenger.isBusy = true;
+
+        Utils.debugLog(`${passenger.iid}: ${path[0]} => ${path[path.length - 1]}`);
+    }
+
+    _movePassengers(delta) {
+        const me = this;
+
+        for (let i = 0; i < me._graph.length; ++i) {
+            const passenger = me._graph[i].passenger;
+            if (!passenger)
+                continue;
+
+            passenger.setDepth(passenger.y - me.consts.gridPos.y);
+
+            if (passenger.path.length == 0) {
+                if (me._components.road.isStoppedInsideBusArea() && passenger.state == Enums.PassengerState.EXIT)
+                    me._processPasengerExit(i, passenger);
+                else if (passenger.playerCommand != null && passenger.state == Enums.PassengerState.NORMAL) {
+                    me._startMoving(passenger, i, passenger.playerCommand);
+                    passenger.playerCommand = null;
+                }
+                continue;
+            }
+
+            const target = passenger.path[0];
+            if (!me._tryMoveThrough(i, passenger, target))
+                continue;
+
+            // change pos
+            const pos = me._toWorldPosition(target);
+            const speed = passenger.isSwap ? me.consts.swapSpeed : me.consts.speed;
+            passenger.setPosition(
+                passenger.x + delta * speed * Math.sign(pos.x - passenger.x),
+                passenger.y + delta * speed * Math.sign(pos.y - passenger.y),
+            );
+
+            me._checkOnTarget(i, passenger, pos, target);
+        }
+    }
+
+    _processPasengerExit(index, passenger) {
+        const me = this;
+
+        me._graph[index].passenger = null;
+        me._graph[index].release();
+        me._spritePool.killAndHide(passenger);
+        
+        me._events.emit('onPasangerExit');
+
+        me._checkExitComplete();
+    }
+
+    _tryMoveThrough(index, passenger, target) {
+        const me = this;
+
+        if (me._graph[target].isFree(passenger.iid)) {
+            me._graph[target].lease(passenger.iid);    
+            return true;
+        }
+        
+        const other = me._graph[target].passenger;
+        if (!other)
+            return false;
+
+        if (other.iid == passenger.iid)
+            return true;
+
+        if (other.isBusy)
+            return false;
+
+        if (other.state > passenger.state)
+            return false;
+
+        if (other.state == Enums.PassengerState.EXIT)
+            return false;
+
+        if (other.state == passenger.state && other.path.length >= passenger.path.length)
+            return false;
+
+        Utils.debugLog(`swap ${index} <> ${target} (${passenger.iid}, ${other.iid})`);
+
+        me._graph[target].passenger = passenger;
+        me._graph[index].passenger = other;
+        passenger.isSwap = true;
+        other.isSwap = true;
+        other.path = [index];
+        other.isBusy = true;
+
+        return true;
+    }
+
+    _changeState(passenger, state) {
+        const me = this;
+
+        Utils.debugLog(`change ${passenger.iid}: ${passenger.state} => ${state}`);
+        passenger.state = state;
+    }
+
+    _checkOnTarget(index, passenger, pos, target) {
+        const me = this;
+
+        if (Phaser.Math.Distance.BetweenPoints(passenger, pos) > 5)
+            return;
+
+        passenger.path.shift();
+    
+        passenger.isBusy = passenger.path.length > 0;
+        me._graph[index].passenger = null;
+        me._graph[target].passenger = passenger;
+        me._graph[target].release();
+        passenger.isSwap = false;
+
+        if (passenger.playerCommand != null && passenger.state == Enums.PassengerState.NORMAL) {
+            me._startMoving(passenger, target, passenger.playerCommand);
+            passenger.playerCommand = null;
+            return;
+        }
+
+        if (passenger.isBusy)
+            return;
+        
+        Utils.debugLog(`${passenger.iid} finish at ${target}`);
+
+        if (me._isPaymentPosition(target) && passenger.destination == 0) {
+            if (passenger.state >= Enums.PassengerState.PAYMENT)
+                return;
+
+            me._events.emit('paymentStart', passenger.iid);
+            me._changeState(passenger, Enums.PassengerState.PAYMENT);
+            return;
+        }
+
+        if (target == me.consts.doorIndex && passenger.state != Enums.PassengerState.EXIT) {
+            const freeNode = me._findFreeNode();
+            if (!!freeNode)
+                me._startMoving(passenger, target, freeNode);
+        }
+    }
 }

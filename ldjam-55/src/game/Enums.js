@@ -48,4 +48,11 @@ export default class Enums {
         WIN_THE_GAME: 0,
         SHIELD: 1
     }
+
+    static PassengerState = {
+        NORMAL: 0,
+        READY_TO_PAYMENT: 1,
+        PAYMENT: 2,
+        EXIT: 3
+    }
 }
