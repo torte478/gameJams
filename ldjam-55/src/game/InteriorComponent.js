@@ -82,6 +82,7 @@ export default class InteriorComponent {
         me._events.on('passengerIn', me._onPassengerIn, me);
         me._events.on('busStatusChanged', me._onBusStatusChanged, me);
         me._events.on('paymentComplete', me._onPaymentComplete, me);
+        me._events.on('componentActivated', me._onComponentActivated, me);
     }
 
     update(delta) {
@@ -248,31 +249,39 @@ export default class InteriorComponent {
             Here._.input.activePointer.x,
             Here._.input.activePointer.y);
 
-        if (me.state.isActive != isActive) {
-
-            if (!!me._resizeTween) 
-                me._resizeTween.stop();
-                
-            const targetX = isActive ? 600 : 800;
-            const targetWidth = isActive ? 400 : 200;
-            const targetZoom = isActive ? 1 : me.consts.zoom;
-
-            const percentage = Math.abs(me._camera.x - targetX) / 200
-
-            me._resizeTween = Here._.add.tween({
-                targets: me._camera,
-                x: targetX,
-                width: targetWidth,
-                zoom: targetZoom,
-                duration: 1000 * percentage,
-                ease: 'Sine.easeOut',
-                onUpdate: () => me._camera.centerOn(me._center.x, me._center.y)
-            });
-
-            me._events.emit('componentActivated', Enums.Components.INTERIOR, isActive, percentage);
-        }
+        if (me.state.isActive != isActive && isActive)
+            me._events.emit('componentActivated', Enums.Components.INTERIOR);
 
         me.state.isActive = isActive;
+    }
+
+    _onComponentActivated(component) {
+        const me = this;
+
+        if (component == Enums.Components.ROAD)
+            me._resizeComponent(800, 200, me.consts.zoom);
+
+        if (component == Enums.Components.INTERIOR)
+            me._resizeComponent(600, 400, 1);
+    }
+
+    _resizeComponent(x, width, zoom) {
+        const me = this;
+
+        if (!!me._resizeTween)
+            me._resizeTween.stop();
+
+        const percentage = Math.abs(width, me._camera.width) / width;
+
+        me._resizeTween = Here._.add.tween({
+            targets: me._camera,
+            x: x,
+            width: width,
+            zoom: zoom,
+            duration: 1000 * percentage,
+            ease: 'Sine.easeOut',
+            onUpdate: () => me._camera.centerOn(me._center.x, me._center.y)
+        });
     }
 
     _movePassengers(delta) {

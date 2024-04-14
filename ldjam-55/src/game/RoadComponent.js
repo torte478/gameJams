@@ -28,6 +28,7 @@ export default class RoadComponent {
         }
     }
     _state = {
+        isActive: true,
         speed: 0,
         position: 0,
         delta: 0,
@@ -100,6 +101,7 @@ export default class RoadComponent {
 
         me._processBusStop();
         me._shiftTiles();
+        me._checkActivation();
     }
 
     isStoppedInsideBusArea() {
@@ -152,31 +154,48 @@ export default class RoadComponent {
         };
     }
 
-    _onComponentActivated(component, isActive, percentage) {
+    _checkActivation() {
         const me = this;
 
-        if (component == Enums.Components.INTERIOR) {
-            if (!!me._resizeTween)
-                me._resizeTween.stop();
+        const isActive = Phaser.Geom.Rectangle.Contains(
+            new Phaser.Geom.Rectangle(me._camera.x, me._camera.y, me._camera.width, me._camera.height),
+            Here._.input.activePointer.x,
+            Here._.input.activePointer.y);
 
-            const targetWidth = (isActive ? 500 : 700) - 20;
-            const targetZoom = isActive ? 0.72 : 1;
-            const targetScrollX = isActive ? 100 : 0;
-            const targetScrollY = isActive ? -150 : 0;
+        if (me._state.isActive != isActive && isActive)
+            me._events.emit('componentActivated', Enums.Components.ROAD);
 
-            me._resizeTween = Here._.add.tween({
-                targets: me._camera,
-                width: targetWidth,
-                zoom: targetZoom,
-                scrollX: targetScrollX,
-                scrollY: targetScrollY,
-                duration: 1000 * percentage,
-                ease: 'Sine.easeOut'
-            });
-        }
+        me._state.isActive = isActive;
     }
 
-    
+    _onComponentActivated(component) {
+        const me = this;
+
+        if (component == Enums.Components.ROAD)
+            me._resizeComponent(0, 0, 700 - 20, 1);
+
+        if (component == Enums.Components.INTERIOR)
+            me._resizeComponent(100, -150, 500 - 20, 0.72);
+    }
+
+    _resizeComponent(scrollX, scrollY, width, zoom) {
+        const me = this;
+
+        if (!!me._resizeTween)
+            me._resizeTween.stop();
+
+        const percentage = Math.abs(width, me._camera.width) / width;
+
+        me._resizeTween = Here._.add.tween({
+            targets: me._camera,
+            width: width,
+            zoom: zoom,
+            scrollX: scrollX,
+            scrollY: scrollY,
+            duration: 1000 * percentage,
+            ease: 'Sine.easeOut'
+        });
+    }
 
     _processBusStop() {
         const me = this;
