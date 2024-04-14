@@ -13,7 +13,7 @@ export default class StratagemComponent {
 
     state = {
         isActive: true,
-        money: 0,
+        money: 201,
         arrowIndex: 0,
     }
 
@@ -54,8 +54,8 @@ export default class StratagemComponent {
         }
 
         me._events.on('componentActivated', me._onComponentActivated, me);
-        me._events.on('paymentComplete', me._onPaymentComplete, me);
         me._events.on('stratagemSummon', me._onStratagemSummon, me);
+        me._events.on('moneyIncome', me._onMoneyIncome, me);
     }
 
     update(delta) {
@@ -63,12 +63,21 @@ export default class StratagemComponent {
 
         me._checkActivation();
         me._updateControls();
+        me._updateStratagems();
     }
 
-    _onStratagemSummon() {
+    _onStratagemSummon(stratagem) {
         const me = this;
 
+        me._onMoneyIncome(-me._stratagems[stratagem]._cost);
         me._resetStratagems();
+    }
+
+    _updateStratagems() {
+        const me = this;
+
+        for (let i = 0; i < me._stratagems.length; ++i)
+            me._stratagems[i].updateTimer(me.state.money);
     }
 
     _updateControls() {
@@ -83,7 +92,11 @@ export default class StratagemComponent {
 
         let result = Enums.StratagemResult.MISS;
         for (let i = 0; i < me._stratagems.length; ++i) {
-            result = Math.max(result, me._stratagems[i].updateArrow(me.state.arrowIndex, arrow));
+            const stratagem = me._stratagems[i];
+            if (!stratagem.isAvaialbe())
+                continue;
+
+            result = Math.max(result, stratagem.updateArrow(me.state.arrowIndex, arrow));
 
             if (result == Enums.StratagemResult.COMPLETE)
                 break;
@@ -99,7 +112,7 @@ export default class StratagemComponent {
         const me = this;
 
         for (let i = 0; i < me._stratagems.length; ++i)
-                me._stratagems[i].reset();
+            me._stratagems[i].reset(me.state.money);
 
         me.state.arrowIndex = 0;
     }
@@ -122,7 +135,7 @@ export default class StratagemComponent {
         return null;
     }
 
-    _onPaymentComplete(index, money) {
+    _onMoneyIncome(money) {
         const me = this;
 
         me.state.money += money;

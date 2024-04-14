@@ -21,6 +21,14 @@ export default class Stratagem {
     /** @type {Phaser.GameObjects.Image} */
     _fade;
 
+    _cost;
+
+    _cooldown;
+
+    _cooldownEnd = new Date().getTime();
+
+    _descText;
+
     constructor(index, events) {
         const me = this;
 
@@ -31,17 +39,23 @@ export default class Stratagem {
         me._pos = Utils.toPoint(panel);
         
 
-        Here._.add.image(panel.x + 100, panel.y - 10, 'stratagems', 0);
+        Here._.add.image(panel.x + 100, panel.y - 10, 'stratagems', index).setScale(0.75);
 
         me._statusText = Here._.add.text(panel.x + 135, panel.y + 20, '12.5s', { fontSize: 20, fontStyle: 'bold'})
             .setOrigin(1, 0,5);
 
-        const descText = Here._.add.text(panel.x - 135, panel.y - 25, 'TEST TEST TEST', {fontSize: 20, fontStyle: 'bold', fontFamily: 'Tahoma'})
+        me._descText = Here._.add.text(panel.x - 135, panel.y - 25, 'TEST TEST TEST', {fontSize: 20, fontStyle: 'bold', fontFamily: 'Tahoma'})
             .setOrigin(0, 0.5);
 
-        me._init(index, descText);
+        me._init(index);
 
         me._fade = Here._.add.image(me._pos.x, me._pos.y, 'panel', 1).setAlpha(0.5).setVisible(false);
+    }
+
+    isAvaialbe() {
+        const me = this;
+
+        return !me._fade.visible && new Date().getTime() > me._cooldownEnd;
     }
 
     updateArrow(arrowIndex, arrow) {
@@ -58,8 +72,8 @@ export default class Stratagem {
         }
 
         if (arrowIndex == me._arrows.length - 1) {
-            me._events.emit('stratagemSummon', me._index)
-            me.reset();
+            me._cooldownEnd = new Date().getTime() + me._cooldown * 1000;
+            me._events.emit('stratagemSummon', me._index);
             return Enums.StratagemResult.COMPLETE;
         } 
             
@@ -67,11 +81,26 @@ export default class Stratagem {
         return Enums.StratagemResult.HIT;
     }
 
-    reset() {
+    reset(total) {
         const me = this;
 
         me._clearArrows();
-        me._fade.setVisible(false);
+    }
+
+    updateTimer(total) {
+        const me = this;
+
+        const now = new Date().getTime();
+        const diff = me._cooldownEnd - now;
+        const text = diff > 0
+            ? `${parseFloat(diff / 1000).toFixed(1).toLocaleString('en')}s`
+            : `${me._cost}¤`;
+
+        me._statusText.setText(text);
+
+        const isFaded = (total < me._cost) || (now < me._cooldownEnd);
+        if (me._fade.visible != isFaded)
+            me._fade.setVisible(isFaded);
     }
 
     _clearArrows() {
@@ -81,20 +110,30 @@ export default class Stratagem {
             me._arrows[i].setFrame(0);
     }
 
-    _init(index, description) {
+    _init(index) {
         const me = this;
 
         if (index == 0)
-            me._initInternal(description, 'WIN GAME', [Enums.Arrow.RIGHT, Enums.Arrow.DOWN, Enums.Arrow.LEFT, Enums.Arrow.LEFT, Enums.Arrow.RIGHT]);
+            me._initInternal(
+                'WIN THE GAME', 
+                1000,
+                1000,
+                [Enums.Arrow.RIGHT, Enums.Arrow.DOWN, Enums.Arrow.LEFT, Enums.Arrow.LEFT, Enums.Arrow.RIGHT]);
 
         if (index == 1)
-            me._initInternal(description, "SHIELD", [Enums.Arrow.RIGHT, Enums.Arrow.RIGHT, Enums.Arrow.UP]);
+            me._initInternal(
+                "SHIELD", 
+                100,
+                5,
+                [Enums.Arrow.RIGHT, Enums.Arrow.RIGHT, Enums.Arrow.UP]);
     }
 
-    _initInternal(descText, descStr, directions) {
+    _initInternal(descStr, cost, cooldown, directions) {
         const me = this;
 
-        descText.setText(descStr);
+        me._cost = cost;
+        me._cooldown = cooldown;
+        me._descText.setText(descStr);
         for (let i = 0; i < directions.length; ++i) {
             const arrow = Here._.add.sprite(me._pos.x - 125 + i * 38, me._pos.y + 20, 'arrows', 0);
             arrow.direction = directions[i];

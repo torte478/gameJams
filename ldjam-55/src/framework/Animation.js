@@ -5,7 +5,7 @@ export default class Animation {
     static init() {
         Here._.anims.create({
             key: 'smoke',
-            frames: 'smoke', // frames: Animation.getFrames('ASSET_NAME', [ 1, 2, 3 ]),
+            frames: 'smoke',
             frameRate: 12,
             repeat: -1
         });
@@ -14,6 +14,20 @@ export default class Animation {
             key: 'lattern',
             frames: 'lattern',
             frameRate: 16,
+            repeat: -1
+        });
+
+        Here._.anims.create({
+            key: 'shield',
+            frames: 'shield',
+            frameRate: 8,
+            repeat: -1
+        });
+
+        Here._.anims.create({
+            key: 'insect',
+            frames: Animation.getFrames('insect', [ 0, 1 ]),
+            frameRate: 4,
             repeat: -1
         });
     }

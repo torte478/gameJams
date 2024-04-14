@@ -29,14 +29,21 @@ export default class RoadComponent {
             passengers: 200,
             lattern: 400,
             bus: 500,
-        }
+        },
+
+        smallInsectPeriod: 100,
+        bigInsectPeriod: 1000
     }
     _state = {
         isActive: true,
         speed: 0,
         position: 0,
+        lastSmallInsect: 0,
+        lastBigInsect: 0,
         delta: 0,
-        status: Enums.BusStatus.ENTER
+        status: Enums.BusStatus.ENTER,
+
+        shieldActiveTo: new Date().getTime()
     }
 
     /** @type {Components} */
@@ -63,15 +70,26 @@ export default class RoadComponent {
     /** @type {Phaser.GameObjects.Sprite} */
     _smokeSprite;
 
+    /** @type {Phaser.GameObjects.Sprite} */
+    _shieldSprite;
+
     /** @type {Phaser.GameObjects.Text} */
     _signText;
 
     _signPanel;
 
+    /** @type {Phaser.GameObjects.Sprite[]} */
+    _insects = [];
+
+    /** @type {Phaser.Physics.Arcade.Group} */
+    _insectPool;
+
     constructor(events) {
         const me = this;
 
         me._events = events;
+
+        me._insectPool = Here._.physics.add.group();
 
         me._camera = Here._.cameras.main;
         me._camera.setViewport(0, 0, 700 - 20, 800).setPosition(110, 0).setScroll(0, 0);
@@ -86,9 +104,14 @@ export default class RoadComponent {
 
         me._smokeSprite = Here._.add.sprite(0, 35, 'smoke').play('smoke').setOrigin(0.5, 0).setVisible(false);
         const busSprite = Here._.add.image(0, 0, 'bus');
+        me._shieldSprite = Here._.add.sprite(0, 0, 'shield').play('shield').setScale(1.25).setVisible(false);
 
-        me._bus = Here._.add.container(me._consts.startX, me._consts.startY, [ me._smokeSprite, busSprite ])
-            .setDepth(me._consts.depth.bus);
+        me._bus = Here._.add.container(
+                me._consts.startX, 
+                me._consts.startY, 
+                [ me._smokeSprite, busSprite, me._shieldSprite ])
+            .setDepth(me._consts.depth.bus)
+            .setSize(45, 80);
         Here._.physics.world.enable(me._bus);
 
         me._signPanel = Here._.add.image(65, 750, 'sign');
@@ -96,8 +119,16 @@ export default class RoadComponent {
 
         me._events.on('componentActivated', me._onComponentActivated, me);
         me._events.on('exitComplete', me._onExitComplete, me);
+        me._events.on('stratagemSummon', me._onStratagemSummon, me);
 
         me._createBusStop(600);
+
+        Here._.physics.add.overlap(
+            me._bus, 
+            me._insectPool, 
+            (b, i) => me._onInsectCollde(i), 
+            null, 
+            me);
     }
 
     update(delta) {
@@ -115,10 +146,12 @@ export default class RoadComponent {
         if (!me._busStop && me._state.position >= me._consts.busStopCreate)
             me._createBusStop(-610);
 
+        me._tryCreateInsects();
         me._processBusStop();
         me._shiftTiles();
         me._checkActivation();
         me._updateSign();
+        me._updateStratagems();
     }
 
     isStoppedInsideBusArea() {
@@ -133,6 +166,66 @@ export default class RoadComponent {
         return me._bus.x >= 515 && Math.abs(me._bus.y - me._busStop.y) <= 300;
     }
 
+    _updateStratagems() {
+        const me = this;
+
+        if (new Date().getTime() >= me._state.shieldActiveTo)
+            me._shieldSprite.setVisible(false);
+    }
+
+    _onInsectCollde(insect) {
+        const me = this;
+
+        if (!insect.healthy)
+            return;
+
+        const isBigInsect = insect.scale > 0.9;
+        const canCollide = !isBigInsect || me._shieldSprite.visible;
+
+        insect.healthy = false;
+
+        if (canCollide) {
+            insect.stop();
+            insect.setFrame(2);
+            
+        } else {
+            me._state.speed = Math.max(me._state.speed - 500, 0);
+        }
+
+        //TODO: money
+        //TODO: dismorale
+    }
+
+    _tryCreateInsects() {
+        const me = this;
+
+        const small = Math.floor(me._state.position / me._consts.smallInsectPeriod);
+        if (small > me._state.lastSmallInsect) {
+            me._state.lastSmallInsect = small;
+            /** @type {Phaser.GameObjects.Sprite} */
+            const insect = me._createInsect();
+            insect.setScale(0.5)
+        }
+
+        const big = Math.floor(me._state.position / me._consts.bigInsectPeriod);
+        if (big > me._state.lastBigInsect) {
+            me._state.lastBigInsect = big;
+            me._createInsect();
+        }
+    }
+
+    _createInsect() {
+        const me = this;
+
+        /** @type {Phaser.GameObjects.Sprite} */
+        const insect = me._insectPool.create(Utils.getRandom(50, 450), -100, 'insect');
+        insect.play('insect');
+        insect.healthy = true;
+        insect.setFlipX(Utils.getRandom(1, 2) == 1);
+        me._insects.push(insect);
+        return insect;
+    }
+
     _updateSign() {
         const me = this;
 
@@ -141,6 +234,20 @@ export default class RoadComponent {
         me._signText.setVisible(visible);
         me._signPanel.setVisible(visible);
         me._signText.setText(`${distance|0}m`);
+    }
+
+    _onStratagemSummon(stratagem) {
+        const me = this;
+
+        if (stratagem == Enums.StratagemType.SHIELD)
+            me._activateShield();
+    }
+
+    _activateShield() {
+        const me = this;
+
+        me._state.shieldActiveTo = new Date().getTime() + 15 * 1000;
+        me._shieldSprite.setVisible(true);
     }
 
     _isStopped() {
@@ -280,6 +387,13 @@ export default class RoadComponent {
             me._shiftTile(
                 me._roadTiles[i], 
                 tile => tile.setY(tile.y - me._roadTiles.length * 200))
+
+        for (let i = 0; i < me._insects.length; ++i)
+            me._shiftTile(
+                me._insects[i],
+                x => me._insectPool.killAndHide(x));
+
+        me._insects = me._insects.filter(x => x.active);
         
         if (!!me._busStop) {
             me._shiftTile(me._busStop.lattern);
@@ -289,6 +403,8 @@ export default class RoadComponent {
                 me._spritePool.killAndHide(me._busStop.lattern);
                 me._busStop = null;
                 me._state.position = 0;
+                me._state.lastSmallInsect = 0;
+                me._state.lastBigInsect = 0;
 
                 me._changeStatus(Enums.BusStatus.DEPARTURE);
             });

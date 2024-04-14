@@ -43,4 +43,9 @@ export default class Enums {
         HIT: 1,
         COMPLETE: 2
     }
+
+    static StratagemType = {
+        WIN_THE_GAME: 0,
+        SHIELD: 1
+    }
 }

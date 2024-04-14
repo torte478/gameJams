@@ -61,7 +61,7 @@ export default class Game {
             let text = 
                 `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
                 `que: ${me._components.money._paymentQueue}\n` +
-                `str: ${me._components.stratagem._camera.x | 0}`;
+                `ins: ${me._components.road._insects.length}`;
 
             me._log.setText(text);
         });

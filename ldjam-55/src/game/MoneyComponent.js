@@ -126,6 +126,7 @@ export default class MoneyComponent {
         
         const index = me._paymentQueue.shift();
         const money = Utils.getRandom(10, 100);
-        me._events.emit('paymentComplete', index, money);
+        me._events.emit('paymentComplete', index);
+        me._events.emit('moneyIncome', money);
     }
 }
