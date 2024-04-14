@@ -2,6 +2,7 @@ import Phaser from './lib/phaser.js';
 
 import Consts from './game/Consts.js';
 import GameScene from './scenes/GameScene.js';
+import MenuScene from './scenes/MenuScene.js';
 
 export default new Phaser.Game({
     type: Phaser.AUTO,
@@ -13,6 +14,7 @@ export default new Phaser.Game({
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
     scene: [ 
+        MenuScene,
         GameScene
         ],
     physics: {
