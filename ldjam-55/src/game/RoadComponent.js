@@ -12,6 +12,7 @@ export default class RoadComponent {
         speedXChange: 50,
 
         maxSpeedY: 1000,
+        maxSpeedYDirt: 200,
         speedYUpChange: 200,
         speedYDownChange: 400,
 
@@ -43,7 +44,8 @@ export default class RoadComponent {
         delta: 0,
         status: Enums.BusStatus.ENTER,
 
-        shieldActiveTo: new Date().getTime()
+        shieldActiveTo: new Date().getTime(),
+        gunActiveTo: new Date().getTime()
     }
 
     /** @type {Components} */
@@ -84,6 +86,11 @@ export default class RoadComponent {
     /** @type {Phaser.Physics.Arcade.Group} */
     _insectPool;
 
+    /** @type {Phaser.GameObjects.Image} */
+    _gunSprite;
+
+    _lastGunShot = new Date().getTime();
+
     constructor(events) {
         const me = this;
 
@@ -104,12 +111,13 @@ export default class RoadComponent {
 
         me._smokeSprite = Here._.add.sprite(0, 35, 'smoke').play('smoke').setOrigin(0.5, 0).setVisible(false);
         const busSprite = Here._.add.image(0, 0, 'bus');
+        me._gunSprite = Here._.add.sprite(0, 20, 'gun', 0).setScale(1.25).setOrigin(0.5, 0.75).setVisible(false);
         me._shieldSprite = Here._.add.sprite(0, 0, 'shield').play('shield').setScale(1.25).setVisible(false);
 
         me._bus = Here._.add.container(
                 me._consts.startX, 
                 me._consts.startY, 
-                [ me._smokeSprite, busSprite, me._shieldSprite ])
+                [ me._smokeSprite, busSprite, me._gunSprite, me._shieldSprite,  ])
             .setDepth(me._consts.depth.bus)
             .setSize(45, 80);
         Here._.physics.world.enable(me._bus);
@@ -169,8 +177,36 @@ export default class RoadComponent {
     _updateStratagems() {
         const me = this;
 
-        if (new Date().getTime() >= me._state.shieldActiveTo)
+        const now = new Date().getTime();
+        if (now >= me._state.shieldActiveTo) 
             me._shieldSprite.setVisible(false);
+
+        if (now >= me._state.gunActiveTo)
+            me._gunSprite.setVisible(false);
+
+        if (me._gunSprite.visible) {
+            const aliveInsects = me._insects
+            .filter(insect => !!insect.healthy 
+                && me._bus.y - insect.y < 600
+                && insect.y < 760);
+
+            if ((now - me._lastGunShot) / 1000 > 0.5 
+                && aliveInsects.length > 0) {
+
+                const insect = aliveInsects[0];
+                me._killInsect(insect);
+                me._lastGunShot = now;
+
+                me._gunSprite.play('gun');
+
+                me._gunSprite.setRotation(Phaser.Math.Angle.Between(
+                    me._bus.x,
+                    me._bus.y,
+                    insect.x,
+                    insect.y));
+                me._gunSprite.setAngle(me._gunSprite.angle + 90);
+            }
+        }
     }
 
     _onInsectCollde(insect) {
@@ -185,13 +221,21 @@ export default class RoadComponent {
         insect.healthy = false;
 
         if (canCollide) {
-            insect.stop();
-            insect.setFrame(2);
-            me._events.emit('moneyIncome', isBigInsect ? 100 : 1);    
+            me._killInsect(insect)
         } else {
             me._state.speed = Math.max(me._state.speed - 500, 0);
             me._events.emit('dismorale');
         }
+    }
+
+    _killInsect(insect) {
+        const me = this;
+
+        insect.healthy = false;
+        const isBigInsect = insect.scale > 0.9;
+        insect.stop();
+        insect.setFrame(2);
+        me._events.emit('moneyIncome', isBigInsect ? 100 : 1);    
     }
 
     _tryCreateInsects() {
@@ -239,6 +283,11 @@ export default class RoadComponent {
 
         if (stratagem == Enums.StratagemType.SHIELD)
             me._activateShield();
+
+        if (stratagem == Enums.StratagemType.GUN) {
+            me._gunSprite.setVisible(true);
+            me._state.gunActiveTo = new Date().getTime() + 15 * 1000;
+        }
     }
 
     _activateShield() {
@@ -447,9 +496,10 @@ export default class RoadComponent {
             return;
         }
 
+        const isDirt = me._bus.x > 550;
         if (Here.Controls.isPressing(Enums.Keyboard.UP)) {
             me._state.speed = Math.min(
-                me._consts.maxSpeedY, 
+                isDirt ? me._consts.maxSpeedYDirt : me._consts.maxSpeedY, 
                 me._state.speed + me._consts.speedYUpChange * me._state.delta);
             me._smokeSprite.setScale(1.5);
         }
@@ -458,6 +508,10 @@ export default class RoadComponent {
                 0,
                  me._state.speed - me._consts.speedYDownChange * me._state.delta)
             me._smokeSprite.setScale(0.5);
+        } else if(isDirt && me._state.speed > me._consts.maxSpeedYDirt) {   
+            me._state.speed = Math.max(
+                0,
+                 me._state.speed - me._consts.speedYDownChange * me._state.delta);
         } else {
             me._smokeSprite.setScale(1);
         }

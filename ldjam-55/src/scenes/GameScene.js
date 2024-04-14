@@ -38,6 +38,7 @@ export default class GameScene extends HereScene {
         Utils.loadSpriteSheet('lattern', 40, 160);
         Utils.loadSpriteSheet('insect', 100);
         Utils.loadSpriteSheet('shield', 100);
+        Utils.loadSpriteSheet('gun', 50, 100);
 
         Utils.loadImage('busInterior');
         Utils.loadSpriteSheet('passengerInside', 50);

@@ -56,7 +56,7 @@ export default class Stratagem {
     isAvaialbe() {
         const me = this;
 
-        return !me._fade.visible && new Date().getTime() > me._cooldownEnd;
+        return !me._fade.visible && new Date().getTime() > me._cooldownEnd &&!me._misss;
     }
 
     updateArrow(arrowIndex, arrow) {
@@ -103,7 +103,7 @@ export default class Stratagem {
 
         me._statusText.setText(text);
 
-        const isFaded = (total < me._cost) || (now < me._cooldownEnd) || me._missa;
+        const isFaded = (total < me._cost) || (now < me._cooldownEnd) || me._miss;
         if (me._fade.visible != isFaded)
             me._fade.setVisible(isFaded);
     }
@@ -121,7 +121,7 @@ export default class Stratagem {
         if (index == Enums.StratagemType.WIN_THE_GAME)
             me._initInternal(
                 'WIN THE GAME', 
-                1000,
+                9999,
                 1000,
                 [Enums.Arrow.UP, Enums.Arrow.DOWN, Enums.Arrow.LEFT, Enums.Arrow.LEFT, Enums.Arrow.RIGHT]);
 

@@ -30,6 +30,12 @@ export default class Animation {
             frameRate: 4,
             repeat: -1
         });
+
+        Here._.anims.create({
+            key: 'gun',
+            frames: Animation.getFrames('gun', [ 1, 2, 0 ]),
+            frameRate: 8
+        });
     }
 
     static getFrames(texture, frames) {
