@@ -15,7 +15,7 @@ export default class Enums {
         ROAD: 0,
         INTERIOR: 1,
         MONEY: 2,
-        STRATEGEMS: 3
+        STRATEGEM: 3
     }
 
     static NodeType = {

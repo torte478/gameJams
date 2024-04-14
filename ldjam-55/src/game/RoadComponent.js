@@ -172,13 +172,16 @@ export default class RoadComponent {
         const me = this;
 
         if (component == Enums.Components.ROAD)
-            me._resizeComponent(0, 0, 700 - 20, 1);
+            me._resizeComponent(110, 0, 0, 700 - 20, 1);
 
-        if (component == Enums.Components.INTERIOR)
-            me._resizeComponent(100, -150, 500 - 20, 0.72);
+        if (component == Enums.Components.INTERIOR || component == Enums.Components.MONEY)
+            me._resizeComponent(110, 100, -150, 500 - 20, 0.72);
+
+        if (component == Enums.Components.STRATEGEM)
+            me._resizeComponent(310, 100, -150, 600 -20, 0.72);
     }
 
-    _resizeComponent(scrollX, scrollY, width, zoom) {
+    _resizeComponent(x, scrollX, scrollY, width, zoom) {
         const me = this;
 
         if (!!me._resizeTween)
@@ -188,6 +191,7 @@ export default class RoadComponent {
 
         me._resizeTween = Here._.add.tween({
             targets: me._camera,
+            x: x,
             width: width,
             zoom: zoom,
             scrollX: scrollX,

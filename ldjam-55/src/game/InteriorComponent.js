@@ -28,7 +28,7 @@ export default class InteriorComponent {
     /** @type {Components} */
     _components;
 
-    _center = Utils.buildPoint(2180, 300);
+    _center = Utils.buildPoint(2180, 370);
 
     /** @type {Phaser.Cameras.Scene2D.Camera} */
     _camera;
@@ -67,7 +67,7 @@ export default class InteriorComponent {
             .setZoom(me.consts.zoom)
             .setRoundPixels(false);
 
-        Here._.add.image(me._center.x, me._center.y, 'busInterior');
+        Here._.add.image(me._center.x, me._center.y - 20, 'busInterior');
         me._camera.centerOn(me._center.x, me._center.y);
         me._interiorRectangle = new Phaser.Geom.Rectangle(me.consts.pos.x, me.consts.pos.y, 320, 560);
 
@@ -259,13 +259,16 @@ export default class InteriorComponent {
         const me = this;
 
         if (component == Enums.Components.ROAD)
-            me._resizeComponent(800, 200, me.consts.zoom);
+            me._resizeComponent(800, 210, 200, 600, me.consts.zoom);
 
         if (component == Enums.Components.INTERIOR)
-            me._resizeComponent(600, 400, 1);
+            me._resizeComponent(600, 210, 400, 600, 1);
+
+        if (component == Enums.Components.MONEY)
+            me._resizeComponent(600, 460, 400, 350, me.consts.zoom);
     }
 
-    _resizeComponent(x, width, zoom) {
+    _resizeComponent(x, y, width, height, zoom) {
         const me = this;
 
         if (!!me._resizeTween)
@@ -276,7 +279,9 @@ export default class InteriorComponent {
         me._resizeTween = Here._.add.tween({
             targets: me._camera,
             x: x,
+            y: y,
             width: width,
+            height: height,
             zoom: zoom,
             duration: 1000 * percentage,
             ease: 'Sine.easeOut',
