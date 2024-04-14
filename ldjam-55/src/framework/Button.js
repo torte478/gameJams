@@ -53,31 +53,41 @@ export default class Button {
 
         me._container.setScale(0.75);
         me._isClicked = true;
-        Here._.time.delayedCall(500, () => { 
+
+        me._sprite.clearTint();
+        me._sprite.setTint(me._config.tintPress);
+
+        Here._.time.delayedCall(200, () => { 
             me._container.setScale(1) 
             me._isClicked = false;
+            me._sprite.clearTint();
+            if (!!me._config.callback)
+                me._config.callback.call(me._config.callbackScope, me);
         }, me);
 
         if (!!me._config.sound)
             Here.Audio.play(me._config.sound);
-
-        Here._.time.delayedCall(
-            200, 
-            me._config.callback, 
-            me._config.callbackScope);
     }
 
     _select() {
         const me = this;
 
-        if (me._config.frameSelected !== null)
-            me._sprite.setFrame(me._config.frameSelected);
+        if (me._isClicked)
+            return;
+
+        if (me._config.tintSelected !== null) {
+            me._sprite.clearTint();
+            me._sprite.setTint(me._config.tintSelected);
+        }
     }
 
     _unselect() {
         const me = this;
 
-        if (me._config.frameIdle !== null)
-            me._sprite.setFrame(me._config.frameIdle);
+        if (me._isClicked)
+            return;
+
+        if (me._config.tintSelected !== null)
+            me._sprite.clearTint();
     }
 }

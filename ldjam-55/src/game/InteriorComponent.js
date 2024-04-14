@@ -14,6 +14,7 @@ export default class InteriorComponent {
         speed: 100 * 2,
         swapSpeed: 25,
         zoom: 0.4,
+        badTint: 0xFF0000,
 
         depth: {
             selection: 1000
@@ -201,11 +202,20 @@ export default class InteriorComponent {
         return {index: minIndex, x: pos.x, y: pos.y};
     }
 
-    _onPaymentComplete(index) {
+    _onPaymentComplete(iid, success) {
         const me = this;
+
+        const index = Utils.firstIndexOrNull(me._graph, n => !!n.passenger && n.passenger.iid == iid);
 
         const passenger = me._graph[index].passenger;
         passenger.isReadyToExit = true;
+
+        if (!success) {
+            passenger.clearTint();
+            passenger.setTint(me.consts.badTint)
+        }
+            
+
         me._startMoving(passenger, index, me.consts.doorIndex);
     }
 
@@ -245,7 +255,7 @@ export default class InteriorComponent {
         const me = this;
 
         if (destination < 0)
-            return 0xFF0000;
+            return me.consts.badTint;
 
         if (destination == 0)
             return 0x00FF00;
@@ -401,7 +411,7 @@ export default class InteriorComponent {
             if (passenger.isOnPayment)
                 return;
 
-            me._events.emit('paymentStart', target);
+            me._events.emit('paymentStart', passenger.iid);
             passenger.isOnPayment = true;
             return;
         }

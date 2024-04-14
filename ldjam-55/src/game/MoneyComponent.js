@@ -8,10 +8,12 @@ import Enums from './Enums.js';
 export default class MoneyComponent {
     _consts = {
         zoom: 0.42,
+        buttonsPos: Utils.buildPoint(2940, 15),
+        incomes: [ 17, 18, 18, 18, 20, 20, 20, 25, 25, 40, 50, 100]
     }
 
     _state = {
-        
+        income: 0
     }
 
     /** @type {Components} */
@@ -27,7 +29,16 @@ export default class MoneyComponent {
     _paymentQueue = [];
 
     /** @type {Phaser.Geom.Point} */
-    _center = Utils.buildPoint(3100, 85)
+    _center = Utils.buildPoint(3100, 85);
+
+    /** @type {Phaser.GameObjects.Text} */
+    _totalText;
+    /** @type {Phaser.GameObjects.Text} */
+    _costText;
+    /** @type {Phaser.GameObjects.Text} */
+    _currentText;
+
+    _currentString = '0';
 
     constructor(events) {
         const me = this;
@@ -36,24 +47,16 @@ export default class MoneyComponent {
 
         me._camera = Here._.cameras.add(800, 0, 200, 200)
             .setZoom(me._consts.zoom)
-            .setBackgroundColor('#d9a066')
+            .setBackgroundColor('#D3EEE7')
             .centerOn(me._center.x, me._center.y);
 
         Here._.add.image(me._center.x, me._center.y, 'moneyBox');
-
-        new Button({
-            x: 3100,
-            y: 90,
-            texture: 'bus',
-            frameIdle: 0,
-            frameSelected: 0,
-            text: 'PAY',
-            textStyle: { fontSize: 32 },
-            callbackScope: me,
-            callback: () => {
-                me._completePayment();
-            }
-        });
+        
+        me._createButtons();
+        me._totalText = Here._.add.text(3270, -90, '100¤', { fontSize: 30, fontStyle: 'italic bold', color: '#89582E'}).setOrigin(1, 0.5);
+        me._costText = Here._.add.text(3270, -60, '- 17¤', { fontSize: 30, fontStyle: 'italic bold', color: '#89582E'}).setOrigin(1, 0.5);
+        me._currentText = Here._.add.text(3270, -30, '= 0¤', { fontSize: 36, fontStyle: 'italic bold', color: '#89582E'}).setOrigin(1, 0.5);
+        me._showText(false);
 
         me._events.on('paymentStart', me._onPaymentStart, me);
         me._events.on('componentActivated', me._onComponentActivated, me);
@@ -63,6 +66,87 @@ export default class MoneyComponent {
         const me = this;
 
         me._checkActivation();
+    }
+
+    _showText(visible) {
+        const me = this;
+
+        me._totalText.setVisible(visible);
+        me._costText.setVisible(visible);
+        me._currentText.setVisible(visible);
+    }
+
+    _createButtons() {
+        const me = this;
+
+        me._createButton(1, 0, 0);
+        me._createButton(2, 1, 0);
+        me._createButton(3, 2, 0);
+
+        me._createButton(4, 0, 1);
+        me._createButton(5, 1, 1);
+        me._createButton(6, 2, 1);
+
+        me._createButton(7, 0, 2);
+        me._createButton(8, 1, 2);
+        me._createButton(9, 2, 2);
+
+        me._createButton(0, 3, 0);
+        me._createButton(10, 3, 2);
+        me._createButton(11, 3, 1);
+
+        new Button({
+            x: 3020,
+            y: 252,
+            texture: 'okButton',
+            frameIdle: 0,
+            tintSelected: 0x00ff00,
+            tintPress: 0xff0000,
+            callbackScope: me,
+            callback: me._onOkButtonClick,
+        });
+    }
+
+    _createButton(frame, x, y) {
+        const me = this;
+
+        new Button({
+            x: me._consts.buttonsPos.x + 10 + x * 75 + 30,
+            y: me._consts.buttonsPos.y + 10 + y * 65 + 30,
+            texture: 'buttons',
+            frameIdle: frame,
+            tintSelected: 0x00ff00,
+            tintPress: 0xff0000,
+            callbackScope: me,
+            callback: me._onButtonClick,
+        });
+    }
+
+    _onOkButtonClick() {
+        const me = this;
+
+        me._completePayment();
+    }
+
+    _onButtonClick(sender) {
+        const me = this;
+
+        const frame = sender._sprite.frame.name;
+        if (frame >= 0 && frame <= 9 && me._currentString.length < 6) {
+            me._currentString = me._currentString == '0'
+                ? frame + ''
+                : me._currentString + frame;
+        }
+
+        if (frame == 10)
+            me._currentString = '0';
+
+        if (frame == 11)
+            me._currentString = me._currentString.length <= 1
+                ? '0'
+                : me._currentString.substring(0, me._currentString.length - 1);
+
+        me._currentText.setText(`= ${me._currentString}¤`);
     }
 
     _checkActivation() {
@@ -112,10 +196,18 @@ export default class MoneyComponent {
         });
     }
 
-    _onPaymentStart(index) {
+    _onPaymentStart(iid) {
         const me = this;
 
-        me._paymentQueue.push(index);
+        me._paymentQueue.push(iid);
+
+        me._state.income = Utils.getRandomEl(me._consts.incomes);
+
+        me._totalText.setText(`${me._state.income}¤`);
+        me._currentString = '0';
+        me._currentText.setText(`= ${me._currentString}¤`);
+
+        me._showText(true);
     }
 
     _completePayment() {
@@ -124,9 +216,16 @@ export default class MoneyComponent {
         if (me._paymentQueue.length == 0)
             return;
         
-        const index = me._paymentQueue.shift();
-        const money = Utils.getRandom(10, 100);
-        me._events.emit('paymentComplete', index);
-        me._events.emit('moneyIncome', money);
+        const iid = me._paymentQueue.shift();
+        const money = 17;
+
+        const current = Number(me._currentString);
+        const success = me._state.income - money === current;
+
+        me._events.emit('paymentComplete', iid, success);
+        if (success)
+            me._events.emit('moneyIncome', money);
+
+        me._showText(false);
     }
 }

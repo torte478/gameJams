@@ -29,4 +29,7 @@ export default class ButtonConfig {
 
     /** @type {string} */
     sound;
+
+    tintSelected;
+    tintPress;
 }

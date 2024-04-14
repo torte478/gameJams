@@ -43,6 +43,8 @@ export default class GameScene extends HereScene {
         Utils.loadSpriteSheet('passengerInside', 50);
 
         Utils.loadImage('moneyBox');
+        Utils.loadSpriteSheet('buttons', 60);
+        Utils.loadImage('okButton');
 
         Utils.loadSpriteSheet('panel', 300, 100);
         Utils.loadSpriteSheet('stratagems', 80);
