@@ -47,7 +47,11 @@ export default class Enums {
     static StratagemType = {
         WIN_THE_GAME: 0,
         SHIELD: 1,
-        FIX_BUGS: 2
+        GUN: 2,
+        MORE_DIVERS: 3,
+        WITHOUT_CHANGE: 4,
+        DIVERS_SPEED: 5,
+        FIX_BUGS: 6
     }
 
     static PassengerState = {

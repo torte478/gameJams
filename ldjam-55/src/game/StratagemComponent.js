@@ -13,7 +13,7 @@ export default class StratagemComponent {
 
     state = {
         isActive: true,
-        money: 0,
+        money: 1000,
         arrowIndex: 0,
     }
 
@@ -44,10 +44,10 @@ export default class StratagemComponent {
             .setScroll(4000, 0)
             .setBackgroundColor('#007665');
 
-        me._totalText = Here._.add.text(4295, 20, `${me.state.money}¤`, { fontSize: 28, fontStyle: 'bold'})
+        me._totalText = Here._.add.text(4295, 25, `${me.state.money}¤`, { fontSize: 28, fontStyle: 'bold'})
             .setOrigin(1, 0.5);
 
-        const stratagemCount = 3;
+        const stratagemCount = 7;
         for (let i = 0; i < stratagemCount; ++i) {
             const stratagem = new Stratagem(i, me._events);
             me._stratagems.push(stratagem);

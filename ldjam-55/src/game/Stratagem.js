@@ -29,16 +29,17 @@ export default class Stratagem {
 
     _descText;
 
+    _miss = false;
+
     constructor(index, events) {
         const me = this;
 
         me._events = events;
         me._index = index;
 
-        const panel = Here._.add.image(4150, 150 + index * 100, 'panel')
+        const panel = Here._.add.image(4150, 100 + index * 105, 'panel')
         me._pos = Utils.toPoint(panel);
         
-
         Here._.add.image(panel.x + 100, panel.y - 10, 'stratagems', index).setScale(0.75);
 
         me._statusText = Here._.add.text(panel.x + 135, panel.y + 20, '12.5s', { fontSize: 20, fontStyle: 'bold'})
@@ -61,13 +62,16 @@ export default class Stratagem {
     updateArrow(arrowIndex, arrow) {
         const me = this;
 
-        if (arrowIndex >= me._arrows.length)
+        if (arrowIndex >= me._arrows.length) {
+            me._miss = true;
             return Enums.StratagemResult.MISS;
-
+        }
+            
         const arrowSprite = me._arrows[arrowIndex];
         if (arrowSprite.direction != arrow) {
             me._clearArrows();
             me._fade.setVisible(true);
+            me._miss = true;
             return Enums.StratagemResult.MISS;
         }
 
@@ -84,6 +88,7 @@ export default class Stratagem {
     reset(total) {
         const me = this;
 
+        me._miss = false;
         me._clearArrows();
     }
 
@@ -98,7 +103,7 @@ export default class Stratagem {
 
         me._statusText.setText(text);
 
-        const isFaded = (total < me._cost) || (now < me._cooldownEnd);
+        const isFaded = (total < me._cost) || (now < me._cooldownEnd) || me._missa;
         if (me._fade.visible != isFaded)
             me._fade.setVisible(isFaded);
     }
@@ -113,21 +118,49 @@ export default class Stratagem {
     _init(index) {
         const me = this;
 
-        if (index == 0)
+        if (index == Enums.StratagemType.WIN_THE_GAME)
             me._initInternal(
                 'WIN THE GAME', 
                 1000,
                 1000,
-                [Enums.Arrow.RIGHT, Enums.Arrow.DOWN, Enums.Arrow.LEFT, Enums.Arrow.LEFT, Enums.Arrow.RIGHT]);
+                [Enums.Arrow.UP, Enums.Arrow.DOWN, Enums.Arrow.LEFT, Enums.Arrow.LEFT, Enums.Arrow.RIGHT]);
 
-        if (index == 1)
+        if (index == Enums.StratagemType.SHIELD)
             me._initInternal(
                 "SHIELD", 
                 100,
-                5,
-                [Enums.Arrow.RIGHT, Enums.Arrow.RIGHT, Enums.Arrow.DOWN]);
+                15,
+                [Enums.Arrow.LEFT, Enums.Arrow.LEFT, Enums.Arrow.DOWN]);
 
-        if (index == 2)
+        if (index == Enums.StratagemType.GUN)
+            me._initInternal(
+                "GUN", 
+                200,
+                30,
+                [Enums.Arrow.DOWN, Enums.Arrow.RIGHT, Enums.Arrow.DOWN, Enums.Arrow.LEFT]);
+
+        if (index == Enums.StratagemType.MORE_DIVERS)
+            me._initInternal(
+                "MORE DIVERS", 
+                100,
+                30,
+                [Enums.Arrow.DOWN, Enums.Arrow.DOWN, Enums.Arrow.UP, Enums.Arrow.LEFT]);
+
+        if (index == Enums.StratagemType.WITHOUT_CHANGE)
+            me._initInternal(
+                "NO CHANGE", 
+                300,
+                45,
+                [Enums.Arrow.LEFT, Enums.Arrow.UP, Enums.Arrow.LEFT, Enums.Arrow.UP, Enums.Arrow.RIGHT]);
+
+        if (index == Enums.StratagemType.DIVERS_SPEED)
+            me._initInternal(
+                "DIVER SPEED", 
+                300,
+                60,
+                [Enums.Arrow.UP, Enums.Arrow.LEFT, Enums.Arrow.DOWN, Enums.Arrow.RIGHT, Enums.Arrow.UP]);
+
+        if (index == Enums.StratagemType.FIX_BUGS)
             me._initInternal(
                 "FIX BUGS =)",
                 0,
