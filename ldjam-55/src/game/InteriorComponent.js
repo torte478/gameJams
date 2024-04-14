@@ -582,7 +582,7 @@ export default class InteriorComponent {
 
         passenger.state = Enums.PassengerState.NORMAL;
         passenger.iid = me.state.iid++;
-        passenger.destination = Utils.getRandom(1, 5, 1);
+        passenger.destination = Utils.getRandom(1, 5);
         passenger.playerCommand = null;
         passenger.isSwap = false;
 
@@ -628,7 +628,9 @@ export default class InteriorComponent {
 
             // change pos
             const pos = me._toWorldPosition(target);
-            const speed = passenger.isSwap ? me.consts.swapSpeed : me.consts.speed;
+            let speed = passenger.isSwap ? me.consts.swapSpeed : me.consts.speed;
+            if (me._components.road._state.isSpeedStratagemActivated)
+                speed = 2 * speed;
             passenger.setPosition(
                 passenger.x + delta * speed * Math.sign(pos.x - passenger.x),
                 passenger.y + delta * speed * Math.sign(pos.y - passenger.y),

@@ -49,6 +49,9 @@ export default class RoadComponent {
 
         isMoreDriversStratagem: false,
         isMoreDriversStratagemActiveTo: new Date().getTime(),
+
+        isSpeedStratagemActivated: false,
+        isSpeedStratagemActiveTo: new Date().getTime(),
     }
 
     /** @type {Components} */
@@ -125,8 +128,8 @@ export default class RoadComponent {
             .setSize(45, 80);
         Here._.physics.world.enable(me._bus);
 
-        me._signPanel = Here._.add.image(65, 750, 'sign');
-        me._signText = Here._.add.text(110, 750, '1000m', {fontSize: 24, fontStyle: 'bold'}).setOrigin(1, 0.5);
+        me._signPanel = Here._.add.image(65, 750, 'sign').setDepth(1000);
+        me._signText = Here._.add.text(110, 750, '1000m', {fontSize: 24, fontStyle: 'bold'}).setOrigin(1, 0.5).setDepth(1100);
 
         me._events.on('componentActivated', me._onComponentActivated, me);
         me._events.on('exitComplete', me._onExitComplete, me);
@@ -155,7 +158,7 @@ export default class RoadComponent {
             me._changeStatus(Enums.BusStatus.PREPARE_TO_EXIT);
 
         if (!me._busStop && me._state.position >= me._consts.busStopCreate)
-            me._createBusStop(-610);
+            me._createBusStop(-810);
 
         me._tryCreateInsects();
         me._processBusStop();
@@ -186,6 +189,12 @@ export default class RoadComponent {
 
         if (now >= me._state.gunActiveTo)
             me._gunSprite.setVisible(false);
+
+        if (now >= me._state.isMoreDriversStratagemActiveTo)
+            me._state.isMoreDriversStratagem = false;
+
+        if (now >= me._state.isSpeedStratagemActiveTo)
+            me._state.isSpeedStratagemActivated = false;
 
         if (me._gunSprite.visible) {
             const aliveInsects = me._insects
@@ -255,15 +264,21 @@ export default class RoadComponent {
         const big = Math.floor(me._state.position / me._consts.bigInsectPeriod);
         if (big > me._state.lastBigInsect) {
             me._state.lastBigInsect = big;
-            me._createInsect();
+            
+            const insect = me._createInsect();
+            insect.body.setSize(50, 50);
         }
     }
 
+    /**
+     * 
+     * @returns {Phaser.Physics.Arcade.Image}
+     */
     _createInsect() {
         const me = this;
 
         /** @type {Phaser.GameObjects.Sprite} */
-        const insect = me._insectPool.create(Utils.getRandom(50, 450), -100, 'insect');
+        const insect = me._insectPool.create(Utils.getRandom(50, 450), -600, 'insect');
         insect.play('insect');
         insect.healthy = true;
         insect.setFlipX(Utils.getRandom(1, 2) == 1);
@@ -296,6 +311,11 @@ export default class RoadComponent {
             me._state.isMoreDriversStratagem = true;
             me._state.isMoreDriversStratagemActiveTo = new Date().getTime() + 50 * 1000;
         }
+
+        if (stratagem == Enums.StratagemType.DIVERS_SPEED) {
+            me._state.isSpeedStratagemActivated = true;
+            me._state.isSpeedStratagemActiveTo = new Date().getTime() + 55 * 1000;
+        }
     }
 
     _activateShield() {
@@ -321,7 +341,11 @@ export default class RoadComponent {
         const me = this;
 
         me._busStop = me._spritePool.create(595, busStopY, 'busStop').setDepth(me._consts.depth.busStop);
-        me._busStop.lattern = me._spritePool.create(600, busStopY + 400, 'lattern').setDepth(me._consts.depth.lattern).play('lattern');
+        me._busStop.lattern = me._spritePool
+            .create(600, busStopY + 800, 'lattern')
+            .setDepth(me._consts.depth.lattern)
+            .setScale(2)
+            .play('lattern');
 
         let positions = Utils
             .buildArray(
@@ -413,7 +437,11 @@ export default class RoadComponent {
             return;
 
         const doorPos = Utils.buildPoint(me._bus.x + 40, me._bus.y);
-        const shift = me._consts.passengerSpeed * me._state.delta;
+        const speed = me._state.isSpeedStratagemActivated
+             ? 2 * me._consts.passengerSpeed
+             : me._consts.passengerSpeed;
+
+        const shift = speed * me._state.delta;
         for (let i = 0; i < me._passengers.length; ++i) {
             if (!me._components.interior.isDoorFree())
                 break;

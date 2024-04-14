@@ -13,7 +13,9 @@ export default class MoneyComponent {
     }
 
     _state = {
-        income: 0
+        income: 0,
+        isNoChangeActivated: false,
+        isNoChangeActiveTo: new Date().getTime(),
     }
 
     /** @type {Components} */
@@ -60,12 +62,31 @@ export default class MoneyComponent {
 
         me._events.on('paymentStart', me._onPaymentStart, me);
         me._events.on('componentActivated', me._onComponentActivated, me);
+        me._events.on('stratagemSummon', me._onStratagemSummon, me);
     }
 
     update(delta) {
         const me = this;
 
         me._checkActivation();
+        me._checkStratagem();
+    }
+
+    _onStratagemSummon(stratagem) {
+        const me = this;
+
+        if (stratagem == Enums.StratagemType.WITHOUT_CHANGE) {
+            me._state.isNoChangeActivated = true;
+            me._state.isNoChangeActiveTo = new Date().getTime() + 40 * 1000;
+        };
+    }
+
+    _checkStratagem() {
+        const me = this;
+
+        const now = new Date().getTime();
+        if (now >= me._state.isNoChangeActiveTo) 
+            me._state.isNoChangeActivated = false;
     }
 
     _showText(visible) {
@@ -79,25 +100,25 @@ export default class MoneyComponent {
     _createButtons() {
         const me = this;
 
-        me._createButton(1, 0, 0);
-        me._createButton(2, 1, 0);
-        me._createButton(3, 2, 0);
+        me._createButton(1, 0, 2);
+        me._createButton(2, 1, 2);
+        me._createButton(3, 2, 2);
 
         me._createButton(4, 0, 1);
         me._createButton(5, 1, 1);
         me._createButton(6, 2, 1);
 
-        me._createButton(7, 0, 2);
-        me._createButton(8, 1, 2);
-        me._createButton(9, 2, 2);
+        me._createButton(7, 0, 0);
+        me._createButton(8, 1, 0);
+        me._createButton(9, 2, 0);
 
-        me._createButton(0, 3, 0);
-        me._createButton(10, 3, 2);
+        me._createButton(0, 3, 2);
+        me._createButton(10, 3, 0);
         me._createButton(11, 3, 1);
 
         new Button({
-            x: 3020,
-            y: 252,
+            x: 3170,
+            y: 250,
             texture: 'okButton',
             frameIdle: 0,
             tintSelected: 0x00ff00,
@@ -204,7 +225,9 @@ export default class MoneyComponent {
 
         me._paymentIid = iid;
 
-        me._state.income = Utils.getRandomEl(me._consts.incomes);
+        me._state.income = me._state.isNoChangeActivated
+            ? 17
+            : Utils.getRandomEl(me._consts.incomes);
 
         me._totalText.setText(`${me._state.income}¤`);
         me._currentString = '0';

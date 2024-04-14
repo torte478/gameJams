@@ -121,7 +121,7 @@ export default class Stratagem {
         if (index == Enums.StratagemType.WIN_THE_GAME)
             me._initInternal(
                 'WIN THE GAME', 
-                9999,
+                9000,
                 1000,
                 [Enums.Arrow.UP, Enums.Arrow.DOWN, Enums.Arrow.LEFT, Enums.Arrow.LEFT, Enums.Arrow.RIGHT]);
 
