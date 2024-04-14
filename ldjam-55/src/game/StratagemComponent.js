@@ -13,7 +13,7 @@ export default class StratagemComponent {
 
     state = {
         isActive: true,
-        money: 0,
+        money: 1000,
         arrowIndex: 0,
     }
 
@@ -140,6 +140,8 @@ export default class StratagemComponent {
 
         me.state.money += money;
         me._totalText.setText(`${me.state.money}¤`);
+
+        me._components.specEffects.addMoney(money);
     }
 
     _checkActivation() {

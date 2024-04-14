@@ -1,6 +1,7 @@
 import InteriorComponent from "./InteriorComponent.js";
 import MoneyComponent from "./MoneyComponent.js";
 import RoadComponent from "./RoadComponent.js";
+import SpecEffects from "./SpecEffects.js";
 import StratagemComponent from "./StratagemComponent.js";
 
 export default class {
@@ -16,6 +17,8 @@ export default class {
 
     /** @type {StratagemComponent} */
     stratagem;
+
+    specEffects = new SpecEffects();
 
     update(delta) {
         const me = this;

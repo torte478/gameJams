@@ -39,9 +39,11 @@ export default class GameScene extends HereScene {
         Utils.loadSpriteSheet('insect', 100);
         Utils.loadSpriteSheet('shield', 100);
         Utils.loadSpriteSheet('gun', 50, 100);
+        Utils.loadSpriteSheet('blood', 100);
 
         Utils.loadImage('busInterior');
         Utils.loadSpriteSheet('passengerInside', 50);
+        Utils.loadImage('dismorale');
 
         Utils.loadImage('moneyBox');
         Utils.loadSpriteSheet('buttons', 60);
@@ -50,6 +52,7 @@ export default class GameScene extends HereScene {
         Utils.loadSpriteSheet('panel', 300, 100);
         Utils.loadSpriteSheet('stratagems', 80);
         Utils.loadSpriteSheet('arrows', 40);
+        Utils.loadSpriteSheet('moneyEffect', 100, 50);
     }
 
     create() {

@@ -248,6 +248,8 @@ export default class RoadComponent {
         insect.stop();
         insect.setFrame(2);
         me._events.emit('moneyIncome', isBigInsect ? 100 : 1);    
+
+        me._components.specEffects.doBlood(insect.x, insect.y, isBigInsect);
     }
 
     _tryCreateInsects() {

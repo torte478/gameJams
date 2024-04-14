@@ -36,6 +36,12 @@ export default class Animation {
             frames: Animation.getFrames('gun', [ 1, 2, 0 ]),
             frameRate: 8
         });
+
+        Here._.anims.create({
+            key: 'blood',
+            frames: 'blood',
+            frameRate: 16
+        });
     }
 
     static getFrames(texture, frames) {

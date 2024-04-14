@@ -764,5 +764,7 @@ export default class InteriorComponent {
             if (!!passenger)
                 me._makeBadFeelengs(passenger, i);
         }
+
+        me._components.specEffects.doDismorale();
     }
 }
