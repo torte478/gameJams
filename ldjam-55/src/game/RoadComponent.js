@@ -294,6 +294,14 @@ export default class RoadComponent {
     _processControls() {
         const me = this;
 
+        /** @type {Phaser.Physics.Arcade.Body} */
+        const body = me._bus.body;
+
+        if (me._components.stratagem.state.isActive) {
+            body.setVelocityX(0);
+            return;
+        }
+
         if (Here.Controls.isPressing(Enums.Keyboard.UP)) {
             me._state.speed = Math.min(
                 me._consts.maxSpeedY, 
@@ -305,8 +313,6 @@ export default class RoadComponent {
                  me._state.speed - me._consts.speedYDownChange * me._state.delta)
         }
 
-        /** @type {Phaser.Physics.Arcade.Body} */
-        const body = me._bus.body;
         const minShiftX = me._isStopped() ? 0 : 50;
         const speedXChange = Math.min(
             500, 

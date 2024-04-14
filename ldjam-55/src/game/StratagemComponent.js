@@ -13,7 +13,8 @@ export default class StratagemComponent {
 
     state = {
         isActive: true,
-        money: 0
+        money: 0,
+        arrowIndex: 0,
     }
 
     /** @type {Components} */
@@ -48,18 +49,74 @@ export default class StratagemComponent {
 
         const stratagemCount = 2;
         for (let i = 0; i < stratagemCount; ++i) {
-            const stratagem = new Stratagem(i);
+            const stratagem = new Stratagem(i, me._events);
             me._stratagems.push(stratagem);
         }
 
         me._events.on('componentActivated', me._onComponentActivated, me);
         me._events.on('paymentComplete', me._onPaymentComplete, me);
+        me._events.on('stratagemSummon', me._onStratagemSummon, me);
     }
 
     update(delta) {
         const me = this;
 
         me._checkActivation();
+        me._updateControls();
+    }
+
+    _onStratagemSummon() {
+        const me = this;
+
+        me._resetStratagems();
+    }
+
+    _updateControls() {
+        const me = this;
+
+        const arrow = me._getArrowFromControl();
+        if (arrow == null)
+            return;
+
+        let result = Enums.StratagemResult.MISS;
+        for (let i = 0; i < me._stratagems.length; ++i) {
+            result = Math.max(result, me._stratagems[i].updateArrow(me.state.arrowIndex, arrow));
+
+            if (result == Enums.StratagemResult.COMPLETE)
+                break;
+        }
+
+        if (result == Enums.StratagemResult.MISS)
+            me._resetStratagems();
+        else if (result == Enums.StratagemResult.HIT)
+            me.state.arrowIndex += 1;
+    }
+
+    _resetStratagems() {
+        const me = this;
+
+        for (let i = 0; i < me._stratagems.length; ++i)
+                me._stratagems[i].reset();
+
+        me.state.arrowIndex = 0;
+    }
+
+    _getArrowFromControl() {
+        const me = this;
+
+        if (Here.Controls.isPressedOnce(Enums.Keyboard.UP))
+            return Enums.Arrow.UP;
+
+        if (Here.Controls.isPressedOnce(Enums.Keyboard.DOWN))
+            return Enums.Arrow.DOWN;
+
+        if (Here.Controls.isPressedOnce(Enums.Keyboard.LEFT))
+            return Enums.Arrow.LEFT;
+
+        if (Here.Controls.isPressedOnce(Enums.Keyboard.RIGHT))
+            return Enums.Arrow.RIGHT;
+
+        return null;
     }
 
     _onPaymentComplete(index, money) {

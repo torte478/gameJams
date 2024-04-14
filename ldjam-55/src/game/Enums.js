@@ -37,4 +37,10 @@ export default class Enums {
         DOWN: 2,
         RIGHT: 3
     }
+
+    static StratagemResult = {
+        MISS: 0,
+        HIT: 1,
+        COMPLETE: 2
+    }
 }

@@ -39,7 +39,7 @@ export default class GameScene extends HereScene {
 
         Utils.loadImage('moneyBox');
 
-        Utils.loadImage('panel');
+        Utils.loadSpriteSheet('panel', 300, 100);
         Utils.loadSpriteSheet('stratagems', 80);
         Utils.loadSpriteSheet('arrows', 40);
     }
