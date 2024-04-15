@@ -42,6 +42,9 @@ export default class MoneyComponent {
 
     _currentString = '0';
 
+    /** @type {Phaser.GameObjects.Image} */
+    _bangSprite;
+
     constructor(events) {
         const me = this;
 
@@ -58,6 +61,17 @@ export default class MoneyComponent {
         me._totalText = Here._.add.text(3270, -90, '100¤', { fontSize: 30, fontStyle: 'italic bold', color: '#89582E'}).setOrigin(1, 0.5);
         me._costText = Here._.add.text(3270, -60, '- 17¤', { fontSize: 30, fontStyle: 'italic bold', color: '#89582E'}).setOrigin(1, 0.5);
         me._currentText = Here._.add.text(3270, -30, '= 0¤', { fontSize: 36, fontStyle: 'italic bold', color: '#89582E'}).setOrigin(1, 0.5);
+        
+
+        me._bangSprite = Here._.add.image(2970, -60, 'bang');
+        Here._.tweens.add({
+            targets: me._bangSprite,
+            scale: { from: 0.8, to: 1.2 },
+            duration: 1000,
+            yoyo: true,
+            repeat: -1
+        });
+
         me._showText(false);
 
         me._events.on('paymentStart', me._onPaymentStart, me);
@@ -95,6 +109,7 @@ export default class MoneyComponent {
         me._totalText.setVisible(visible);
         me._costText.setVisible(visible);
         me._currentText.setVisible(visible);
+        me._bangSprite.setVisible(visible);
     }
 
     _createButtons() {
@@ -235,6 +250,7 @@ export default class MoneyComponent {
         me._currentText.setText(`= ${me._currentString}¤`);
 
         me._showText(true);
+        Here.Audio.play('readyToPay');
     }
 
     _completePayment() {

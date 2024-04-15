@@ -25,9 +25,6 @@ export default class EndScene extends HereScene {
         super.preload();
         const me = this;
 
-        if (!me._isRestart)
-            Utils.runLoadingBar();
-
         Utils.loadImage('logo');
         Utils.loadMp3('mainTheme');
         Utils.loadSpriteSheet('insect', 100);

@@ -14,7 +14,7 @@ export default class RoadComponent {
         maxSpeedY: 1000,
         maxSpeedYDirt: 200,
         speedYUpChange: 200,
-        speedYDownChange: 400,
+        speedYDownChange: 600,
 
         busStopPrepare: 1000,
         busStopCreate: 10000,
@@ -29,6 +29,7 @@ export default class RoadComponent {
             busStop: 100,
             passengers: 200,
             lattern: 400,
+            insect: 410,
             bus: 500,
         },
 
@@ -127,6 +128,8 @@ export default class RoadComponent {
             .setDepth(me._consts.depth.bus)
             .setSize(45, 80);
         Here._.physics.world.enable(me._bus);
+        Here._.physics.world.setBounds(0, 500, 680, 1000);
+        me._bus.body.setCollideWorldBounds(true, 1, 1);
 
         me._signPanel = Here._.add.image(65, 750, 'sign').setDepth(1000);
         me._signText = Here._.add.text(110, 750, '1000m', {fontSize: 24, fontStyle: 'bold'}).setOrigin(1, 0.5).setDepth(1100);
@@ -142,7 +145,7 @@ export default class RoadComponent {
             null, 
             me);
 
-        me._createBusStop(600);
+        // me._createBusStop(600);
         
         me._engineSound = Here._.sound.add('engine', { volume: 0.02, loop: -1});
     }
@@ -256,6 +259,8 @@ export default class RoadComponent {
         me._events.emit('moneyIncome', isBigInsect ? 100 : 1);    
 
         me._components.specEffects.doBlood(insect.x, insect.y, isBigInsect);
+
+        Here.Audio.play('hurt');
     }
 
     _tryCreateInsects() {
@@ -286,7 +291,7 @@ export default class RoadComponent {
         const me = this;
 
         /** @type {Phaser.GameObjects.Sprite} */
-        const insect = me._insectPool.create(Utils.getRandom(50, 450), -600, 'insect');
+        const insect = me._insectPool.create(Utils.getRandom(50, 500), -600, 'insect').setDepth(me._consts.depth.insect);
         insect.play('insect');
         insect.healthy = true;
         insect.setFlipX(Utils.getRandom(1, 2) == 1);
@@ -355,18 +360,20 @@ export default class RoadComponent {
             .setScale(2)
             .play('lattern');
 
+        Here.Audio.play('lattern', { volume: 0.5});
+
+        const minCount = me._state.isMoreDriversStratagem ? 10 : 1;
+        const maxCount = me._state.isMoreDriversStratagem ? 12 : 5;
+        const passengerCount = Utils.getRandom(minCount, maxCount);
+
         let positions = Utils
-            .buildArray(
-                Utils.getRandom(3, 3, 24), 0)
+            .buildArray(passengerCount, 0)
             .map((_, i) => Utils.buildPoint(
                 me._busStop.x + Math.floor(i / 12) * 50 + 10 + Utils.getRandom(0, 15),
                 me._busStop.y  - (me._busStop.height / 2) + 25 + (i % 12 * 50) + Utils.getRandom(0, 10)));
 
         positions = Utils.shuffle(positions);
 
-        const minCount = me._state.isMoreDriversStratagem ? 10 : 1;
-        const maxCount = me._state.isMoreDriversStratagem ? 12 : 5;
-        const passengerCount = Utils.getRandom(minCount, maxCount);
         for (let i = 0; i < passengerCount; ++i) {
             const passenger = me._spritePool.create(
                 positions[i].x,

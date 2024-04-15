@@ -1,7 +1,7 @@
 export default class Config {
 
     static Debug = {
-        Global: true,
+        Global: false,
         Log: true,
         ShowSceneLog: true,
         PlaySound: true,

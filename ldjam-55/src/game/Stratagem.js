@@ -121,7 +121,7 @@ export default class Stratagem {
         if (index == Enums.StratagemType.WIN_THE_GAME)
             me._initInternal(
                 'WIN THE GAME', 
-                9000,
+                4000,
                 1000,
                 [Enums.Arrow.UP, Enums.Arrow.DOWN, Enums.Arrow.LEFT, Enums.Arrow.LEFT, Enums.Arrow.RIGHT]);
 
@@ -149,14 +149,14 @@ export default class Stratagem {
         if (index == Enums.StratagemType.WITHOUT_CHANGE)
             me._initInternal(
                 "NO CHANGE", 
-                300,
+                120,
                 45,
                 [Enums.Arrow.LEFT, Enums.Arrow.UP, Enums.Arrow.LEFT, Enums.Arrow.UP, Enums.Arrow.RIGHT]);
 
         if (index == Enums.StratagemType.DIVERS_SPEED)
             me._initInternal(
                 "DIVER SPEED", 
-                300,
+                200,
                 60,
                 [Enums.Arrow.UP, Enums.Arrow.LEFT, Enums.Arrow.DOWN, Enums.Arrow.RIGHT, Enums.Arrow.UP]);
 

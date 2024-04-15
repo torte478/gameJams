@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 
 export default class SpecEffects {
 
@@ -75,5 +76,24 @@ export default class SpecEffects {
         const me = this;
 
         Here.Audio.play('select', { volume: 0.5 });
+    }
+
+    doExit(x, y) {
+        const me = this;
+
+        const sprite = me._pool.create(x, y, 'passengerOutside').setDepth(1000);
+        sprite.tween = Here._.tweens.add({
+            targets: sprite,
+            x: 700,
+            y: y - 40 + Utils.getRandom(0, 80),
+            duration: 1000,
+            ease: 'Sine.easeIn',
+            onComplete: () => {
+                sprite.tween = null;
+                me._pool.killAndHide(sprite);
+            }
+        });
+
+        Here.Audio.play('exit', { volume: 0.4 });
     }
 }

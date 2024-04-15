@@ -15,7 +15,7 @@ export default new Phaser.Game({
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
     scene: [ 
-        // MenuScene,
+        MenuScene,
         GameScene,
         EndScene,
         ],

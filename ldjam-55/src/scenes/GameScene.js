@@ -48,6 +48,7 @@ export default class GameScene extends HereScene {
         Utils.loadImage('moneyBox');
         Utils.loadSpriteSheet('buttons', 60);
         Utils.loadImage('okButton');
+        Utils.loadImage('bang');
 
         Utils.loadSpriteSheet('panel', 300, 100);
         Utils.loadSpriteSheet('stratagems', 80);
@@ -61,6 +62,11 @@ export default class GameScene extends HereScene {
         Utils.loadWav('shot');
         Utils.loadWav('select');
         Utils.loadWav('summon');
+        Utils.loadWav('lattern');
+        Utils.loadWav('enter');
+        Utils.loadWav('exit');
+        Utils.loadWav('hurt');
+        Utils.loadWav('readyToPay');
     }
 
     create() {

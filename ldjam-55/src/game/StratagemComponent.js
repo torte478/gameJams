@@ -13,7 +13,7 @@ export default class StratagemComponent {
 
     state = {
         isActive: true,
-        money: 9000,
+        money: 0,
         arrowIndex: 0,
     }
 

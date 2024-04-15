@@ -223,7 +223,7 @@ export default class InteriorComponent {
         me._startMoving(passenger, index, me.consts.doorIndex);
     }
 
-    _makeBadFeelengs(passenger, index) {
+    _updateDestination(passenger, index) {
         const me = this;
 
         const old = passenger.destination;
@@ -238,9 +238,14 @@ export default class InteriorComponent {
         if (passenger.destination < 0 && old >= 0) {
             me._changeState(passenger, Enums.PassengerState.EXIT);
             me._startMoving(passenger, index, me.consts.doorIndex);
-            if (me._components.money._paymentIid == passenger.iid)
+            if (me._components.money._paymentIid == passenger.iid) {
                 me._components.money._paymentIid = null;
+                me._components.money._showText(false);
+            }
+                
+            return true;
         }
+        return false;
     }
 
     _onBusStatusChanged(status) {
@@ -248,10 +253,13 @@ export default class InteriorComponent {
 
         const passengers = me._enumeratePassengers();
         if (status == Enums.BusStatus.DEPARTURE) {
+            let hasDismorale = false;
             for (let i = 0; i < passengers.length; ++i) {
                 const passenger = passengers[i].passenger;
-                me._makeBadFeelengs(passenger, passengers[i].index);
+                hasDismorale = hasDismorale || me._updateDestination(passenger, passengers[i].index);
             }
+            if (hasDismorale)
+                me._components.specEffects.doDismorale();
         }
 
         if (status == Enums.BusStatus.PREPARE_TO_EXIT) {
@@ -590,6 +598,8 @@ export default class InteriorComponent {
         me._graph[me.consts.doorIndex].lease(passenger);
 
         me._startMoving(passenger, me.consts.doorIndex, freeNode);
+
+        Here.Audio.play('enter', { volume: 0.75 });
     }
 
     _startMoving(passenger, from, to) {
@@ -648,6 +658,9 @@ export default class InteriorComponent {
         me._spritePool.killAndHide(passenger);
         
         me._events.emit('onPasangerExit');
+
+        const pos = me._components.road._bus;
+        me._components.specEffects.doExit(pos.x + 30, pos.y);
 
         me._checkExitComplete();
     }
@@ -761,8 +774,11 @@ export default class InteriorComponent {
         for (let i = 0; i < me._graph.length; ++i) {
             const passenger = me._graph[i].passenger;
 
-            if (!!passenger)
-                me._makeBadFeelengs(passenger, i);
+            if (!!passenger) {
+                passenger.destination = 0,
+                me._updateDestination(passenger, i);
+            }
+                
         }
 
         me._components.specEffects.doDismorale();
