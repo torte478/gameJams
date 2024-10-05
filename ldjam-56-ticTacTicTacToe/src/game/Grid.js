@@ -113,7 +113,7 @@ export default class Grid {
     if (cell == Enums.Cells.RD)
       return [Enums.Cells.LU, Enums.Cells.LD, Enums.Cells.RU];
 
-    throw `can't calculate farest corners ${cell}`;
+    return [];
   }
 
   static _getRowWinner(cells, a, b, c) {

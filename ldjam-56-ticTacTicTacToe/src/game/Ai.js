@@ -175,7 +175,8 @@ export default class Ai {
     const freeCorners = chunk.filterFree(farestCorners);
     for (let i = 0; i < freeCorners.length; ++i) {
       res.add(freeCorners[i]);
-      return res;
+
+      if (res.size > 0) return res;
     }
 
     // hasn't free corner

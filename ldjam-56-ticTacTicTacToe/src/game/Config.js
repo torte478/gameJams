@@ -10,7 +10,7 @@ export default class Config {
   };
 
   static Init = {
-    Difficulty: Enums.Difficulty.EASYr,
+    Difficulty: Enums.Difficulty.HARD,
     Side: Enums.Side.NOUGHT,
   };
 }
