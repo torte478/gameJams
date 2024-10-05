@@ -31,34 +31,64 @@ export default class View {
   }
 
   /**
-   * @param {Object} state
+   * @param {Object} nextState
    * @param {Function} callback
    * @param {Object} scope
    */
-  changeState(state, callback, scope) {
+  goToUp(nextState, callback, scope) {
     const me = this;
-
-    const duration = 1500;
 
     Here._.add.tween({
       targets: me._first.container,
       scale: { from: 1, to: 0.25 },
       alpha: { from: 1, to: 0 },
-      duration: duration,
+      duration: Config.Duration.LayerChange,
       ease: "Sine.easeInOut",
     });
 
-    me._second.setState(state);
+    me._second.setState(nextState);
     Here._.add.tween({
       targets: me._second.container,
       scale: { from: 2, to: 1 },
       alpha: { from: 0, to: 1 },
-      duration: duration,
+      duration: Config.Duration.LayerChange,
       ease: "Sine.easeInOut",
       onComplete: () => {
         me._swap();
+        Utils.callCallback(callback, scope);
+      },
+    });
+  }
 
-        if (!!callback) callback.call(scope);
+  /**
+   * @param {Object} nextState
+   * @param {Number} cell
+   * @param {Function} callback
+   * @param {Object} scope
+   */
+  goToDown(nextState, cell, callback, scope) {
+    const me = this;
+
+    const pos = Grid.cellToPos(cell);
+
+    Here._.add.tween({
+      targets: me._first.container,
+      scale: { from: 1, to: 2 },
+      alpha: { from: 1, to: 0 },
+      duration: Config.Duration.LayerChange,
+      ease: "Sine.easeInOut",
+    });
+
+    me._second.setState(nextState);
+    Here._.add.tween({
+      targets: me._second.container,
+      scale: { from: 0.25, to: 1 },
+      alpha: { from: 0, to: 1 },
+      duration: Config.Duration.LayerChange,
+      ease: "Sine.easeInOut",
+      onComplete: () => {
+        me._swap();
+        Utils.callCallback(callback, scope);
       },
     });
   }

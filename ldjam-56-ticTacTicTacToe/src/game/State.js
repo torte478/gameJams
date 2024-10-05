@@ -14,6 +14,9 @@ export default class State {
   /** @type {Boolean} */
   isInputEnabled;
 
+  /** @type {Number[]} */
+  path;
+
   constructor(chunk) {
     const me = this;
 
@@ -21,5 +24,6 @@ export default class State {
     me.side = Config.Init.Side;
     me.layer = 0;
     me.isInputEnabled = true;
+    me.path = [];
   }
 }

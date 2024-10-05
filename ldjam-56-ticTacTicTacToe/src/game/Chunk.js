@@ -13,7 +13,7 @@ export default class Chunk {
   _cells;
 
   /** @type {Number} */
-  _layer;
+  layer;
 
   /** @type {Array}} */
   stepHistory;
@@ -27,7 +27,7 @@ export default class Chunk {
   constructor(layer) {
     const me = this;
 
-    me._layer = layer;
+    me.layer = layer;
     me._cells = Utils.buildArray(9, Enums.Side.NONE);
     me.stepHistory = [];
     me.winner = Enums.Side.NONE;
@@ -58,26 +58,39 @@ export default class Chunk {
     me.parent = chunk;
   }
 
-  /**
-   * @param {Number} cell
-   * @returns {Number | Chunk}
-   */
-  getCell(cell) {
+  getRoot() {
     const me = this;
 
-    if (cell < 0 || cell >= 9) throw `wrong cell ${cell}`;
+    let root = this;
+    while (!!root.parent) root = me.parent;
 
-    return me._cells[cell];
+    return root;
   }
 
   /**
-   * @param {Number} cell
-   * @returns {Boolean}
+   * @param {Number} cellIndex
+   * @returns {Number | Chunk}
    */
-  isFree(cell) {
+  getCell(cellIndex) {
     const me = this;
 
-    return me.getCell(cell) == Enums.Side.NONE;
+    if (cellIndex < 0 || cellIndex >= 9) throw `wrong cell ${cellIndex}`;
+
+    const cell = me._cells[cellIndex];
+    if (me.layer > 0 && !cell) me._cells[cellIndex] = new Chunk(me.layer - 1);
+
+    return me._cells[cellIndex];
+  }
+
+  /**
+   * @param {Number} cellIndex
+   * @returns {Boolean}
+   */
+  isFree(cellIndex) {
+    const me = this;
+
+    const cell = me.getCell(cellIndex);
+    return cell == Enums.Side.NONE || cell.winner == Enums.Side.NONE;
   }
 
   /**
@@ -85,9 +98,10 @@ export default class Chunk {
    */
   getAvailableSteps() {
     const me = this;
+
     const result = [];
-    for (let i = 0; i < me._cells.length; ++i)
-      if (me._cells[i] == Enums.Side.NONE) result.push(i);
+    for (let i = 0; i < me._cells.length; ++i) if (me.isFree(i)) result.push(i);
+
     return result;
   }
 
@@ -113,7 +127,7 @@ export default class Chunk {
     const cells = [];
     for (let i = 0; i < me._cells.length; ++i) {
       const side =
-        me._layer == 0 || !me._cells[i] ? me._cells[i] : me._cells[i].winner;
+        me.layer == 0 || !me._cells[i] ? me._cells[i] : me._cells[i].winner;
       cells.push(side);
     }
     return {
@@ -124,7 +138,7 @@ export default class Chunk {
   getChildState(cell) {
     const me = this;
 
-    if (me._layer == 0) throw "can't have child";
+    if (me.layer == 0) throw "can't have child";
 
     const child = me._cells[cell];
     if (!!child) return child.getState();

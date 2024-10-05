@@ -13,4 +13,8 @@ export default class Config {
     Difficulty: Enums.Difficulty.DEBUG,
     Side: Enums.Side.CROSS,
   };
+
+  static Duration = {
+    LayerChange: 1500,
+  };
 }

@@ -21,15 +21,43 @@ export default class Ai {
 
   /**
    * @param {Chunk} chunk
-   * @returns {Number}
+   * @returns {Number[]}
    */
-  makeStep(chunk) {
+  calcStep(chunk) {
+    const me = this;
+
+    let current = chunk.getRoot();
+
+    Utils.debugLog("=====");
+
+    const path = [];
+
+    while (true) {
+      const cell = me._calcStepInternal(current);
+
+      if (current.layer > 0) {
+        path.push(cell);
+      } else {
+        return {
+          path: path,
+          cell: cell,
+        };
+      }
+
+      current = current.getCell(cell);
+    }
+  }
+
+  _calcStepInternal(chunk) {
     const me = this;
 
     const availableSteps = chunk.getAvailableSteps();
     if (availableSteps.length == 0) throw "no available steps";
 
-    if (me._difficulty == Enums.Difficulty.DEBUG) return availableSteps[0];
+    if (me._difficulty == Enums.Difficulty.DEBUG) {
+      Utils.debugLog([availableSteps[0]]);
+      return availableSteps[0];
+    }
 
     const winSteps = Array.from(me._getWinSteps(chunk, availableSteps));
 

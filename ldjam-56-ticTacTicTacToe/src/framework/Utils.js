@@ -135,6 +135,20 @@ export default class Utils {
   }
 
   /**
+   * @param {Array} first
+   * @param {Array} second
+   * @returns {Boolean}
+   */
+  static equalArrays(first, second) {
+    if (first.length != second.length) return false;
+
+    for (let i = 0; i < first.length; ++i)
+      if (first[i] != second[i]) return false;
+
+    return true;
+  }
+
+  /**
    * @param {Number} length
    * @param {Object} value
    * @returns {Object[]}
@@ -436,4 +450,12 @@ export default class Utils {
   }
 
   // --- New ---
+
+  /**
+   * @param {Function} f
+   * @param {Object} scope
+   */
+  static callCallback(f, scope) {
+    if (!!f) f.call(scope);
+  }
 }

@@ -79,7 +79,8 @@ export default class Game {
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `sde: ${me._state.side == 1 ? "X" : "O"}\n` +
-        `lyr: ${me._state.layer}`;
+        `lyr: ${me._state.layer}\n` +
+        `pth: ${me._state.path}`;
 
       me._log.setText(text);
     });
@@ -110,59 +111,118 @@ export default class Game {
 
     me._hidePhantom();
 
-    const winner = me._makeStep(cell, Enums.Side.CROSS);
-    if (winner == Enums.Side.NONE) {
-      const aiStep = me._ai.makeStep(chunk);
+    if (me._state.layer == 0) {
+      const result = me._makeStep({ path: [], cell: cell }, Enums.Side.CROSS);
+
+      const aiStep = me._ai.calcStep(chunk);
       me._makeStep(aiStep, Enums.Side.NOUGHT);
-    } else {
-      me._toNextLayer(winner);
-    }
+    } else throw "not implemented";
+
+    // if (result == Enums.Side.CROSS || result == Enums.Side.DRAW) {
+    //     me._toNextLayer();
+    // } else {
+    //     const aiStep = me._ai.makeStep(chunk);
+    //     me._makeStep(aiStep, Enums.Side.NOUGHT);
+    // }
   }
 
-  _toNextLayer(winner) {
+  _makeStep(step, side) {
     const me = this;
 
+    if (Utils.equalArrays(step.path, me._state.path)) {
+      return me._makeLayer0Step(step.cell, side);
+    }
+
+    if (me._state.path.length > 0)
+      me._goToLayerUp(() => me._makeStep(step, side), me);
+    else me._goToLayerDown(step.path[0], () => me._makeStep(step, side), me);
+
+    // if (me._state.path.length == 0 && step.path.length > 0)
+    //     return me._goToLayer(me._state.layer - 1, () => me._makeStep(step, side), me);
+    // me._goToLayer(me._state.layer + 1, () => me._makeStep(step, side), me);
+
+    // if (me._state.layer > 0else {
+    //   me._showLayer(me._state.layer + 1, () => me._makeStep(step, side), me);
+    // }
+
+    // let chunk = me._state.chunk.getRoot();
+    // for (let i = 0; i < step.length - 1; ++i) {
+    //   chunk = chunk.getCell(step[i]);
+    // }
+  }
+
+  _goToLayerUp(callback, scope) {
+    const me = this;
     const chunk = me._state.chunk;
-    if (!chunk.parent) {
-      const parent = new Chunk(me._state.layer + 1, me._imagePool);
-      chunk.setParent(parent);
-      parent.makeStep(Enums.Cells.C, chunk);
-    } else {
-      throw "not implemented";
-    }
-
-    me._state.chunk = chunk.parent;
-    me._showLayer(me._state.layer + 1);
-  }
-
-  _showLayer(layer) {
-    const me = this;
 
     me._state.isInputEnabled = false;
 
-    me._state.layer = layer;
-    me._view.changeState(
-      me._state.chunk.getState(),
+    me._state.layer++;
+    me._view.goToUp(
+      chunk.parent.getState(),
       () => {
+        me._state.chunk = chunk.parent;
+        const newPath = [];
+        for (let i = 0; i < me._state.path.length - 1; ++i)
+          newPath.push(me._state.path[i]);
+        me._state.path = newPath;
+
+        Utils.callCallback(callback, scope);
+
         me._state.isInputEnabled = true;
       },
       me
     );
   }
 
-  _makeStep(cell, side) {
+  _goToLayerDown(cell, callback, scope) {
     const me = this;
-    const winner = me._state.chunk.makeStep(cell, side);
+    const chunk = me._state.chunk;
+
+    me._state.isInputEnabled = false;
+
+    me._state.layer--;
+    me._view.goToDown(
+      chunk.getCell(cell).getState(),
+      cell,
+      () => {
+        me._state.chunk = chunk.getCell(cell);
+        me._state.path.push(cell);
+
+        Utils.callCallback(callback, scope);
+
+        me._state.isInputEnabled = true;
+      },
+      me
+    );
+  }
+
+  _makeLayer0Step(cell, side) {
+    const me = this;
+    const chunk = me._state.chunk;
+
+    const winner = chunk.makeStep(cell, side);
     me._view.makeStep(cell, side);
     me._state.side *= -1;
+
+    if (winner == Enums.Side.NONE) return winner;
+
+    if (!chunk.parent) {
+      const parent = new Chunk(me._state.layer + 1, me._imagePool);
+      chunk.setParent(parent);
+      parent.makeStep(Enums.Cells.C, chunk);
+
+      const newPath = [Enums.Cells.C];
+      for (let i = 0; i < me._state.path.length; ++i)
+        newPath.push(me._state.path[i]);
+      me._state.path = newPath;
+    }
+
     return winner;
   }
 
   _gameLoop() {
     const me = this;
-
-    if (me._isFirstFrame && me._state.side == Enums.Side.NOUGHT)
-      return me._debugFirstNoughtStep();
 
     if (!me._state.isInputEnabled) return;
 
@@ -173,13 +233,6 @@ export default class Game {
     if (me._isFirstFrame) {
       if (worldPos.x != 0 || worldPos.y != 0) me._isFirstFrame = false;
     } else me._showPhantom(cell);
-  }
-
-  _debugFirstNoughtStep() {
-    const me = this;
-
-    const aiStep = me._ai.makeStep(me._state.chunk);
-    me._makeStep(aiStep, Enums.Side.NOUGHT);
   }
 
   _showPhantom(cell) {
