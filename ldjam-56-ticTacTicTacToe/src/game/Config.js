@@ -7,16 +7,16 @@ export default class Config {
     ShowSceneLog: true,
     PlaySound: true,
     Random: true,
+    Skip: false,
   };
 
   static Init = {
     Difficulty: Enums.Difficulty.DEBUG,
     Side: Enums.Side.CROSS,
-    Layer: 0,
   };
 
   static Duration = {
-    LayerChange: 1000,
+    Layer: 100,
   };
 
   static Scale = {

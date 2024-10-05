@@ -54,25 +54,12 @@ export default class Game {
 
     Here._.input.on("pointerdown", me._onMouseClick, me);
 
-    if (Config.Init.Layer == 1) me._debugSkipToLayer1();
-
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
         .text(10, 10, "", { fontSize: 18, backgroundColor: "#000" })
         .setScrollFactor(0)
         .setDepth(Consts.Depth.Max);
     });
-  }
-
-  _debugSkipToLayer1() {
-    const me = this;
-
-    me._makeLayer0Step(Enums.Cells.LD, Enums.Side.CROSS);
-    me._makeLayer0Step(Enums.Cells.D, Enums.Side.CROSS);
-    me._makeLayer0Step(Enums.Cells.L, Enums.Side.CROSS);
-    me._makeLayer0Step(Enums.Cells.LU, Enums.Side.NOUGHT);
-    me._makeLayer0Step(Enums.Cells.U, Enums.Side.NOUGHT);
-    me._makeLayer0Step(Enums.Cells.RU, Enums.Side.NOUGHT);
   }
 
   update() {
@@ -137,38 +124,31 @@ export default class Game {
 
     if (me._state.layer > 0) return me._goToLayerDown(cell, null, me);
 
-    const result = me._makeStep(
+    me._makeStep(
       { path: me._state.path, cell: cell },
-      Enums.Side.CROSS
+      Enums.Side.CROSS,
+      () => me._doAiStep(),
+      me
     );
-
-    const aiStep = me._ai.calcStep(chunk);
-    me._makeStep(aiStep, Enums.Side.NOUGHT);
   }
 
-  _makeStep(step, side) {
+  _doAiStep() {
+    const me = this;
+
+    const aiStep = me._ai.calcStep(me._state.chunk);
+    me._makeStep(aiStep, Enums.Side.NOUGHT, null, me);
+  }
+
+  _makeStep(step, side, callback, scope) {
     const me = this;
 
     if (Utils.equalArrays(step.path, me._state.path)) {
-      return me._makeLayer0Step(step.cell, side);
+      return me._makeLayer0Step(step.cell, side, callback, scope);
     }
 
-    if (me._state.path.length > 0)
-      me._goToLayerUp(() => me._makeStep(step, side), me);
-    else me._goToLayerDown(step.path[0], () => me._makeStep(step, side), me);
-
-    // if (me._state.path.length == 0 && step.path.length > 0)
-    //     return me._goToLayer(me._state.layer - 1, () => me._makeStep(step, side), me);
-    // me._goToLayer(me._state.layer + 1, () => me._makeStep(step, side), me);
-
-    // if (me._state.layer > 0else {
-    //   me._showLayer(me._state.layer + 1, () => me._makeStep(step, side), me);
-    // }
-
-    // let chunk = me._state.chunk.getRoot();
-    // for (let i = 0; i < step.length - 1; ++i) {
-    //   chunk = chunk.getCell(step[i]);
-    // }
+    const onComplete = () => me._makeStep(step, side, callback, scope);
+    if (me._state.path.length > 0) me._goToLayerUp(onComplete, me);
+    else me._goToLayerDown(step.path[0], onComplete, me);
   }
 
   _goToLayerUp(callback, scope) {
@@ -218,7 +198,7 @@ export default class Game {
     );
   }
 
-  _makeLayer0Step(cell, side) {
+  _makeLayer0Step(cell, side, callback, scope) {
     const me = this;
     const chunk = me._state.chunk;
 
@@ -226,20 +206,24 @@ export default class Game {
     me._view.makeStep(cell, side);
     me._state.side *= -1;
 
-    if (winner == Enums.Side.NONE) return winner;
+    if (winner == Enums.Side.NONE) {
+      return Utils.callCallback(callback, scope);
+    }
 
-    if (!chunk.parent) {
-      const parent = new Chunk(me._state.layer + 1, me._imagePool);
+    let parent = chunk.parent;
+    if (!parent) {
+      parent = new Chunk(me._state.layer + 1, me._imagePool);
       chunk.setParent(parent);
       parent.makeStep(Enums.Cells.C, chunk);
-
       const newPath = [Enums.Cells.C];
       for (let i = 0; i < me._state.path.length; ++i)
         newPath.push(me._state.path[i]);
       me._state.path = newPath;
     }
 
-    return winner;
+    me._goToLayerUp(() => {
+      Utils.callCallback(callback, scope);
+    }, me);
   }
 
   _gameLoop() {

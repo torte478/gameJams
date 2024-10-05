@@ -40,6 +40,7 @@ export default class View {
 
     const target = Grid.cellToPos(cell);
     const center = Grid.getCenterPos();
+    const duration = Config.Duration.Layer;
 
     Here._.add.tween({
       targets: me._first.container,
@@ -47,7 +48,7 @@ export default class View {
       y: { from: center.y, to: target.y },
       scale: { from: Config.Scale.Normal, to: Config.Scale.Small },
       alpha: { from: 1, to: 0 },
-      duration: Config.Duration.LayerChange,
+      duration: duration,
     });
 
     me._second.setState(nextState);
@@ -57,7 +58,7 @@ export default class View {
       y: center.y,
       scale: { from: Config.Scale.Big, to: Config.Scale.Normal },
       alpha: { from: 0, to: 1 },
-      duration: Config.Duration.LayerChange,
+      duration: duration,
       onComplete: () => {
         me._swap();
         Utils.callCallback(callback, scope);
@@ -77,7 +78,7 @@ export default class View {
 
     const target = Grid.cellToPos(cell);
     const opposite = Grid.cellToPos(Grid.toOpposite(cell));
-    const duration = Config.Duration.LayerChange;
+    const duration = Config.Duration.Layer;
     const center = Grid.getCenterPos();
 
     Here._.add.tween({
