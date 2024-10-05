@@ -1,6 +1,7 @@
 import Animation from "../framework/Animation.js";
 import HereScene from "../framework/HereScene.js";
 import Utils from "../framework/Utils.js";
+import Consts from "../game/Consts.js";
 import Game from "../game/Game.js";
 
 export default class GameScene extends HereScene {
@@ -29,6 +30,7 @@ export default class GameScene extends HereScene {
     Utils.loadWav("button_click");
 
     Utils.loadImage("grid");
+    Utils.loadSpriteSheet("step", Consts.Sizes.Cell);
   }
 
   create() {
