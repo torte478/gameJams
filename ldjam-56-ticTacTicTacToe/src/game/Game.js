@@ -47,10 +47,12 @@ export default class Game {
       .setAlpha(0.5);
 
     me._imagePool = Here._.add.group();
-    const initChunk = new Chunk(0, me._imagePool);
-    me._state = new State(initChunk);
     me._ai = new Ai(Config.Init.Difficulty);
     me._view = new View();
+    const initChunk = new Chunk(0);
+    me._state = new State(initChunk);
+
+    if (Utils.isDebug(Config.Debug.Skip)) me._debugInit();
 
     Here._.input.on("pointerdown", me._onMouseClick, me);
 
@@ -113,11 +115,7 @@ export default class Game {
     const chunk = me._state.chunk;
 
     const cell = Grid.posToCell(Utils.buildPoint(x, y));
-    if (
-      cell == -1 ||
-      (me._state.layer == 0 &&
-        (chunk.winner != Enums.Side.NONE || !chunk.isFree(cell)))
-    )
+    if (cell == -1 || (me._state.layer == 0 && !chunk.canMakeStep(cell)))
       return;
 
     me._hidePhantom();
@@ -149,9 +147,18 @@ export default class Game {
       return me._makeLayer0Step(step.cell, side, callback, scope);
     }
 
-    const onComplete = () => me._makeStep(step, side, callback, scope);
-    if (me._state.path.length > 0) me._goToLayerUp(onComplete, me);
-    else me._goToLayerDown(step.path[0], onComplete, me);
+    const onTransitionComplete = () =>
+      me._makeStep(step, side, callback, scope);
+    let correct = true;
+    for (let i = 0; i < me._state.path.length; ++i)
+      if (me._state.path[i] != step.path[i]) {
+        correct = false;
+        break;
+      }
+
+    if (!correct) me._goToLayerUp(onTransitionComplete, me);
+    else
+      me._goToLayerDown(step.path[me._state.layer], onTransitionComplete, me);
   }
 
   _goToLayerUp(callback, scope) {
@@ -197,9 +204,18 @@ export default class Game {
     const me = this;
     const chunk = me._state.chunk;
 
-    const winner = chunk.makeStep(cell, side);
+    chunk.makeStep(cell, side);
     me._view.makeStep(cell, side);
     me._state.side *= -1;
+
+    me._tryUp(callback, scope);
+  }
+
+  _tryUp(callback, scope) {
+    const me = this;
+    const chunk = me._state.chunk;
+
+    const winner = chunk.recalculateWinner();
 
     if (winner == Enums.Side.NONE) {
       return Utils.callCallback(callback, scope);
@@ -209,15 +225,16 @@ export default class Game {
     if (!parent) {
       parent = new Chunk(me._state.layer + 1, me._imagePool);
       chunk.setParent(parent);
-      parent.makeStep(Enums.Cells.C, chunk);
       const newPath = [Enums.Cells.C];
       for (let i = 0; i < me._state.path.length; ++i)
         newPath.push(me._state.path[i]);
       me._state.path = newPath;
     }
 
+    const parentCell = me._state.path[me._state.path.length - 1];
     me._goToLayerUp(() => {
-      Utils.callCallback(callback, scope);
+      parent.makeStep(parentCell, chunk);
+      me._tryUp(callback, scope);
     }, me);
   }
 
@@ -242,8 +259,7 @@ export default class Game {
 
     const pos = Grid.cellToPos(cell);
     if (me._state.layer == 0) {
-      if (!me._state.chunk.isFree(cell)) return me._phantom.setVisible(false);
-      if (me._state.chunk.winner != Enums.Side.NONE)
+      if (!me._state.chunk.canMakeStep(cell))
         return me._phantom.setVisible(false);
 
       return me._phantom.setVisible(true).setPosition(pos.x, pos.y);
@@ -265,5 +281,41 @@ export default class Game {
     if (me._state.layer > 0) me._view.resetChildView(me._state.chunk);
 
     me._state.isInputEnabled = true;
+  }
+
+  _debugInit() {
+    const me = this;
+
+    if (Config.Init.Skip == 0) return;
+
+    if (Config.Init.Skip == 1) {
+      const chunk = new Chunk(0);
+      chunk.makeStep(Enums.Cells.LU, Enums.Side.NOUGHT);
+      chunk.makeStep(Enums.Cells.U, Enums.Side.NOUGHT);
+      chunk.makeStep(Enums.Cells.LD, Enums.Side.CROSS);
+      chunk.makeStep(Enums.Cells.D, Enums.Side.CROSS);
+      me._view._first.setState(chunk.getState());
+      me._state.chunk = chunk;
+    }
+
+    if (Config.Init.Skip == 2) {
+      const me = this;
+
+      const chunks = [new Chunk(0), new Chunk(0), new Chunk(0)];
+      const parent = new Chunk(1);
+      for (let i = 0; i < chunks.length; ++i) {
+        const chunk = chunks[i];
+        chunk.makeStep(Enums.Cells.LU, Enums.Side.NOUGHT);
+        chunk.makeStep(Enums.Cells.U, Enums.Side.NOUGHT);
+        if (i < 2) chunk.makeStep(Enums.Cells.RU, Enums.Side.NOUGHT);
+        chunk.setParent(parent);
+        parent.makeStep(i, chunk);
+      }
+
+      me._state.path = [2];
+      const res = chunks[2];
+      me._view._first.setState(res.getState());
+      me._state.chunk = res;
+    }
   }
 }

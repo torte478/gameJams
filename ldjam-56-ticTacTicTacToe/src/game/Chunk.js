@@ -150,4 +150,28 @@ export default class Chunk {
       cells: Utils.buildArray(9, Enums.Side.NONE),
     };
   }
+
+  recalculateWinner() {
+    const me = this;
+
+    me.winner = Grid.getWinner(me.getState().cells);
+    return me.winner;
+  }
+
+  canMakeStep(cell) {
+    const me = this;
+
+    if (me.layer > 0) return false;
+
+    if (!me.isFree(cell)) return false;
+
+    let chunk = this;
+    while (!!chunk) {
+      if (chunk.winner != Enums.Side.NONE) return false;
+
+      chunk = chunk.parent;
+    }
+
+    return true;
+  }
 }

@@ -57,6 +57,7 @@ export default class View {
     me._hideChildren();
 
     const target = Grid.cellToPos(cell);
+    const opposite = Grid.cellToPos(Grid.toOpposite(cell));
     const center = Grid.getCenterPos();
     const duration = Config.Duration.Layer;
 
@@ -72,8 +73,14 @@ export default class View {
     me._second.setState(chunk.getState());
     Here._.add.tween({
       targets: me._second.container,
-      x: center.x,
-      y: center.y,
+      x: {
+        from: center.x + (opposite.x - center.x) * Config.Scale.Big,
+        to: center.x,
+      },
+      y: {
+        from: center.y + (opposite.y - center.y) * Config.Scale.Big,
+        to: center.y,
+      },
       scale: { from: Config.Scale.Big, to: Config.Scale.Normal },
       alpha: { from: 0, to: 1 },
       duration: duration,
@@ -171,7 +178,7 @@ export default class View {
 
   _swap() {
     const me = this;
-    const t = me._first;
+    let t = me._first;
     me._first = me._second;
     me._second = t;
   }

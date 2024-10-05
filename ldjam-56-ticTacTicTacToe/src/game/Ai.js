@@ -79,7 +79,9 @@ export default class Ai {
       ? Utils.getRandomEl(winSteps, 0)
       : Utils.getRandomEl(Utils.except(availableSteps, winSteps), 0);
 
-    if (!chunk.isFree(result)) throw `AI is broken!`;
+    if (!chunk.isFree(result)) {
+      throw `AI is broken!`;
+    }
 
     return result;
   }
