@@ -27,11 +27,13 @@ export default class Enums {
     NONE: 0,
     CROSS: 1,
     NOUGHT: -1,
+    DRAW: 100,
   };
 
   static Difficulty = {
-    EASY: 0,
-    NORMAL: 1,
-    HARD: 2,
+    DEBUG: 0,
+    EASY: 1,
+    NORMAL: 2,
+    HARD: 3,
   };
 }

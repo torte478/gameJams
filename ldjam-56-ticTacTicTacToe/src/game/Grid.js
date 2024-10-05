@@ -89,7 +89,9 @@ export default class Grid {
       if (winner != Enums.Side.NONE) return winner;
     }
 
-    return Enums.Side.NONE;
+    return Utils.all(cells, (x) => x != Enums.Side.NONE)
+      ? Enums.Side.DRAW
+      : Enums.Side.NONE;
   }
 
   static toFarestCorners(cell) {

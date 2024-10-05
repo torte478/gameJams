@@ -10,6 +10,8 @@ import Grid from "./Grid.js";
 import Controls from "../framework/Controls.js";
 import Chunk from "./Chunk.js";
 import Ai from "./Ai.js";
+import State from "./State.js";
+import ChunkView from "./ChunkView.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -18,11 +20,8 @@ export default class Game {
   /** @type {Phaser.GameObjects.Image} */
   _phantom;
 
-  /** @type {Chunk} */
-  _currentChunk;
-
   /** @type {Phaser.GameObjects.Group} */
-  _stepPool;
+  _imagePool;
 
   /** @type {Boolean} */
   _isFirstFrame = true;
@@ -30,8 +29,11 @@ export default class Game {
   /** @type {Ai} */
   _ai;
 
-  /** @type {Number} */
-  _currentSide;
+  /** @type {State} */
+  _state;
+
+  /** @type {ChunkView} */
+  _chunkView;
 
   constructor() {
     const me = this;
@@ -40,17 +42,16 @@ export default class Game {
     Here._.input.mouse.disableContextMenu();
 
     me._phantom = Here._.add
-      .image(100, 100, "step", 0)
+      .image(100, 100, "step", 1)
+      .setDepth(Consts.Depth.UI)
       .setVisible(false)
       .setAlpha(0.5);
 
-    me._currentSide = Config.Init.Side;
-
-    me._stepPool = Here._.add.group();
-    me._currentChunk = new Chunk(me._stepPool);
+    me._imagePool = Here._.add.group();
+    const initChunk = new Chunk(0, me._imagePool);
+    me._state = new State(initChunk);
     me._ai = new Ai(Config.Init.Difficulty);
-
-    Here._.add.image(Consts.Sizes.Cell * 1.5, Consts.Sizes.Cell * 1.5, "grid");
+    me._chunkView = new ChunkView();
 
     Here._.input.on("pointerdown", me._onMouseClick, me);
 
@@ -78,7 +79,8 @@ export default class Game {
       const mouse = Here._.input.activePointer;
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY.y | 0}\n` +
-        `sde: ${me._currentSide}`;
+        `sde: ${me._state.side}\n` +
+        `lyr: ${me._state.layer}`;
 
       me._log.setText(text);
     });
@@ -87,7 +89,7 @@ export default class Game {
   _onMouseClick(pointer) {
     const me = this;
 
-    if (me._currentSide != Enums.Side.CROSS) return;
+    if (me._state.side != Enums.Side.CROSS) return;
 
     return pointer.rightButtonDown()
       ? me._onRightButtonClick()
@@ -102,23 +104,56 @@ export default class Game {
   _onLeftButtonClick(x, y) {
     const me = this;
 
-    const cell = Grid.posToCell(Utils.buildPoint(x, y));
-    if (cell == -1 || !me._currentChunk.isFree(cell)) return;
+    const chunk = me._state.chunk;
 
-    me._currentChunk.makeStep(cell, Enums.Side.CROSS);
-    const aiStep = me._ai.makeStep(me._currentChunk);
-    me._currentChunk.makeStep(aiStep, Enums.Side.NOUGHT);
+    const cell = Grid.posToCell(Utils.buildPoint(x, y));
+    if (cell == -1 || !chunk.isFree(cell)) return;
+
+    const winner = me._makeStep(cell, Enums.Side.CROSS);
+    if (winner == Enums.Side.NONE) {
+      const aiStep = me._ai.makeStep(chunk);
+      me._makeStep(aiStep, Enums.Side.NOUGHT);
+    } else {
+      me._toNextLayer(winner);
+    }
+  }
+
+  _toNextLayer(winner) {
+    const me = this;
+
+    const chunk = me._state.chunk;
+    if (!chunk.parent) {
+      const parent = new Chunk(me._state.layer + 1, me._imagePool);
+      chunk.setParent(parent);
+      parent.setChunk(Enums.Cells.C, chunk);
+    } else {
+      throw "not implemented";
+    }
+
+    me._state.chunk = chunk.parent;
+    me._showLayer(me._state.layer + 1);
+  }
+
+  _showLayer(layer) {
+    const me = this;
+
+    me._state.layer = layer;
+    me._chunkView.setState(me._state.chunk.getState());
+  }
+
+  _makeStep(cell, side) {
+    const me = this;
+    const winner = me._state.chunk.makeStep(cell, side);
+    me._chunkView.makeStep(cell, side);
+    me._state.side *= -1;
+    return winner;
   }
 
   _gameLoop() {
     const me = this;
 
-    if (me._isFirstFrame && me._currentSide == Enums.Side.NOUGHT) {
-      const aiStep = me._ai.makeStep(me._currentChunk);
-      me._currentChunk.makeStep(aiStep, Enums.Side.NOUGHT);
-      me._nextSide();
-      return;
-    }
+    if (me._isFirstFrame && me._state.side == Enums.Side.NOUGHT)
+      return me._debugFirstNoughtStep();
 
     const mouse = Here._.input.activePointer;
     const worldPos = Utils.buildPoint(mouse.worldX, mouse.worldY);
@@ -129,21 +164,25 @@ export default class Game {
     } else me._showPhantom(cell);
   }
 
-  _nextSide() {
+  _debugFirstNoughtStep() {
     const me = this;
 
-    me._currentSide *= -1;
+    const aiStep = me._ai.makeStep(me._state.chunk);
+    me._makeStep(aiStep, Enums.Side.NOUGHT);
   }
 
   _showPhantom(cell) {
     const me = this;
 
-    if (cell == -1 || !me._currentChunk.isFree(cell)) {
-      me._phantom.setVisible(false);
-      return;
-    }
+    if (cell == -1) return me._phantom.setVisible(false);
 
     const pos = Grid.cellToPos(cell);
-    me._phantom.setVisible(true).setPosition(pos.x, pos.y);
+    if (me._state.layer == 0) {
+      if (!me._state.chunk.isFree(cell)) return me._phantom.setVisible(false);
+
+      return me._phantom.setVisible(true).setPosition(pos.x, pos.y);
+    }
+
+    return me._phantom.setVisible(false);
   }
 }

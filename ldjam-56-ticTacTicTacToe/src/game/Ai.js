@@ -29,6 +29,8 @@ export default class Ai {
     const availableSteps = chunk.getAvailableSteps();
     if (availableSteps.length == 0) throw "no available steps";
 
+    if (me._difficulty == Enums.Difficulty.DEBUG) return availableSteps[0];
+
     const winSteps = Array.from(me._getWinSteps(chunk, availableSteps));
 
     Utils.debugLog(winSteps);
@@ -36,12 +38,7 @@ export default class Ai {
     if (winSteps.length == 0 || winSteps.length == availableSteps.length)
       return Utils.getRandomEl(availableSteps, 0);
 
-    const winProbability =
-      me._difficulty == Enums.Difficulty.HARD
-        ? 1
-        : me._difficulty == Enums.Difficulty.NORMAL
-        ? 2
-        : 4;
+    const winProbability = me._getWinProbalityByDifficulty();
     const isWinStep = Utils.getRandom(1, winProbability) == 1;
 
     const result = isWinStep
@@ -51,6 +48,15 @@ export default class Ai {
     if (!chunk.isFree(result)) throw `AI is broken!`;
 
     return result;
+  }
+
+  _getWinProbalityByDifficulty() {
+    const me = this;
+
+    if (me._difficulty == Enums.Difficulty.HARD) return 1;
+    if (me._difficulty == Enums.Difficulty.NORMAL) return 2;
+    if (me._difficulty == Enums.Difficulty.EASY) return 4;
+    throw `too easy`;
   }
 
   /**

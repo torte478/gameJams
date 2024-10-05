@@ -9,25 +9,60 @@ import Enums from "./Enums.js";
 import Grid from "./Grid.js";
 
 export default class Chunk {
-  /** @type {Number[]} */
+  /** @type {Number[] | Chunk[]} } */
   _cells;
 
-  /** @type {Phaser.GameObjects.Image[]} */
-  _images;
-
-  /** @type {Phaser.GameObjects.Group} */
-  _stepPool;
+  /** @type {Number} */
+  _layer;
 
   /** @type {Array}} */
   stepHistory;
 
-  constructor(stepPool) {
+  /** @type {Number} */
+  winner;
+
+  /** @type {Chunk | null} */
+  parent;
+
+  constructor(layer) {
     const me = this;
 
+    me._layer = layer;
     me._cells = Utils.buildArray(9, Enums.Side.NONE);
-    me._images = Utils.buildArray(9, null);
-    me._stepPool = stepPool;
     me.stepHistory = [];
+    me.winner = Enums.Side.NONE;
+    me.parent = null;
+  }
+
+  /**
+   * @param {Number} cell
+   * @param {Number} side
+   */
+  makeStep(cell, side) {
+    const me = this;
+
+    if (me.winner != Enums.Side.NONE) throw "chunk is complete";
+
+    me._cells[cell] = side;
+
+    me.stepHistory.push({ cell: cell, side: side });
+
+    me.winner = Grid.getWinner(me._cells);
+    return me.winner;
+  }
+
+  setParent(chunk) {
+    const me = this;
+    if (!!me.parent) throw "parent already initialized";
+
+    me.parent = chunk;
+  }
+
+  setChunk(cell, chunk) {
+    const me = this;
+    if (me._layer == 0 || !!me._cells[cell]) throw "chunk alredy initialized";
+
+    me._cells[cell] = chunk;
   }
 
   /**
@@ -50,26 +85,6 @@ export default class Chunk {
     const me = this;
 
     return me.getCell(cell) == Enums.Side.NONE;
-  }
-
-  /**
-   * @param {Number} cell
-   * @param {Number} side
-   */
-  makeStep(cell, side) {
-    const me = this;
-
-    me._cells[cell] = side;
-
-    const pos = Grid.cellToPos(cell);
-    me._images[cell] = me._stepPool.create(
-      pos.x,
-      pos.y,
-      "step",
-      side == Enums.Side.CROSS ? 0 : 1
-    );
-
-    me.stepHistory.push({ cell: cell, side: side });
   }
 
   /**
@@ -97,5 +112,19 @@ export default class Chunk {
     for (let i = 0; i < cells.length; ++i)
       if (me.isFree(cells[i])) res.push(cells[i]);
     return res;
+  }
+
+  getState() {
+    const me = this;
+
+    const cells = [];
+    for (let i = 0; i < me._cells.length; ++i) {
+      const side =
+        me._layer == 0 || !me._cells[i] ? me._cells[i] : me._cells[i].winner;
+      cells.push(side);
+    }
+    return {
+      cells: cells,
+    };
   }
 }

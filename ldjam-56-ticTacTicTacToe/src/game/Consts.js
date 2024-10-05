@@ -15,6 +15,8 @@ export default class Consts {
   };
 
   static Depth = {
+    Chunk: 0,
+    UI: 1000,
     Max: 100000,
   };
 }
