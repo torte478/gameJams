@@ -14,7 +14,7 @@ export default class Enums {
   static Cells = {
     LU: 0,
     U: 1,
-    LR: 2,
+    RU: 2,
     L: 3,
     C: 4,
     R: 5,
@@ -27,5 +27,11 @@ export default class Enums {
     NONE: 0,
     CROSS: 1,
     NOUGHT: -1,
+  };
+
+  static Difficulty = {
+    EASY: 0,
+    NORMAL: 1,
+    HARD: 2,
   };
 }

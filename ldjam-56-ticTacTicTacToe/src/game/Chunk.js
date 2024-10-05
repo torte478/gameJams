@@ -18,12 +18,16 @@ export default class Chunk {
   /** @type {Phaser.GameObjects.Group} */
   _stepPool;
 
+  /** @type {Array}} */
+  stepHistory;
+
   constructor(stepPool) {
     const me = this;
 
     me._cells = Utils.buildArray(9, Enums.Side.NONE);
     me._images = Utils.buildArray(9, null);
     me._stepPool = stepPool;
+    me.stepHistory = [];
   }
 
   /**
@@ -48,6 +52,10 @@ export default class Chunk {
     return me.getCell(cell) == Enums.Side.NONE;
   }
 
+  /**
+   * @param {Number} cell
+   * @param {Number} side
+   */
   makeStep(cell, side) {
     const me = this;
 
@@ -60,5 +68,34 @@ export default class Chunk {
       "step",
       side == Enums.Side.CROSS ? 0 : 1
     );
+
+    me.stepHistory.push({ cell: cell, side: side });
+  }
+
+  /**
+   * @returns {Number[]}
+   */
+  getAvailableSteps() {
+    const me = this;
+    const result = [];
+    for (let i = 0; i < me._cells.length; ++i)
+      if (me._cells[i] == Enums.Side.NONE) result.push(i);
+    return result;
+  }
+
+  toAssumption(cell, side) {
+    const me = this;
+
+    const assumption = Utils.copyArray(me._cells);
+    assumption[cell] = side;
+    return assumption;
+  }
+
+  filterFree(cells) {
+    const me = this;
+    const res = [];
+    for (let i = 0; i < cells.length; ++i)
+      if (me.isFree(cells[i])) res.push(cells[i]);
+    return res;
   }
 }

@@ -9,6 +9,7 @@ import Enums from "./Enums.js";
 import Grid from "./Grid.js";
 import Controls from "../framework/Controls.js";
 import Chunk from "./Chunk.js";
+import Ai from "./Ai.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -26,6 +27,9 @@ export default class Game {
   /** @type {Boolean} */
   _isFirstFrame = true;
 
+  /** @type {Ai} */
+  _ai;
+
   constructor() {
     const me = this;
 
@@ -39,6 +43,7 @@ export default class Game {
 
     me._stepPool = Here._.add.group();
     me._currentChunk = new Chunk(me._stepPool);
+    me._ai = new Ai(Config.Init.Difficulty);
 
     Here._.add.image(Consts.Sizes.Cell * 1.5, Consts.Sizes.Cell * 1.5, "grid");
 
@@ -92,6 +97,8 @@ export default class Game {
     if (cell == -1 || !me._currentChunk.isFree(cell)) return;
 
     me._currentChunk.makeStep(cell, Enums.Side.CROSS);
+    const aiStep = me._ai.makeStep(me._currentChunk);
+    me._currentChunk.makeStep(aiStep, Enums.Side.NOUGHT);
   }
 
   _gameLoop() {
@@ -101,8 +108,9 @@ export default class Game {
     const worldPos = Utils.buildPoint(mouse.worldX, mouse.worldY);
     const cell = Grid.posToCell(worldPos);
 
-    if (me._isFirstFrame) me._isFirstFrame = false;
-    else me._showPhantom(cell);
+    if (me._isFirstFrame) {
+      if (worldPos.x != 0 || worldPos.y != 0) me._isFirstFrame = false;
+    } else me._showPhantom(cell);
   }
 
   _showPhantom(cell) {

@@ -1,10 +1,15 @@
-export default class Config {
+import Enums from "./Enums.js";
 
-    static Debug = {
-        Global: true,
-        Log: true,
-        ShowSceneLog: true,
-        PlaySound: true,
-        Random: false
-    };
+export default class Config {
+  static Debug = {
+    Global: true,
+    Log: true,
+    ShowSceneLog: true,
+    PlaySound: true,
+    Random: false,
+  };
+
+  static Init = {
+    Difficulty: Enums.Difficulty.HARD,
+  };
 }
