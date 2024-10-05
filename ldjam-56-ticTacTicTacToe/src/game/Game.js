@@ -149,16 +149,27 @@ export default class Game {
 
     const onTransitionComplete = () =>
       me._makeStep(step, side, callback, scope);
-    let correct = true;
+
+    let canGoDown = true;
     for (let i = 0; i < me._state.path.length; ++i)
       if (me._state.path[i] != step.path[i]) {
-        correct = false;
+        canGoDown = false;
         break;
       }
 
-    if (!correct) me._goToLayerUp(onTransitionComplete, me);
-    else
-      me._goToLayerDown(step.path[me._state.layer], onTransitionComplete, me);
+    if (canGoDown) {
+      me._goToLayerDown(
+        step.path[step.path.length - me._state.layer],
+        () => {
+          const duration = me._state.layer > 0 ? Config.Duration.Between : 0;
+          Here._.time.delayedCall(duration, onTransitionComplete, me);
+          // onTransitionComplete();
+        },
+        me
+      );
+    } else {
+      me._goToLayerUp(onTransitionComplete, me);
+    }
   }
 
   _goToLayerUp(callback, scope) {
@@ -234,7 +245,12 @@ export default class Game {
     const parentCell = me._state.path[me._state.path.length - 1];
     me._goToLayerUp(() => {
       parent.makeStep(parentCell, chunk);
-      me._tryUp(callback, scope);
+      me._view.makeStep(parentCell, winner);
+      Here._.time.delayedCall(
+        Config.Duration.Between,
+        () => me._tryUp(callback, scope),
+        me
+      );
     }, me);
   }
 

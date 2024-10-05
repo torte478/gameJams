@@ -6,18 +6,19 @@ export default class Config {
     Log: true,
     ShowSceneLog: true,
     PlaySound: true,
-    Random: true,
+    Random: false,
     Skip: false,
   };
 
   static Init = {
-    Difficulty: Enums.Difficulty.HARD,
+    Difficulty: Enums.Difficulty.NORMAL,
     Side: Enums.Side.CROSS,
     Skip: 2,
   };
 
   static Duration = {
     Layer: 1000,
+    Between: 250,
   };
 
   static Scale = {

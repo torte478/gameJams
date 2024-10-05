@@ -91,15 +91,18 @@ export default class Grid {
   }
 
   static getWinner(cells) {
+    let canWin = false;
     for (let i = 0; i < Grid._rows.length; ++i) {
       const row = Grid._rows[i];
       const winner = Grid._getRowWinner(cells, row[0], row[1], row[2]);
-      if (winner != Enums.Side.NONE) return winner;
+      if (winner == Enums.Side.NONE) canWin = true;
+
+      if (winner != Enums.Side.NONE && winner != Enums.Side.DRAW) return winner;
     }
 
-    return Utils.all(cells, (x) => x != Enums.Side.NONE)
-      ? Enums.Side.DRAW
-      : Enums.Side.NONE;
+    if (Utils.all(cells, (x) => x != Enums.Side.NONE)) return Enums.Side.DRAW;
+
+    return canWin ? Enums.Side.NONE : Enums.Side.DRAW;
   }
 
   static toFarestCorners(cell) {
@@ -131,6 +134,13 @@ export default class Grid {
   }
 
   static _getRowWinner(cells, a, b, c) {
+    if (
+      cells[a] == Enums.Side.DRAW ||
+      cells[b] == Enums.Side.DRAW ||
+      cells[c] == Enums.Side.DRAW
+    )
+      return Enums.Side.DRAW;
+
     const sum = cells[a] + cells[b] + cells[c];
     return sum == 3
       ? Enums.Side.CROSS
