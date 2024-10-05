@@ -30,6 +30,9 @@ export default class Game {
   /** @type {Ai} */
   _ai;
 
+  /** @type {Number} */
+  _currentSide;
+
   constructor() {
     const me = this;
 
@@ -40,6 +43,8 @@ export default class Game {
       .image(100, 100, "step", 0)
       .setVisible(false)
       .setAlpha(0.5);
+
+    me._currentSide = Config.Init.Side;
 
     me._stepPool = Here._.add.group();
     me._currentChunk = new Chunk(me._stepPool);
@@ -71,7 +76,9 @@ export default class Game {
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
-      let text = `mse: ${mouse.worldX | 0} ${mouse.worldY.y | 0}\n`;
+      let text =
+        `mse: ${mouse.worldX | 0} ${mouse.worldY.y | 0}\n` +
+        `sde: ${me._currentSide}`;
 
       me._log.setText(text);
     });
@@ -79,6 +86,8 @@ export default class Game {
 
   _onMouseClick(pointer) {
     const me = this;
+
+    if (me._currentSide != Enums.Side.CROSS) return;
 
     return pointer.rightButtonDown()
       ? me._onRightButtonClick()
@@ -104,6 +113,13 @@ export default class Game {
   _gameLoop() {
     const me = this;
 
+    if (me._isFirstFrame && me._currentSide == Enums.Side.NOUGHT) {
+      const aiStep = me._ai.makeStep(me._currentChunk);
+      me._currentChunk.makeStep(aiStep, Enums.Side.NOUGHT);
+      me._nextSide();
+      return;
+    }
+
     const mouse = Here._.input.activePointer;
     const worldPos = Utils.buildPoint(mouse.worldX, mouse.worldY);
     const cell = Grid.posToCell(worldPos);
@@ -111,6 +127,12 @@ export default class Game {
     if (me._isFirstFrame) {
       if (worldPos.x != 0 || worldPos.y != 0) me._isFirstFrame = false;
     } else me._showPhantom(cell);
+  }
+
+  _nextSide() {
+    const me = this;
+
+    me._currentSide *= -1;
   }
 
   _showPhantom(cell) {

@@ -54,8 +54,17 @@ export default class Grid {
     throw `not corner ${corner}`;
   }
 
+  static toOppositeMiddle(middle) {
+    if (middle == Enums.Cells.U) return Enums.Cells.D;
+    if (middle == Enums.Cells.D) return Enums.Cells.U;
+    if (middle == Enums.Cells.L) return Enums.Cells.R;
+    if (middle == Enums.Cells.R) return Enums.Cells.L;
+
+    throw `not middle ${middle}`;
+  }
+
   static toClosestCorner(first, second) {
-    if (first < second) {
+    if (first > second) {
       const t = first;
       first = second;
       second = t;
@@ -81,6 +90,30 @@ export default class Grid {
     }
 
     return Enums.Side.NONE;
+  }
+
+  static toFarestCorners(cell) {
+    const me = this;
+    if (cell == Enums.Cells.LU)
+      return [Enums.Cells.RD, Enums.Cells.RU, Enums.Cells.LD];
+    if (cell == Enums.Cells.U)
+      return [Enums.Cells.LD, Enums.Cells.RD, Enums.Cells.LU, Enums.Cells.RU];
+    if (cell == Enums.Cells.RU)
+      return [Enums.Cells.LD, Enums.Cells.LU, Enums.Cells.RD];
+
+    if (cell == Enums.Cells.L)
+      return [Enums.Cells.RU, Enums.Cells.RD, Enums.Cells.LU, Enums.Cells.LD];
+    if (cell == Enums.Cells.R)
+      return [Enums.Cells.LU, Enums.Cells.LD, Enums.Cells.RU, Enums.Cells.RD];
+
+    if (cell == Enums.Cells.LD)
+      return [Enums.Cells.RU, Enums.Cells.LU, Enums.Cells.RD];
+    if (cell == Enums.Cells.D)
+      return [Enums.Cells.LU, Enums.Cells.RU, Enums.Cells.LD, Enums.Cells.RD];
+    if (cell == Enums.Cells.RD)
+      return [Enums.Cells.LU, Enums.Cells.LD, Enums.Cells.RU];
+
+    throw `can't calculate farest corners ${cell}`;
   }
 
   static _getRowWinner(cells, a, b, c) {
