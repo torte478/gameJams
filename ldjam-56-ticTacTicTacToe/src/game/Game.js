@@ -7,11 +7,10 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Grid from "./Grid.js";
-import Controls from "../framework/Controls.js";
 import Chunk from "./Chunk.js";
 import Ai from "./Ai.js";
 import State from "./State.js";
-import ChunkView from "./ChunkView.js";
+import View from "./View.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -32,8 +31,8 @@ export default class Game {
   /** @type {State} */
   _state;
 
-  /** @type {ChunkView} */
-  _chunkView;
+  /** @type {View} */
+  _view;
 
   constructor() {
     const me = this;
@@ -51,7 +50,7 @@ export default class Game {
     const initChunk = new Chunk(0, me._imagePool);
     me._state = new State(initChunk);
     me._ai = new Ai(Config.Init.Difficulty);
-    me._chunkView = new ChunkView();
+    me._view = new View();
 
     Here._.input.on("pointerdown", me._onMouseClick, me);
 
@@ -78,7 +77,7 @@ export default class Game {
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
       let text =
-        `mse: ${mouse.worldX | 0} ${mouse.worldY.y | 0}\n` +
+        `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `sde: ${me._state.side}\n` +
         `lyr: ${me._state.layer}`;
 
@@ -138,13 +137,13 @@ export default class Game {
     const me = this;
 
     me._state.layer = layer;
-    me._chunkView.setState(me._state.chunk.getState());
+    me._view.changeState(me._state.chunk.getState());
   }
 
   _makeStep(cell, side) {
     const me = this;
     const winner = me._state.chunk.makeStep(cell, side);
-    me._chunkView.makeStep(cell, side);
+    me._view.makeStep(cell, side);
     me._state.side *= -1;
     return winner;
   }

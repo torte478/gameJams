@@ -16,25 +16,21 @@ export default class ChunkView {
   _cells;
 
   /** @type {Phaser.GameObjects.Container} */
-  _container;
+  container;
 
   constructor() {
     const me = this;
 
-    me._grid = Here._.add.image(
-      Consts.Sizes.Cell * 1.5,
-      Consts.Sizes.Cell * 1.5,
-      "grid"
-    );
+    me._grid = Here._.add.image(0, 0, "grid");
 
     me._cells = [];
 
-    for (let i = 0; i < 3; ++i)
-      for (let j = 0; j < 3; ++j)
+    for (let i = -1; i < 2; ++i)
+      for (let j = -1; j < 2; ++j)
         me._cells.push(
           Here._.add.image(
-            j * Consts.Sizes.Cell + 0.5 * Consts.Sizes.Cell,
-            i * Consts.Sizes.Cell + 0.5 * Consts.Sizes.Cell,
+            j * Consts.Sizes.Cell,
+            i * Consts.Sizes.Cell,
             "step",
             0
           )
@@ -44,7 +40,11 @@ export default class ChunkView {
     children.push(me._grid);
     for (let i = 0; i < me._cells.length; ++i) children.push(me._cells[i]);
 
-    me._container = Here._.add.container(0, 0, children);
+    me.container = Here._.add.container(
+      Consts.Sizes.Cell * 1.5,
+      Consts.Sizes.Cell * 1.5,
+      children
+    );
   }
 
   makeStep(cell, side) {
