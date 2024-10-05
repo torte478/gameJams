@@ -23,14 +23,19 @@ export default class Ai {
    * @param {Chunk} chunk
    * @returns {Number[]}
    */
-  calcStep(chunk) {
+  calcStep(chunk, currentPath) {
     const me = this;
 
-    let current = chunk.getRoot();
-
+    let current = null;
+    let path = null;
+    if (chunk.getAvailableSteps().length > 0) {
+      current = chunk;
+      path = Utils.copyArray(currentPath);
+    } else {
+      current = chunk.getRoot();
+      path = [];
+    }
     Utils.debugLog("=====");
-
-    const path = [];
 
     while (true) {
       const cell = me._calcStepInternal(current);

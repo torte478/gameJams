@@ -138,16 +138,8 @@ export default class Game {
   _doAiStep() {
     const me = this;
 
-    const aiStep = me._ai.calcStep(me._state.chunk);
+    const aiStep = me._ai.calcStep(me._state.chunk, me._state.path);
     me._makeStep(aiStep, Enums.Side.NOUGHT, me._onFullStepComplete, me);
-  }
-
-  _onFullStepComplete() {
-    const me = this;
-
-    if (me._state.layer > 0) me._view.resetChildView(me._state.chunk);
-
-    me._state.isInputEnabled = true;
   }
 
   _makeStep(step, side, callback, scope) {
@@ -265,5 +257,13 @@ export default class Game {
 
     me._phantom.setVisible(false);
     if (me._state.layer > 0) me._view.resetChildView(me._state.chunk);
+  }
+
+  _onFullStepComplete() {
+    const me = this;
+
+    if (me._state.layer > 0) me._view.resetChildView(me._state.chunk);
+
+    me._state.isInputEnabled = true;
   }
 }
