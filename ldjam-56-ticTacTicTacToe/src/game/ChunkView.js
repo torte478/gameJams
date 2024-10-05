@@ -67,6 +67,7 @@ export default class ChunkView {
     if (side == Enums.Side.NONE) return 0;
     if (side == Enums.Side.CROSS) return 1;
     if (side == Enums.Side.NOUGHT) return 2;
+    if (side == Enums.Side.DRAW) return 3;
 
     throw `wrong side ${side}`;
   }

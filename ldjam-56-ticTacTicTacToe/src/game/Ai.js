@@ -55,7 +55,7 @@ export default class Ai {
     if (availableSteps.length == 0) throw "no available steps";
 
     if (me._difficulty == Enums.Difficulty.DEBUG) {
-      const step = availableSteps[0]; //availableSteps.length - 1];
+      const step = availableSteps[0];
       Utils.debugLog(step);
       return step;
     }

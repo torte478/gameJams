@@ -104,7 +104,7 @@ export default class Game {
     me._hidePhantom();
 
     me._state.isInputEnabled = false;
-    me._goToLayerUp(null, me);
+    me._goToLayerUp(me._onFullStepComplete, me);
   }
 
   _onLeftButtonClick(x, y) {
@@ -122,8 +122,11 @@ export default class Game {
 
     me._hidePhantom();
 
-    if (me._state.layer > 0) return me._goToLayerDown(cell, null, me);
+    me._state.isInputEnabled = false;
+    if (me._state.layer > 0)
+      return me._goToLayerDown(cell, me._onFullStepComplete, me);
 
+    me._state.isInputEnabled = false;
     me._makeStep(
       { path: me._state.path, cell: cell },
       Enums.Side.CROSS,
@@ -136,7 +139,15 @@ export default class Game {
     const me = this;
 
     const aiStep = me._ai.calcStep(me._state.chunk);
-    me._makeStep(aiStep, Enums.Side.NOUGHT, null, me);
+    me._makeStep(aiStep, Enums.Side.NOUGHT, me._onFullStepComplete, me);
+  }
+
+  _onFullStepComplete() {
+    const me = this;
+
+    if (me._state.layer > 0) me._view.resetChildView(me._state.chunk);
+
+    me._state.isInputEnabled = true;
   }
 
   _makeStep(step, side, callback, scope) {
@@ -155,11 +166,9 @@ export default class Game {
     const me = this;
     const chunk = me._state.chunk;
 
-    me._state.isInputEnabled = false;
-
     me._state.layer++;
     me._view.goToUp(
-      chunk.parent.getState(),
+      chunk.parent,
       me._state.path[me._state.path.length - 1],
       () => {
         me._state.chunk = chunk.parent;
@@ -169,8 +178,6 @@ export default class Game {
         me._state.path = newPath;
 
         Utils.callCallback(callback, scope);
-
-        me._state.isInputEnabled = true;
       },
       me
     );
@@ -180,19 +187,15 @@ export default class Game {
     const me = this;
     const chunk = me._state.chunk;
 
-    me._state.isInputEnabled = false;
-
     me._state.layer--;
     me._view.goToDown(
-      chunk.getCell(cell).getState(),
+      chunk.getCell(cell),
       cell,
       () => {
         me._state.chunk = chunk.getCell(cell);
         me._state.path.push(cell);
 
         Utils.callCallback(callback, scope);
-
-        me._state.isInputEnabled = true;
       },
       me
     );
@@ -243,7 +246,7 @@ export default class Game {
   _showPhantom(cell) {
     const me = this;
 
-    if (cell == -1) return me._phantom.setVisible(false);
+    if (cell == -1 || !me._state.isInputEnabled) return me._hidePhantom();
 
     const pos = Grid.cellToPos(cell);
     if (me._state.layer == 0) {
@@ -254,14 +257,13 @@ export default class Game {
       return me._phantom.setVisible(true).setPosition(pos.x, pos.y);
     }
 
-    const childState = me._state.chunk.getChildState(cell);
-    return me._view.showPhantom(cell, me._state.chunk.getState(), childState);
+    return me._view.showPhantom(me._state.chunk, cell);
   }
 
   _hidePhantom() {
     const me = this;
 
     me._phantom.setVisible(false);
-    me._view.hidePhantom(me._state.chunk.getState());
+    if (me._state.layer > 0) me._view.resetChildView(me._state.chunk);
   }
 }

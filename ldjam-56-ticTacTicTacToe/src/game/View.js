@@ -8,6 +8,7 @@ import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Grid from "./Grid.js";
 import ChunkView from "./ChunkView.js";
+import Chunk from "./Chunk.js";
 
 export default class View {
   /** @type {ChunkView} */
@@ -16,12 +17,27 @@ export default class View {
   /** @type {ChunkView} */
   _second;
 
+  /** @type {ChunkView[]} */
+  _cells;
+
   constructor() {
     const me = this;
 
     me._first = new ChunkView();
     me._second = new ChunkView();
     me._second.container.setAlpha(0);
+
+    me._cells = [];
+    for (let i = 0; i < 9; ++i) {
+      const chunk = new ChunkView();
+      const pos = Grid.cellToPos(i);
+      chunk.container
+        .setAlpha(0)
+        .setScale(Config.Scale.Small)
+        .setPosition(pos.x, pos.y);
+
+      me._cells.push(chunk);
+    }
   }
 
   makeStep(cell, side) {
@@ -31,12 +47,14 @@ export default class View {
   }
 
   /**
-   * @param {Object} nextState
+   * @param {Chunk} chunk
    * @param {Function} callback
    * @param {Object} scope
    */
-  goToUp(nextState, cell, callback, scope) {
+  goToUp(chunk, cell, callback, scope) {
     const me = this;
+
+    me._hideChildren();
 
     const target = Grid.cellToPos(cell);
     const center = Grid.getCenterPos();
@@ -51,7 +69,7 @@ export default class View {
       duration: duration,
     });
 
-    me._second.setState(nextState);
+    me._second.setState(chunk.getState());
     Here._.add.tween({
       targets: me._second.container,
       x: center.x,
@@ -67,14 +85,15 @@ export default class View {
   }
 
   /**
-   * @param {Object} nextState
+   * @param {Chunk} chunk
    * @param {Number} cell
    * @param {Function} callback
    * @param {Object} scope
    */
-  goToDown(nextState, cell, callback, scope) {
-    const me = this,
-      cellSize = Consts.Sizes.Cell;
+  goToDown(chunk, cell, callback, scope) {
+    const me = this;
+
+    me._hideChildren();
 
     const target = Grid.cellToPos(cell);
     const opposite = Grid.cellToPos(Grid.toOpposite(cell));
@@ -96,7 +115,7 @@ export default class View {
       duration: duration,
     });
 
-    me._second.setState(nextState);
+    me._second.setState(chunk.getState());
     Here._.add.tween({
       targets: me._second.container,
       x: {
@@ -117,25 +136,37 @@ export default class View {
     });
   }
 
-  showPhantom(cell, state, childState) {
+  /**
+   * @param {Chunk} chunk
+   */
+  resetChildView(chunk) {
     const me = this;
 
-    me._first.setState(state);
-    me._first.makeStep(cell, Enums.Side.NONE);
+    for (let i = 0; i < me._cells.length; ++i) {
+      const child = chunk.getCell(i);
+      me._cells[i].setState(child.getState());
+      me._first.makeStep(i, child.winner);
 
-    me._second.setState(childState);
-    const pos = Grid.cellToPos(cell);
-    me._second.container
-      .setPosition(pos.x, pos.y)
-      .setAlpha(0.5)
-      .setScale(Config.Scale.Small);
+      const alpha = child.winner == Enums.Side.NONE ? 0.5 : 0;
+      me._cells[i].container.setAlpha(alpha);
+    }
   }
 
-  hidePhantom(state) {
+  showPhantom(chunk, cell) {
     const me = this;
 
-    me._second.container.setAlpha(0);
-    me._first.setState(state);
+    me.resetChildView(chunk);
+    me._first.makeStep(cell, Enums.Side.NONE);
+    me._cells[cell].setState(chunk.getCell(cell).getState());
+    me._cells[cell].container.setAlpha(1);
+  }
+
+  _hideChildren() {
+    const me = this;
+
+    for (let i = 0; i < me._cells.length; ++i) {
+      me._cells[i].container.setAlpha(0);
+    }
   }
 
   _swap() {
