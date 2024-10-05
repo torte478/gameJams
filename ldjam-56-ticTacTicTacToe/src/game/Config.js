@@ -12,9 +12,16 @@ export default class Config {
   static Init = {
     Difficulty: Enums.Difficulty.DEBUG,
     Side: Enums.Side.CROSS,
+    Layer: 0,
   };
 
   static Duration = {
-    LayerChange: 1500,
+    LayerChange: 1000,
+  };
+
+  static Scale = {
+    Small: 0.25,
+    Normal: 1,
+    Big: 4,
   };
 }

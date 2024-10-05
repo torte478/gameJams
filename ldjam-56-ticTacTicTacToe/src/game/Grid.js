@@ -63,6 +63,14 @@ export default class Grid {
     throw `not middle ${middle}`;
   }
 
+  static toOpposite(cell) {
+    if (cell == Enums.Cells.C) return Enums.Cells.C;
+
+    return Utils.contains(Grid.corners, cell)
+      ? Grid.toOppositeCorner(cell)
+      : Grid.toOppositeMiddle(cell);
+  }
+
   static toClosestCorner(first, second) {
     if (first > second) {
       const t = first;
@@ -116,6 +124,10 @@ export default class Grid {
       return [Enums.Cells.LU, Enums.Cells.LD, Enums.Cells.RU];
 
     return [];
+  }
+
+  static getCenterPos() {
+    return Utils.buildPoint(1.5 * Consts.Sizes.Cell, 1.5 * Consts.Sizes.Cell);
   }
 
   static _getRowWinner(cells, a, b, c) {

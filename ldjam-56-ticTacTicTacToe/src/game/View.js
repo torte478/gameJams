@@ -35,24 +35,29 @@ export default class View {
    * @param {Function} callback
    * @param {Object} scope
    */
-  goToUp(nextState, callback, scope) {
+  goToUp(nextState, cell, callback, scope) {
     const me = this;
+
+    const target = Grid.cellToPos(cell);
+    const center = Grid.getCenterPos();
 
     Here._.add.tween({
       targets: me._first.container,
-      scale: { from: 1, to: 0.25 },
+      x: { from: center.x, to: target.x },
+      y: { from: center.y, to: target.y },
+      scale: { from: Config.Scale.Normal, to: Config.Scale.Small },
       alpha: { from: 1, to: 0 },
       duration: Config.Duration.LayerChange,
-      ease: "Sine.easeInOut",
     });
 
     me._second.setState(nextState);
     Here._.add.tween({
       targets: me._second.container,
-      scale: { from: 2, to: 1 },
+      x: center.x,
+      y: center.y,
+      scale: { from: Config.Scale.Big, to: Config.Scale.Normal },
       alpha: { from: 0, to: 1 },
       duration: Config.Duration.LayerChange,
-      ease: "Sine.easeInOut",
       onComplete: () => {
         me._swap();
         Utils.callCallback(callback, scope);
@@ -67,25 +72,43 @@ export default class View {
    * @param {Object} scope
    */
   goToDown(nextState, cell, callback, scope) {
-    const me = this;
+    const me = this,
+      cellSize = Consts.Sizes.Cell;
 
-    const pos = Grid.cellToPos(cell);
+    const target = Grid.cellToPos(cell);
+    const opposite = Grid.cellToPos(Grid.toOpposite(cell));
+    const duration = Config.Duration.LayerChange;
+    const center = Grid.getCenterPos();
 
     Here._.add.tween({
       targets: me._first.container,
-      scale: { from: 1, to: 2 },
+      x: {
+        from: center.x,
+        to: center.x + (opposite.x - center.x) * Config.Scale.Big,
+      },
+      y: {
+        from: center.y,
+        to: center.y + (opposite.y - center.y) * Config.Scale.Big,
+      },
+      scale: { from: Config.Scale.Normal, to: Config.Scale.Big },
       alpha: { from: 1, to: 0 },
-      duration: Config.Duration.LayerChange,
-      ease: "Sine.easeInOut",
+      duration: duration,
     });
 
     me._second.setState(nextState);
     Here._.add.tween({
       targets: me._second.container,
-      scale: { from: 0.25, to: 1 },
-      alpha: { from: 0, to: 1 },
-      duration: Config.Duration.LayerChange,
-      ease: "Sine.easeInOut",
+      x: {
+        from: target.x,
+        to: center.x,
+      },
+      y: {
+        from: target.y,
+        to: center.y,
+      },
+      scale: { from: Config.Scale.Small, to: Config.Scale.Normal },
+      alpha: { from: 0.5, to: 1 },
+      duration: duration,
       onComplete: () => {
         me._swap();
         Utils.callCallback(callback, scope);
@@ -101,7 +124,10 @@ export default class View {
 
     me._second.setState(childState);
     const pos = Grid.cellToPos(cell);
-    me._second.container.setPosition(pos.x, pos.y).setAlpha(0.5);
+    me._second.container
+      .setPosition(pos.x, pos.y)
+      .setAlpha(0.5)
+      .setScale(Config.Scale.Small);
   }
 
   hidePhantom(state) {

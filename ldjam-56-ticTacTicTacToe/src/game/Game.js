@@ -54,12 +54,25 @@ export default class Game {
 
     Here._.input.on("pointerdown", me._onMouseClick, me);
 
+    if (Config.Init.Layer == 1) me._debugSkipToLayer1();
+
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
         .text(10, 10, "", { fontSize: 18, backgroundColor: "#000" })
         .setScrollFactor(0)
         .setDepth(Consts.Depth.Max);
     });
+  }
+
+  _debugSkipToLayer1() {
+    const me = this;
+
+    me._makeLayer0Step(Enums.Cells.LD, Enums.Side.CROSS);
+    me._makeLayer0Step(Enums.Cells.D, Enums.Side.CROSS);
+    me._makeLayer0Step(Enums.Cells.L, Enums.Side.CROSS);
+    me._makeLayer0Step(Enums.Cells.LU, Enums.Side.NOUGHT);
+    me._makeLayer0Step(Enums.Cells.U, Enums.Side.NOUGHT);
+    me._makeLayer0Step(Enums.Cells.RU, Enums.Side.NOUGHT);
   }
 
   update() {
@@ -98,7 +111,13 @@ export default class Game {
 
   _onRightButtonClick() {
     const me = this;
-    throw "not implemented";
+
+    if (!me._state.chunk.parent) return;
+
+    me._hidePhantom();
+
+    me._state.isInputEnabled = false;
+    me._goToLayerUp(null, me);
   }
 
   _onLeftButtonClick(x, y) {
@@ -107,23 +126,24 @@ export default class Game {
     const chunk = me._state.chunk;
 
     const cell = Grid.posToCell(Utils.buildPoint(x, y));
-    if (cell == -1 || !chunk.isFree(cell)) return;
+    if (
+      cell == -1 ||
+      (me._state.layer == 0 &&
+        (chunk.winner != Enums.Side.NONE || !chunk.isFree(cell)))
+    )
+      return;
 
     me._hidePhantom();
 
-    if (me._state.layer == 0) {
-      const result = me._makeStep({ path: [], cell: cell }, Enums.Side.CROSS);
+    if (me._state.layer > 0) return me._goToLayerDown(cell, null, me);
 
-      const aiStep = me._ai.calcStep(chunk);
-      me._makeStep(aiStep, Enums.Side.NOUGHT);
-    } else throw "not implemented";
+    const result = me._makeStep(
+      { path: me._state.path, cell: cell },
+      Enums.Side.CROSS
+    );
 
-    // if (result == Enums.Side.CROSS || result == Enums.Side.DRAW) {
-    //     me._toNextLayer();
-    // } else {
-    //     const aiStep = me._ai.makeStep(chunk);
-    //     me._makeStep(aiStep, Enums.Side.NOUGHT);
-    // }
+    const aiStep = me._ai.calcStep(chunk);
+    me._makeStep(aiStep, Enums.Side.NOUGHT);
   }
 
   _makeStep(step, side) {
@@ -160,6 +180,7 @@ export default class Game {
     me._state.layer++;
     me._view.goToUp(
       chunk.parent.getState(),
+      me._state.path[me._state.path.length - 1],
       () => {
         me._state.chunk = chunk.parent;
         const newPath = [];
@@ -243,6 +264,8 @@ export default class Game {
     const pos = Grid.cellToPos(cell);
     if (me._state.layer == 0) {
       if (!me._state.chunk.isFree(cell)) return me._phantom.setVisible(false);
+      if (me._state.chunk.winner != Enums.Side.NONE)
+        return me._phantom.setVisible(false);
 
       return me._phantom.setVisible(true).setPosition(pos.x, pos.y);
     }

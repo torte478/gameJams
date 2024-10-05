@@ -77,8 +77,11 @@ export default class Chunk {
     if (cellIndex < 0 || cellIndex >= 9) throw `wrong cell ${cellIndex}`;
 
     const cell = me._cells[cellIndex];
-    if (me.layer > 0 && !cell) me._cells[cellIndex] = new Chunk(me.layer - 1);
-
+    if (me.layer > 0 && !cell) {
+      const child = new Chunk(me.layer - 1);
+      child.setParent(this);
+      me._cells[cellIndex] = child;
+    }
     return me._cells[cellIndex];
   }
 
