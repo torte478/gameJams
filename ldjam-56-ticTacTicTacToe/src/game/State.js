@@ -11,11 +11,15 @@ export default class State {
   /** @type {Number} */
   layer;
 
+  /** @type {Boolean} */
+  isInputEnabled;
+
   constructor(chunk) {
     const me = this;
 
     me.chunk = chunk;
     me.side = Config.Init.Side;
     me.layer = 0;
+    me.isInputEnabled = true;
   }
 }

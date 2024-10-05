@@ -78,7 +78,7 @@ export default class Game {
       const mouse = Here._.input.activePointer;
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `sde: ${me._state.side}\n` +
+        `sde: ${me._state.side == 1 ? "X" : "O"}\n` +
         `lyr: ${me._state.layer}`;
 
       me._log.setText(text);
@@ -88,7 +88,7 @@ export default class Game {
   _onMouseClick(pointer) {
     const me = this;
 
-    if (me._state.side != Enums.Side.CROSS) return;
+    if (me._state.side != Enums.Side.CROSS || !me._state.isInputEnabled) return;
 
     return pointer.rightButtonDown()
       ? me._onRightButtonClick()
@@ -108,6 +108,8 @@ export default class Game {
     const cell = Grid.posToCell(Utils.buildPoint(x, y));
     if (cell == -1 || !chunk.isFree(cell)) return;
 
+    me._hidePhantom();
+
     const winner = me._makeStep(cell, Enums.Side.CROSS);
     if (winner == Enums.Side.NONE) {
       const aiStep = me._ai.makeStep(chunk);
@@ -124,7 +126,7 @@ export default class Game {
     if (!chunk.parent) {
       const parent = new Chunk(me._state.layer + 1, me._imagePool);
       chunk.setParent(parent);
-      parent.setChunk(Enums.Cells.C, chunk);
+      parent.makeStep(Enums.Cells.C, chunk);
     } else {
       throw "not implemented";
     }
@@ -136,8 +138,16 @@ export default class Game {
   _showLayer(layer) {
     const me = this;
 
+    me._state.isInputEnabled = false;
+
     me._state.layer = layer;
-    me._view.changeState(me._state.chunk.getState());
+    me._view.changeState(
+      me._state.chunk.getState(),
+      () => {
+        me._state.isInputEnabled = true;
+      },
+      me
+    );
   }
 
   _makeStep(cell, side) {
@@ -153,6 +163,8 @@ export default class Game {
 
     if (me._isFirstFrame && me._state.side == Enums.Side.NOUGHT)
       return me._debugFirstNoughtStep();
+
+    if (!me._state.isInputEnabled) return;
 
     const mouse = Here._.input.activePointer;
     const worldPos = Utils.buildPoint(mouse.worldX, mouse.worldY);
@@ -182,6 +194,14 @@ export default class Game {
       return me._phantom.setVisible(true).setPosition(pos.x, pos.y);
     }
 
-    return me._phantom.setVisible(false);
+    const childState = me._state.chunk.getChildState(cell);
+    return me._view.showPhantom(cell, me._state.chunk.getState(), childState);
+  }
+
+  _hidePhantom() {
+    const me = this;
+
+    me._phantom.setVisible(false);
+    me._view.hidePhantom(me._state.chunk.getState());
   }
 }

@@ -30,15 +30,18 @@ export default class View {
     me._first.makeStep(cell, side);
   }
 
-  changeState(state) {
+  /**
+   * @param {Object} state
+   * @param {Function} callback
+   * @param {Object} scope
+   */
+  changeState(state, callback, scope) {
     const me = this;
 
     const duration = 1500;
 
     Here._.add.tween({
       targets: me._first.container,
-      // x: 1.5 * Consts.Sizes.Cell,
-      // y: 1.5 * Consts.Sizes.Cell - 75,
       scale: { from: 1, to: 0.25 },
       alpha: { from: 1, to: 0 },
       duration: duration,
@@ -48,12 +51,40 @@ export default class View {
     me._second.setState(state);
     Here._.add.tween({
       targets: me._second.container,
-      // x: 1.5 * Consts.Sizes.Cell - 75,
-      // y: 1.5 * Consts.Sizes.Cell - 75,
       scale: { from: 2, to: 1 },
       alpha: { from: 0, to: 1 },
       duration: duration,
       ease: "Sine.easeInOut",
+      onComplete: () => {
+        me._swap();
+
+        if (!!callback) callback.call(scope);
+      },
     });
+  }
+
+  showPhantom(cell, state, childState) {
+    const me = this;
+
+    me._first.setState(state);
+    me._first.makeStep(cell, Enums.Side.NONE);
+
+    me._second.setState(childState);
+    const pos = Grid.cellToPos(cell);
+    me._second.container.setPosition(pos.x, pos.y).setAlpha(0.5);
+  }
+
+  hidePhantom(state) {
+    const me = this;
+
+    me._second.container.setAlpha(0);
+    me._first.setState(state);
+  }
+
+  _swap() {
+    const me = this;
+    const t = me._first;
+    me._first = me._second;
+    me._second = t;
   }
 }

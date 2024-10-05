@@ -36,18 +36,18 @@ export default class Chunk {
 
   /**
    * @param {Number} cell
-   * @param {Number} side
+   * @param {Number} step
    */
-  makeStep(cell, side) {
+  makeStep(cell, step) {
     const me = this;
 
     if (me.winner != Enums.Side.NONE) throw "chunk is complete";
 
-    me._cells[cell] = side;
+    me._cells[cell] = step;
 
-    me.stepHistory.push({ cell: cell, side: side });
+    me.stepHistory.push({ cell: cell, side: step });
 
-    me.winner = Grid.getWinner(me._cells);
+    me.winner = Grid.getWinner(me.getState().cells);
     return me.winner;
   }
 
@@ -58,16 +58,9 @@ export default class Chunk {
     me.parent = chunk;
   }
 
-  setChunk(cell, chunk) {
-    const me = this;
-    if (me._layer == 0 || !!me._cells[cell]) throw "chunk alredy initialized";
-
-    me._cells[cell] = chunk;
-  }
-
   /**
    * @param {Number} cell
-   * @returns {Number}
+   * @returns {Number | Chunk}
    */
   getCell(cell) {
     const me = this;
@@ -125,6 +118,19 @@ export default class Chunk {
     }
     return {
       cells: cells,
+    };
+  }
+
+  getChildState(cell) {
+    const me = this;
+
+    if (me._layer == 0) throw "can't have child";
+
+    const child = me._cells[cell];
+    if (!!child) return child.getState();
+
+    return {
+      cells: Utils.buildArray(9, Enums.Side.NONE),
     };
   }
 }
