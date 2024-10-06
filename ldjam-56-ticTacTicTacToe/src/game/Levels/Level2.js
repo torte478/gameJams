@@ -4,7 +4,7 @@ import ColorConfig from "../ColorConfig.js";
 import Config from "../Config.js";
 import Consts from "../Consts.js";
 
-export default class Level1 {
+export default class Level2 {
   /** @type {Phaser.Physics.Arcade.Group} */
   _pool;
 
@@ -24,7 +24,7 @@ export default class Level1 {
     });
     Here._.physics.add.collider(me._pool);
 
-    me._color = Config.Colors[1];
+    me._color = Config.Colors[2];
 
     me._container = Here._.add
       .container(-200, -100, [])
@@ -35,20 +35,19 @@ export default class Level1 {
   start() {
     const me = this;
 
-    for (let i = 0; i < 20; ++i) {
-      const isCross = i % 2 == 0;
+    for (let i = 0; i < 10; ++i) {
+      const frame = (i + 4) % 8;
       /** @type {Phaser.Physics.Arcade.Sprite} */
-      const item = me._pool.create(0, 0, "level1_anim");
+      const item = me._pool.create(0, 0, "level2", frame);
+      item.setFlipX(Utils.getRandom(0, 1) == 0);
 
-      const speed = 50;
+      const speed = 40;
       item.setVelocity(
         Utils.getRandom(-speed, speed),
         Utils.getRandom(-speed, speed)
       );
-      item.setAngularVelocity(Utils.getRandom(10, 90));
 
       item.setTint(me._color.item);
-      item.play(isCross ? "level1_cross" : "level1_nougth");
       me._container.add(item);
     }
 

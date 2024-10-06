@@ -12,6 +12,7 @@ import Ai from "./Ai.js";
 import State from "./State.js";
 import View from "./View.js";
 import Level1 from "./Levels/Level1.js";
+import Level2 from "./Levels/Level2.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -73,6 +74,7 @@ export default class Game {
     me._view.drawBonusCount(me._bonusCounter);
 
     me._level1Stuff = new Level1();
+    me._level2Stuff = new Level2();
 
     if (Utils.isDebug(Config.Debug.Skip)) me._debugInit();
 
@@ -247,6 +249,7 @@ export default class Game {
     const chunk = me._state.chunk;
 
     me._level1Stuff.stop();
+    me._level2Stuff.stop();
 
     me._state.layer++;
     me._view.goToUp(
@@ -271,6 +274,7 @@ export default class Game {
     const chunk = me._state.chunk;
 
     me._level1Stuff.stop();
+    me._level2Stuff.stop();
 
     me._state.layer--;
     me._view.goToDown(
@@ -434,6 +438,7 @@ export default class Game {
     if (me._state.layer > 0) me._view.resetChildView(me._state.chunk);
 
     if (me._state.layer == 1) me._level1Stuff.start();
+    if (me._state.layer == 2) me._level2Stuff.start();
 
     me._state.isInputEnabled = true;
   }
