@@ -29,6 +29,19 @@ export default class Animation {
       frameRate: 12,
       repeat: -1,
     });
+
+    Here._.anims.create({
+      key: "level4",
+      frames: Animation.getFrames("level4", [0, 1]),
+      frameRate: 16,
+      repeat: -1,
+    });
+
+    Here._.anims.create({
+      key: "bullet",
+      frames: Animation.getFrames("bullet", [1, 2, 3, 4]),
+      frameRate: 12,
+    });
   }
 
   static getFrames(texture, frames) {

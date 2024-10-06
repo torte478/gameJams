@@ -14,6 +14,7 @@ import View from "./View.js";
 import Level1 from "./Levels/Level1.js";
 import Level2 from "./Levels/Level2.js";
 import Level3 from "./Levels/Level3.js";
+import Level4 from "./Levels/Level4.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -77,6 +78,8 @@ export default class Game {
     me._level1Stuff = new Level1();
     me._level2Stuff = new Level2();
     me._level3Stuff = new Level3();
+    me._level4Stuff = new Level4();
+    me._level4Stuff.start();
 
     if (Utils.isDebug(Config.Debug.Skip)) me._debugInit();
 
