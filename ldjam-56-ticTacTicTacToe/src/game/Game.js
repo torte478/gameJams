@@ -36,6 +36,9 @@ export default class Game {
 
   _maxLayer = 0;
 
+  _bonusCounter = 0 + Config.Init.BonusCount;
+  _maxBonusCount = 0;
+
   constructor() {
     const me = this;
 
@@ -54,6 +57,10 @@ export default class Game {
     me._view = new View(Config.Colors[0]);
     const initChunk = new Chunk(0);
     me._state = new State(initChunk);
+
+    for (let i = 0; i < Config.Bonuses.segments.length; ++i) {
+      me._maxBonusCount += Config.Bonuses.segments[i];
+    }
 
     if (Utils.isDebug(Config.Debug.Skip)) me._debugInit();
 
@@ -117,6 +124,16 @@ export default class Game {
 
     const chunk = me._state.chunk;
 
+    if (me._state.bonusState == Enums.BonusState.NONE) {
+      const bonus = me._view.tryClickBonus(
+        me._bonusCounter,
+        Utils.buildPoint(x, y)
+      );
+      if (!!bonus) {
+        return me._onBonusClick(bonus);
+      }
+    }
+
     const cell = Grid.posToCell(Utils.buildPoint(x, y));
     if (cell == -1 || (me._state.layer == 0 && !chunk.canMakeStep(cell)))
       return;
@@ -127,13 +144,30 @@ export default class Game {
     if (me._state.layer > 0)
       return me._goToLayerDown(cell, me._onFullStepComplete, me);
 
-    me._state.isInputEnabled = false;
     me._makeStep(
       { path: me._state.path, cell: cell },
       Enums.Side.CROSS,
-      () => me._doAiStep(),
+      () => {
+        if (me._state.bonusState != Enums.BonusState.DOUBLE_CLICK) {
+          me._doAiStep();
+        } else {
+          me._state.bonusState = Enums.BonusState.NONE;
+          me._state.isInputEnabled = true;
+        }
+      },
       me
     );
+  }
+
+  _onBonusClick(bonusIndex) {
+    const me = this;
+
+    me._state.bonusState = bonusIndex;
+    me._bonusCounter = Math.max(
+      0,
+      me._bonusCounter - Config.Bonuses.segments[bonusIndex]
+    );
+    me._view.drawBonusCount(me._bonusCounter);
   }
 
   _doAiStep() {
@@ -224,7 +258,8 @@ export default class Game {
     me._view.makeStep(cell, side);
     if (winner != Enums.Side.NONE) me._view._first.setState(chunk.getState());
 
-    me._state.side *= -1;
+    if (me._state.bonusState != Enums.BonusState.DOUBLE_CLICK)
+      me._state.side *= -1;
 
     me._tryUp(callback, scope);
   }
@@ -238,6 +273,8 @@ export default class Game {
     if (winner == Enums.Side.NONE) {
       return Utils.callCallback(callback, scope);
     }
+
+    me._updateBonusCounter(winner);
 
     let parent = chunk.parent;
     if (!parent) {
@@ -286,6 +323,11 @@ export default class Game {
 
     const mouse = Here._.input.activePointer;
     const worldPos = Utils.buildPoint(mouse.worldX, mouse.worldY);
+
+    if (me._state.bonusState == Enums.BonusState.NONE) {
+      me._view.updateBonusText(me._bonusCounter, worldPos);
+    }
+
     const cell = Grid.posToCell(worldPos);
 
     if (me._isFirstFrame) {
@@ -322,6 +364,19 @@ export default class Game {
     if (me._state.layer > 0) me._view.resetChildView(me._state.chunk);
 
     me._state.isInputEnabled = true;
+  }
+
+  _updateBonusCounter(winner) {
+    const me = this;
+
+    if (winner == Enums.Side.NONE || winner == Enums.Side.NOUGHT) return;
+
+    if (winner == Enums.Side.CROSS) me._bonusCounter += 3;
+    if (winner == Enums.Side.DRAW) me._bonusCounter += 1;
+
+    me._bonusCounter = Math.min(me._bonusCounter, me._maxBonusCount);
+
+    me._view.drawBonusCount(me._bonusCounter);
   }
 
   _debugInit() {

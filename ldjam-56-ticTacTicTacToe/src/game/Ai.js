@@ -35,7 +35,6 @@ export default class Ai {
       current = chunk.getRoot();
       path = [];
     }
-    Utils.debugLog("=====");
 
     while (true) {
       const cell = me._calcStepInternal(current);
@@ -61,13 +60,10 @@ export default class Ai {
 
     if (me._difficulty == Enums.Difficulty.DEBUG) {
       const step = availableSteps[0];
-      Utils.debugLog(step);
       return step;
     }
 
     const winSteps = Array.from(me._getWinSteps(chunk, availableSteps));
-
-    Utils.debugLog(winSteps);
 
     if (winSteps.length == 0 || winSteps.length == availableSteps.length)
       return Utils.getRandomEl(availableSteps, 0);

@@ -36,4 +36,11 @@ export default class Enums {
     NORMAL: 2,
     HARD: 3,
   };
+
+  static BonusState = {
+    NONE: 0,
+    DOUBLE_CLICK: 1,
+    SWAP: 2,
+    ULTRA: 3,
+  };
 }

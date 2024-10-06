@@ -33,6 +33,21 @@ export default class View {
   /** @type {Phaser.GameObjects.Image} */
   _mapPointer;
 
+  /** @type {Phaser.GameObjects.Graphics} */
+  _bonuses;
+
+  /** @type {Phaser.GameObjects.Container} */
+  _bonusesContainer;
+
+  /** @type {Phaser.GameObjects.Image[]} */
+  _bonusIcons = [];
+
+  /** @type {Phaser.GameObjects.Rectangle[]} */
+  _bonusRectangles = [];
+
+  /** @type {Phaser.GameObjects.Text} */
+  _hintText;
+
   /**
    * @param {ColorConfig} colorConfig
    */
@@ -62,6 +77,15 @@ export default class View {
       me._cells.push(chunk);
     }
 
+    // other
+
+    me._hintText = Here._.add
+      .text(300, 650, "TEST", { fontSize: 32, fontFamily: "Arial Black" })
+      .setOrigin(0.5)
+      .setTintFill(colorConfig.main)
+      .setAlpha(0.75)
+      .setVisible(false);
+
     // map
 
     me._mapGraphics = Here._.add.graphics();
@@ -77,6 +101,96 @@ export default class View {
       .setDepth(Consts.Depth.UI);
 
     me.drawMapSegment(0);
+
+    // bonuses
+    me._bonuses = Here._.add.graphics();
+    me._bonuses.lineStyle(2, colorConfig.main);
+    me._bonuses.fillStyle(colorConfig.background);
+    let curY = 500;
+    const bonusChildren = [];
+    bonusChildren.push(me._bonuses);
+    for (let i = 0; i < Config.Bonuses.segments.length; ++i) {
+      for (let j = 0; j < Config.Bonuses.segments[i] - 1; ++j) {
+        const rect = new Phaser.Geom.Rectangle(
+          0,
+          curY - Config.Bonuses.segmentSizeY,
+          Config.Bonuses.segmentSizeX,
+          Config.Bonuses.segmentSizeY
+        );
+        me._bonuses.fillRectShape(rect);
+        me._bonuses.strokeRectShape(rect);
+
+        curY -= Config.Bonuses.segmentSizeY;
+      }
+
+      const button = new Phaser.Geom.Rectangle(
+        0,
+        curY - Config.Bonuses.buttonSizeY,
+        Config.Bonuses.buttonSizeX,
+        Config.Bonuses.buttonSizeY
+      );
+      me._bonuses.fillRectShape(button);
+      me._bonuses.strokeRectShape(button);
+
+      me._bonusRectangles.push(
+        new Phaser.Geom.Rectangle(
+          button.x + Config.Bonuses.x,
+          button.y + Config.Bonuses.y,
+          button.width,
+          button.height
+        )
+      );
+
+      const icon = Here._.add
+        .image(
+          Config.Bonuses.buttonSizeX / 2,
+          curY - Config.Bonuses.buttonSizeY / 2,
+          "bonuses",
+          i
+        )
+        .setTintFill(colorConfig.main);
+
+      icon.animTween = Here._.add.tween({
+        targets: icon,
+        scale: { from: 0.8, to: 1.2 },
+        yoyo: true,
+        repeat: -1,
+        duration: 1000,
+        ease: "Sine.easeInOut",
+      });
+      icon.animTween.pause();
+
+      me._bonusIcons.push(icon);
+      bonusChildren.push(icon);
+
+      curY -= Config.Bonuses.buttonSizeY;
+    }
+    me._bonusesContainer = Here._.add
+      .container(Config.Bonuses.x, Config.Bonuses.y, bonusChildren)
+      .setDepth(Consts.Depth.UI);
+  }
+
+  updateBonusText(bonusCount, mousePos) {
+    const me = this;
+
+    me._hintText.setVisible(false);
+    const index = me._findBonusRect(bonusCount, mousePos);
+    if (index == -1) return;
+
+    const text = index == 0 ? "CLICK FOR A DOUBLE MOVE" : "TODO";
+    me._hintText.setText(text).setVisible(true);
+  }
+
+  tryClickBonus(bonusCount, mousePos) {
+    const me = this;
+
+    const index = me._findBonusRect(bonusCount, mousePos);
+    if (index == -1) return Enums.BonusState.NONE;
+
+    const text = index == 0 ? "DOUBLE MOVE (CANCEL - ESC)" : "TODO";
+    me._hintText.setText(text).setVisible(true);
+
+    return index + 1;
   }
 
   drawMapSegment(layer) {
@@ -254,6 +368,70 @@ export default class View {
     me._cells[cell].container.setAlpha(1);
   }
 
+  drawBonusCount(count) {
+    const me = this;
+
+    const colorConfig = Config.Colors[0];
+
+    let curY = 500;
+    let currentBonusCount = 0;
+    for (let i = 0; i < Config.Bonuses.segments.length; ++i) {
+      for (let j = 0; j < Config.Bonuses.segments[i] - 1; ++j) {
+        const rect = new Phaser.Geom.Rectangle(
+          0,
+          curY - Config.Bonuses.segmentSizeY,
+          Config.Bonuses.segmentSizeX,
+          Config.Bonuses.segmentSizeY
+        );
+        me._bonuses.fillStyle(
+          currentBonusCount >= count
+            ? colorConfig.background
+            : colorConfig.selection
+        );
+
+        me._bonuses.fillRectShape(rect);
+        me._bonuses.strokeRectShape(rect);
+
+        curY -= Config.Bonuses.segmentSizeY;
+
+        ++currentBonusCount;
+      }
+
+      const button = new Phaser.Geom.Rectangle(
+        0,
+        curY - Config.Bonuses.buttonSizeY,
+        Config.Bonuses.buttonSizeX,
+        Config.Bonuses.buttonSizeY
+      );
+      const isActive = currentBonusCount < count;
+
+      me._bonuses.fillStyle(
+        isActive ? colorConfig.selection : colorConfig.background
+      );
+      me._bonuses.fillRectShape(button);
+      me._bonuses.strokeRectShape(button);
+
+      if (isActive) me._bonusIcons[i].animTween.restart();
+      else me._bonusIcons[i].animTween.pause();
+
+      ++currentBonusCount;
+      curY -= Config.Bonuses.buttonSizeY;
+    }
+  }
+
+  _findBonusRect(bonusCount, mousePos) {
+    const me = this;
+
+    for (let i = 0; i < me._bonusRectangles.length; ++i) {
+      if (bonusCount < Config.Bonuses.segments[i]) return -1;
+
+      if (Phaser.Geom.Rectangle.ContainsPoint(me._bonusRectangles[i], mousePos))
+        return i;
+    }
+
+    return -1;
+  }
+
   _redrawBorders(layerCount, color) {
     const me = this;
 
@@ -293,6 +471,8 @@ export default class View {
       me._cells[i].updateColor(from, to, duration);
 
     Utils.UpdateColor(me._mapPointer, duration, from.main, to.main);
+
+    Utils.UpdateColor(me._hintText, duration, from.main, to.main);
   }
 
   _hideChildren() {

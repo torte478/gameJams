@@ -1,5 +1,6 @@
 import Chunk from "./Chunk.js";
 import Config from "./Config.js";
+import Enums from "./Enums.js";
 
 export default class State {
   /** @type {Chunk} */
@@ -17,6 +18,9 @@ export default class State {
   /** @type {Number[]} */
   path;
 
+  /** @type {Number} */
+  bonusState;
+
   constructor(chunk) {
     const me = this;
 
@@ -25,5 +29,6 @@ export default class State {
     me.layer = 0;
     me.isInputEnabled = true;
     me.path = [];
+    me.bonusState = Enums.BonusState.NONE;
   }
 }
