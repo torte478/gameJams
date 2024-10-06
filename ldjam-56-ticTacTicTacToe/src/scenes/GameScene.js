@@ -29,8 +29,10 @@ export default class GameScene extends HereScene {
 
     Utils.loadWav("button_click");
 
-    Utils.loadImage("grid");
     Utils.loadSpriteSheet("step", Consts.Sizes.Cell);
+
+    Utils.loadImage("grid");
+    Utils.loadImage("background");
   }
 
   create() {

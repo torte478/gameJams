@@ -458,4 +458,37 @@ export default class Utils {
   static callCallback(f, scope) {
     if (!!f) f.call(scope);
   }
+
+  /**
+   * @param {Phaser.GameObjects.Image} target
+   * @param {Number} duration
+   * @param {Number} from
+   * @param {Number} to
+   */
+  static UpdateColor(target, duration, from, to) {
+    const fromColor = Phaser.Display.Color.IntegerToColor(from);
+    const toColor = Phaser.Display.Color.IntegerToColor(to);
+
+    // target.setTintFill(fromColor);
+    Here._.tweens.addCounter({
+      from: 0,
+      to: 1,
+      duration: duration,
+      onUpdate: (tween) => {
+        const r = Phaser.Math.Interpolation.Linear(
+          [fromColor.red, toColor.red],
+          tween.progress
+        );
+        const g = Phaser.Math.Interpolation.Linear(
+          [fromColor.green, toColor.green],
+          tween.progress
+        );
+        const b = Phaser.Math.Interpolation.Linear(
+          [fromColor.blue, toColor.blue],
+          tween.progress
+        );
+        target.setTintFill(Phaser.Display.Color.GetColor(r, g, b));
+      },
+    });
+  }
 }

@@ -44,11 +44,12 @@ export default class Game {
       .image(100, 100, "step", 1)
       .setDepth(Consts.Depth.UI)
       .setVisible(false)
-      .setAlpha(0.5);
+      .setAlpha(0.5)
+      .setTintFill(Config.Colors[0].main);
 
     me._imagePool = Here._.add.group();
     me._ai = new Ai(Config.Init.Difficulty);
-    me._view = new View();
+    me._view = new View(Config.Colors[0]);
     const initChunk = new Chunk(0);
     me._state = new State(initChunk);
 

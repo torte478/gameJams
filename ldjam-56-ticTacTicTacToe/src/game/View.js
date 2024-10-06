@@ -9,6 +9,7 @@ import Enums from "./Enums.js";
 import Grid from "./Grid.js";
 import ChunkView from "./ChunkView.js";
 import Chunk from "./Chunk.js";
+import ColorConfig from "./ColorConfig.js";
 
 export default class View {
   /** @type {ChunkView} */
@@ -20,16 +21,27 @@ export default class View {
   /** @type {ChunkView[]} */
   _cells;
 
-  constructor() {
+  /** @type {Phaser.GameObjects.Image} */
+  _background;
+
+  /**
+   * @param {ColorConfig} colorConfig
+   */
+  constructor(colorConfig) {
     const me = this;
 
-    me._first = new ChunkView();
-    me._second = new ChunkView();
+    me._background = Here._.add
+      .image(1.5 * Consts.Sizes.Cell, 1.5 * Consts.Sizes.Cell, "background")
+      .setDepth(Consts.Depth.Background)
+      .setTintFill(colorConfig.background);
+
+    me._first = new ChunkView(colorConfig);
+    me._second = new ChunkView(colorConfig);
     me._second.container.setAlpha(0);
 
     me._cells = [];
     for (let i = 0; i < 9; ++i) {
-      const chunk = new ChunkView();
+      const chunk = new ChunkView(colorConfig);
       const pos = Grid.cellToPos(i);
       chunk.container
         .setAlpha(0)
@@ -60,6 +72,11 @@ export default class View {
     const opposite = Grid.cellToPos(Grid.toOpposite(cell));
     const center = Grid.getCenterPos();
     const duration = Config.Duration.Layer;
+
+    const fromColor = Config.Colors[chunk.layer - 1];
+    const toColor = Config.Colors[chunk.layer];
+
+    me._updateColors(fromColor, toColor, duration);
 
     Here._.add.tween({
       targets: me._first.container,
@@ -106,6 +123,11 @@ export default class View {
     const opposite = Grid.cellToPos(Grid.toOpposite(cell));
     const duration = Config.Duration.Layer;
     const center = Grid.getCenterPos();
+
+    const fromColor = Config.Colors[chunk.layer + 1];
+    const toColor = Config.Colors[chunk.layer];
+
+    me._updateColors(fromColor, toColor, duration);
 
     Here._.add.tween({
       targets: me._first.container,
@@ -166,6 +188,17 @@ export default class View {
     me._first.makeStep(cell, Enums.Side.NONE);
     me._cells[cell].setState(chunk.getCell(cell).getState());
     me._cells[cell].container.setAlpha(1);
+  }
+
+  _updateColors(from, to, duration) {
+    const me = this;
+
+    Utils.UpdateColor(me._background, duration, from.background, to.background);
+
+    me._first.updateColor(from, to, duration);
+    me._second.updateColor(from, to, duration);
+    for (let i = 0; i < me._cells.length; ++i)
+      me._cells[i].updateColor(from, to, duration);
   }
 
   _hideChildren() {

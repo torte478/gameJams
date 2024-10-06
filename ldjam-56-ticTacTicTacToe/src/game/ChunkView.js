@@ -7,6 +7,7 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Grid from "./Grid.js";
+import ColorConfig from "./ColorConfig.js";
 
 export default class ChunkView {
   /** @type {Phaser.GameObjects.Image} */
@@ -18,22 +19,22 @@ export default class ChunkView {
   /** @type {Phaser.GameObjects.Container} */
   container;
 
-  constructor() {
+  /**
+   * @param {ColorConfig} colorConfig
+   */
+  constructor(colorConfig) {
     const me = this;
 
-    me._grid = Here._.add.image(0, 0, "grid");
+    me._grid = Here._.add.image(0, 0, "grid").setTintFill(colorConfig.main);
 
     me._cells = [];
 
     for (let i = -1; i < 2; ++i)
       for (let j = -1; j < 2; ++j)
         me._cells.push(
-          Here._.add.image(
-            j * Consts.Sizes.Cell,
-            i * Consts.Sizes.Cell,
-            "step",
-            0
-          )
+          Here._.add
+            .image(j * Consts.Sizes.Cell, i * Consts.Sizes.Cell, "step", 0)
+            .setTintFill(colorConfig.main)
         );
 
     const children = [];
@@ -59,6 +60,19 @@ export default class ChunkView {
     for (let i = 0; i < me._cells.length; ++i) {
       me._cells[i].setFrame(me._getFrame(state.cells[i]));
     }
+  }
+
+  /**
+   * @param {ColorConfig} fromColor
+   * @param {ColorConfig} toColor
+   * @param {Number} duration
+   */
+  updateColor(fromColor, toColor, duration) {
+    const me = this;
+
+    Utils.UpdateColor(me._grid, duration, fromColor.main, toColor.main);
+    for (let i = 0; i < me._cells.length; ++i)
+      Utils.UpdateColor(me._cells[i], duration, fromColor.main, toColor.main);
   }
 
   _getFrame(side) {
