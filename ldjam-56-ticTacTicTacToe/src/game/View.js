@@ -48,6 +48,12 @@ export default class View {
   /** @type {Phaser.GameObjects.Text} */
   _hintText;
 
+  /** @type {Phaser.GameObjects.Graphics} */
+  _hp;
+
+  /** @type {Phaser.GameObjects.Container} */
+  _hpContainer;
+
   /**
    * @param {ColorConfig} colorConfig
    */
@@ -169,6 +175,24 @@ export default class View {
       .container(Config.Bonuses.x - 150, Config.Bonuses.y, bonusChildren)
       .setDepth(Consts.Depth.UI);
     me._bonusesContainer.setActive(false);
+
+    // hp
+
+    me._hp = Here._.add.graphics();
+    me._hpContainer = Here._.add.container(0, 0, [me._hp]);
+  }
+
+  drawHp(currentHp) {
+    const me = this;
+
+    const rect = new Phaser.Geom.Rectangle(0, -75, 600, 50);
+
+    me._hp.fillStyle(0xa91c06);
+    me._hp.fillRectShape(rect);
+
+    me._hp.fillStyle(0x459a18);
+    const width = (rect.width * currentHp) / Config.Boss.MaxHP;
+    me._hp.fillRect(rect.x, rect.y, width, rect.height);
   }
 
   updateBonusText(bonusCount, mousePos) {

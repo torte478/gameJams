@@ -43,6 +43,8 @@ export default class Game {
   _bonusCounter = 0 + Config.Init.BonusCount;
   _maxBonusCount = 0;
 
+  _hp = Config.Boss.MaxHP;
+
   constructor() {
     const me = this;
 
@@ -79,7 +81,8 @@ export default class Game {
     me._level2Stuff = new Level2();
     me._level3Stuff = new Level3();
     me._level4Stuff = new Level4();
-    me._level4Stuff.start();
+
+    me._view.drawHp(me._hp);
 
     if (Utils.isDebug(Config.Debug.Skip)) me._debugInit();
 
@@ -109,7 +112,7 @@ export default class Game {
       const mouse = Here._.input.activePointer;
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `sde: ${me._state.side == 1 ? "X" : "O"}\n` +
+        `hp: ${me._hp}\n` +
         `bns: ${me._bonusCounter}`;
 
       me._log.setText(text);
@@ -165,6 +168,8 @@ export default class Game {
       { path: me._state.path, cell: cell },
       Enums.Side.CROSS,
       () => {
+        if (me._hp == 0) return me._gameOver();
+
         if (me._state.bonusState != Enums.BonusState.DOUBLE_CLICK) {
           me._doAiStep();
         } else {
@@ -256,6 +261,7 @@ export default class Game {
     me._level1Stuff.stop();
     me._level2Stuff.stop();
     me._level3Stuff.stop();
+    me._level4Stuff.stop();
 
     me._state.layer++;
     me._view.goToUp(
@@ -282,6 +288,7 @@ export default class Game {
     me._level1Stuff.stop();
     me._level2Stuff.stop();
     me._level3Stuff.stop();
+    me._level4Stuff.stop();
 
     me._state.layer--;
     me._view.goToDown(
@@ -447,6 +454,7 @@ export default class Game {
     if (me._state.layer == 1) me._level1Stuff.start();
     if (me._state.layer == 2) me._level2Stuff.start();
     if (me._state.layer == 3) me._level3Stuff.start();
+    if (me._state.layer == 4) me._level4Stuff.start();
 
     me._state.isInputEnabled = true;
   }
@@ -454,7 +462,17 @@ export default class Game {
   _updateBonusCounter(winner) {
     const me = this;
 
-    if (me._maxLayer < 2) return;
+    // if (me._maxLayer < 2) return; // TODO
+
+    if (me._maxLayer >= 0) {
+      // TODO
+      if (winner == Enums.Side.CROSS) me._hp -= 3;
+      if (winner == Enums.Side.DRAW) me._hp -= 1;
+      if (winner == Enums.Side.NOUGHT) me._hp += 3;
+
+      me._hp = Math.min(Config.Boss.MaxHP, Math.max(0, me._hp));
+      me._view.drawHp(me._hp);
+    }
 
     if (winner == Enums.Side.NONE || winner == Enums.Side.NOUGHT) return;
 
@@ -500,5 +518,71 @@ export default class Game {
       me._view._first.setState(res.getState());
       me._state.chunk = res;
     }
+  }
+
+  _gameOver() {
+    const me = this;
+
+    me._view._first.container.setVisible(false);
+    me._view._second.container.setVisible(false);
+    for (let i = 0; i < me._view._cells.length; ++i)
+      me._view._cells[i].container.setVisible(false);
+    me._view._hpContainer.setVisible(false);
+    me._view._bonusesContainer.setVisible(false);
+    me._view._mapGraphicsContainer.setVisible(false);
+    me._view._hintText.setVisible(false);
+
+    Utils.UpdateColor(
+      me._view._background,
+      1000,
+      Config.Colors[me._state.layer].background,
+      Config.Colors[4].background
+    );
+
+    const boss = Here._.add.image(300, 300, "boss").setAlpha(0);
+    Here._.add.tween({
+      targets: boss,
+      alpha: { from: 0, to: 1 },
+      duration: 200, //0,
+      ease: "Sine.easeIn",
+      onComplete: () => {
+        const t1 = Here._.add.tween({
+          targets: boss,
+          x: { from: 300 + -50 * boss.scale, to: 300 + 50 * boss.scale },
+          yoyo: true,
+          duration: 100,
+          repeat: -1,
+        });
+
+        Here._.add.tween({
+          targets: boss,
+          scale: { from: 1, to: 0.25 },
+          alpha: { from: 1, to: 0.25 },
+          duration: 100, //00,
+          onComplete: () => {
+            boss.setVisible(false);
+            t1.stop();
+            me._gameGameOver();
+          },
+        });
+      },
+    });
+  }
+
+  _gameGameOver() {
+    const me = this;
+
+    Here._.add
+      .text(300, 200, "VICTORY!!!", { fontSize: 84, fontFamily: "Arial Black" })
+      .setTintFill(Config.Colors[4].main)
+      .setOrigin(0.5);
+
+    Here._.add
+      .text(300, 400, "TODO: fix this screen before jam ends", {
+        fontSize: 24,
+        fontFamily: "Arial",
+      })
+      .setTintFill(Config.Colors[4].main)
+      .setOrigin(0.5);
   }
 }

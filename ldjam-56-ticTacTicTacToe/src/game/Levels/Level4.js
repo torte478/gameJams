@@ -38,13 +38,14 @@ export default class Level4 {
       .setDepth(Consts.Depth.Stuff)
       .setAlpha(0);
 
-    me._boss = Here._.add.image(0, 0, "boss");
+    me._boss = Here._.add.image(0, 0, "boss").setVisible(false);
   }
 
   start() {
     const me = this;
 
     // boss
+    me._boss.setVisible(true);
     me._boss.tween = Here._.add.tween({
       targets: me._boss,
       y: { from: 900, to: 0 },
@@ -141,6 +142,7 @@ export default class Level4 {
         }
         me._boss.tween.stop();
         me._container.remove(me._boss);
+        me._boss.setVisible(false);
       },
     });
   }
