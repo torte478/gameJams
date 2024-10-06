@@ -49,6 +49,11 @@ export default class GameScene extends HereScene {
     Utils.loadWav("draw");
     Utils.loadWav("win");
     Utils.loadWav("gameover");
+
+    Utils.loadMp3("level1");
+    Utils.loadMp3("level2");
+    Utils.loadMp3("level3");
+    Utils.loadMp3("level4");
   }
 
   create() {

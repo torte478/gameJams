@@ -63,6 +63,37 @@ export default class View {
   constructor(colorConfig) {
     const me = this;
 
+    me._muteText = Here._.add.text(-150, 665, "MUTE", {
+      fontSize: 32,
+      fontFamily: "Arial Black",
+    });
+
+    me._muteText
+      .setTintFill(colorConfig.main)
+      .setOrigin(0, 0.5)
+      .setInteractive();
+
+    me._muteText.on("pointerover", () => {
+      me._muteText.setScale(1.5);
+    });
+
+    me._muteText.on("pointerout", () => {
+      me._muteText.setScale(1);
+    });
+
+    me._muteText.on("pointerdown", () => {
+      if (Config.Init.PlayMusic) {
+        Config.Init.PlayMusic = false;
+        me._muteText.setText("UNMUTE");
+        Here._.sound.stopAll();
+      } else {
+        Config.Init.PlayMusic = true;
+        me._muteText.setText("MUTE");
+      }
+    });
+
+    //====
+
     me._difficultyText = Here._.add.text(780, 665, "EASY", {
       fontSize: 32,
       fontFamily: "Arial Black",
@@ -589,6 +620,7 @@ export default class View {
 
     Utils.UpdateColor(me._hintText, duration, from.main, to.main);
     Utils.UpdateColor(me._difficultyText, duration, from.main, to.main);
+    Utils.UpdateColor(me._muteText, duration, from.main, to.main);
   }
 
   _hideChildren() {

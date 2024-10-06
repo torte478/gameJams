@@ -410,15 +410,27 @@ export default class Game {
     // me._view.showHp();
     // return;
 
+    Here._.sound.stopAll();
+
     if (newLayer == 1) {
       me._view._hintText.setText("RIGHT CLICK TO GO BACK").setVisible(true);
       me._view.showMap();
+      if (Config.Init.PlayMusic)
+        Here._.sound.play("level1", { loop: -1, volume: 0.5 });
     }
     if (newLayer == 2) {
       me._view.showBonuses();
+      if (Config.Init.PlayMusic)
+        Here._.sound.play("level2", { loop: -1, volume: 0.4 });
+    }
+    if (newLayer == 3) {
+      if (Config.Init.PlayMusic)
+        Here._.sound.play("level3", { loop: -1, volume: 0.4 });
     }
     if (newLayer == 4) {
       me._view.showHp();
+      if (Config.Init.PlayMusic)
+        Here._.sound.play("level4", { loop: -1, volume: 0.3 });
     }
   }
 
@@ -579,6 +591,7 @@ export default class Game {
     me._view._mapGraphicsContainer.setVisible(false);
     me._view._hintText.setVisible(false);
     me._view._difficultyText.disableInteractive().setVisible(false);
+    me._view._muteText.disableInteractive().setVisible(false);
 
     Utils.UpdateColor(
       me._view._background,

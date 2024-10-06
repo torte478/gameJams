@@ -3,7 +3,7 @@ import Enums from "./Enums.js";
 
 export default class Config {
   static Debug = {
-    Global: true,
+    Global: false,
     Log: true,
     ShowSceneLog: true,
     PlaySound: true,
@@ -12,15 +12,16 @@ export default class Config {
   };
 
   static Init = {
-    Difficulty: Enums.Difficulty.DEBUG,
+    Difficulty: Enums.Difficulty.NORMAL,
     Side: Enums.Side.CROSS,
     Skip: 0,
     BonusCount: 0,
+    PlayMusic: true,
   };
 
   static Duration = {
-    Layer: 150, //600,
-    Between: 150, //400,
+    Layer: 600,
+    Between: 400,
   };
 
   static Scale = {
