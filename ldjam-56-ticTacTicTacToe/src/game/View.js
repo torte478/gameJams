@@ -219,7 +219,7 @@ export default class View {
     // hp
 
     me._hp = Here._.add.graphics();
-    me._hpContainer = Here._.add.container(0, 0, [me._hp]);
+    me._hpContainer = Here._.add.container(0, -100, [me._hp]);
   }
 
   _changeDifficultyText() {
@@ -239,10 +239,10 @@ export default class View {
 
     const rect = new Phaser.Geom.Rectangle(0, -75, 600, 50);
 
-    me._hp.fillStyle(0xa91c06);
+    me._hp.fillStyle(0xa91c06); // red
     me._hp.fillRectShape(rect);
 
-    me._hp.fillStyle(0x459a18);
+    me._hp.fillStyle(0x459a18); // green
     const width = (rect.width * currentHp) / Config.Boss.MaxHP;
     me._hp.fillRect(rect.x, rect.y, width, rect.height);
   }
@@ -312,6 +312,16 @@ export default class View {
     Here._.add.tween({
       targets: me._bonusesContainer,
       x: Config.Bonuses.x,
+      duration: Config.Duration.Layer,
+    });
+  }
+
+  showHp() {
+    const me = this;
+
+    Here._.add.tween({
+      targets: me._hpContainer,
+      y: 0,
       duration: Config.Duration.Layer,
     });
   }

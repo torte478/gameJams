@@ -45,11 +45,16 @@ export default class Game {
 
   _hp = Config.Boss.MaxHP;
 
+  /** @type {Phaser.GameObjects.Group} */
+  _digitPool;
+
   constructor() {
     const me = this;
 
     Here._.cameras.main.setScroll(-200, -100);
     Here._.input.mouse.disableContextMenu();
+
+    me._digitPool = Here._.add.group();
 
     Here._.physics.world.setBounds(
       -200,
@@ -382,12 +387,20 @@ export default class Game {
     ++me._maxLayer;
     me._view.drawMapSegment(newLayer);
 
+    me._view.showMap();
+    me._view.showBonuses();
+    me._view.showHp();
+    return;
+
     if (newLayer == 1) {
       me._view._hintText.setText("RIGHT CLICK TO GO BACK").setVisible(true);
       me._view.showMap();
     }
     if (newLayer == 2) {
       me._view.showBonuses();
+    }
+    if (newLayer == 4) {
+      me._view.showHp();
     }
   }
 
@@ -466,9 +479,18 @@ export default class Game {
 
     if (me._maxLayer >= 0) {
       // TODO
-      if (winner == Enums.Side.CROSS) me._hp -= 3;
-      if (winner == Enums.Side.DRAW) me._hp -= 1;
-      if (winner == Enums.Side.NOUGHT) me._hp += 3;
+      if (winner == Enums.Side.CROSS) {
+        me._hp -= 3;
+        me._shotDigit(+3, false);
+      }
+      if (winner == Enums.Side.DRAW) {
+        me._hp -= 1;
+        me._shotDigit(+1, false);
+      }
+      if (winner == Enums.Side.NOUGHT) {
+        me._hp += 3;
+        me._shotDigit(-3, false);
+      }
 
       me._hp = Math.min(Config.Boss.MaxHP, Math.max(0, me._hp));
       me._view.drawHp(me._hp);
@@ -476,8 +498,14 @@ export default class Game {
 
     if (winner == Enums.Side.NONE || winner == Enums.Side.NOUGHT) return;
 
-    if (winner == Enums.Side.CROSS) me._bonusCounter += 3;
-    if (winner == Enums.Side.DRAW) me._bonusCounter += 1;
+    if (winner == Enums.Side.CROSS) {
+      me._bonusCounter += 3;
+      me._shotDigit(+3, true);
+    }
+    if (winner == Enums.Side.DRAW) {
+      me._bonusCounter += 1;
+      me._shotDigit(+1, true);
+    }
 
     me._bonusCounter = Math.min(me._bonusCounter, me._maxBonusCount);
 
@@ -585,5 +613,40 @@ export default class Game {
       })
       .setTintFill(Config.Colors[4].main)
       .setOrigin(0.5);
+  }
+
+  _shotDigit(digit, isBonus) {
+    const me = this;
+
+    let frame = -1;
+    if (digit == 1) frame = 0;
+    if (digit == 3) frame = 1;
+    if (digit == -1) frame = 2;
+    if (digit == -3) frame = 3;
+
+    if (frame == -1) throw `wrong digit ${digit}`;
+
+    /** @type {Phaser.GameObjects.Image} */
+    const item = me._digitPool.create(0, 0, "digits", frame);
+
+    item.setDepth(Consts.Depth.UI + 100);
+
+    const startPos = isBonus
+      ? Utils.buildPoint(-100, 600)
+      : Utils.buildPoint(550, 0);
+    const targetPos = isBonus
+      ? Utils.buildPoint(100, 500)
+      : Utils.buildPoint(500, 200);
+
+    Here._.add.tween({
+      targets: item,
+      x: { from: startPos.x, to: targetPos.x },
+      y: { from: startPos.y, to: targetPos.y },
+      alpha: { from: 1, to: 0 },
+      duration: 1000,
+      onComplete: () => {
+        me._digitPool.killAndHide(item);
+      },
+    });
   }
 }

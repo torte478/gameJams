@@ -14,7 +14,7 @@ export default class Config {
   static Init = {
     Difficulty: Enums.Difficulty.DEBUG,
     Side: Enums.Side.CROSS,
-    Skip: 0,
+    Skip: 1,
     BonusCount: 0,
   };
 
@@ -47,7 +47,7 @@ export default class Config {
   };
 
   static Boss = {
-    MaxHP: 2,
+    MaxHP: 10,
   };
 
   // switch palette
