@@ -24,6 +24,9 @@ export default class Chunk {
   /** @type {Chunk | null} */
   parent;
 
+  /** @type {Number[]} */
+  _winRow;
+
   constructor(layer) {
     const me = this;
 
@@ -47,7 +50,9 @@ export default class Chunk {
 
     me.stepHistory.push({ cell: cell, side: step });
 
-    me.winner = Grid.getWinner(me.getState().cells);
+    const winResult = Grid.getWinner(me.getState().cells);
+    me.winner = winResult.winner;
+    me._winRow = winResult.row;
     return me.winner;
   }
 
@@ -135,6 +140,7 @@ export default class Chunk {
     }
     return {
       cells: cells,
+      winRow: me._winRow,
     };
   }
 
@@ -154,7 +160,9 @@ export default class Chunk {
   recalculateWinner() {
     const me = this;
 
-    me.winner = Grid.getWinner(me.getState().cells);
+    const winResult = Grid.getWinner(me.getState().cells);
+    me.winner = winResult.winner;
+    me._winRow = winResult.row;
     return me.winner;
   }
 

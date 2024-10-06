@@ -19,6 +19,9 @@ export default class ChunkView {
   /** @type {Phaser.GameObjects.Container} */
   container;
 
+  /** @type {ColorConfig} */
+  _color;
+
   /**
    * @param {ColorConfig} colorConfig
    */
@@ -26,6 +29,7 @@ export default class ChunkView {
     const me = this;
 
     me._grid = Here._.add.image(0, 0, "grid").setTintFill(colorConfig.main);
+    me._color = colorConfig;
 
     me._cells = [];
 
@@ -51,7 +55,10 @@ export default class ChunkView {
   makeStep(cell, side) {
     const me = this;
 
-    me._cells[cell].setFrame(me._getFrame(side));
+    const current = me._cells[cell];
+    current
+      .setFrame(me._getFrame(side))
+      .setTintFill(!!current.isWinner ? me._color.selection : me._color.main);
   }
 
   setState(state) {
@@ -59,6 +66,11 @@ export default class ChunkView {
 
     for (let i = 0; i < me._cells.length; ++i) {
       me._cells[i].setFrame(me._getFrame(state.cells[i]));
+      me._cells[i].isWinner = !!state.winRow && Utils.contains(state.winRow, i);
+      const color = me._cells[i].isWinner
+        ? me._color.selection
+        : me._color.main;
+      me._cells[i].setTintFill(color);
     }
   }
 
@@ -70,9 +82,17 @@ export default class ChunkView {
   updateColor(fromColor, toColor, duration) {
     const me = this;
 
+    me._color = toColor;
     Utils.UpdateColor(me._grid, duration, fromColor.main, toColor.main);
-    for (let i = 0; i < me._cells.length; ++i)
-      Utils.UpdateColor(me._cells[i], duration, fromColor.main, toColor.main);
+    for (let i = 0; i < me._cells.length; ++i) {
+      const isWinner = !!me._cells[i].isWinner;
+      Utils.UpdateColor(
+        me._cells[i],
+        duration,
+        isWinner ? fromColor.selection : fromColor.main,
+        isWinner ? toColor.selection : toColor.main
+      );
+    }
   }
 
   _getFrame(side) {

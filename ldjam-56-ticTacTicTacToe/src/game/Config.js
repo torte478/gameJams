@@ -12,7 +12,7 @@ export default class Config {
   };
 
   static Init = {
-    Difficulty: Enums.Difficulty.EASY,
+    Difficulty: Enums.Difficulty.DEBUG,
     Side: Enums.Side.CROSS,
     Skip: 1,
   };

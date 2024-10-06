@@ -76,6 +76,8 @@ export default class View {
     const fromColor = Config.Colors[chunk.layer - 1];
     const toColor = Config.Colors[chunk.layer];
 
+    me._second.setState(chunk.getState());
+
     me._updateColors(fromColor, toColor, duration);
 
     Here._.add.tween({
@@ -87,7 +89,6 @@ export default class View {
       duration: duration,
     });
 
-    me._second.setState(chunk.getState());
     Here._.add.tween({
       targets: me._second.container,
       x: {
@@ -127,6 +128,8 @@ export default class View {
     const fromColor = Config.Colors[chunk.layer + 1];
     const toColor = Config.Colors[chunk.layer];
 
+    me._second.setState(chunk.getState());
+
     me._updateColors(fromColor, toColor, duration);
 
     Here._.add.tween({
@@ -144,7 +147,6 @@ export default class View {
       duration: duration,
     });
 
-    me._second.setState(chunk.getState());
     Here._.add.tween({
       targets: me._second.container,
       x: {

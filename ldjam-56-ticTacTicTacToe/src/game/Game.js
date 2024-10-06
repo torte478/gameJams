@@ -216,8 +216,10 @@ export default class Game {
     const me = this;
     const chunk = me._state.chunk;
 
-    chunk.makeStep(cell, side);
+    const winner = chunk.makeStep(cell, side);
     me._view.makeStep(cell, side);
+    if (winner != Enums.Side.NONE) me._view._first.setState(chunk.getState());
+
     me._state.side *= -1;
 
     me._tryUp(callback, scope);
@@ -243,16 +245,22 @@ export default class Game {
       me._state.path = newPath;
     }
 
-    const parentCell = me._state.path[me._state.path.length - 1];
-    me._goToLayerUp(() => {
-      parent.makeStep(parentCell, chunk);
-      me._view.makeStep(parentCell, winner);
-      Here._.time.delayedCall(
-        Config.Duration.Between,
-        () => me._tryUp(callback, scope),
-        me
-      );
-    }, me);
+    Here._.time.delayedCall(
+      Config.Duration.Between,
+      () => {
+        const parentCell = me._state.path[me._state.path.length - 1];
+        me._goToLayerUp(() => {
+          parent.makeStep(parentCell, chunk);
+          me._view.makeStep(parentCell, winner);
+          Here._.time.delayedCall(
+            Config.Duration.Between,
+            () => me._tryUp(callback, scope),
+            me
+          );
+        }, me);
+      },
+      me
+    );
   }
 
   _gameLoop() {

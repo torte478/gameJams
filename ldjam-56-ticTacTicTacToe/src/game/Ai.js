@@ -229,6 +229,6 @@ export default class Ai {
     const me = this;
 
     const cells = chunk.toAssumption(cell, side);
-    return Grid.getWinner(cells) == side;
+    return Grid.getWinner(cells).winner == side;
   }
 }

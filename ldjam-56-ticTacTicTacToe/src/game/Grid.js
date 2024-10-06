@@ -97,12 +97,22 @@ export default class Grid {
       const winner = Grid._getRowWinner(cells, row[0], row[1], row[2]);
       if (winner == Enums.Side.NONE) canWin = true;
 
-      if (winner != Enums.Side.NONE && winner != Enums.Side.DRAW) return winner;
+      if (winner != Enums.Side.NONE && winner != Enums.Side.DRAW)
+        return {
+          winner: winner,
+          row: Grid._rows[i],
+        };
     }
 
-    if (Utils.all(cells, (x) => x != Enums.Side.NONE)) return Enums.Side.DRAW;
+    if (Utils.all(cells, (x) => x != Enums.Side.NONE))
+      return {
+        winner: Enums.Side.DRAW,
+      };
 
-    return canWin ? Enums.Side.NONE : Enums.Side.DRAW;
+    const res = canWin ? Enums.Side.NONE : Enums.Side.DRAW;
+    return {
+      winner: res,
+    };
   }
 
   static toFarestCorners(cell) {
