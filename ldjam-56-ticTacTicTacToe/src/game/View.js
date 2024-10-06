@@ -95,6 +95,7 @@ export default class View {
         Config.Init.Difficulty = Enums.Difficulty.EASY;
 
       me._changeDifficultyText();
+      Here._.sound.play("click");
     });
 
     // main

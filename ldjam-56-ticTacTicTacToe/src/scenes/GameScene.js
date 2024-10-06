@@ -42,6 +42,13 @@ export default class GameScene extends HereScene {
     Utils.loadImage("background");
     Utils.loadImage("mapPointer");
     Utils.loadImage("boss");
+
+    Utils.loadWav("click");
+    Utils.loadWav("transition");
+    Utils.loadWav("lose");
+    Utils.loadWav("draw");
+    Utils.loadWav("win");
+    Utils.loadWav("gameover");
   }
 
   create() {

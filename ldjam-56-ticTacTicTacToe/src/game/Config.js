@@ -3,7 +3,7 @@ import Enums from "./Enums.js";
 
 export default class Config {
   static Debug = {
-    Global: true,
+    Global: false,
     Log: true,
     ShowSceneLog: true,
     PlaySound: true,
@@ -12,10 +12,10 @@ export default class Config {
   };
 
   static Init = {
-    Difficulty: Enums.Difficulty.DEBUG,
+    Difficulty: Enums.Difficulty.NORMAL,
     Side: Enums.Side.CROSS,
     Skip: 1,
-    BonusCount: 0,
+    BonusCount: 18,
   };
 
   static Duration = {
@@ -47,7 +47,7 @@ export default class Config {
   };
 
   static Boss = {
-    MaxHP: 10,
+    MaxHP: 1,
   };
 
   // switch palette

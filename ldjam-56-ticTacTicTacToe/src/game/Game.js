@@ -38,7 +38,7 @@ export default class Game {
   /** @type {View} */
   _view;
 
-  _maxLayer = 0;
+  _maxLayer = 4;
 
   _bonusCounter = 0 + Config.Init.BonusCount;
   _maxBonusCount = 0;
@@ -156,6 +156,7 @@ export default class Game {
         Utils.buildPoint(x, y)
       );
       if (!!bonus) {
+        Here._.sound.play("click");
         return me._onBonusClick(bonus);
       }
     }
@@ -169,6 +170,7 @@ export default class Game {
     if (me._state.layer > 0)
       return me._goToLayerDown(cell, me._onFullStepComplete, me);
 
+    Here._.sound.play("click");
     me._makeStep(
       { path: me._state.path, cell: cell },
       Enums.Side.CROSS,
@@ -268,6 +270,8 @@ export default class Game {
     me._level3Stuff.stop();
     me._level4Stuff.stop();
 
+    Here._.sound.play("transition");
+
     me._state.layer++;
     me._view.goToUp(
       chunk.parent,
@@ -296,6 +300,9 @@ export default class Game {
     me._level4Stuff.stop();
 
     me._state.layer--;
+
+    Here._.sound.play("transition");
+
     me._view.goToDown(
       chunk.getCell(cell),
       cell,
@@ -352,6 +359,10 @@ export default class Game {
 
     me._updateBonusCounter(winner);
 
+    if (winner == Enums.Side.NOUGHT) Here._.sound.play("lose");
+    if (winner == Enums.Side.DRAW) Here._.sound.play("draw");
+    if (winner == Enums.Side.CROSS) Here._.sound.play("win");
+
     let parent = chunk.parent;
     if (!parent) {
       parent = new Chunk(me._state.layer + 1, me._imagePool);
@@ -387,10 +398,12 @@ export default class Game {
     ++me._maxLayer;
     me._view.drawMapSegment(newLayer);
 
-    me._view.showMap();
-    me._view.showBonuses();
-    me._view.showHp();
-    return;
+    // TODODO
+
+    // me._view.showMap();
+    // me._view.showBonuses();
+    // me._view.showHp();
+    // return;
 
     if (newLayer == 1) {
       me._view._hintText.setText("RIGHT CLICK TO GO BACK").setVisible(true);
@@ -413,6 +426,7 @@ export default class Game {
       Here.Controls.isPressedOnce(Enums.Keyboard.CANCEL) &&
       me._state.bonusState != Enums.BonusState.NONE
     ) {
+      Here._.sound.play("draw");
       me._state.bonusState = Enums.BonusState.NONE;
       me._view._hintText.setVisible(false);
       return;
@@ -475,10 +489,10 @@ export default class Game {
   _updateBonusCounter(winner) {
     const me = this;
 
-    // if (me._maxLayer < 2) return; // TODO
+    if (me._maxLayer < 2) return; // TODOOD
 
-    if (me._maxLayer >= 0) {
-      // TODO
+    // TODODO
+    if (me._maxLayer >= 4) {
       if (winner == Enums.Side.CROSS) {
         me._hp -= 3;
         me._shotDigit(+3, false);
@@ -572,9 +586,10 @@ export default class Game {
     Here._.add.tween({
       targets: boss,
       alpha: { from: 0, to: 1 },
-      duration: 200, //0, // TODO
+      duration: 2000, // TODODO
       ease: "Sine.easeIn",
       onComplete: () => {
+        Here._.sound.play("gameover", { loop: -1 });
         const t1 = Here._.add.tween({
           targets: boss,
           x: { from: 300 + -50 * boss.scale, to: 300 + 50 * boss.scale },
@@ -587,7 +602,7 @@ export default class Game {
           targets: boss,
           scale: { from: 1, to: 0.25 },
           alpha: { from: 1, to: 0.25 },
-          duration: 100, //00, // TODO
+          duration: 5000, // TODODO
           onComplete: () => {
             boss.setVisible(false);
             t1.stop();
@@ -600,6 +615,8 @@ export default class Game {
 
   _gameGameOver() {
     const me = this;
+
+    Here._.sound.stopAll();
 
     Here._.add
       .text(300, 200, "VICTORY!!!", { fontSize: 84, fontFamily: "Arial Black" })
