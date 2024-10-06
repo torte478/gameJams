@@ -10,13 +10,8 @@ import Grid from "./Grid.js";
 import Chunk from "./Chunk.js";
 
 export default class Ai {
-  /** @type {Number} */
-  _difficulty;
-
-  constructor(difficulty) {
+  constructor() {
     const me = this;
-
-    me._difficulty = difficulty;
   }
 
   /**
@@ -58,7 +53,7 @@ export default class Ai {
     const availableSteps = chunk.getAvailableSteps();
     if (availableSteps.length == 0) throw "no available steps";
 
-    if (me._difficulty == Enums.Difficulty.DEBUG) {
+    if (Config.Init.Difficulty == Enums.Difficulty.DEBUG) {
       const step = availableSteps[0];
       return step;
     }
@@ -85,9 +80,10 @@ export default class Ai {
   _getWinProbalityByDifficulty() {
     const me = this;
 
-    if (me._difficulty == Enums.Difficulty.HARD) return 1;
-    if (me._difficulty == Enums.Difficulty.NORMAL) return 2;
-    if (me._difficulty == Enums.Difficulty.EASY) return 4;
+    const difficulty = Config.Init.Difficulty;
+    if (difficulty == Enums.Difficulty.HARD) return 1;
+    if (difficulty == Enums.Difficulty.NORMAL) return 2;
+    if (difficulty == Enums.Difficulty.EASY) return 4;
     throw `too easy`;
   }
 

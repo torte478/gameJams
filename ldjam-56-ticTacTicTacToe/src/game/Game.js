@@ -66,7 +66,7 @@ export default class Game {
       .setTintFill(Config.Colors[0].main);
 
     me._imagePool = Here._.add.group();
-    me._ai = new Ai(Config.Init.Difficulty);
+    me._ai = new Ai();
     me._view = new View(Config.Colors[0]);
     const initChunk = new Chunk(0);
     me._state = new State(initChunk);
@@ -531,6 +531,7 @@ export default class Game {
     me._view._bonusesContainer.setVisible(false);
     me._view._mapGraphicsContainer.setVisible(false);
     me._view._hintText.setVisible(false);
+    me._view._difficultyText.disableInteractive().setVisible(false);
 
     Utils.UpdateColor(
       me._view._background,
@@ -543,7 +544,7 @@ export default class Game {
     Here._.add.tween({
       targets: boss,
       alpha: { from: 0, to: 1 },
-      duration: 200, //0,
+      duration: 200, //0, // TODO
       ease: "Sine.easeIn",
       onComplete: () => {
         const t1 = Here._.add.tween({
@@ -558,7 +559,7 @@ export default class Game {
           targets: boss,
           scale: { from: 1, to: 0.25 },
           alpha: { from: 1, to: 0.25 },
-          duration: 100, //00,
+          duration: 100, //00, // TODO
           onComplete: () => {
             boss.setVisible(false);
             t1.stop();

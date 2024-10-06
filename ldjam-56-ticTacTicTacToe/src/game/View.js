@@ -54,11 +54,48 @@ export default class View {
   /** @type {Phaser.GameObjects.Container} */
   _hpContainer;
 
+  /** @type {Phaser.GameObjects.Text} */
+  _difficultyText;
+
   /**
    * @param {ColorConfig} colorConfig
    */
   constructor(colorConfig) {
     const me = this;
+
+    me._difficultyText = Here._.add.text(780, 665, "EASY", {
+      fontSize: 32,
+      fontFamily: "Arial Black",
+    });
+    me._difficultyText
+      .setTintFill(colorConfig.main)
+      .setOrigin(1, 0.5)
+      .setInteractive();
+    me._changeDifficultyText();
+
+    me._difficultyText.on("pointerover", () => {
+      me._difficultyText.setScale(1.5);
+    });
+
+    me._difficultyText.on("pointerout", () => {
+      me._difficultyText.setScale(1);
+    });
+
+    me._difficultyText.on("pointerdown", () => {
+      const difficuly = Config.Init.Difficulty;
+      if (difficuly == Enums.Difficulty.DEBUG) return;
+
+      if (difficuly == Enums.Difficulty.EASY)
+        Config.Init.Difficulty = Enums.Difficulty.NORMAL;
+
+      if (difficuly == Enums.Difficulty.NORMAL)
+        Config.Init.Difficulty = Enums.Difficulty.HARD;
+
+      if (difficuly == Enums.Difficulty.HARD)
+        Config.Init.Difficulty = Enums.Difficulty.EASY;
+
+      me._changeDifficultyText();
+    });
 
     // main
 
@@ -86,7 +123,10 @@ export default class View {
     // other
 
     me._hintText = Here._.add
-      .text(300, 650, "TEST", { fontSize: 32, fontFamily: "Arial Black" })
+      .text(300, 650, "TESTESTESTESTESTESTEST", {
+        fontSize: 32,
+        fontFamily: "Arial Black",
+      })
       .setOrigin(0.5)
       .setTintFill(colorConfig.main)
       .setAlpha(0.75)
@@ -180,6 +220,18 @@ export default class View {
 
     me._hp = Here._.add.graphics();
     me._hpContainer = Here._.add.container(0, 0, [me._hp]);
+  }
+
+  _changeDifficultyText() {
+    const me = this;
+
+    let text = "DEBUG";
+    const difficulty = Config.Init.Difficulty;
+    if (difficulty == Enums.Difficulty.EASY) text = "EASY";
+    if (difficulty == Enums.Difficulty.NORMAL) text = "NORMAL";
+    if (difficulty == Enums.Difficulty.HARD) text = "HARD";
+
+    me._difficultyText.setText(text);
   }
 
   drawHp(currentHp) {
@@ -525,6 +577,7 @@ export default class View {
     Utils.UpdateColor(me._mapPointer, duration, from.main, to.main);
 
     Utils.UpdateColor(me._hintText, duration, from.main, to.main);
+    Utils.UpdateColor(me._difficultyText, duration, from.main, to.main);
   }
 
   _hideChildren() {
