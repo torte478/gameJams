@@ -41,10 +41,10 @@ export default class Chunk {
    * @param {Number} cell
    * @param {Number} step
    */
-  makeStep(cell, step) {
+  makeStep(cell, step, force) {
     const me = this;
 
-    if (me.winner != Enums.Side.NONE) throw "chunk is complete";
+    if (!force && me.winner != Enums.Side.NONE) throw "chunk is complete";
 
     me._cells[cell] = step;
 

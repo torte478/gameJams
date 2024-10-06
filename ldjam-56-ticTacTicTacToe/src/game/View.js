@@ -177,7 +177,12 @@ export default class View {
     const index = me._findBonusRect(bonusCount, mousePos);
     if (index == -1) return;
 
-    const text = index == 0 ? "CLICK FOR A DOUBLE MOVE" : "TODO";
+    const text =
+      index == 0
+        ? "CLICK FOR A DOUBLE MOVE"
+        : index == 1
+        ? "CLICK FOR SWAP"
+        : "TODO";
     me._hintText.setText(text).setVisible(true);
   }
 
@@ -187,7 +192,12 @@ export default class View {
     const index = me._findBonusRect(bonusCount, mousePos);
     if (index == -1) return Enums.BonusState.NONE;
 
-    const text = index == 0 ? "DOUBLE MOVE (CANCEL - ESC)" : "TODO";
+    const text =
+      index == 0
+        ? "DOUBLE MOVE (CANCEL - ESC)"
+        : index == 1
+        ? "SWAP 'O' TO 'X' (CANCEL - ESC)"
+        : "TODO";
     me._hintText.setText(text).setVisible(true);
 
     return index + 1;
@@ -422,8 +432,10 @@ export default class View {
   _findBonusRect(bonusCount, mousePos) {
     const me = this;
 
+    let sum = 0;
     for (let i = 0; i < me._bonusRectangles.length; ++i) {
-      if (bonusCount < Config.Bonuses.segments[i]) return -1;
+      sum += Config.Bonuses.segments[i];
+      if (bonusCount < sum) return -1;
 
       if (Phaser.Geom.Rectangle.ContainsPoint(me._bonusRectangles[i], mousePos))
         return i;

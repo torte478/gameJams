@@ -62,6 +62,8 @@ export default class Game {
       me._maxBonusCount += Config.Bonuses.segments[i];
     }
 
+    me._view.drawBonusCount(me._bonusCounter);
+
     if (Utils.isDebug(Config.Debug.Skip)) me._debugInit();
 
     Here._.input.on("pointerdown", me._onMouseClick, me);
@@ -91,8 +93,7 @@ export default class Game {
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `sde: ${me._state.side == 1 ? "X" : "O"}\n` +
-        `lyr: ${me._state.layer}\n` +
-        `pth: ${me._state.path}`;
+        `lyr: ${me._bonusCounter}`;
 
       me._log.setText(text);
     });
@@ -135,8 +136,7 @@ export default class Game {
     }
 
     const cell = Grid.posToCell(Utils.buildPoint(x, y));
-    if (cell == -1 || (me._state.layer == 0 && !chunk.canMakeStep(cell)))
-      return;
+    if (!me._canMakeStep(chunk, cell)) return;
 
     me._hidePhantom();
 
@@ -152,6 +152,7 @@ export default class Game {
           me._doAiStep();
         } else {
           me._state.bonusState = Enums.BonusState.NONE;
+          me._view._hintText.setVisible(false);
           me._state.isInputEnabled = true;
         }
       },
@@ -159,14 +160,33 @@ export default class Game {
     );
   }
 
+  _canMakeStep(chunk, cell) {
+    const me = this;
+
+    if (cell == -1) return false;
+
+    if (me._state.layer > 0) return true;
+
+    // layer == 0
+
+    if (me._state.bonusState == Enums.BonusState.SWAP) {
+      if (chunk.getCell(cell) == Enums.Side.NOUGHT) return true;
+      else return false;
+    }
+
+    if (chunk.canMakeStep(cell)) return true;
+
+    return false;
+  }
+
   _onBonusClick(bonusIndex) {
     const me = this;
 
     me._state.bonusState = bonusIndex;
-    me._bonusCounter = Math.max(
-      0,
-      me._bonusCounter - Config.Bonuses.segments[bonusIndex]
-    );
+    let cost = 0;
+    for (let i = 0; i < bonusIndex; ++i) cost += Config.Bonuses.segments[i];
+
+    me._bonusCounter = Math.max(0, me._bonusCounter - cost);
     me._view.drawBonusCount(me._bonusCounter);
   }
 
@@ -200,7 +220,6 @@ export default class Game {
         () => {
           const duration = me._state.layer > 0 ? Config.Duration.Between : 0;
           Here._.time.delayedCall(duration, onTransitionComplete, me);
-          // onTransitionComplete();
         },
         me
       );
@@ -254,7 +273,13 @@ export default class Game {
     const me = this;
     const chunk = me._state.chunk;
 
-    const winner = chunk.makeStep(cell, side);
+    const force = me._state.bonusState == Enums.BonusState.SWAP;
+    const winner = chunk.makeStep(cell, side, force);
+    if (me._state.bonusState == Enums.BonusState.SWAP) {
+      me._view._hintText.setVisible(false);
+      me._state.bonusState = Enums.BonusState.NONE;
+    }
+
     me._view.makeStep(cell, side);
     if (winner != Enums.Side.NONE) me._view._first.setState(chunk.getState());
 
@@ -342,7 +367,7 @@ export default class Game {
 
     const pos = Grid.cellToPos(cell);
     if (me._state.layer == 0) {
-      if (!me._state.chunk.canMakeStep(cell))
+      if (!me._canMakeStep(me._state.chunk, cell))
         return me._phantom.setVisible(false);
 
       return me._phantom.setVisible(true).setPosition(pos.x, pos.y);
