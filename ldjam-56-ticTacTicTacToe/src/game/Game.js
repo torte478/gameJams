@@ -174,6 +174,10 @@ export default class Game {
       else return false;
     }
 
+    if (me._state.bonusState == Enums.BonusState.SUPER_X) {
+      return true;
+    }
+
     if (chunk.canMakeStep(cell)) return true;
 
     return false;
@@ -273,9 +277,19 @@ export default class Game {
     const me = this;
     const chunk = me._state.chunk;
 
-    const force = me._state.bonusState == Enums.BonusState.SWAP;
-    const winner = chunk.makeStep(cell, side, force);
-    if (me._state.bonusState == Enums.BonusState.SWAP) {
+    const force =
+      me._state.bonusState == Enums.BonusState.SWAP ||
+      me._state.bonusState == Enums.BonusState.SUPER_X;
+    let winner = -1;
+    if (me._state.bonusState == Enums.BonusState.SUPER_X) {
+      for (let i = 0; i < 9; ++i) winner = chunk.makeStep(i, side, force);
+    } else {
+      winner = chunk.makeStep(cell, side, force);
+    }
+    if (
+      me._state.bonusState == Enums.BonusState.SWAP ||
+      me._state.bonusState == Enums.BonusState.SUPER_X
+    ) {
       me._view._hintText.setVisible(false);
       me._state.bonusState = Enums.BonusState.NONE;
     }
@@ -368,9 +382,13 @@ export default class Game {
     const pos = Grid.cellToPos(cell);
     if (me._state.layer == 0) {
       if (!me._canMakeStep(me._state.chunk, cell))
-        return me._phantom.setVisible(false);
+        return me._phantom.setVisible(false).setScale(1);
 
-      return me._phantom.setVisible(true).setPosition(pos.x, pos.y);
+      if (me._state.bonusState == Enums.BonusState.SUPER_X) {
+        return me._phantom.setVisible(true).setPosition(300, 300).setScale(3);
+      }
+
+      return me._phantom.setVisible(true).setPosition(pos.x, pos.y).setScale(1);
     }
 
     return me._view.showPhantom(me._state.chunk, cell);
@@ -379,7 +397,7 @@ export default class Game {
   _hidePhantom() {
     const me = this;
 
-    me._phantom.setVisible(false);
+    me._phantom.setVisible(false).setScale(1);
     if (me._state.layer > 0) me._view.resetChildView(me._state.chunk);
   }
 

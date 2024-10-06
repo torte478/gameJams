@@ -182,7 +182,7 @@ export default class View {
         ? "CLICK FOR A DOUBLE MOVE"
         : index == 1
         ? "CLICK FOR SWAP"
-        : "TODO";
+        : "CLICK FOR SUPER 'X'";
     me._hintText.setText(text).setVisible(true);
   }
 
@@ -197,7 +197,7 @@ export default class View {
         ? "DOUBLE MOVE (CANCEL - ESC)"
         : index == 1
         ? "SWAP 'O' TO 'X' (CANCEL - ESC)"
-        : "TODO";
+        : "SUPER 'X' (CANCEL - ESC)";
     me._hintText.setText(text).setVisible(true);
 
     return index + 1;

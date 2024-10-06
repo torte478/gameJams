@@ -15,7 +15,7 @@ export default class Config {
     Difficulty: Enums.Difficulty.DEBUG,
     Side: Enums.Side.CROSS,
     Skip: 1,
-    BonusCount: 10,
+    BonusCount: 18,
   };
 
   static Duration = {

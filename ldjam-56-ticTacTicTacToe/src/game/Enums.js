@@ -41,6 +41,6 @@ export default class Enums {
     NONE: 0,
     DOUBLE_CLICK: 1,
     SWAP: 2,
-    ULTRA: 3,
+    SUPER_X: 3,
   };
 }
