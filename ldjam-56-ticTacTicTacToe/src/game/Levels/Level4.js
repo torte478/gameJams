@@ -20,6 +20,8 @@ export default class Level4 {
   /** @type {Phaser.GameObjects.Group} */
   _bullets;
 
+  _isRunning = false;
+
   constructor() {
     const me = this;
 
@@ -38,14 +40,8 @@ export default class Level4 {
       .setDepth(Consts.Depth.Stuff)
       .setAlpha(0);
 
-    me._boss = Here._.add.image(0, 0, "boss").setVisible(false);
-  }
+    me._boss = Here._.add.image(0, 0, "boss");
 
-  start() {
-    const me = this;
-
-    // boss
-    me._boss.setVisible(true);
     me._boss.tween = Here._.add.tween({
       targets: me._boss,
       y: { from: 900, to: 0 },
@@ -90,6 +86,7 @@ export default class Level4 {
             "bullet",
             0
           );
+          bullet.setVisible(me._isRunning);
           bullet.setDepth(Consts.Depth.Stuff);
           let point = Phaser.Geom.Rectangle.Random(goddamnRect);
           point = Utils.buildPoint(
@@ -117,32 +114,37 @@ export default class Level4 {
     Phaser.Actions.RandomRectangle(me._container.getAll(), goddamnRect);
     me._boss.x = 500;
 
+    me._container.setVisible(false);
+  }
+
+  start() {
+    const me = this;
+
+    me._isRunning = true;
+
+    me._container.setAlpha(0);
+    me._container.setVisible(true);
+
     Here._.add.tween({
       targets: me._container,
       alpha: { from: 0, to: 1 },
-      duration: Config.Duration.Layer,
+      duration: Config.Duration.Layer - 100,
     });
   }
 
   stop() {
     const me = this;
 
-    const children = Utils.copyArray(me._container.getAll());
-    if (children.length == 0) return;
+    if (!me._isRunning) return;
+
+    me._isRunning = false;
 
     Here._.add.tween({
       targets: me._container,
       alpha: { from: 1, to: 0 },
-      duration: Config.Duration.Layer,
+      duration: Config.Duration.Layer - 100,
       onComplete: () => {
-        for (let i = 0; i < children.length; ++i) {
-          me._container.remove(children[i]);
-          children.tween.stop();
-          me._pool.killAndHide(children[i]);
-        }
-        me._boss.tween.stop();
-        me._container.remove(me._boss);
-        me._boss.setVisible(false);
+        me._container.setVisible(true);
       },
     });
   }

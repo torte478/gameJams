@@ -14,6 +14,8 @@ export default class Level3 {
   /** @type {Phaser.GameObjects.Container} */
   _container;
 
+  _isRunning = false;
+
   constructor() {
     const me = this;
 
@@ -29,10 +31,6 @@ export default class Level3 {
       .container(-200, -100, [])
       .setDepth(Consts.Depth.Stuff)
       .setAlpha(0);
-  }
-
-  start() {
-    const me = this;
 
     for (let i = 0; i < 6; ++i) {
       const isCross = i < 3;
@@ -65,29 +63,37 @@ export default class Level3 {
       me._container.add(item);
     }
 
+    me._container.setVisible(false);
+  }
+
+  start() {
+    const me = this;
+
+    me._isRunning = true;
+
+    me._container.setAlpha(0);
+    me._container.setVisible(true);
+
     Here._.add.tween({
       targets: me._container,
       alpha: { from: 0, to: 1 },
-      duration: Config.Duration.Layer,
+      duration: Config.Duration.Layer - 100,
     });
   }
 
   stop() {
     const me = this;
 
-    const children = Utils.copyArray(me._container.getAll());
-    if (children.length == 0) return;
+    if (!me._isRunning) return;
+
+    me._isRunning = false;
 
     Here._.add.tween({
       targets: me._container,
       alpha: { from: 1, to: 0 },
-      duration: Config.Duration.Layer,
+      duration: Config.Duration.Layer - 100,
       onComplete: () => {
-        for (let i = 0; i < children.length; ++i) {
-          me._container.remove(children[i]);
-          children.tween.stop();
-          me._pool.killAndHide(children[i]);
-        }
+        me._container.setVisible(true);
       },
     });
   }

@@ -38,7 +38,7 @@ export default class Game {
   /** @type {View} */
   _view;
 
-  _maxLayer = 4;
+  _maxLayer = 0; // TODODO
 
   _bonusCounter = 0 + Config.Init.BonusCount;
   _maxBonusCount = 0;
@@ -162,7 +162,10 @@ export default class Game {
     }
 
     const cell = Grid.posToCell(Utils.buildPoint(x, y));
-    if (!me._canMakeStep(chunk, cell)) return;
+    if (!me._canMakeStep(chunk, cell)) {
+      Here._.sound.play("lose");
+      return;
+    }
 
     me._hidePhantom();
 
@@ -352,6 +355,7 @@ export default class Game {
     const chunk = me._state.chunk;
 
     const winner = chunk.recalculateWinner();
+    me._view._first.setState(chunk.getState());
 
     if (winner == Enums.Side.NONE) {
       return Utils.callCallback(callback, scope);
@@ -381,6 +385,7 @@ export default class Game {
         me._goToLayerUp(() => {
           parent.makeStep(parentCell, chunk);
           me._view.makeStep(parentCell, winner);
+
           Here._.time.delayedCall(
             Config.Duration.Between,
             () => me._tryUp(callback, scope),
