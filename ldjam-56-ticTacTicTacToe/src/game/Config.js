@@ -12,10 +12,10 @@ export default class Config {
   };
 
   static Init = {
-    Difficulty: Enums.Difficulty.DEBUG,
+    Difficulty: Enums.Difficulty.HARD,
     Side: Enums.Side.CROSS,
-    Skip: 1,
-    BonusCount: 18,
+    Skip: 0,
+    BonusCount: 0,
   };
 
   static Duration = {

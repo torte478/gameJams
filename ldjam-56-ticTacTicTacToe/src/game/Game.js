@@ -93,7 +93,7 @@ export default class Game {
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `sde: ${me._state.side == 1 ? "X" : "O"}\n` +
-        `lyr: ${me._bonusCounter}`;
+        `bns: ${me._bonusCounter}`;
 
       me._log.setText(text);
     });
@@ -351,7 +351,11 @@ export default class Game {
     me._view.drawMapSegment(newLayer);
 
     if (newLayer == 1) {
+      me._view._hintText.setText("RIGHT CLICK TO GO BACK").setVisible(true);
       me._view.showMap();
+    }
+    if (newLayer == 2) {
+      me._view.showBonuses();
     }
   }
 
@@ -420,6 +424,8 @@ export default class Game {
 
   _updateBonusCounter(winner) {
     const me = this;
+
+    if (me._maxLayer < 2) return;
 
     if (winner == Enums.Side.NONE || winner == Enums.Side.NOUGHT) return;
 

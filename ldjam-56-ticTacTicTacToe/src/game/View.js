@@ -166,12 +166,15 @@ export default class View {
       curY -= Config.Bonuses.buttonSizeY;
     }
     me._bonusesContainer = Here._.add
-      .container(Config.Bonuses.x, Config.Bonuses.y, bonusChildren)
+      .container(Config.Bonuses.x - 150, Config.Bonuses.y, bonusChildren)
       .setDepth(Consts.Depth.UI);
+    me._bonusesContainer.setActive(false);
   }
 
   updateBonusText(bonusCount, mousePos) {
     const me = this;
+
+    if (!me._bonusesContainer.active) return;
 
     me._hintText.setVisible(false);
     const index = me._findBonusRect(bonusCount, mousePos);
@@ -188,6 +191,8 @@ export default class View {
 
   tryClickBonus(bonusCount, mousePos) {
     const me = this;
+
+    if (!me._bonusesContainer.active) return Enums.BonusState.NONE;
 
     const index = me._findBonusRect(bonusCount, mousePos);
     if (index == -1) return Enums.BonusState.NONE;
@@ -222,6 +227,17 @@ export default class View {
       me._mapGraphicsContainer.x,
       (Consts.Viewport.Height - (layer + 3) * Config.MapSegment.height) / 2
     );
+  }
+
+  showBonuses() {
+    const me = this;
+
+    me._bonusesContainer.setActive(true);
+    Here._.add.tween({
+      targets: me._bonusesContainer,
+      x: Config.Bonuses.x,
+      duration: Config.Duration.Layer,
+    });
   }
 
   showMap() {
