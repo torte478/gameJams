@@ -33,6 +33,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("bonuses", 40);
     Utils.loadSpriteSheet("level1_anim", 50);
     Utils.loadSpriteSheet("level2", 100);
+    Utils.loadSpriteSheet("level3", 150);
 
     Utils.loadImage("grid");
     Utils.loadImage("background");

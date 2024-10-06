@@ -13,6 +13,7 @@ import State from "./State.js";
 import View from "./View.js";
 import Level1 from "./Levels/Level1.js";
 import Level2 from "./Levels/Level2.js";
+import Level3 from "./Levels/Level3.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -75,6 +76,7 @@ export default class Game {
 
     me._level1Stuff = new Level1();
     me._level2Stuff = new Level2();
+    me._level3Stuff = new Level3();
 
     if (Utils.isDebug(Config.Debug.Skip)) me._debugInit();
 
@@ -250,6 +252,7 @@ export default class Game {
 
     me._level1Stuff.stop();
     me._level2Stuff.stop();
+    me._level3Stuff.stop();
 
     me._state.layer++;
     me._view.goToUp(
@@ -275,6 +278,7 @@ export default class Game {
 
     me._level1Stuff.stop();
     me._level2Stuff.stop();
+    me._level3Stuff.stop();
 
     me._state.layer--;
     me._view.goToDown(
@@ -439,6 +443,7 @@ export default class Game {
 
     if (me._state.layer == 1) me._level1Stuff.start();
     if (me._state.layer == 2) me._level2Stuff.start();
+    if (me._state.layer == 3) me._level3Stuff.start();
 
     me._state.isInputEnabled = true;
   }
