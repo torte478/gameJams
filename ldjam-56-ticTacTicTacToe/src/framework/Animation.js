@@ -1,17 +1,23 @@
 import Here from "./Here.js";
 
 export default class Animation {
+  static init() {
+    Here._.anims.create({
+      key: "level1_cross",
+      frames: Animation.getFrames("level1_anim", [0, 1, 2, 3]),
+      frameRate: 8,
+      repeat: -1,
+    });
 
-    static init() {
-        // scene.anims.create({
-        //     key: 'ANIM_NAME',
-        //     frames: Animation.getFrames('ASSET_NAME', [ 1, 2, 3 ]),
-        //     frameRate: 24,
-        //     repeat: -1
-        // });
-    }
+    Here._.anims.create({
+      key: "level1_nougth",
+      frames: Animation.getFrames("level1_anim", [4, 5, 6, 7]),
+      frameRate: 8,
+      repeat: -1,
+    });
+  }
 
-    static getFrames(texture, frames) {
-        return Here._.anims.generateFrameNames(texture, { frames: frames });
-    }
+  static getFrames(texture, frames) {
+    return Here._.anims.generateFrameNames(texture, { frames: frames });
+  }
 }

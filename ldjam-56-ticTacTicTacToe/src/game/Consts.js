@@ -16,6 +16,7 @@ export default class Consts {
 
   static Depth = {
     Background: -10000,
+    Stuff: -2000,
     Chunk: 0,
     UI: 1000,
     Max: 100000,

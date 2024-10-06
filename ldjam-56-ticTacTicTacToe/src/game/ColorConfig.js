@@ -2,11 +2,13 @@ export default class ColorConfig {
   main;
   background;
   selection;
+  item;
 
-  constructor(m, b, s) {
+  constructor(main, background, selection, item) {
     const me = this;
-    me.main = m;
-    me.background = b;
-    me.selection = s;
+    me.main = main;
+    me.background = background;
+    me.selection = selection;
+    me.item = item;
   }
 }

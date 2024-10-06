@@ -11,6 +11,7 @@ import Chunk from "./Chunk.js";
 import Ai from "./Ai.js";
 import State from "./State.js";
 import View from "./View.js";
+import Level1 from "./Levels/Level1.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -45,6 +46,13 @@ export default class Game {
     Here._.cameras.main.setScroll(-200, -100);
     Here._.input.mouse.disableContextMenu();
 
+    Here._.physics.world.setBounds(
+      -200,
+      -100,
+      Consts.Viewport.Width,
+      Consts.Viewport.Height
+    );
+
     me._phantom = Here._.add
       .image(100, 100, "step", 1)
       .setDepth(Consts.Depth.UI)
@@ -63,6 +71,8 @@ export default class Game {
     }
 
     me._view.drawBonusCount(me._bonusCounter);
+
+    me._level1Stuff = new Level1();
 
     if (Utils.isDebug(Config.Debug.Skip)) me._debugInit();
 
@@ -236,6 +246,8 @@ export default class Game {
     const me = this;
     const chunk = me._state.chunk;
 
+    me._level1Stuff.stop();
+
     me._state.layer++;
     me._view.goToUp(
       chunk.parent,
@@ -257,6 +269,8 @@ export default class Game {
   _goToLayerDown(cell, callback, scope) {
     const me = this;
     const chunk = me._state.chunk;
+
+    me._level1Stuff.stop();
 
     me._state.layer--;
     me._view.goToDown(
@@ -418,6 +432,8 @@ export default class Game {
     const me = this;
 
     if (me._state.layer > 0) me._view.resetChildView(me._state.chunk);
+
+    if (me._state.layer == 1) me._level1Stuff.start();
 
     me._state.isInputEnabled = true;
   }
