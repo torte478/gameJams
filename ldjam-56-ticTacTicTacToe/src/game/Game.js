@@ -360,6 +360,15 @@ export default class Game {
 
     if (!me._state.isInputEnabled) return;
 
+    if (
+      Here.Controls.isPressedOnce(Enums.Keyboard.CANCEL) &&
+      me._state.bonusState != Enums.BonusState.NONE
+    ) {
+      me._state.bonusState = Enums.BonusState.NONE;
+      me._view._hintText.setVisible(false);
+      return;
+    }
+
     const mouse = Here._.input.activePointer;
     const worldPos = Utils.buildPoint(mouse.worldX, mouse.worldY);
 
