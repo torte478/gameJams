@@ -350,6 +350,8 @@ export default class Game {
     me._tryUp(callback, scope);
   }
 
+  _pleaseWork = false;
+
   _tryUp(callback, scope) {
     const me = this;
     const chunk = me._state.chunk;
@@ -358,7 +360,22 @@ export default class Game {
     me._view._first.setState(chunk.getState());
 
     if (winner == Enums.Side.NONE) {
-      return Utils.callCallback(callback, scope);
+      if (me._pleaseWork) {
+        me._pleaseWork = false;
+
+        const layer = me._state.layer;
+        if (layer == 1) me._level1Stuff.start();
+        if (layer == 2) me._level2Stuff.start();
+        if (layer == 3) me._level3Stuff.start();
+        if (layer == 4) me._level4Stuff.start();
+
+        Here._.time.delayedCall(3000, () => {
+          Utils.callCallback(callback, scope);
+        });
+        return;
+      } else {
+        return Utils.callCallback(callback, scope);
+      }
     }
 
     me._updateBonusCounter(winner);
@@ -376,6 +393,7 @@ export default class Game {
         newPath.push(me._state.path[i]);
       me._state.path = newPath;
       me._onNewLayer(me._state.layer + 1);
+      me._pleaseWork = true;
     }
 
     Here._.time.delayedCall(
