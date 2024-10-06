@@ -24,11 +24,22 @@ export default class View {
   /** @type {Phaser.GameObjects.Image} */
   _background;
 
+  /** @type {Phaser.GameObjects.Graphics} */
+  _mapGraphics;
+
+  /** @type {Phaser.GameObjects.Container} */
+  _mapGraphicsContainer;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _mapPointer;
+
   /**
    * @param {ColorConfig} colorConfig
    */
   constructor(colorConfig) {
     const me = this;
+
+    // main
 
     me._background = Here._.add
       .image(1.5 * Consts.Sizes.Cell, 1.5 * Consts.Sizes.Cell, "background")
@@ -50,6 +61,53 @@ export default class View {
 
       me._cells.push(chunk);
     }
+
+    // map
+
+    me._mapGraphics = Here._.add.graphics();
+    me._mapGraphics.lineStyle(2, Config.Colors[0].main);
+
+    me._mapPointer = Here._.add
+      .image(-20, Config.MapSegment.height / 2, "mapPointer")
+      .setScale(0.5)
+      .setTintFill(colorConfig.main);
+
+    me._mapGraphicsContainer = Here._.add
+      .container(900, Config.MapSegment.y, [me._mapGraphics, me._mapPointer])
+      .setDepth(Consts.Depth.UI);
+
+    me.drawMapSegment(0);
+  }
+
+  drawMapSegment(layer) {
+    const me = this;
+
+    const rect = new Phaser.Geom.Rectangle(
+      0,
+      layer * Config.MapSegment.height,
+      Config.MapSegment.width,
+      Config.MapSegment.height
+    );
+
+    me._mapGraphics.fillStyle(Config.Colors[layer].background);
+    me._mapGraphics.fillRectShape(rect);
+
+    me._mapGraphics.strokeRectShape(rect);
+
+    me._mapGraphicsContainer.setPosition(
+      me._mapGraphicsContainer.x,
+      (Consts.Viewport.Height - (layer + 3) * Config.MapSegment.height) / 2
+    );
+  }
+
+  showMap() {
+    const me = this;
+
+    Here._.add.tween({
+      targets: me._mapGraphicsContainer,
+      x: Config.MapSegment.x,
+      duration: Config.Duration.Layer,
+    });
   }
 
   makeStep(cell, side) {
@@ -63,7 +121,7 @@ export default class View {
    * @param {Function} callback
    * @param {Object} scope
    */
-  goToUp(chunk, cell, callback, scope) {
+  goToUp(chunk, cell, layerCount, callback, scope) {
     const me = this;
 
     me._hideChildren();
@@ -79,6 +137,7 @@ export default class View {
     me._second.setState(chunk.getState());
 
     me._updateColors(fromColor, toColor, duration);
+    me._moveMapPointer(chunk.layer, duration);
 
     Here._.add.tween({
       targets: me._first.container,
@@ -104,6 +163,7 @@ export default class View {
       duration: duration,
       onComplete: () => {
         me._swap();
+        me._redrawBorders(layerCount, toColor.main);
         Utils.callCallback(callback, scope);
       },
     });
@@ -115,7 +175,7 @@ export default class View {
    * @param {Function} callback
    * @param {Object} scope
    */
-  goToDown(chunk, cell, callback, scope) {
+  goToDown(chunk, cell, layerCount, callback, scope) {
     const me = this;
 
     me._hideChildren();
@@ -131,6 +191,7 @@ export default class View {
     me._second.setState(chunk.getState());
 
     me._updateColors(fromColor, toColor, duration);
+    me._moveMapPointer(chunk.layer, duration);
 
     Here._.add.tween({
       targets: me._first.container,
@@ -162,6 +223,7 @@ export default class View {
       duration: duration,
       onComplete: () => {
         me._swap();
+        me._redrawBorders(layerCount, toColor.main);
         Utils.callCallback(callback, scope);
       },
     });
@@ -192,6 +254,34 @@ export default class View {
     me._cells[cell].container.setAlpha(1);
   }
 
+  _redrawBorders(layerCount, color) {
+    const me = this;
+
+    for (let i = 0; i < layerCount; ++i) {
+      const rect = new Phaser.Geom.Rectangle(
+        0,
+        i * Config.MapSegment.height,
+        Config.MapSegment.width,
+        Config.MapSegment.height
+      );
+
+      me._mapGraphics.lineStyle(2, color);
+      me._mapGraphics.strokeRectShape(rect);
+    }
+  }
+
+  _moveMapPointer(toLayer, duration) {
+    const me = this;
+
+    const to = (toLayer + 0.5) * Config.MapSegment.height;
+
+    Here._.tweens.add({
+      targets: me._mapPointer,
+      y: (toLayer + 0.5) * Config.MapSegment.height,
+      duration: duration,
+    });
+  }
+
   _updateColors(from, to, duration) {
     const me = this;
 
@@ -201,6 +291,8 @@ export default class View {
     me._second.updateColor(from, to, duration);
     for (let i = 0; i < me._cells.length; ++i)
       me._cells[i].updateColor(from, to, duration);
+
+    Utils.UpdateColor(me._mapPointer, duration, from.main, to.main);
   }
 
   _hideChildren() {

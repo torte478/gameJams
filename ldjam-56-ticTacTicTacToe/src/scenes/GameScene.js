@@ -33,6 +33,7 @@ export default class GameScene extends HereScene {
 
     Utils.loadImage("grid");
     Utils.loadImage("background");
+    Utils.loadImage("mapPointer");
   }
 
   create() {

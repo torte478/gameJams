@@ -34,6 +34,8 @@ export default class Game {
   /** @type {View} */
   _view;
 
+  _maxLayer = 0;
+
   constructor() {
     const me = this;
 
@@ -181,6 +183,7 @@ export default class Game {
     me._view.goToUp(
       chunk.parent,
       me._state.path[me._state.path.length - 1],
+      me._maxLayer + 1,
       () => {
         me._state.chunk = chunk.parent;
         const newPath = [];
@@ -202,6 +205,7 @@ export default class Game {
     me._view.goToDown(
       chunk.getCell(cell),
       cell,
+      me._maxLayer + 1,
       () => {
         me._state.chunk = chunk.getCell(cell);
         me._state.path.push(cell);
@@ -243,6 +247,7 @@ export default class Game {
       for (let i = 0; i < me._state.path.length; ++i)
         newPath.push(me._state.path[i]);
       me._state.path = newPath;
+      me._onNewLayer(me._state.layer + 1);
     }
 
     Here._.time.delayedCall(
@@ -261,6 +266,17 @@ export default class Game {
       },
       me
     );
+  }
+
+  _onNewLayer(newLayer) {
+    const me = this;
+
+    ++me._maxLayer;
+    me._view.drawMapSegment(newLayer);
+
+    if (newLayer == 1) {
+      me._view.showMap();
+    }
   }
 
   _gameLoop() {

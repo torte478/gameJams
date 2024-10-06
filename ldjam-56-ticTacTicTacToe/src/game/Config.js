@@ -8,7 +8,7 @@ export default class Config {
     ShowSceneLog: true,
     PlaySound: true,
     Random: true,
-    Skip: true,
+    Skip: false,
   };
 
   static Init = {
@@ -28,10 +28,19 @@ export default class Config {
     Big: 4,
   };
 
+  static MapSegment = {
+    x: 720,
+    y: 0,
+    width: 50,
+    height: 125,
+  };
+
   // switch palette
   static Colors = [
-    new ColorConfig(0x1b3649, 0xbfdaf2, 0xaa6800), // 0
-    new ColorConfig(0x003826, 0x8ecfb6, 0x005ccf), // 1
-    new ColorConfig(0xaf74af, 0x410b43, 0x00c9c4), // 2
+    new ColorConfig(0x323a39, 0xe8f3f1, 0xc341ac), // 0
+    new ColorConfig(0x003f30, 0x00e1c7, 0x9233a5), // 1
+    new ColorConfig(0x002d63, 0x0098da, 0xe69c24), // 2
+    new ColorConfig(0xbac4ff, 0x0043af, 0xc4a862), // 3
+    new ColorConfig(0xb1a8b9, 0x370079, 0xa91c06), // 4
   ];
 }
