@@ -1,5 +1,6 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
+import Config from "./Config.js";
 import Consts from "./Consts.js";
 
 export default class Cursor {
@@ -14,9 +15,10 @@ export default class Cursor {
         Consts.Viewport.Width / 2,
         Consts.Viewport.Height / 2,
         "placeholder40",
-        0
+        1
       )
-      .setDepth(Consts.Depth.Max);
+      .setDepth(Consts.Depth.Max)
+      .setVisible(!Utils.isDebug(Config.Debug.Cursor));
 
     Here._.input.on(
       "pointerdown",

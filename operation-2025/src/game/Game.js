@@ -9,6 +9,8 @@ import Enums from "./Enums.js";
 import Yarik from "./Yarik.js";
 import Lera from "./Lera.js";
 import Cursor from "./Cursor.js";
+import Enemies from "./Enemies.js";
+import Bullets from "./Bullets.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -23,6 +25,9 @@ export default class Game {
   /** @type {Cursor} */
   _cursor;
 
+  /** @type {Enemies} */
+  _enemies;
+
   constructor() {
     const me = this;
 
@@ -30,14 +35,37 @@ export default class Game {
 
     me._yarik = new Yarik();
 
-    const bulletPool = Here._.physics.add.group();
-    bulletPool.setcoll;
+    const bullets = new Bullets();
 
-    me._lera = new Lera(bulletPool);
+    me._lera = new Lera(bullets, me._cursor);
+
+    me._enemies = new Enemies(me._lera.getGameObject());
 
     Here._.physics.add.collider(
       me._yarik.getGameObject(),
       me._lera.getGameObject()
+    );
+
+    Here._.physics.add.overlap(
+      me._enemies.getPool(),
+      bullets.getPool(),
+      (e, b) => {
+        bullets.onHit(b);
+        //--
+      },
+      null,
+      me
+    );
+
+    // TODO
+    Here._.physics.add.overlap(
+      me._lera.getGameObject(),
+      me._enemies.getPool(),
+      (l, e) => {
+        Here._.scene.restart({ isRestart: true });
+      },
+      null,
+      me
     );
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
@@ -76,5 +104,7 @@ export default class Game {
 
     me._yarik.update();
     me._lera.update(me._cursor.getPos());
+
+    me._enemies.update();
   }
 }

@@ -13,6 +13,10 @@ export default class Config {
 
   static Lera = {
     AimOffset: 100,
-    BulletSpeed: 100,
+    BulletSpeed: 400,
+  };
+
+  static Enemy = {
+    Speed: 50,
   };
 }

@@ -434,4 +434,12 @@ export default class Utils {
   static normalize(x, y) {
     return Utils._isNonZero(x, y) ? 1 / this._getMagnitude(x, y) : 0;
   }
+
+  static getDirection(from, to) {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dist = Math.sqrt(dx * dx + dy * dy) + Phaser.Math.EPSILON;
+
+    return Utils.buildPoint(dx / dist, dy / dist);
+  }
 }

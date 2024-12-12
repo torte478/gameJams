@@ -1,34 +1,32 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
-import Config from "./Config.js";
-import Consts from "./Consts.js";
+import Bullets from "./Bullets.js";
+import Cursor from "./Cursor.js";
 
 export default class Lera {
   /** @type{Phaser.GameObjects.Container} */
   _container;
 
-  /** @type {Phaser.GameObjects.Image} */
-  _aim;
+  /** @type {Bullets} */
+  _bullets;
 
-  /** @type {Phaser.Physics.Arcade.Group} */
-  _bulletPool;
+  /** @type {Cursor} */
+  _cursor;
 
   /**
-   * @param {Phaser.Physics.Arcade.Group} bulletPool
+   * @param {Bullets} bullets
+   * @param {Cursor} cursor
    */
-  constructor(bulletPool) {
+  constructor(bullets, cursor) {
     const me = this;
 
-    me._bulletPool = bulletPool;
+    me._bullets = bullets;
+    me._cursor = cursor;
 
     const sprite = Here._.add.image(0, 0, "placeholder80", 1);
 
-    me._aim = Here._.add
-      .image(0, 0, "placeholder40", 1)
-      .setDepth(Consts.Depth.GUI);
-
     me._container = Here._.add
-      .container(600, 300, [sprite, me._aim])
+      .container(600, 300, [sprite])
       .setSize(sprite.width, sprite.height);
 
     Here._.physics.world.enable(me._container);
@@ -54,17 +52,17 @@ export default class Lera {
   update(mousePos) {
     const me = this;
 
-    const dirX = mousePos.x - me._container.x;
-    const dirY = mousePos.y - me._container.y;
+    // const dirX = mousePos.x - me._container.x;
+    // const dirY = mousePos.y - me._container.y;
 
-    const length = Math.sqrt(dirX * dirX + dirY * dirY) + Phaser.Math.EPSILON;
-    const nDirX = dirX / length;
-    const nDirY = dirY / length;
+    // const length = Math.sqrt(dirX * dirX + dirY * dirY) + Phaser.Math.EPSILON;
+    // const nDirX = dirX / length;
+    // const nDirY = dirY / length;
 
-    me._aim.setPosition(
-      nDirX * Config.Lera.AimOffset,
-      nDirY * Config.Lera.AimOffset
-    );
+    // me._aim.setPosition(
+    //   nDirX * Config.Lera.AimOffset,
+    //   nDirY * Config.Lera.AimOffset
+    // );
   }
 
   /**
@@ -78,29 +76,6 @@ export default class Lera {
   _onMouseClick() {
     const me = this;
 
-    /** @type {Phaser.Physics.Arcade.Image} */
-    const bullet = me._bulletPool.get(
-      me._container.x,
-      me._container.y,
-      "placeholder40",
-      2
-    );
-
-    bullet.body.enable = true;
-    bullet.body.reset(bullet.x, bullet.y);
-
-    bullet
-      .setActive(true)
-      .setVisible(true)
-      .setVelocity(
-        Config.Lera.BulletSpeed * (me._aim.x / Config.Lera.AimOffset),
-        Config.Lera.BulletSpeed * (me._aim.y / Config.Lera.AimOffset)
-      );
-
-    // TODO
-    Here._.time.delayedCall(1000, () => {
-      bullet.setActive(false).setVisible(false);
-      bullet.body.enable = false;
-    });
+    me._bullets.shot(me._container, me._cursor.getPos());
   }
 }
