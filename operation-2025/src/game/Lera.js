@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 
@@ -9,8 +10,16 @@ export default class Lera {
   /** @type {Phaser.GameObjects.Image} */
   _aim;
 
-  constructor() {
+  /** @type {Phaser.Physics.Arcade.Group} */
+  _bulletPool;
+
+  /**
+   * @param {Phaser.Physics.Arcade.Group} bulletPool
+   */
+  constructor(bulletPool) {
     const me = this;
+
+    me._bulletPool = bulletPool;
 
     const sprite = Here._.add.image(0, 0, "placeholder80", 1);
 
@@ -27,6 +36,8 @@ export default class Lera {
     const body = me._getBody();
     body.setSlideFactor(0, 0);
     body.pushable = true;
+
+    Here._.input.on("pointerdown", (_) => me._onMouseClick(), me);
   }
 
   /**
@@ -62,5 +73,34 @@ export default class Lera {
   _getBody() {
     const me = this;
     return me._container.body;
+  }
+
+  _onMouseClick() {
+    const me = this;
+
+    /** @type {Phaser.Physics.Arcade.Image} */
+    const bullet = me._bulletPool.get(
+      me._container.x,
+      me._container.y,
+      "placeholder40",
+      2
+    );
+
+    bullet.body.enable = true;
+    bullet.body.reset(bullet.x, bullet.y);
+
+    bullet
+      .setActive(true)
+      .setVisible(true)
+      .setVelocity(
+        Config.Lera.BulletSpeed * (me._aim.x / Config.Lera.AimOffset),
+        Config.Lera.BulletSpeed * (me._aim.y / Config.Lera.AimOffset)
+      );
+
+    // TODO
+    Here._.time.delayedCall(1000, () => {
+      bullet.setActive(false).setVisible(false);
+      bullet.body.enable = false;
+    });
   }
 }

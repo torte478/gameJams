@@ -29,7 +29,11 @@ export default class Game {
     me._cursor = new Cursor();
 
     me._yarik = new Yarik();
-    me._lera = new Lera();
+
+    const bulletPool = Here._.physics.add.group();
+    bulletPool.setcoll;
+
+    me._lera = new Lera(bulletPool);
 
     Here._.physics.add.collider(
       me._yarik.getGameObject(),

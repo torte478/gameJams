@@ -13,5 +13,6 @@ export default class Config {
 
   static Lera = {
     AimOffset: 100,
+    BulletSpeed: 100,
   };
 }
