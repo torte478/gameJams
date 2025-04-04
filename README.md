@@ -1,5 +1,12 @@
 # gameJams
 
+## Tic-Tac-Tic-Tac-Toe
+Game: https://torte478.itch.io/tic-tac-tic-tac-toe
+
+Submission for https://ldjam.com/events/ludum-dare/56
+
+05.10.2024 - 07.10.2024
+
 ## Helldrivers
 Game: https://torte478.itch.io/helldrivers
 
