@@ -112,7 +112,15 @@ export default class Game {
 
     const playerCursorPos = me._player.toMousePos();
 
-    me._player.update(deltaSec);
+    const createSpotAngle = me._player.update(deltaSec);
+
+    if (createSpotAngle != null)
+      me._garbage.createStep(
+        me._player.toGameObject().x,
+        me._player.toGameObject().y,
+        createSpotAngle
+      );
+
     me._tools.update();
     for (let i = 0; i < me._dumpsters.length; ++i)
       me._dumpsters[i].update(playerCursorPos);

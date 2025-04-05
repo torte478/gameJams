@@ -180,10 +180,33 @@ export default class Garbage {
   createSpot(x, y) {
     const me = this;
 
-    const frame = Utils.getRandom(6, 8, 6);
+    me._createSpotInternal(
+      x,
+      y,
+      Utils.getRandom(6, 8, 6),
+      Utils.getRandom(0, 360, 0)
+    );
+  }
+
+  createStep(x, y, angle) {
+    const me = this;
+
+    const step = me._createSpotInternal(
+      x,
+      y + 40,
+      Utils.getRandom(9, 10),
+      angle
+    );
+    step.isStep = true;
+  }
+
+  _createSpotInternal(x, y, frame, angle) {
+    const me = this;
+
     const spot = me._spotPool.create(x, y, "items", frame);
     spot.isSpot = true;
-    spot.setDepth(Consts.Depth.Spot).setAngle(Utils.getRandom(0, 360, 0));
+    spot.setDepth(Consts.Depth.Spot).setAngle(angle);
+    return spot;
   }
 
   _onMovableCollideProcess(movable) {

@@ -19,12 +19,14 @@ export default class Config {
     GarbageSpeed: 100,
     BagSpawnVelocity: 500,
     SpotCreatePeriodSec: 1,
+    StepSpotCount: 3,
+    StepSpotIntervalSec: 0.25,
   };
 
   static Tools = {
     MaxGarbageCountAtBag: 2,
-    MaxMopDirt: 2,
-    MaxBucketDirt: 3,
+    MaxMopDirt: 4,
+    MaxBucketDirt: 8,
     FireballSpeed: 400,
     MaxMana: 10,
     FireballCost: 2,

@@ -3,6 +3,7 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
+import MyStaticTime from "./MyStaticTime.js";
 
 export default class Player {
   /** @type {Phaser.GameObjects.Container} */
@@ -19,6 +20,9 @@ export default class Player {
 
   /** @type {Phaser.Geom.Point} */
   _previousMovementVector = Player._zeroVector;
+
+  _nextStepSpotTimeSec = -1;
+  _spotStepCount = 0;
 
   static _zeroVector = Utils.buildPoint(0, 0);
 
@@ -46,7 +50,7 @@ export default class Player {
   update(deltaSec) {
     const me = this;
 
-    me._updateMovement();
+    return me._updateMovement();
   }
 
   toGameObject() {
@@ -103,11 +107,17 @@ export default class Player {
     );
 
     let speed = Config.Player.Speed;
-    const isSpot = Utils.any(otherBodies, (f) => !!f.gameObject.isSpot);
+    const spot = Utils.firstOrNull(otherBodies, (f) => !!f.gameObject.isSpot);
+    const isSpot = !!spot;
     const isGarbage = Utils.any(otherBodies, (f) => !!f.gameObject.isGarbage);
+
     if (isSpot) {
       me._sprite.play("player_at_spot", true);
       speed = Config.Player.SpotSpeed;
+      if (!spot.gameObject.isStep) {
+        me._nextStepSpotTimeSec = MyStaticTime.time;
+        me._spotStepCount = 0;
+      }
     } else if (isGarbage) {
       speed = Config.Player.GarbageSpeed;
     }
@@ -123,7 +133,7 @@ export default class Player {
         body.setVelocity(0, 0);
         me._sprite.play("player_idle", true);
       }
-      return;
+      return null;
     }
 
     if (dx !== 0 && dy !== 0) {
@@ -135,6 +145,26 @@ export default class Player {
     body.setVelocity(dx * speed, dy * speed);
     me._previousMovementVector = Utils.buildPoint(dx, dy);
 
-    if (!isSpot) me._sprite.play("player_walk", true);
+    let stepAngle = null;
+    if (!isSpot) {
+      me._sprite.play("player_walk", true);
+
+      const needDrawStep =
+        me._nextStepSpotTimeSec > 0 &&
+        me._spotStepCount < Config.Player.StepSpotCount &&
+        MyStaticTime.time > me._nextStepSpotTimeSec;
+      if (needDrawStep) {
+        stepAngle = Phaser.Math.RadToDeg(
+          Phaser.Math.Angle.Between(0, 0, dx, dy)
+        );
+        me._spotStepCount += 1;
+        me._nextStepSpotTimeSec =
+          me._spotStepCount < Config.Player.StepSpotCount
+            ? MyStaticTime.time + Config.Player.StepSpotIntervalSec
+            : -1;
+      }
+    }
+
+    return stepAngle;
   }
 }

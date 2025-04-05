@@ -251,7 +251,7 @@ export default class Tools {
     const bodies = Here._.physics.overlapCirc(
       mopPos.x,
       mopPos.y + mopDummyOffset,
-      5,
+      10,
       true,
       true
     );
