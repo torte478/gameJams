@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Config from "./Config.js";
 import Consts from "./Consts.js";
 
 export default class Garbage {
@@ -10,6 +11,9 @@ export default class Garbage {
 
   /** @type {Phaser.Physics.Arcade.Group} */
   _spotPool;
+
+  /** @type {Phaser.Physics.Arcade.StaticGroup} */
+  _wallPool;
 
   constructor(playerGameObj) {
     const me = this;
@@ -29,9 +33,12 @@ export default class Garbage {
 
     me._spotPool = Here._.physics.add.staticGroup();
 
+    me._wallPool = Here._.physics.add.staticGroup();
+
     Here._.physics.add.collider(me._movablePool);
 
     Here._.physics.add.collider(playerGameObj, me._movablePool);
+    Here._.physics.add.collider(playerGameObj, me._wallPool);
   }
 
   createGarbage(x, y) {
@@ -40,6 +47,35 @@ export default class Garbage {
     const garbage = me._garbagePool.create(x, y, "items", 0);
     garbage.isGarbage = true;
     garbage.setDepth(Consts.Depth.Garbage);
+  }
+
+  createGarbageWall(x, y) {
+    const me = this;
+
+    const wall = me._wallPool.create(x, y, "wall", 2);
+    wall.setOrigin(0, 0);
+    /** @type {Phaser.Physics.Arcade.Body} */
+    const body = wall.body;
+    body.reset();
+
+    wall.isWall = true;
+  }
+
+  removeWall(wall) {
+    const me = this;
+
+    wall.destroy();
+
+    const rect = new Phaser.Geom.Rectangle(
+      wall.x,
+      wall.y,
+      Consts.Unit.Big,
+      Consts.Unit.Big
+    );
+    for (let i = 0; i < Config.Tools.WallToGarbageCount; ++i) {
+      const garbagePos = Phaser.Geom.Rectangle.Random(rect);
+      me.createGarbage(garbagePos.x, garbagePos.y);
+    }
   }
 
   removeGarbage(obj) {

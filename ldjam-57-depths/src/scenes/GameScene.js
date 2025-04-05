@@ -33,6 +33,8 @@ export default class GameScene extends HereScene {
 
     Utils.loadImage("player");
     Utils.loadImage("shop");
+
+    me.load.tilemapCSV("map", "assets/map.csv");
   }
 
   create() {

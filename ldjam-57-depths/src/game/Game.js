@@ -10,7 +10,6 @@ import Player from "./Player.js";
 import Garbage from "./Garbage.js";
 import Tools from "./Tools.js";
 import Dumpster from "./Dumpster.js";
-import Walls from "./Walls.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -32,11 +31,12 @@ export default class Game {
 
     me._player = new Player();
     me._garbage = new Garbage(me._player.toGameObject());
-    me._walls = new Walls(me._player);
 
-    me._tools = new Tools(me._garbage, me._walls);
+    me._tools = new Tools(me._garbage);
 
     me._dumpster = new Dumpster(me._garbage, me._tools);
+
+    me._initMap();
 
     // ----
 
@@ -44,21 +44,21 @@ export default class Game {
 
     // ----
 
-    me._walls.createWall(600, 300);
+    // const rect = new Phaser.Geom.Rectangle(100, 100, 600, 600);
+    // for (let i = 0; i < 5; ++i) {
+    //   const pos = Phaser.Geom.Rectangle.Random(rect);
+    //   me._garbage.createGarbage(pos.x, pos.y);
+    // }
 
-    const rect = new Phaser.Geom.Rectangle(100, 100, 600, 600);
-    for (let i = 0; i < 5; ++i) {
-      const pos = Phaser.Geom.Rectangle.Random(rect);
-      me._garbage.createGarbage(pos.x, pos.y);
-    }
+    // for (let i = 0; i < 5; ++i) {
+    //   const pos = Phaser.Geom.Rectangle.Random(rect);
+    //   me._garbage.createSpot(pos.x, pos.y);
+    // }
 
-    for (let i = 0; i < 5; ++i) {
-      const pos = Phaser.Geom.Rectangle.Random(rect);
-      me._garbage.createSpot(pos.x, pos.y);
-    }
+    // me._garbage.createBucket(300, 200);
+    // me._garbage.createBag(300, 250);
 
-    me._garbage.createBucket(300, 200);
-    me._garbage.createBag(300, 250);
+    // me._garbage.createGarbageWall(500, 500);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -102,5 +102,20 @@ export default class Game {
     Here._.input.mouse.requestPointerLock();
 
     me._tools.onPointerDown(me._player.toMousePos(), me._player.toGameObject());
+  }
+
+  _initMap() {
+    const me = this;
+
+    const tilemap = Here._.make.tilemap({
+      key: "map",
+      tileWidth: Consts.Unit.Big,
+      tileHeight: Consts.Unit.Big,
+    });
+    const tileset = tilemap.addTilesetImage("wall");
+    const layer = tilemap.createLayer(0, tileset, 0, 0);
+
+    tilemap.setCollision(1);
+    Here._.physics.add.collider(me._player.toGameObject(), layer);
   }
 }
