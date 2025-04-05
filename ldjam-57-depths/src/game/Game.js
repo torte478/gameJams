@@ -10,6 +10,7 @@ import Player from "./Player.js";
 import Garbage from "./Garbage.js";
 import Tools from "./Tools.js";
 import Dumpster from "./Dumpster.js";
+import Trigger from "./Trigger.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -27,8 +28,6 @@ export default class Game {
   constructor() {
     const me = this;
 
-    Here._.cameras.main.setBackgroundColor(0xd3d3d3);
-
     me._player = new Player();
     me._garbage = new Garbage(me._player.toGameObject());
 
@@ -37,6 +36,25 @@ export default class Game {
     me._dumpster = new Dumpster(me._garbage, me._tools);
 
     me._initMap();
+
+    const camera = Here._.cameras.main;
+    camera
+      .setBackgroundColor(0xd3d3d3)
+      .startFollow(me._player.toGameObject())
+      .setBounds(0, 0, 2000, 2000)
+      .setRoundPixels(true);
+
+    new Trigger(
+      me._player,
+      600,
+      600,
+      200,
+      100,
+      () => {
+        console.log("trigger");
+      },
+      me
+    );
 
     // ----
 
