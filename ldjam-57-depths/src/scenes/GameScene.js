@@ -1,6 +1,7 @@
 import Animation from "../framework/Animation.js";
 import HereScene from "../framework/HereScene.js";
 import Utils from "../framework/Utils.js";
+import Consts from "../game/Consts.js";
 
 import Game from "../game/Game.js";
 
@@ -27,6 +28,7 @@ export default class GameScene extends HereScene {
 
     if (!me._isRestart) Utils.runLoadingBar();
 
+    Utils.loadSpriteSheet("garbage", Consts.Unit.Normal);
     Utils.loadImage("player");
   }
 

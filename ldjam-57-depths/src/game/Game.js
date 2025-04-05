@@ -7,6 +7,7 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Player from "./Player.js";
+import Garbage from "./Garbage.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -15,12 +16,27 @@ export default class Game {
   /** @type {Player} */
   _player;
 
+  /** @type {Garbage} */
+  _garbage;
+
   constructor() {
     const me = this;
 
     Here._.cameras.main.setBackgroundColor(0xd3d3d3);
 
     me._player = new Player();
+    me._garbage = new Garbage();
+
+    // ----
+
+    Here._.input.on("pointerdown", me._onPointerDown, me);
+
+    // ----
+
+    me._garbage.createGarbage(550, 300);
+    me._garbage.createGarbage(600, 330);
+    me._garbage.createGarbage(500, 260);
+    me._garbage.createGarbage(510, 291);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -40,7 +56,7 @@ export default class Game {
       Here._.scene.restart({ isRestart: true });
     }
 
-    me._gameLoop(deltaSec);
+    me._player.update(deltaSec);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
@@ -51,9 +67,25 @@ export default class Game {
     });
   }
 
-  _gameLoop(deltaSec) {
+  _onPointerDown(pointer) {
     const me = this;
 
-    me._player.update(deltaSec);
+    const bodies = Here._.physics.overlapCirc(
+      pointer.x,
+      pointer.y,
+      5,
+      true,
+      true
+    );
+
+    for (let i = 0; i < bodies.length; ++i) {
+      const gameObj = bodies[i].gameObject;
+      if (!gameObj.isGarbage) continue;
+
+      me._garbage.removeGarbage(gameObj);
+      const isFull = me._player.addGarbage();
+      if (isFull) console.log("full!");
+      break;
+    }
   }
 }

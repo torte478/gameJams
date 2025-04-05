@@ -8,6 +8,9 @@ export default class Player {
   /** @type {Phaser.GameObjects.Container} */
   _container;
 
+  /** @type {Number} */
+  _garbageCount = 0;
+
   constructor() {
     const me = this;
 
@@ -40,5 +43,17 @@ export default class Player {
       oldPos.x + dx * Config.Player.Speed * deltaSec,
       oldPos.y + dy * Config.Player.Speed * deltaSec
     );
+  }
+
+  addGarbage() {
+    const me = this;
+
+    me._garbageCount += 1;
+    if (me._garbageCount < Config.Player.MaxGarbageCount) {
+      return false;
+    }
+
+    me._garbageCount = 0;
+    return true;
   }
 }
