@@ -11,9 +11,12 @@ export default class Consts {
   };
 
   static Depth = {
+    Floor: -60000,
+    FloorPlusOne: -55000,
     Spot: -50000,
     Garbage: -40000,
     Movable: -30000,
+    UI: 1000,
     Max: 100000,
   };
 }

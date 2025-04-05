@@ -9,6 +9,9 @@ export default class Player {
   /** @type {Phaser.GameObjects.Container} */
   _container;
 
+  /** @type {Phaser.GameObjects.Sprite} */
+  _hand;
+
   /** @type {Number} */
   _garbageCount = 0;
 
@@ -16,15 +19,58 @@ export default class Player {
     const me = this;
 
     const sprite = Here._.add.image(0, 0, "player");
+    me._hand = Here._.add.sprite(50, 0, "items", 6).setDepth(Consts.Depth.UI);
+
     me._container = Here._.add
-      .container(400, 300, sprite)
+      .container(400, 300, [sprite, me._hand])
       .setSize(Consts.Unit.Normal, Consts.Unit.Normal);
 
     Here._.physics.world.enable(me._container);
     me._container.body.setBounce(1, 1);
+
+    Here._.input.on("pointermove", me._onPointerMove, me);
   }
 
   update(deltaSec) {
+    const me = this;
+
+    me._updateMovement();
+  }
+
+  toGameObject() {
+    const me = this;
+
+    return me._container;
+  }
+
+  toMousePos() {
+    const me = this;
+
+    return Utils.buildPoint(
+      me._container.x + me._hand.x,
+      me._container.y + me._hand.y
+    );
+  }
+
+  _onPointerMove(pointer) {
+    const me = this;
+
+    if (!Here._.input.mouse.locked) return;
+
+    me._hand.x += pointer.movementX;
+    me._hand.y += pointer.movementY;
+
+    const distance = Math.sqrt(
+      me._hand.x * me._hand.x + me._hand.y * me._hand.y
+    );
+    const maxDistance = 100;
+    if (distance > maxDistance) {
+      const ratio = maxDistance / distance;
+      me._hand.setPosition(me._hand.x * ratio, me._hand.y * ratio);
+    }
+  }
+
+  _updateMovement() {
     const me = this;
 
     const body = me._container.body;
@@ -47,23 +93,5 @@ export default class Player {
     }
 
     body.setVelocity(dx * Config.Player.Speed, dy * Config.Player.Speed);
-  }
-
-  toGameObject() {
-    const me = this;
-
-    return me._container;
-  }
-
-  addGarbage() {
-    const me = this;
-
-    me._garbageCount += 1;
-    if (me._garbageCount < Config.Player.MaxGarbageCountAtBag) {
-      return false;
-    }
-
-    me._garbageCount = 0;
-    return true;
   }
 }

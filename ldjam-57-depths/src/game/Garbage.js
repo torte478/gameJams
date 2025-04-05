@@ -54,6 +54,18 @@ export default class Garbage {
     spot.destroy();
   }
 
+  removeBag(bag) {
+    const me = this;
+
+    bag.destroy();
+  }
+
+  removeBucket(bucket) {
+    const me = this;
+
+    bucket.destroy();
+  }
+
   createBag(x, y) {
     const me = this;
 

@@ -12,9 +12,15 @@ export default class Enums {
     FIREBALL_TOOL: 7,
   };
 
-  static Tool = {
+  static Tools = {
     HAND: 1,
     MOP: 2,
     FIREBALL: 3,
+  };
+
+  static HandContent = {
+    EMPTY: 0,
+    BAG: 1,
+    BUCKET: 2,
   };
 }

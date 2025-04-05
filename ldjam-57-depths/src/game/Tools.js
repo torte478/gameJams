@@ -9,17 +9,20 @@ export default class Tools {
   _garbage;
 
   /** @type {Number} */
-  currentTool;
+  currentTool = Enums.Tools.HAND;
 
   /** @type {Number} */
   _bagGarbageCount = 0;
 
+  /** @type {Number} */
   _mopDirt = 0;
+
+  /** @type {Number} */
+  _handContentType = Enums.HandContent.EMPTY;
 
   constructor(garbage) {
     const me = this;
 
-    me.currentTool = Enums.Tool.HAND;
     me._garbage = garbage;
   }
 
@@ -28,11 +31,11 @@ export default class Tools {
 
     let input = -1;
     if (Here.Controls.isPressedOnce(Enums.Keyboard.HAND_TOOL)) {
-      input = Enums.Tool.HAND;
+      input = Enums.Tools.HAND;
     } else if (Here.Controls.isPressedOnce(Enums.Keyboard.MOP_TOOL)) {
-      input = Enums.Tool.MOP;
+      input = Enums.Tools.MOP;
     } else if (Here.Controls.isPressedOnce(Enums.Keyboard.FIREBALL_TOOL)) {
-      input = Enums.Tool.FIREBALL;
+      input = Enums.Tools.FIREBALL;
     }
     if (input === -1) return;
 
@@ -42,10 +45,10 @@ export default class Tools {
   onPointerDown(pos) {
     const me = this;
 
-    if (me.currentTool == Enums.Tool.HAND) {
+    if (me.currentTool == Enums.Tools.HAND) {
       return me._processHandClick(pos);
     }
-    if (me.currentTool == Enums.Tool.MOP) {
+    if (me.currentTool == Enums.Tools.MOP) {
       return me._processMopClick(pos);
     }
   }
@@ -53,7 +56,47 @@ export default class Tools {
   _processHandClick(pos) {
     const me = this;
 
+    if (me._handContentType == Enums.HandContent.EMPTY)
+      return me._processEmptyHandClick(pos);
+
+    if (me._handContentType == Enums.HandContent.BAG)
+      return me._processBagHandClick(pos);
+
+    if (me._handContentType == Enums.HandContent.BUCKET)
+      return me._processBucketHandClick(pos);
+  }
+
+  _processBucketHandClick(pos) {
+    const me = this;
+
+    me._garbage.createBucket(pos.x, pos.y);
+    me._handContentType = Enums.HandContent.EMPTY;
+  }
+
+  _processBagHandClick(pos) {
+    const me = this;
+
+    me._garbage.createBag(pos.x, pos.y);
+    me._handContentType = Enums.HandContent.EMPTY;
+  }
+
+  _processEmptyHandClick(pos) {
+    const me = this;
+
     const bodies = Here._.physics.overlapCirc(pos.x, pos.y, 5, true, true);
+    const bag = Utils.firstOrNull(bodies, (b) => !!b.gameObject.isBag);
+    if (!!bag) {
+      me._handContentType = Enums.HandContent.BAG;
+      me._garbage.removeBag(bag.gameObject);
+      return;
+    }
+
+    const bucket = Utils.firstOrNull(bodies, (b) => !!b.gameObject.isBucket);
+    if (!!bucket) {
+      me._handContentType = Enums.HandContent.BUCKET;
+      me._garbage.removeBucket(bucket.gameObject);
+      return;
+    }
 
     for (let i = 0; i < bodies.length; ++i) {
       const gameObj = bodies[i].gameObject;
@@ -91,7 +134,7 @@ export default class Tools {
       bucket.dirt += me._mopDirt;
       me._mopDirt = 0;
 
-      if (bucket.dirt === Config.Tools.MaxBucketDirt) bucket.setFrame(5);
+      if (bucket.dirt >= Config.Tools.MaxBucketDirt) bucket.setFrame(5);
     }
   }
 

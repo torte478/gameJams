@@ -9,6 +9,7 @@ import Enums from "./Enums.js";
 import Player from "./Player.js";
 import Garbage from "./Garbage.js";
 import Tools from "./Tools.js";
+import Dumpster from "./Dumpster.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -32,6 +33,8 @@ export default class Game {
     me._garbage = new Garbage(me._player.toGameObject());
     me._tools = new Tools(me._garbage);
 
+    me._dumpster = new Dumpster(me._garbage);
+
     // ----
 
     Here._.input.on("pointerdown", me._onPointerDown, me);
@@ -49,12 +52,8 @@ export default class Game {
       me._garbage.createSpot(pos.x, pos.y);
     }
 
-    // me._garbage.createSpot(550, 300);
-    // me._garbage.createSpot(600, 330);
-    // me._garbage.createSpot(500, 260);
-    // me._garbage.createSpot(510, 291);
-
     me._garbage.createBucket(300, 200);
+    me._garbage.createBag(300, 250);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -79,19 +78,23 @@ export default class Game {
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
-
+      const playerHand = me._player.toMousePos();
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `tool: ${me._tools.currentTool}\n` +
-        `mop: ${me._tools._mopDirt}`;
+        `crs: ${playerHand.x | 0} ${playerHand.y | 0}\n` +
+        `tol: ${me._tools.currentTool}\n` +
+        `mop: ${me._tools._mopDirt}\n` +
+        `hand: ${me._tools._handContentType}`;
 
       me._log.setText(text);
     });
   }
 
-  _onPointerDown(pointer) {
+  _onPointerDown() {
     const me = this;
 
-    me._tools.onPointerDown(pointer);
+    Here._.input.mouse.requestPointerLock();
+
+    me._tools.onPointerDown(me._player.toMousePos());
   }
 }
