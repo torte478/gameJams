@@ -25,24 +25,29 @@ export default class Game {
   /** @type {Tools} */
   _tools;
 
+  /** @type {Phaser.Tilemaps.TilemapLayer} */
+  _mapLayer;
+
   constructor() {
     const me = this;
 
     me._player = new Player();
-    me._garbage = new Garbage(me._player.toGameObject());
+    const map = me._initMap();
 
-    me._tools = new Tools(me._garbage);
+    me._garbage = new Garbage(me._player.toGameObject(), me._mapLayer);
+
+    me._tools = new Tools(me._garbage, me._player, me._mapLayer);
 
     // me._dumpster = new Dumpster(me._garbage, me._tools);
 
-    me._initMap();
+    Here._.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
     const camera = Here._.cameras.main;
     camera
       .setBackgroundColor(0xe2f0f7)
       // .setBackgroundColor(0x1d083c) // main color
       .startFollow(me._player.toGameObject())
-      .setBounds(0, 0, 2000, 2000)
+      .setBounds(0, 0, map.widthInPixels, map.heightInPixels)
       .setRoundPixels(true);
 
     // new Trigger(
@@ -63,18 +68,18 @@ export default class Game {
 
     // ----
 
-    // const rect = new Phaser.Geom.Rectangle(100, 100, 600, 600);
-    // for (let i = 0; i < 5; ++i) {
-    //   const pos = Phaser.Geom.Rectangle.Random(rect);
-    //   me._garbage.createGarbage(pos.x, pos.y);
-    // }
+    const rect = new Phaser.Geom.Rectangle(400, 150, 500, 500);
+    for (let i = 0; i < 5; ++i) {
+      const pos = Phaser.Geom.Rectangle.Random(rect);
+      me._garbage.createGarbage(pos.x, pos.y);
+    }
 
-    // for (let i = 0; i < 5; ++i) {
-    //   const pos = Phaser.Geom.Rectangle.Random(rect);
-    //   me._garbage.createSpot(pos.x, pos.y);
-    // }
+    for (let i = 0; i < 5; ++i) {
+      const pos = Phaser.Geom.Rectangle.Random(rect);
+      me._garbage.createSpot(pos.x, pos.y);
+    }
 
-    // me._garbage.createBucket(300, 200);
+    me._garbage.createBucket(400, 200);
     // me._garbage.createBag(300, 250);
 
     // me._garbage.createGarbageWall(500, 500);
@@ -132,9 +137,12 @@ export default class Game {
       tileHeight: Consts.Unit.Big,
     });
     const tileset = tilemap.addTilesetImage("wall");
-    const layer = tilemap.createLayer(0, tileset, 0, 0);
+    me._mapLayer = tilemap.createLayer(0, tileset, 0, 0);
+    me._mapLayer.setDepth(Consts.Depth.Floor);
 
     tilemap.setCollision(1);
-    Here._.physics.add.collider(me._player.toGameObject(), layer);
+    Here._.physics.add.collider(me._player.toGameObject(), me._mapLayer);
+
+    return tilemap;
   }
 }

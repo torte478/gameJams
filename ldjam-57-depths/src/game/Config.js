@@ -15,10 +15,11 @@ export default class Config {
 
   static Player = {
     Speed: 400,
+    BagSpawnVelocity: 500,
   };
 
   static Tools = {
-    MaxGarbageCountAtBag: 2,
+    MaxGarbageCountAtBag: 1,
     MaxMopDirt: 2,
     MaxBucketDirt: 4,
     FireballSpeed: 400,

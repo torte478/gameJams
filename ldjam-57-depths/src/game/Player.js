@@ -22,7 +22,7 @@ export default class Player {
     const me = this;
 
     me._sprite = Here._.add.sprite(5, 0, "player_idle", 0);
-    me._hand = Here._.add.sprite(50, 50, "items", 6).setDepth(Consts.Depth.UI);
+    me._hand = Here._.add.sprite(50, 50, "hand", 0).setDepth(Consts.Depth.UI);
 
     me._container = Here._.add
       .container(Config.Start.PlayerX, Config.Start.PlayerY, [
@@ -59,6 +59,38 @@ export default class Player {
       me._container.x + me._hand.x,
       me._container.y + me._hand.y
     );
+  }
+
+  setHandContent(content) {
+    const me = this;
+
+    if (content == Enums.HandContent.EMPTY) {
+      return me._hand.setFrame(0);
+    }
+
+    if (content == Enums.HandContent.BAG) {
+      return me._hand.setFrame(1);
+    }
+
+    throw "error";
+  }
+
+  setTool(tool) {
+    const me = this;
+
+    if (tool == Enums.Tools.HAND) {
+      return me._hand.setFrame(0); // TODO
+    }
+
+    if (tool == Enums.Tools.MOP) {
+      return me._hand.setFrame(4); // TODO
+    }
+
+    if (tool == Enums.Tools.FIREBALL) {
+      return me._hand.setFrame(10);
+    }
+
+    throw "error";
   }
 
   _onPointerMove(pointer) {

@@ -29,6 +29,7 @@ export default class GameScene extends HereScene {
     if (!me._isRestart) Utils.runLoadingBar();
 
     Utils.loadSpriteSheet("items", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("hand", 75);
     Utils.loadSpriteSheet("wall", Consts.Unit.Big);
     Utils.loadSpriteSheet("player_walk", Consts.Unit.Big);
     Utils.loadSpriteSheet("player_idle", Consts.Unit.Big);

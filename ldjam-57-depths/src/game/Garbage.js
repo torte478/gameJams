@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 
@@ -15,7 +16,7 @@ export default class Garbage {
   /** @type {Phaser.Physics.Arcade.StaticGroup} */
   _wallPool;
 
-  constructor(playerGameObj) {
+  constructor(playerGameObj, layer) {
     const me = this;
 
     me._garbagePool = Here._.physics.add.staticGroup();
@@ -39,14 +40,18 @@ export default class Garbage {
 
     Here._.physics.add.collider(playerGameObj, me._movablePool);
     Here._.physics.add.collider(playerGameObj, me._wallPool);
+
+    Here._.physics.add.collider(layer, me._movablePool);
   }
 
   createGarbage(x, y) {
     const me = this;
 
-    const garbage = me._garbagePool.create(x, y, "items", 0);
+    const frame = Utils.getRandom(3, 5, 3);
+    /** @type {Phaser.Physics.Arcade.Image} */
+    const garbage = me._garbagePool.create(x, y, "items", frame);
     garbage.isGarbage = true;
-    garbage.setDepth(Consts.Depth.Garbage);
+    garbage.setDepth(Consts.Depth.Garbage).setAngle(Utils.getRandom(0, 360, 0));
   }
 
   createGarbageWall(x, y) {
@@ -102,21 +107,28 @@ export default class Garbage {
     bucket.destroy();
   }
 
+  /**
+   * @param {Number} x
+   * @param {Number} y
+   * @returns {Phaser.Physics.Arcade.Image}
+   */
   createBag(x, y) {
     const me = this;
 
-    const bag = me._movablePool.create(x, y, "items", 1);
+    const bag = me._movablePool.create(x, y, "items", 0);
     bag.isBag = true;
 
     bag.setDepth(Consts.Depth.Movable);
 
-    me.createSpot(x, y);
+    // me.createSpot(x, y);
+
+    return bag;
   }
 
   createBucket(x, y) {
     const me = this;
 
-    const bucket = me._movablePool.create(x, y, "items", 4);
+    const bucket = me._movablePool.create(x, y, "items", 1);
     bucket.isBucket = true;
     bucket.setDepth(Consts.Depth.Movable);
 
@@ -128,8 +140,9 @@ export default class Garbage {
   createSpot(x, y) {
     const me = this;
 
-    const spot = me._spotPool.create(x, y, "items", 2);
+    const frame = Utils.getRandom(6, 8, 6);
+    const spot = me._spotPool.create(x, y, "items", frame);
     spot.isSpot = true;
-    spot.setDepth(Consts.Depth.Spot);
+    spot.setDepth(Consts.Depth.Spot).setAngle(Utils.getRandom(0, 360, 0));
   }
 }

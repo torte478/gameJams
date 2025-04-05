@@ -3,6 +3,7 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Enums from "./Enums.js";
 import Garbage from "./Garbage.js";
+import Player from "./Player.js";
 
 export default class Tools {
   /** @type {Garbage} */
@@ -26,13 +27,19 @@ export default class Tools {
   /** @type {Number} */
   _mana = Config.Start.Mana;
 
+  /** @type {Player} */
+  _player;
+
   /**
    * @param {Garbage} garbage
+   * @param {Player} player
    */
-  constructor(garbage, walls) {
+  constructor(garbage, player, layer) {
     const me = this;
 
     me._garbage = garbage;
+    me._player = player;
+
     me._fireballPool = Here._.physics.add.group({ collideWorldBounds: true });
 
     Here._.physics.world.on(
@@ -50,6 +57,14 @@ export default class Tools {
       me._fireballPool,
       me._garbage._movablePool,
       (fireball, movable) => me._onFireballHit(fireball),
+      null,
+      me
+    );
+
+    Here._.physics.add.collider(
+      me._fireballPool,
+      layer,
+      (fireball, l) => me._onFireballHit(fireball),
       null,
       me
     );
@@ -77,6 +92,7 @@ export default class Tools {
     if (input === -1) return;
 
     me.currentTool = input;
+    me._player.setTool(me.currentTool);
   }
 
   onPointerDown(pos, playerPos) {
@@ -155,6 +171,7 @@ export default class Tools {
 
     me._garbage.createBag(pos.x, pos.y);
     me._handContentType = Enums.HandContent.EMPTY;
+    me._player.setHandContent(me._handContentType);
   }
 
   _processEmptyHandClick(pos) {
@@ -180,7 +197,7 @@ export default class Tools {
       if (!gameObj.isGarbage) continue;
 
       me._garbage.removeGarbage(gameObj);
-      me._addGarbageToHands();
+      me._tryCreateBag();
       return;
     }
   }
@@ -208,7 +225,7 @@ export default class Tools {
       bucket.dirt += me._mopDirt;
       me._mopDirt = 0;
 
-      if (bucket.dirt >= Config.Tools.MaxBucketDirt) bucket.setFrame(5);
+      if (bucket.dirt >= Config.Tools.MaxBucketDirt) bucket.setFrame(2);
     }
   }
 
@@ -234,17 +251,22 @@ export default class Tools {
     me._mopDirt -= 1;
   }
 
-  _addGarbageToHands() {
+  _tryCreateBag() {
     const me = this;
 
     me._bagGarbageCount += 1;
     if (me._bagGarbageCount < Config.Tools.MaxGarbageCountAtBag) {
-      return false;
+      return;
     }
 
-    me._handContentType = Enums.HandContent.BAG;
     me._bagGarbageCount = 0;
-    return true;
+
+    const playerPos = me._player.toGameObject();
+    const bag = me._garbage.createBag(playerPos.x, playerPos.y);
+    bag.setVelocity(
+      Utils.getRandom(-1, 1) * Config.Player.BagSpawnVelocity,
+      Utils.getRandom(-1, 1) * Config.Player.BagSpawnVelocity
+    );
   }
 
   _onFireballHit(fireball) {
