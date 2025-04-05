@@ -12,6 +12,7 @@ import Tools from "./Tools.js";
 import Dumpster from "./Dumpster.js";
 import Trigger from "./Trigger.js";
 import BucketFactory from "./BucketFactory.js";
+import MyStaticTime from "./MyStaticTime.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -76,12 +77,12 @@ export default class Game {
     // ----
 
     const rect = new Phaser.Geom.Rectangle(400, 150, 500, 500);
-    for (let i = 0; i < 5; ++i) {
+    for (let i = 0; i < 10; ++i) {
       const pos = Phaser.Geom.Rectangle.Random(rect);
       me._garbage.createGarbage(pos.x, pos.y);
     }
 
-    for (let i = 0; i < 5; ++i) {
+    for (let i = 0; i < 10; ++i) {
       const pos = Phaser.Geom.Rectangle.Random(rect);
       me._garbage.createSpot(pos.x, pos.y);
     }
@@ -106,6 +107,8 @@ export default class Game {
     ) {
       Here._.scene.restart({ isRestart: true });
     }
+
+    MyStaticTime.time = timeSec;
 
     const playerCursorPos = me._player.toMousePos();
 

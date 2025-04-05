@@ -3,6 +3,7 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Enums from "./Enums.js";
 import Garbage from "./Garbage.js";
+import MyStaticTime from "./MyStaticTime.js";
 import Player from "./Player.js";
 
 export default class Tools {
@@ -254,9 +255,9 @@ export default class Tools {
       true,
       true
     );
-    // Here._.add.image(pos.x, pos.y + mopDummyOffset, "hand", 10).setDepth(1000);
+
     const bucket = Utils.firstOrNull(bodies, (b) => !!b.gameObject.isBucket);
-    if (!!bucket) return me._onBucketClick(bucket.gameObject);
+    if (!!bucket) return me._onBucketClickByMop(bucket.gameObject);
 
     if (me._mopDirt < Config.Tools.MaxMopDirt) {
       return me._tryCleanSpot(mopPos);
@@ -266,7 +267,7 @@ export default class Tools {
     }
   }
 
-  _onBucketClick(bucket) {
+  _onBucketClickByMop(bucket) {
     const me = this;
 
     if (bucket.dirt < Config.Tools.MaxBucketDirt) {
@@ -276,7 +277,10 @@ export default class Tools {
       me._mopDirt = 0;
       me._player._hand.setFrame(4);
 
-      if (bucket.dirt >= Config.Tools.MaxBucketDirt) bucket.setFrame(2);
+      if (bucket.dirt >= Config.Tools.MaxBucketDirt) {
+        bucket.setFrame(2);
+        bucket.nextSpot = MyStaticTime.time + Config.Player.SpotCreatePeriodSec;
+      }
     }
   }
 
@@ -302,7 +306,6 @@ export default class Tools {
     const me = this;
 
     me._garbage.createSpot(pos.x, pos.y);
-    // me._mopDirt -= 1;
   }
 
   _tryCreateBagFromGarbage() {

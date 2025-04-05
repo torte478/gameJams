@@ -2,6 +2,7 @@ import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
+import MyStaticTime from "./MyStaticTime.js";
 
 export default class Garbage {
   /** @type {Phaser.Physics.Arcade.Group} */
@@ -47,9 +48,24 @@ export default class Garbage {
 
     me._wallPool = Here._.physics.add.staticGroup();
 
-    Here._.physics.add.collider(me._movablePool);
+    Here._.physics.add.collider(
+      me._movablePool,
+      me._movablePool,
+      null,
+      (m1, m2) => {
+        me._onMovableCollideProcess(m1);
+        me._onMovableCollideProcess(m2);
+      },
+      me
+    );
 
-    Here._.physics.add.collider(playerGameObj, me._movablePool);
+    Here._.physics.add.collider(
+      playerGameObj,
+      me._movablePool,
+      null,
+      (p, movable) => me._onMovableCollideProcess(movable),
+      me
+    );
     Here._.physics.add.collider(playerGameObj, me._wallPool);
 
     Here._.physics.add.collider(layer, me._movablePool);
@@ -131,6 +147,7 @@ export default class Garbage {
     bag.isBag = true;
 
     bag.setDepth(Consts.Depth.Movable);
+    bag.nextSpot = MyStaticTime.time + Config.Player.SpotCreatePeriodSec;
 
     if (!!withRandomVelocity) {
       const vector = Utils.getRandomEl(Garbage._vectors);
@@ -152,7 +169,10 @@ export default class Garbage {
     bucket.setDepth(Consts.Depth.Movable);
 
     bucket.dirt = dirt;
-    if (isDirt) me.createSpot(x, y);
+    if (isDirt) {
+      me.createSpot(x, y);
+      bucket.nextSpot = MyStaticTime.time + Config.Player.SpotCreatePeriodSec;
+    }
 
     return bucket;
   }
@@ -164,5 +184,23 @@ export default class Garbage {
     const spot = me._spotPool.create(x, y, "items", frame);
     spot.isSpot = true;
     spot.setDepth(Consts.Depth.Spot).setAngle(Utils.getRandom(0, 360, 0));
+  }
+
+  _onMovableCollideProcess(movable) {
+    const me = this;
+
+    if (movable.isBag && movable.nextSpot < MyStaticTime.time) {
+      me.createSpot(movable.x, movable.y);
+      movable.nextSpot = MyStaticTime.time + Config.Player.SpotCreatePeriodSec;
+    }
+
+    if (
+      movable.isBucket &&
+      movable.dirt >= Config.Tools.MaxBucketDirt &&
+      movable.nextSpot < MyStaticTime.time
+    ) {
+      me.createSpot(movable.x, movable.y);
+      movable.nextSpot = MyStaticTime.time + Config.Player.SpotCreatePeriodSec;
+    }
   }
 }
