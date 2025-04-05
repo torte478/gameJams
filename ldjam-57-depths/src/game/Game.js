@@ -28,6 +28,9 @@ export default class Game {
   /** @type {Phaser.Tilemaps.TilemapLayer} */
   _mapLayer;
 
+  /** @type {Dumpster[]} */
+  _dumpsters = [];
+
   constructor() {
     const me = this;
 
@@ -38,7 +41,7 @@ export default class Game {
 
     me._tools = new Tools(me._garbage, me._player, me._mapLayer);
 
-    // me._dumpster = new Dumpster(me._garbage, me._tools);
+    me._dumpsters.push(new Dumpster(me._garbage, me._tools));
 
     Here._.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
@@ -102,15 +105,18 @@ export default class Game {
       Here._.scene.restart({ isRestart: true });
     }
 
+    const playerCursorPos = me._player.toMousePos();
+
     me._player.update(deltaSec);
     me._tools.update();
+    for (let i = 0; i < me._dumpsters.length; ++i)
+      me._dumpsters[i].update(playerCursorPos);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
-      const playerHand = me._player.toMousePos();
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `crs: ${playerHand.x | 0} ${playerHand.y | 0}\n` +
+        `crs: ${playerCursorPos.x | 0} ${playerCursorPos.y | 0}\n` +
         `tol: ${me._tools.currentTool}\n` +
         `mop: ${me._tools._mopDirt}\n` +
         `hand: ${me._tools._handContentType}\n` +

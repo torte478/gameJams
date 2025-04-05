@@ -84,15 +84,19 @@ export default class Tools {
     let input = -1;
     if (Here.Controls.isPressedOnce(Enums.Keyboard.HAND_TOOL)) {
       input = Enums.Tools.HAND;
+      me._player._hand.setFrame(0);
     } else if (Here.Controls.isPressedOnce(Enums.Keyboard.MOP_TOOL)) {
       input = Enums.Tools.MOP;
+      me._player._hand.setFrame(me._mopDirt >= Config.Tools.MaxMopDirt ? 7 : 4);
+      me._tryThrowCurrentItem();
     } else if (Here.Controls.isPressedOnce(Enums.Keyboard.FIREBALL_TOOL)) {
       input = Enums.Tools.FIREBALL;
+      me._player._hand.setFrame(10);
+      me._tryThrowCurrentItem();
     }
     if (input === -1) return;
 
     me.currentTool = input;
-    me._player.setTool(me.currentTool);
   }
 
   onPointerDown(pos, playerPos) {
@@ -114,6 +118,20 @@ export default class Tools {
     const me = this;
 
     me._mana = Math.min(Config.Tools.MaxMana, me._mana + change);
+  }
+
+  _tryThrowCurrentItem() {
+    const me = this;
+
+    if (me._handContentType == Enums.HandContent.EMPTY) return;
+
+    const playerPos = me._player.toGameObject();
+
+    if (me._handContentType == Enums.HandContent.BAG) {
+      me._garbage.createBag(playerPos.x, playerPos.y, true, true);
+      me._handContentType = Enums.HandContent.EMPTY;
+      return;
+    }
   }
 
   _processFireballClick(cursorPos, playerPos) {
@@ -169,9 +187,9 @@ export default class Tools {
   _processBagHandClick(pos) {
     const me = this;
 
-    me._garbage.createBag(pos.x, pos.y);
+    me._garbage.createBag(pos.x, pos.y, false, true);
     me._handContentType = Enums.HandContent.EMPTY;
-    me._player.setHandContent(me._handContentType);
+    me._player._hand.setFrame(0);
   }
 
   _processEmptyHandClick(pos) {
@@ -182,6 +200,7 @@ export default class Tools {
     if (!!bag) {
       me._handContentType = Enums.HandContent.BAG;
       me._garbage.removeBag(bag.gameObject);
+      me._player._hand.setFrame(1);
       return;
     }
 
@@ -197,7 +216,7 @@ export default class Tools {
       if (!gameObj.isGarbage) continue;
 
       me._garbage.removeGarbage(gameObj);
-      me._tryCreateBag();
+      me._tryCreateBagFromGarbage();
       return;
     }
   }
@@ -266,7 +285,7 @@ export default class Tools {
     // me._mopDirt -= 1;
   }
 
-  _tryCreateBag() {
+  _tryCreateBagFromGarbage() {
     const me = this;
 
     me._bagGarbageCount += 1;
@@ -277,11 +296,7 @@ export default class Tools {
     me._bagGarbageCount = 0;
 
     const playerPos = me._player.toGameObject();
-    const bag = me._garbage.createBag(playerPos.x, playerPos.y);
-    bag.setVelocity(
-      Utils.getRandom(-1, 1) * Config.Player.BagSpawnVelocity,
-      Utils.getRandom(-1, 1) * Config.Player.BagSpawnVelocity
-    );
+    me._garbage.createBag(playerPos.x, playerPos.y, true, false);
   }
 
   _onFireballHit(fireball) {

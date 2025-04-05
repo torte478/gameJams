@@ -61,38 +61,6 @@ export default class Player {
     );
   }
 
-  setHandContent(content) {
-    const me = this;
-
-    if (content == Enums.HandContent.EMPTY) {
-      return me._hand.setFrame(0);
-    }
-
-    if (content == Enums.HandContent.BAG) {
-      return me._hand.setFrame(1);
-    }
-
-    throw "error";
-  }
-
-  setTool(tool) {
-    const me = this;
-
-    if (tool == Enums.Tools.HAND) {
-      return me._hand.setFrame(0); // TODO
-    }
-
-    if (tool == Enums.Tools.MOP) {
-      return me._hand.setFrame(4); // TODO
-    }
-
-    if (tool == Enums.Tools.FIREBALL) {
-      return me._hand.setFrame(10);
-    }
-
-    throw "error";
-  }
-
   _onPointerMove(pointer) {
     const me = this;
 

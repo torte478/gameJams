@@ -16,6 +16,17 @@ export default class Garbage {
   /** @type {Phaser.Physics.Arcade.StaticGroup} */
   _wallPool;
 
+  static _vectors = [
+    { x: -1, y: -1 },
+    { x: -1, y: 0 },
+    { x: -1, y: 1 },
+    { x: 0, y: -1 },
+    { x: 0, y: 1 },
+    { x: 1, y: -1 },
+    { x: 1, y: 0 },
+    { x: 1, y: 1 },
+  ];
+
   constructor(playerGameObj, layer) {
     const me = this;
 
@@ -110,9 +121,10 @@ export default class Garbage {
   /**
    * @param {Number} x
    * @param {Number} y
-   * @returns {Phaser.Physics.Arcade.Image}
+   * @param {Boolean} withRandomVelocity
+   * @param {Boolean} withSpot
    */
-  createBag(x, y) {
+  createBag(x, y, withRandomVelocity, withSpot) {
     const me = this;
 
     const bag = me._movablePool.create(x, y, "items", 0);
@@ -120,9 +132,15 @@ export default class Garbage {
 
     bag.setDepth(Consts.Depth.Movable);
 
-    // me.createSpot(x, y);
+    if (!!withRandomVelocity) {
+      const vector = Utils.getRandomEl(Garbage._vectors);
+      bag.setVelocity(
+        vector.x * Config.Player.BagSpawnVelocity,
+        vector.y * Config.Player.BagSpawnVelocity
+      );
+    }
 
-    return bag;
+    if (!!withSpot) me.createSpot(x, y);
   }
 
   createBucket(x, y) {
