@@ -10,6 +10,7 @@ import Player from "./Player.js";
 import Garbage from "./Garbage.js";
 import Tools from "./Tools.js";
 import Dumpster from "./Dumpster.js";
+import Walls from "./Walls.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -31,7 +32,9 @@ export default class Game {
 
     me._player = new Player();
     me._garbage = new Garbage(me._player.toGameObject());
-    me._tools = new Tools(me._garbage);
+    me._walls = new Walls(me._player);
+
+    me._tools = new Tools(me._garbage, me._walls);
 
     me._dumpster = new Dumpster(me._garbage, me._tools);
 
@@ -40,6 +43,8 @@ export default class Game {
     Here._.input.on("pointerdown", me._onPointerDown, me);
 
     // ----
+
+    me._walls.createWall(600, 300);
 
     const rect = new Phaser.Geom.Rectangle(100, 100, 600, 600);
     for (let i = 0; i < 5; ++i) {

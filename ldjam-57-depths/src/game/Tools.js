@@ -1,12 +1,17 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Garbage from "./Garbage.js";
+import Walls from "./Walls.js";
 
 export default class Tools {
   /** @type {Garbage} */
   _garbage;
+
+  /** @type {Walls} */
+  _walls;
 
   /** @type {Number} */
   currentTool = Enums.Tools.HAND;
@@ -24,12 +29,19 @@ export default class Tools {
   _fireballPool;
 
   /** @type {Number} */
-  _mana = 0;
+  _mana = Config.Start.Mana;
 
-  constructor(garbage) {
+  /**
+   *
+   * @param {Garbage} garbage
+   * @param {Walls} walls
+   */
+  constructor(garbage, walls) {
     const me = this;
 
     me._garbage = garbage;
+    me._walls = walls;
+
     me._fireballPool = Here._.physics.add.group({ collideWorldBounds: true });
 
     Here._.physics.world.on(
@@ -47,6 +59,14 @@ export default class Tools {
       me._fireballPool,
       me._garbage._movablePool,
       (fireball, movable) => me._onFireballHit(fireball),
+      null,
+      me
+    );
+
+    Here._.physics.add.collider(
+      me._fireballPool,
+      me._walls._wallPool,
+      (f, m) => me._onFireballHit(f),
       null,
       me
     );
@@ -257,6 +277,20 @@ export default class Tools {
 
       if (!!gameObj.isBucket) {
         me._garbage.removeBucket(gameObj);
+      }
+
+      if (!!gameObj.isWall) {
+        me._walls.removeWall(gameObj);
+        const rect = new Phaser.Geom.Rectangle(
+          gameObj.x,
+          gameObj.y,
+          Consts.Unit.Big,
+          Consts.Unit.Big
+        );
+        for (let i = 0; i < Config.Tools.WallToGarbageCount; ++i) {
+          const garbagePos = Phaser.Geom.Rectangle.Random(rect);
+          me._garbage.createGarbage(garbagePos.x, garbagePos.y);
+        }
       }
     }
   }

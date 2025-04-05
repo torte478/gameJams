@@ -7,6 +7,10 @@ export default class Config {
     Random: false,
   };
 
+  static Start = {
+    Mana: 100, //0
+  };
+
   static Player = {
     Speed: 400,
   };
@@ -19,5 +23,6 @@ export default class Config {
     MaxMana: 10,
     FireballCost: 2,
     UtilizeBagCost: 1,
+    WallToGarbageCount: 4,
   };
 }

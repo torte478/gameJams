@@ -26,7 +26,10 @@ export default class Player {
       .setSize(Consts.Unit.Normal, Consts.Unit.Normal);
 
     Here._.physics.world.enable(me._container);
-    me._container.body.setBounce(1, 1);
+    /** @type {Phaser.Physics.Arcade.Body} */
+    const body = me._container.body;
+
+    body.setBounce(1, 1).setCircle(25);
 
     Here._.input.on("pointermove", me._onPointerMove, me);
   }
