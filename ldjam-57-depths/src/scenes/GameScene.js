@@ -30,8 +30,9 @@ export default class GameScene extends HereScene {
 
     Utils.loadSpriteSheet("items", Consts.Unit.Normal);
     Utils.loadSpriteSheet("wall", Consts.Unit.Big);
+    Utils.loadSpriteSheet("player_walk", Consts.Unit.Big);
+    Utils.loadSpriteSheet("player_idle", Consts.Unit.Big);
 
-    Utils.loadImage("player");
     Utils.loadImage("shop");
 
     me.load.tilemapCSV("map", "assets/map.csv");

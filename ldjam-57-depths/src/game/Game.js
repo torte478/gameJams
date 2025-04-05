@@ -33,28 +33,28 @@ export default class Game {
 
     me._tools = new Tools(me._garbage);
 
-    me._dumpster = new Dumpster(me._garbage, me._tools);
+    // me._dumpster = new Dumpster(me._garbage, me._tools);
 
     me._initMap();
 
     const camera = Here._.cameras.main;
     camera
-      .setBackgroundColor(0xd3d3d3)
+      .setBackgroundColor(0xe2f0f7)
       .startFollow(me._player.toGameObject())
       .setBounds(0, 0, 2000, 2000)
       .setRoundPixels(true);
 
-    new Trigger(
-      me._player,
-      600,
-      600,
-      200,
-      100,
-      () => {
-        console.log("trigger");
-      },
-      me
-    );
+    // new Trigger(
+    //   me._player,
+    //   600,
+    //   600,
+    //   200,
+    //   100,
+    //   () => {
+    //     console.log("trigger");
+    //   },
+    //   me
+    // );
 
     // ----
 

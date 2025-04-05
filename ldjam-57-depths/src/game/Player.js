@@ -10,6 +10,9 @@ export default class Player {
   _container;
 
   /** @type {Phaser.GameObjects.Sprite} */
+  _sprite;
+
+  /** @type {Phaser.GameObjects.Sprite} */
   _hand;
 
   /** @type {Number} */
@@ -18,18 +21,21 @@ export default class Player {
   constructor() {
     const me = this;
 
-    const sprite = Here._.add.image(0, 0, "player");
-    me._hand = Here._.add.sprite(50, 0, "items", 6).setDepth(Consts.Depth.UI);
+    me._sprite = Here._.add.sprite(5, 0, "player_idle", 0);
+    me._hand = Here._.add.sprite(50, 50, "items", 6).setDepth(Consts.Depth.UI);
 
     me._container = Here._.add
-      .container(400, 300, [sprite, me._hand])
+      .container(Config.Start.PlayerX, Config.Start.PlayerY, [
+        me._sprite,
+        me._hand,
+      ])
       .setSize(Consts.Unit.Normal, Consts.Unit.Normal);
 
     Here._.physics.world.enable(me._container);
     /** @type {Phaser.Physics.Arcade.Body} */
     const body = me._container.body;
 
-    body.setBounce(1, 1).setCircle(25);
+    body.setBounce(1, 1).setCircle(30);
 
     Here._.input.on("pointermove", me._onPointerMove, me);
   }
@@ -86,6 +92,8 @@ export default class Player {
 
     if (dx === 0 && dy === 0) {
       body.setVelocity(0, 0);
+
+      me._sprite.play("player_idle", true);
       return;
     }
 
@@ -96,5 +104,6 @@ export default class Player {
     }
 
     body.setVelocity(dx * Config.Player.Speed, dy * Config.Player.Speed);
+    me._sprite.play("player_walk", true);
   }
 }
