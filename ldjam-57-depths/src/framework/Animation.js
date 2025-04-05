@@ -27,6 +27,13 @@ export default class Animation {
     });
 
     Here._.anims.create({
+      key: "player_at_spot",
+      frames: Animation.getFrames("player_walk", [11]),
+      frameRate: 1,
+      repeat: -1,
+    });
+
+    Here._.anims.create({
       key: "mop_clean",
       frames: Animation.getFrames("hand", [5, 6, 5, 6, 4]),
       frameRate: 8,

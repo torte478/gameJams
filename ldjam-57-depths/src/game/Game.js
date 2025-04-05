@@ -76,7 +76,7 @@ export default class Game {
 
     // ----
 
-    const rect = new Phaser.Geom.Rectangle(400, 150, 500, 500);
+    const rect = new Phaser.Geom.Rectangle(600, 300, 600, 200);
     for (let i = 0; i < 10; ++i) {
       const pos = Phaser.Geom.Rectangle.Random(rect);
       me._garbage.createGarbage(pos.x, pos.y);

@@ -15,6 +15,8 @@ export default class Config {
 
   static Player = {
     Speed: 400,
+    SpotSpeed: 500,
+    GarbageSpeed: 100,
     BagSpawnVelocity: 500,
     SpotCreatePeriodSec: 1,
   };

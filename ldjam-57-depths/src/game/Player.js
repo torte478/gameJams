@@ -17,13 +17,17 @@ export default class Player {
   /** @type {Number} */
   _garbageCount = 0;
 
+  /** @type {Phaser.Geom.Point} */
+  _previousMovementVector = Player._zeroVector;
+
+  static _zeroVector = Utils.buildPoint(0, 0);
+
   constructor() {
     const me = this;
 
     me._sprite = Here._.add.sprite(5, 0, "player_idle", 0);
     me._hand = Here._.add.sprite(50, 50, "hand", 0).setDepth(Consts.Depth.UI);
-
-    me._container = Here._.add
+    me._previousMovementVector = me._container = Here._.add
       .container(Config.Start.PlayerX, Config.Start.PlayerY, [
         me._sprite,
         me._hand,
@@ -89,10 +93,36 @@ export default class Player {
     if (Here.Controls.isPressing(Enums.Keyboard.UP)) dy = -1;
     if (Here.Controls.isPressing(Enums.Keyboard.DOWN)) dy = +1;
 
-    if (dx === 0 && dy === 0) {
-      body.setVelocity(0, 0);
+    const otherBodies = Here._.physics.overlapRect(
+      me._container.x - 25,
+      me._container.y + 25,
+      50,
+      25,
+      false,
+      true
+    );
 
-      me._sprite.play("player_idle", true);
+    let speed = Config.Player.Speed;
+    const isSpot = Utils.any(otherBodies, (f) => !!f.gameObject.isSpot);
+    const isGarbage = Utils.any(otherBodies, (f) => !!f.gameObject.isGarbage);
+    if (isSpot) {
+      me._sprite.play("player_at_spot", true);
+      speed = Config.Player.SpotSpeed;
+    } else if (isGarbage) {
+      speed = Config.Player.GarbageSpeed;
+    }
+
+    if (dx === 0 && dy === 0) {
+      if (isSpot) {
+        body.setVelocity(
+          me._previousMovementVector.x * speed,
+          me._previousMovementVector.y * speed
+        );
+      } else {
+        me._previousMovementVector = Player._zeroVector;
+        body.setVelocity(0, 0);
+        me._sprite.play("player_idle", true);
+      }
       return;
     }
 
@@ -102,7 +132,9 @@ export default class Player {
       dy *= normalizeFactor;
     }
 
-    body.setVelocity(dx * Config.Player.Speed, dy * Config.Player.Speed);
-    me._sprite.play("player_walk", true);
+    body.setVelocity(dx * speed, dy * speed);
+    me._previousMovementVector = Utils.buildPoint(dx, dy);
+
+    if (!isSpot) me._sprite.play("player_walk", true);
   }
 }
