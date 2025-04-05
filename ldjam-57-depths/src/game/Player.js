@@ -46,16 +46,7 @@ export default class Player {
       dy *= normalizeFactor;
     }
 
-    const oldPos = Utils.toPoint(me._container);
-
-    body.setVelocity(
-      dx * Config.Player.Speed * deltaSec,
-      dy * Config.Player.Speed * deltaSec
-    );
-    // me._container.setPosition(
-    //   oldPos.x + dx * Config.Player.Speed * deltaSec,
-    //   oldPos.y + dy * Config.Player.Speed * deltaSec
-    // );
+    body.setVelocity(dx * Config.Player.Speed, dy * Config.Player.Speed);
   }
 
   toGameObject() {
@@ -68,7 +59,7 @@ export default class Player {
     const me = this;
 
     me._garbageCount += 1;
-    if (me._garbageCount < Config.Player.MaxGarbageCount) {
+    if (me._garbageCount < Config.Player.MaxGarbageCountAtBag) {
       return false;
     }
 

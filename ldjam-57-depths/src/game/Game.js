@@ -8,6 +8,7 @@ import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Player from "./Player.js";
 import Garbage from "./Garbage.js";
+import Tools from "./Tools.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -19,6 +20,9 @@ export default class Game {
   /** @type {Garbage} */
   _garbage;
 
+  /** @type {Tools} */
+  _tools;
+
   constructor() {
     const me = this;
 
@@ -26,6 +30,7 @@ export default class Game {
 
     me._player = new Player();
     me._garbage = new Garbage(me._player.toGameObject());
+    me._tools = new Tools();
 
     // ----
 
@@ -37,6 +42,8 @@ export default class Game {
     me._garbage.createGarbage(600, 330);
     me._garbage.createGarbage(500, 260);
     me._garbage.createGarbage(510, 291);
+
+    me._garbage.createBucket(300, 200);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -57,11 +64,14 @@ export default class Game {
     }
 
     me._player.update(deltaSec);
+    me._tools.update();
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
 
-      let text = `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n`;
+      let text =
+        `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
+        `tool: ${me._tools.current}`;
 
       me._log.setText(text);
     });
@@ -83,9 +93,9 @@ export default class Game {
       if (!gameObj.isGarbage) continue;
 
       me._garbage.removeGarbage(gameObj);
-      const isFull = me._player.addGarbage();
+      const isFull = me._tools.addGarbage();
       if (isFull) {
-        me._garbage.createBag(me._player.toGameObject());
+        me._garbage.createBagAtPos(me._player.toGameObject());
       }
       break;
     }

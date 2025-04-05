@@ -13,7 +13,7 @@ export default class Consts {
   static Depth = {
     Spot: -50000,
     Garbage: -40000,
-    Bag: -30000,
+    Movable: -30000,
     Max: 100000,
   };
 }

@@ -8,6 +8,15 @@ export default class Controls {
     { key: Enums.Keyboard.DOWN, value: Phaser.Input.Keyboard.KeyCodes.S },
     { key: Enums.Keyboard.RIGHT, value: Phaser.Input.Keyboard.KeyCodes.D },
     { key: Enums.Keyboard.RESTART, value: Phaser.Input.Keyboard.KeyCodes.R },
+    {
+      key: Enums.Keyboard.HAND_TOOL,
+      value: Phaser.Input.Keyboard.KeyCodes.ONE,
+    },
+    { key: Enums.Keyboard.MOP_TOOL, value: Phaser.Input.Keyboard.KeyCodes.TWO },
+    {
+      key: Enums.Keyboard.FIREBALL_TOOL,
+      value: Phaser.Input.Keyboard.KeyCodes.THREE,
+    },
   ];
 
   /** @type {KeyConfig[]} */
