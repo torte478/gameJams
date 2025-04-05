@@ -20,8 +20,8 @@ export default class Config {
 
   static Tools = {
     MaxGarbageCountAtBag: 1,
-    MaxMopDirt: 2,
-    MaxBucketDirt: 4,
+    MaxMopDirt: 1,
+    MaxBucketDirt: 1,
     FireballSpeed: 400,
     MaxMana: 10,
     FireballCost: 2,

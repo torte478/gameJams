@@ -205,14 +205,25 @@ export default class Tools {
   _processMopClick(pos) {
     const me = this;
 
-    const bodies = Here._.physics.overlapCirc(pos.x, pos.y, 5, true, true);
+    const mopDummyOffset = 20;
+    const mopPos = Utils.buildPoint(pos.x, pos.y + mopDummyOffset);
+
+    const bodies = Here._.physics.overlapCirc(
+      mopPos.x,
+      mopPos.y + mopDummyOffset,
+      5,
+      true,
+      true
+    );
+    // Here._.add.image(pos.x, pos.y + mopDummyOffset, "hand", 10).setDepth(1000);
     const bucket = Utils.firstOrNull(bodies, (b) => !!b.gameObject.isBucket);
     if (!!bucket) return me._onBucketClick(bucket.gameObject);
 
     if (me._mopDirt < Config.Tools.MaxMopDirt) {
-      return me._tryCleanSpot(pos);
+      return me._tryCleanSpot(mopPos);
     } else {
-      return me._createSpot(pos);
+      me._player._hand.play("mop_dirt");
+      return me._createSpot(mopPos);
     }
   }
 
@@ -224,6 +235,7 @@ export default class Tools {
 
       bucket.dirt += me._mopDirt;
       me._mopDirt = 0;
+      me._player._hand.setFrame(4);
 
       if (bucket.dirt >= Config.Tools.MaxBucketDirt) bucket.setFrame(2);
     }
@@ -232,7 +244,7 @@ export default class Tools {
   _tryCleanSpot(pos) {
     const me = this;
 
-    const bodies = Here._.physics.overlapCirc(pos.x, pos.y, 5, true, true);
+    const bodies = Here._.physics.overlapCirc(pos.x, pos.y, 10, true, true);
 
     for (let i = 0; i < bodies.length; ++i) {
       const gameObj = bodies[i].gameObject;
@@ -240,15 +252,18 @@ export default class Tools {
 
       me._garbage.removeSpot(gameObj);
       me._mopDirt += 1;
-      return;
     }
+
+    const anim =
+      me._mopDirt >= Config.Tools.MaxMopDirt ? "mop_dirt" : "mop_clean";
+    me._player._hand.play(anim);
   }
 
   _createSpot(pos) {
     const me = this;
 
     me._garbage.createSpot(pos.x, pos.y);
-    me._mopDirt -= 1;
+    // me._mopDirt -= 1;
   }
 
   _tryCreateBag() {

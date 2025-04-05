@@ -25,6 +25,20 @@ export default class Animation {
       frameRate: 24,
       repeat: -1,
     });
+
+    Here._.anims.create({
+      key: "mop_clean",
+      frames: Animation.getFrames("hand", [5, 6, 5, 6, 4]),
+      frameRate: 8,
+      // repeat: 0
+    });
+
+    Here._.anims.create({
+      key: "mop_dirt",
+      frames: Animation.getFrames("hand", [8, 9, 8, 9, 7]),
+      frameRate: 8,
+      // repeat: 0
+    });
   }
 
   static getFrames(texture, frames) {
