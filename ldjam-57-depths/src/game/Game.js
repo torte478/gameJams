@@ -25,7 +25,7 @@ export default class Game {
     Here._.cameras.main.setBackgroundColor(0xd3d3d3);
 
     me._player = new Player();
-    me._garbage = new Garbage();
+    me._garbage = new Garbage(me._player.toGameObject());
 
     // ----
 
@@ -84,7 +84,9 @@ export default class Game {
 
       me._garbage.removeGarbage(gameObj);
       const isFull = me._player.addGarbage();
-      if (isFull) console.log("full!");
+      if (isFull) {
+        me._garbage.createBag(me._player.toGameObject());
+      }
       break;
     }
   }

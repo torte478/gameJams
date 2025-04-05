@@ -2,6 +2,7 @@ import Controls from "../framework/Controls.js";
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 
 export default class Player {
@@ -15,12 +16,18 @@ export default class Player {
     const me = this;
 
     const sprite = Here._.add.image(0, 0, "player");
-    me._container = Here._.add.container(400, 300, sprite);
+    me._container = Here._.add
+      .container(400, 300, sprite)
+      .setSize(Consts.Unit.Normal, Consts.Unit.Normal);
+
+    Here._.physics.world.enable(me._container);
+    me._container.body.setBounce(1, 1);
   }
 
   update(deltaSec) {
     const me = this;
 
+    const body = me._container.body;
     let dx = 0;
     let dy = 0;
     if (Here.Controls.isPressing(Enums.Keyboard.LEFT)) dx = -1;
@@ -29,6 +36,7 @@ export default class Player {
     if (Here.Controls.isPressing(Enums.Keyboard.DOWN)) dy = +1;
 
     if (dx === 0 && dy === 0) {
+      body.setVelocity(0, 0);
       return;
     }
 
@@ -39,10 +47,21 @@ export default class Player {
     }
 
     const oldPos = Utils.toPoint(me._container);
-    me._container.setPosition(
-      oldPos.x + dx * Config.Player.Speed * deltaSec,
-      oldPos.y + dy * Config.Player.Speed * deltaSec
+
+    body.setVelocity(
+      dx * Config.Player.Speed * deltaSec,
+      dy * Config.Player.Speed * deltaSec
     );
+    // me._container.setPosition(
+    //   oldPos.x + dx * Config.Player.Speed * deltaSec,
+    //   oldPos.y + dy * Config.Player.Speed * deltaSec
+    // );
+  }
+
+  toGameObject() {
+    const me = this;
+
+    return me._container;
   }
 
   addGarbage() {

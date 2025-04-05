@@ -28,7 +28,7 @@ export default class GameScene extends HereScene {
 
     if (!me._isRestart) Utils.runLoadingBar();
 
-    Utils.loadSpriteSheet("garbage", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("items", Consts.Unit.Normal);
     Utils.loadImage("player");
   }
 

@@ -8,7 +8,7 @@ export default class Config {
   };
 
   static Player = {
-    Speed: 400,
-    MaxGarbageCount: 2,
+    Speed: 20000,
+    MaxGarbageCount: 1,
   };
 }
