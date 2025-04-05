@@ -15,5 +15,9 @@ export default class Config {
     MaxGarbageCountAtBag: 2,
     MaxMopDirt: 2,
     MaxBucketDirt: 4,
+    FireballSpeed: 400,
+    MaxMana: 10,
+    FireballCost: 2,
+    UtilizeBagCost: 1,
   };
 }

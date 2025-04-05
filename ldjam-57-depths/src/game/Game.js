@@ -33,7 +33,7 @@ export default class Game {
     me._garbage = new Garbage(me._player.toGameObject());
     me._tools = new Tools(me._garbage);
 
-    me._dumpster = new Dumpster(me._garbage);
+    me._dumpster = new Dumpster(me._garbage, me._tools);
 
     // ----
 
@@ -84,7 +84,8 @@ export default class Game {
         `crs: ${playerHand.x | 0} ${playerHand.y | 0}\n` +
         `tol: ${me._tools.currentTool}\n` +
         `mop: ${me._tools._mopDirt}\n` +
-        `hand: ${me._tools._handContentType}`;
+        `hand: ${me._tools._handContentType}\n` +
+        `mana: ${me._tools._mana}`;
 
       me._log.setText(text);
     });
@@ -95,6 +96,6 @@ export default class Game {
 
     Here._.input.mouse.requestPointerLock();
 
-    me._tools.onPointerDown(me._player.toMousePos());
+    me._tools.onPointerDown(me._player.toMousePos(), me._player.toGameObject());
   }
 }

@@ -1,15 +1,21 @@
 import Here from "../framework/Here.js";
+import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Garbage from "./Garbage.js";
+import Tools from "./Tools.js";
 
 export default class Dumpster {
   /** @type {Garbage} */
   _garbage;
 
-  constructor(garbage) {
+  /** @type {Tools} */
+  _tools;
+
+  constructor(garbage, tools) {
     const me = this;
 
     me._garbage = garbage;
+    me._tools = tools;
 
     const sprite = Here._.physics.add
       .staticImage(800, 100, "shop")
@@ -37,6 +43,7 @@ export default class Dumpster {
 
     if (!!movable.isBag) {
       me._garbage.removeBag(movable);
+      me._tools.increaseMana(Config.Tools.UtilizeBagCost);
       return;
     }
 

@@ -20,10 +20,36 @@ export default class Tools {
   /** @type {Number} */
   _handContentType = Enums.HandContent.EMPTY;
 
+  /** @type {Phaser.Physics.Arcade.Group} */
+  _fireballPool;
+
+  /** @type {Number} */
+  _mana = 0;
+
   constructor(garbage) {
     const me = this;
 
     me._garbage = garbage;
+    me._fireballPool = Here._.physics.add.group({ collideWorldBounds: true });
+
+    Here._.physics.world.on(
+      "worldbounds",
+      (body) => {
+        const gameObj = body.gameObject;
+        if (!!gameObj.isFireball) {
+          me._onFireballHit(gameObj);
+        }
+      },
+      me
+    );
+
+    Here._.physics.add.collider(
+      me._fireballPool,
+      me._garbage._movablePool,
+      (fireball, movable) => me._onFireballHit(fireball),
+      null,
+      me
+    );
   }
 
   update() {
@@ -42,7 +68,7 @@ export default class Tools {
     me.currentTool = input;
   }
 
-  onPointerDown(pos) {
+  onPointerDown(pos, playerPos) {
     const me = this;
 
     if (me.currentTool == Enums.Tools.HAND) {
@@ -51,6 +77,46 @@ export default class Tools {
     if (me.currentTool == Enums.Tools.MOP) {
       return me._processMopClick(pos);
     }
+
+    if (me.currentTool == Enums.Tools.FIREBALL) {
+      return me._processFireballClick(pos, playerPos);
+    }
+  }
+
+  increaseMana(change) {
+    const me = this;
+
+    me._mana = Math.min(Config.Tools.MaxMana, me._mana + change);
+  }
+
+  _processFireballClick(cursorPos, playerPos) {
+    const me = this;
+
+    if (me._mana < Config.Tools.FireballCost) {
+      return;
+    }
+
+    const dx = cursorPos.x - playerPos.x;
+    const dy = cursorPos.y - playerPos.y;
+    const angleRad = Math.atan2(dy, dx);
+    let angleDeg = angleRad * (180 / Math.PI);
+
+    const velocity = Here._.physics.velocityFromAngle(
+      angleDeg,
+      Config.Tools.FireballSpeed
+    );
+
+    const fireball = me._fireballPool.create(
+      cursorPos.x,
+      cursorPos.y,
+      "items",
+      3
+    );
+    fireball.isFireball = true;
+    fireball.body.onWorldBounds = true;
+    fireball.setVelocity(velocity.x, velocity.y);
+
+    me._mana = Math.max(0, me._mana - Config.Tools.FireballCost);
   }
 
   _processHandClick(pos) {
@@ -103,10 +169,7 @@ export default class Tools {
       if (!gameObj.isGarbage) continue;
 
       me._garbage.removeGarbage(gameObj);
-      const isFull = me._addGarbage();
-      if (isFull) {
-        me._garbage.createBag(pos.x, pos.y);
-      }
+      me._addGarbageToHands();
       return;
     }
   }
@@ -160,7 +223,7 @@ export default class Tools {
     me._mopDirt -= 1;
   }
 
-  _addGarbage() {
+  _addGarbageToHands() {
     const me = this;
 
     me._bagGarbageCount += 1;
@@ -168,7 +231,33 @@ export default class Tools {
       return false;
     }
 
+    me._handContentType = Enums.HandContent.BAG;
     me._bagGarbageCount = 0;
     return true;
+  }
+
+  _onFireballHit(fireball) {
+    const me = this;
+
+    fireball.destroy();
+
+    const bodies = Here._.physics.overlapCirc(
+      fireball.x,
+      fireball.y,
+      100,
+      true,
+      true
+    );
+    for (let i = 0; i < bodies.length; ++i) {
+      const gameObj = bodies[i].gameObject;
+
+      if (!!gameObj.isBag) {
+        me._garbage.removeBag(gameObj);
+      }
+
+      if (!!gameObj.isBucket) {
+        me._garbage.removeBucket(gameObj);
+      }
+    }
   }
 }
