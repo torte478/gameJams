@@ -40,6 +40,7 @@ export default class Game {
     const camera = Here._.cameras.main;
     camera
       .setBackgroundColor(0xe2f0f7)
+      // .setBackgroundColor(0x1d083c) // main color
       .startFollow(me._player.toGameObject())
       .setBounds(0, 0, 2000, 2000)
       .setRoundPixels(true);
