@@ -1,13 +1,10 @@
 export default class Enums {
-    static Keyboard = {
-        LEFT: 0,
-        RIGHT: 1,
-        UP: 2,
-        DOWN: 3,
+  static Keyboard = {
+    UP: 0,
+    LEFT: 1,
+    DOWN: 2,
+    RIGHT: 3,
 
-        MAIN_ACTION: 4,
-        SECOND_ACTION: 5,
-
-        RESTART: 6
-    }
+    RESTART: 4,
+  };
 }

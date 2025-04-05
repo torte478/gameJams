@@ -1,50 +1,48 @@
-import Animation from '../framework/Animation.js';
-import HereScene from '../framework/HereScene.js';
-import Utils from '../framework/Utils.js';
+import Animation from "../framework/Animation.js";
+import HereScene from "../framework/HereScene.js";
+import Utils from "../framework/Utils.js";
 
-import Game from '../game/Game.js';
+import Game from "../game/Game.js";
 
 export default class GameScene extends HereScene {
+  /** @type {Game} */
+  _game;
 
-	/** @type {Game} */
-	_game;
+  /** @type {Boolean} */
+  _isRestart;
 
-    /** @type {Boolean} */
-    _isRestart;
+  constructor() {
+    super("gameScene");
+  }
 
-    constructor() {
-        super('gameScene');
-    }
+  init(data) {
+    const me = this;
 
-    init(data) {
-        const me = this;
+    me._isRestart = !!data.isRestart;
+  }
 
-        me._isRestart = !!data.isRestart;
-    }
+  preload() {
+    super.preload();
+    const me = this;
 
-    preload() {
-        super.preload();
-        const me = this;
+    if (!me._isRestart) Utils.runLoadingBar();
 
-        if (!me._isRestart)
-            Utils.runLoadingBar();
+    Utils.loadImage("player");
+  }
 
-        Utils.loadWav('button_click');
-    }
+  create() {
+    const me = this;
 
-    create() {
-        const me = this;
+    Animation.init();
 
-        Animation.init();
+    me._game = new Game();
+  }
 
-        me._game = new Game();
-    }
+  update(time, delta) {
+    super.update();
 
-    update() {
-        super.update();
+    const me = this;
 
-        const me = this;
-
-        me._game.update();
-    }
+    me._game.update(delta / 1000);
+  }
 }
