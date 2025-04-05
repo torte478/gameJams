@@ -82,7 +82,7 @@ export default class Game {
       me._garbage.createSpot(pos.x, pos.y);
     }
 
-    me._garbage.createBucket(400, 200);
+    me._garbage.createBucket(400, 200, 0);
     // me._garbage.createBag(300, 250);
 
     // me._garbage.createGarbageWall(500, 500);

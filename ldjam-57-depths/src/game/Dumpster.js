@@ -64,7 +64,6 @@ export default class Dumpster {
 
     if (!!movable.isBucket) {
       me._garbage.removeBucket(movable);
-      me._garbage.createBucket(300, 200);
     }
   }
 }

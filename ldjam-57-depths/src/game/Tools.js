@@ -30,6 +30,9 @@ export default class Tools {
   /** @type {Player} */
   _player;
 
+  /** @type {Number} */
+  _currentBucketDirt = 0;
+
   /**
    * @param {Garbage} garbage
    * @param {Player} player
@@ -84,12 +87,15 @@ export default class Tools {
     let input = -1;
     if (Here.Controls.isPressedOnce(Enums.Keyboard.HAND_TOOL)) {
       input = Enums.Tools.HAND;
+      me._player._hand.stop();
       me._player._hand.setFrame(0);
     } else if (Here.Controls.isPressedOnce(Enums.Keyboard.MOP_TOOL)) {
+      me._player._hand.stop();
       input = Enums.Tools.MOP;
       me._player._hand.setFrame(me._mopDirt >= Config.Tools.MaxMopDirt ? 7 : 4);
       me._tryThrowCurrentItem();
     } else if (Here.Controls.isPressedOnce(Enums.Keyboard.FIREBALL_TOOL)) {
+      me._player._hand.stop();
       input = Enums.Tools.FIREBALL;
       me._player._hand.setFrame(10);
       me._tryThrowCurrentItem();
@@ -132,6 +138,14 @@ export default class Tools {
       me._handContentType = Enums.HandContent.EMPTY;
       return;
     }
+
+    if (me._handContentType == Enums.HandContent.BUCKET) {
+      me._garbage.createBucket(playerPos.x, playerPos.y, me._currentBucketDirt);
+      me._currentBucketDirt = 0;
+      return;
+    }
+
+    throw "error";
   }
 
   _processFireballClick(cursorPos, playerPos) {
@@ -180,8 +194,10 @@ export default class Tools {
   _processBucketHandClick(pos) {
     const me = this;
 
-    me._garbage.createBucket(pos.x, pos.y);
+    me._garbage.createBucket(pos.x, pos.y, me._currentBucketDirt);
+    me._currentBucketDirt = 0;
     me._handContentType = Enums.HandContent.EMPTY;
+    me._player._hand.setFrame(0);
   }
 
   _processBagHandClick(pos) {
@@ -207,6 +223,10 @@ export default class Tools {
     const bucket = Utils.firstOrNull(bodies, (b) => !!b.gameObject.isBucket);
     if (!!bucket) {
       me._handContentType = Enums.HandContent.BUCKET;
+      me._currentBucketDirt = bucket.gameObject.dirt;
+      const handFrame =
+        me._currentBucketDirt >= Config.Tools.MaxBucketDirt ? 3 : 2;
+      me._player._hand.setFrame(handFrame);
       me._garbage.removeBucket(bucket.gameObject);
       return;
     }

@@ -143,14 +143,16 @@ export default class Garbage {
     if (!!withSpot) me.createSpot(x, y);
   }
 
-  createBucket(x, y) {
+  createBucket(x, y, dirt) {
     const me = this;
 
-    const bucket = me._movablePool.create(x, y, "items", 1);
+    const isDirt = dirt >= Config.Tools.MaxBucketDirt;
+    const bucket = me._movablePool.create(x, y, "items", isDirt ? 2 : 1);
     bucket.isBucket = true;
     bucket.setDepth(Consts.Depth.Movable);
 
-    bucket.dirt = 0;
+    bucket.dirt = dirt;
+    if (isDirt) me.createSpot(x, y);
 
     return bucket;
   }
