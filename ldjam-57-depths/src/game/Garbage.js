@@ -14,7 +14,7 @@ export default class Garbage {
   constructor(playerGameObj) {
     const me = this;
 
-    me._garbagePool = Here._.physics.add.group();
+    me._garbagePool = Here._.physics.add.staticGroup();
 
     const bounce = 0.25;
     const drag = 500;
@@ -27,7 +27,7 @@ export default class Garbage {
       dragY: drag,
     });
 
-    me._spotPool = Here._.physics.add.group();
+    me._spotPool = Here._.physics.add.staticGroup();
 
     Here._.physics.add.collider(me._movablePool);
 
@@ -48,28 +48,39 @@ export default class Garbage {
     obj.destroy();
   }
 
-  createBagAtPos(pos) {
+  removeSpot(spot) {
     const me = this;
 
-    const bag = me._movablePool.create(pos.x, pos.y, "items", 1);
+    spot.destroy();
+  }
+
+  createBag(x, y) {
+    const me = this;
+
+    const bag = me._movablePool.create(x, y, "items", 1);
     bag.isBag = true;
 
     bag.setDepth(Consts.Depth.Movable);
 
-    me.createSpot(pos);
+    me.createSpot(x, y);
   }
 
   createBucket(x, y) {
     const me = this;
 
     const bucket = me._movablePool.create(x, y, "items", 4);
+    bucket.isBucket = true;
     bucket.setDepth(Consts.Depth.Movable);
+
+    bucket.dirt = 0;
+
+    return bucket;
   }
 
-  createSpot(pos) {
+  createSpot(x, y) {
     const me = this;
 
-    const spot = me._spotPool.create(pos.x, pos.y, "items", 2);
+    const spot = me._spotPool.create(x, y, "items", 2);
     spot.isSpot = true;
     spot.setDepth(Consts.Depth.Spot);
   }

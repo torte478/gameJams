@@ -30,7 +30,7 @@ export default class Game {
 
     me._player = new Player();
     me._garbage = new Garbage(me._player.toGameObject());
-    me._tools = new Tools();
+    me._tools = new Tools(me._garbage);
 
     // ----
 
@@ -38,10 +38,21 @@ export default class Game {
 
     // ----
 
-    me._garbage.createGarbage(550, 300);
-    me._garbage.createGarbage(600, 330);
-    me._garbage.createGarbage(500, 260);
-    me._garbage.createGarbage(510, 291);
+    const rect = new Phaser.Geom.Rectangle(100, 100, 600, 600);
+    for (let i = 0; i < 5; ++i) {
+      const pos = Phaser.Geom.Rectangle.Random(rect);
+      me._garbage.createGarbage(pos.x, pos.y);
+    }
+
+    for (let i = 0; i < 5; ++i) {
+      const pos = Phaser.Geom.Rectangle.Random(rect);
+      me._garbage.createSpot(pos.x, pos.y);
+    }
+
+    // me._garbage.createSpot(550, 300);
+    // me._garbage.createSpot(600, 330);
+    // me._garbage.createSpot(500, 260);
+    // me._garbage.createSpot(510, 291);
 
     me._garbage.createBucket(300, 200);
 
@@ -71,7 +82,8 @@ export default class Game {
 
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `tool: ${me._tools.current}`;
+        `tool: ${me._tools.currentTool}\n` +
+        `mop: ${me._tools._mopDirt}`;
 
       me._log.setText(text);
     });
@@ -80,24 +92,6 @@ export default class Game {
   _onPointerDown(pointer) {
     const me = this;
 
-    const bodies = Here._.physics.overlapCirc(
-      pointer.x,
-      pointer.y,
-      5,
-      true,
-      true
-    );
-
-    for (let i = 0; i < bodies.length; ++i) {
-      const gameObj = bodies[i].gameObject;
-      if (!gameObj.isGarbage) continue;
-
-      me._garbage.removeGarbage(gameObj);
-      const isFull = me._tools.addGarbage();
-      if (isFull) {
-        me._garbage.createBagAtPos(me._player.toGameObject());
-      }
-      break;
-    }
+    me._tools.onPointerDown(pointer);
   }
 }

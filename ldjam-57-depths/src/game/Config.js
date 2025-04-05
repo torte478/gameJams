@@ -9,6 +9,11 @@ export default class Config {
 
   static Player = {
     Speed: 400,
-    MaxGarbageCountAtBag: 1,
+  };
+
+  static Tools = {
+    MaxGarbageCountAtBag: 2,
+    MaxMopDirt: 2,
+    MaxBucketDirt: 4,
   };
 }
