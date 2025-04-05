@@ -11,6 +11,7 @@ import Garbage from "./Garbage.js";
 import Tools from "./Tools.js";
 import Dumpster from "./Dumpster.js";
 import Trigger from "./Trigger.js";
+import BucketFactory from "./BucketFactory.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -30,6 +31,9 @@ export default class Game {
 
   /** @type {Dumpster[]} */
   _dumpsters = [];
+
+  /** @type {BucketFactory[]} */
+  _bucketFactories = [];
 
   constructor() {
     const me = this;
@@ -82,9 +86,7 @@ export default class Game {
       me._garbage.createSpot(pos.x, pos.y);
     }
 
-    me._garbage.createBucket(400, 200, 0);
-    // me._garbage.createBag(300, 250);
-
+    me._bucketFactories.push(new BucketFactory(200, 200, me._garbage));
     // me._garbage.createGarbageWall(500, 500);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
@@ -95,7 +97,7 @@ export default class Game {
     });
   }
 
-  update(deltaSec) {
+  update(timeSec, deltaSec) {
     const me = this;
 
     if (
@@ -111,6 +113,8 @@ export default class Game {
     me._tools.update();
     for (let i = 0; i < me._dumpsters.length; ++i)
       me._dumpsters[i].update(playerCursorPos);
+    for (let i = 0; i < me._bucketFactories.length; ++i)
+      me._bucketFactories[i].update(timeSec);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;

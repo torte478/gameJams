@@ -45,8 +45,10 @@ export default class Dumpster {
   update(mousePos) {
     const me = this;
 
+    const contentType = me._tools._handContentType;
     const frame =
-      me._tools._handContentType == Enums.HandContent.BAG &&
+      (contentType == Enums.HandContent.BAG ||
+        contentType == Enums.HandContent.BUCKET) &&
       Phaser.Geom.Rectangle.ContainsPoint(me._sprite.getBounds(), mousePos)
         ? 1
         : 0;
