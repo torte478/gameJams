@@ -5,7 +5,7 @@ import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Garbage from "./Garbage.js";
 import Graphics from "./Graphics.js";
-import Lights from "./Ligths.js";
+import Lights from "./Lights.js";
 import MyStaticTime from "./MyStaticTime.js";
 import Player from "./Player.js";
 

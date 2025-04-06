@@ -8,9 +8,9 @@ export default class Config {
   };
 
   static Start = {
-    Mana: 4, //0
-    PlayerX: 250,
-    PlayerY: 400,
+    Mana: 0,
+    PlayerX: 605,
+    PlayerY: 500,
   };
 
   static Tiles = {
@@ -28,14 +28,14 @@ export default class Config {
   };
 
   static Tools = {
-    MaxGarbageCountAtBag: 2,
-    MaxMopDirt: 4,
-    MaxBucketDirt: 8,
+    MaxGarbageCountAtBag: 4,
+    MaxMopDirt: 8,
+    MaxBucketDirt: 20,
     FireballSpeed: 800,
     MaxMana: 10,
-    FireballCost: 2,
-    UtilizeBagCost: 1,
-    UtilizeBucketCost: 1,
+    FireballCost: 10,
+    UtilizeBagCost: 5,
+    UtilizeBucketCost: 4,
     WallToGarbageCount: 4,
   };
 

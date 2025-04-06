@@ -13,7 +13,7 @@ import Dumpster from "./Dumpster.js";
 import Trigger from "./Trigger.js";
 import BucketFactory from "./BucketFactory.js";
 import MyStaticTime from "./MyStaticTime.js";
-import Lights from "./Ligths.js";
+import Lights from "./Lights.js";
 import Graphics from "./Graphics.js";
 
 export default class Game {
@@ -51,7 +51,7 @@ export default class Game {
     const me = this;
 
     me._player = new Player();
-    const map = me._initMap();
+    const map = me._initTilemap();
     me._lights = new Lights(map);
 
     me._graphics = new Graphics();
@@ -70,7 +70,8 @@ export default class Game {
       me._graphics
     );
 
-    me._dumpsters.push(new Dumpster(me._garbage, me._tools, me._graphics));
+    // me._dumpsters.push(
+    //   new Dumpster(200, 600, me._garbage, me._tools, me._graphics));
 
     Here._.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     Here._.sound.pauseOnBlur = true;
@@ -81,6 +82,7 @@ export default class Game {
     me._ambientSound = Here._.sound.add("ambient", {
       config: { loop: -1, volume: 0.75 },
     });
+
     // me._ambientSound.play();
     // me._themeSound.play();
 
@@ -123,22 +125,24 @@ export default class Game {
 
     // ----
 
-    me._bucketFactories.push(new BucketFactory(200, 200, me._garbage));
+    // me._bucketFactories.push(new BucketFactory(200, 200, me._garbage));
 
-    const tempCount = 10;
-    const rect = new Phaser.Geom.Rectangle(700, 400, 600, 200);
-    for (let i = 0; i < tempCount; ++i) {
-      const pos = Phaser.Geom.Rectangle.Random(rect);
-      me._garbage.createGarbage(pos.x, pos.y);
-    }
+    // const tempCount = 10;
+    // const rect = new Phaser.Geom.Rectangle(700, 400, 600, 200);
+    // for (let i = 0; i < tempCount; ++i) {
+    //   const pos = Phaser.Geom.Rectangle.Random(rect);
+    //   me._garbage.createGarbage(pos.x, pos.y);
+    // }
 
-    for (let i = 0; i < tempCount; ++i) {
-      const pos = Phaser.Geom.Rectangle.Random(rect);
-      me._garbage.createSpot(pos.x, pos.y, true);
-    }
+    // for (let i = 0; i < tempCount; ++i) {
+    //   const pos = Phaser.Geom.Rectangle.Random(rect);
+    //   me._garbage.createSpot(pos.x, pos.y, true);
+    // }
 
-    me._garbage.createGarbageWall(700, 300);
-    me._garbage.createGarbageWall(800, 300);
+    // me._garbage.createGarbageWall(700, 300);
+    // me._garbage.createGarbageWall(800, 300);
+
+    me._createTutorial();
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -199,7 +203,7 @@ export default class Game {
     me._tools.onPointerDown(me._player.toMousePos(), me._player.toGameObject());
   }
 
-  _initMap() {
+  _initTilemap() {
     const me = this;
 
     const tilemap = Here._.make.tilemap({
@@ -215,5 +219,88 @@ export default class Game {
     Here._.physics.add.collider(me._player.toGameObject(), me._mapLayer);
 
     return tilemap;
+  }
+
+  _createTutorial() {
+    const me = this;
+
+    Here._.add
+      .image(605, 500, "title")
+      .setDepth(Consts.Depth.Floor)
+      .setScale(2);
+
+    me._createText(150, 1050, "Use hand (1)\nto pick up trash");
+
+    for (let i = 0; i < 6; ++i)
+      for (let j = 0; j < 2; ++j)
+        me._garbage.createGarbage(500 + j * 50, 1025 + i * 50);
+
+    me._createText(900, 1050, "Use a mop (2)\nto clean spots");
+
+    for (let i = 0; i < 6; ++i)
+      me._garbage.createSpot(1225, 1025 + i * 50, true);
+
+    for (let i = 0; i < 6; ++i)
+      me._garbage.createSpot(1375, 1025 + i * 50, true);
+
+    me._garbage.createGarbageWall(1200, 900);
+    me._garbage.createGarbageWall(1300, 900);
+    me._garbage.createGarbageWall(1400, 900);
+
+    me._garbage.createGarbageWall(1200, 1300);
+    me._garbage.createGarbageWall(1300, 1300);
+    me._garbage.createGarbageWall(1400, 1300);
+
+    new Trigger(
+      me._player,
+      100,
+      900,
+      200,
+      100,
+      () => {
+        me._createText(1550, 1050, "Use bucket\nto clean the mop");
+        me._createText(
+          1550,
+          1150,
+          "Buckets can be\npicked up by hand (1)",
+          true
+        );
+
+        me._bucketFactories.push(new BucketFactory(1925, 1225, me._garbage));
+
+        me._dumpsters.push(
+          new Dumpster(1850, 500, me._garbage, me._tools, me._graphics)
+        );
+
+        me._createText(1720, 750, "Dispose trash\nto gain mana");
+        me._createText(
+          1500,
+          200,
+          "Bags can also\nbe picked up\nby hand (1)",
+          true
+        );
+
+        me._garbage.createBag(1850, 680, false, false);
+
+        for (let i = 0; i < 4; ++i)
+          for (let j = 0; j < 4; ++j)
+            me._garbage.createGarbage(1800 + j * 50, 125 + i * 50);
+
+        me._createText(1208, 450, "Use fireball (3)\nto break\ntrash walls");
+      },
+      me
+    );
+  }
+
+  _createText(x, y, text, small) {
+    const me = this;
+
+    Here._.add
+      .text(x, y, text, {
+        color: "#428aa7",
+        fontSize: !!small ? 24 : 36,
+        fontFamily: "Arial Black",
+      })
+      .setDepth(Consts.Depth.Floor);
   }
 }

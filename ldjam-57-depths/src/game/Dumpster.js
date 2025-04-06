@@ -23,7 +23,7 @@ export default class Dumpster {
   /** @type {Phaser.GameObjects.Group} */
   _manaBallPool;
 
-  constructor(garbage, tools, graphics) {
+  constructor(x, y, garbage, tools, graphics) {
     const me = this;
 
     me._garbage = garbage;
@@ -35,7 +35,7 @@ export default class Dumpster {
     });
 
     me._sprite = Here._.physics.add
-      .staticImage(200, 600, "shop", 0)
+      .staticImage(x, y, "shop", 0)
       .setDepth(Consts.Depth.FloorPlusOne);
 
     Here._.physics.add.overlap(
