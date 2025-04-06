@@ -195,13 +195,13 @@ export default class Garbage {
     );
   }
 
-  createStep(x, y, angle) {
+  createStep(x, y, angle, isHumpscareAlert) {
     const me = this;
 
     const step = me._createSpotInternal(
       x,
       y + 30,
-      Utils.getRandom(9, 10),
+      !!isHumpscareAlert ? 11 : Utils.getRandom(9, 10),
       angle
     );
     step.isStep = true;

@@ -8,7 +8,7 @@ export default class Config {
   };
 
   static Start = {
-    Mana: 1000,
+    Mana: 0,
 
     // start
     // PlayerX: 605,
@@ -19,8 +19,8 @@ export default class Config {
     PlayerY: 1800,
 
     //temp
-    // PlayerX: 605,
-    // PlayerY: 500,
+    // PlayerX: 1800,
+    // PlayerY: 4000,
   };
 
   static Tiles = {
@@ -54,5 +54,16 @@ export default class Config {
     MaxAlpha: 0.95,
     LitleFireballLight: 10,
     BigFireballLight: 20,
+  };
+
+  static Sound = {
+    MainMinVolume: 0.1,
+    MainMaxVolume: 0.5,
+    MainMinDetune: -200,
+    MainMaxDetune: 0,
+    AmbientMinVolume: 0,
+    AmbientMaxVolume: 0.75,
+    StartHeight: 2100,
+    StopHeight: 5300,
   };
 }

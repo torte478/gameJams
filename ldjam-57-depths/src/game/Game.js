@@ -74,27 +74,16 @@ export default class Game {
     Here._.sound.pauseOnBlur = true;
 
     me._themeSound = Here._.sound.add("sound", {
-      config: { loop: -1, volume: 0.5 },
+      loop: -1,
+      config: { volume: Config.Sound.MainMaxVolume },
     });
     me._ambientSound = Here._.sound.add("ambient", {
-      config: { loop: -1, volume: 0.75 },
+      loop: -1,
+      config: { volume: Config.Sound.AmbientMinVolume },
     });
 
-    // me._ambientSound.play();
-    // me._themeSound.play();
-
-    // Here._.tweens.add({
-    //   targets: me._themeSound,
-    //   detune: -200,
-    //   volume: 0.1,
-    //   duration: 20000,
-    // });
-
-    // Here._.tweens.add({
-    //   targets: me._ambientSound,
-    //   volume: { from: 0.1, to: 0.75 },
-    //   duration: 20000,
-    // });
+    me._ambientSound.play();
+    me._themeSound.play();
 
     const camera = Here._.cameras.main;
     camera
@@ -148,6 +137,7 @@ export default class Game {
       me._dumpsters[i].update(playerCursorPos);
     for (let i = 0; i < me._bucketFactories.length; ++i)
       me._bucketFactories[i].update(timeSec);
+    me._updateSoundVolume();
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
@@ -294,36 +284,42 @@ export default class Game {
 
     // wall
 
-    me._garbage.createGarbageWall(700, 2300);
-    me._garbage.createGarbageWall(700, 2400);
+    // me._garbage.createGarbageWall(700, 2300);
+    // me._garbage.createGarbageWall(700, 2400);
 
-    me._garbage.createGarbageWall(100, 2800);
-    me._garbage.createGarbageWall(200, 2800);
+    // me._garbage.createGarbageWall(100, 2800);
+    // me._garbage.createGarbageWall(200, 2800);
 
-    me._garbage.createGarbageWall(1400, 2800);
-    me._garbage.createGarbageWall(1400, 2900);
+    // me._garbage.createGarbageWall(1400, 2800);
+    // me._garbage.createGarbageWall(1400, 2900);
 
-    me._garbage.createGarbageWall(100, 5250);
-    me._garbage.createGarbageWall(200, 5250);
-    me._garbage.createGarbageWall(300, 5250);
-    me._garbage.createGarbageWall(400, 5250);
+    // me._garbage.createGarbageWall(100, 5250);
+    // me._garbage.createGarbageWall(200, 5250);
+    // me._garbage.createGarbageWall(300, 5250);
+    // me._garbage.createGarbageWall(400, 5250);
 
-    me._garbage.createGarbageWall(950, 5600);
-    me._garbage.createGarbageWall(950, 5700);
-    me._garbage.createGarbageWall(1050, 5600);
-    me._garbage.createGarbageWall(1050, 5700);
-    me._garbage.createGarbageWall(1150, 5600);
-    me._garbage.createGarbageWall(1150, 5700);
+    // me._garbage.createGarbageWall(950, 5600);
+    // me._garbage.createGarbageWall(950, 5700);
+    // me._garbage.createGarbageWall(1050, 5600);
+    // me._garbage.createGarbageWall(1050, 5700);
+    // me._garbage.createGarbageWall(1150, 5600);
+    // me._garbage.createGarbageWall(1150, 5700);
 
-    // garbage
+    // // garbage
 
-    me._addDungeonGarbage(1125, 2350, 1875, 2550, 20, 10);
-    me._addDungeonGarbage(1770, 2650, 1930, 3080, 20, 10);
-    me._addDungeonGarbage(160, 2300, 600, 2750, 20, 10);
+    // me._addDungeonGarbage(1125, 2350, 1875, 2550, 20, 10);
+    // me._addDungeonGarbage(1770, 2650, 1930, 3080, 20, 10);
+    // me._addDungeonGarbage(160, 2300, 600, 2750, 20, 10);
 
-    me._addDungeonGarbage(140, 3300, 360, 4500, 20, 10);
+    // me._addDungeonGarbage(140, 3300, 360, 4500, 20, 10);
 
-    me._addDungeonGarbage(140, 5450, 715, 5850, 40, 15);
+    // me._addDungeonGarbage(140, 5450, 715, 5850, 40, 15);
+
+    // humpscare
+    me._garbage.createStep(1800, 3600, 90, true);
+    me._garbage.createStep(1830, 3700, 90, true);
+    me._garbage.createStep(1810, 3800, 90, true);
+    me._garbage.createStep(1840, 3900, 90, true);
   }
 
   _addDungeonGarbage(x, y, toX, toY, garbageCount, spotCount) {
@@ -339,5 +335,55 @@ export default class Game {
       const pos = Phaser.Geom.Rectangle.Random(rect);
       me._garbage.createSpot(pos.x, pos.y, true);
     }
+  }
+
+  _updateSoundVolume() {
+    const me = this;
+
+    const playerY = me._player.toGameObject().y;
+
+    if (playerY < Config.Sound.StartHeight) {
+      me._themeSound
+        .setVolume(Config.Sound.MainMaxVolume)
+        .setDetune(Config.Sound.MainMaxDetune);
+      me._ambientSound.setVolume(Config.Sound.AmbientMinVolume);
+      return;
+    }
+
+    if (playerY > Config.Sound.StopHeight) {
+      me._themeSound
+        .setVolume(Config.Sound.MainMinVolume)
+        .setDetune(Config.Sound.MainMinDetune);
+      me._ambientSound.setVolume(Config.Sound.AmbientMaxVolume);
+      return;
+    }
+
+    const foo = playerY - Config.Sound.StartHeight;
+    const maxFoo = Config.Sound.StopHeight - Config.Sound.StartHeight;
+    const t = foo / maxFoo;
+
+    me._themeSound
+      .setVolume(
+        Phaser.Math.Linear(
+          Config.Sound.MainMaxVolume,
+          Config.Sound.MainMinVolume,
+          t
+        )
+      )
+      .setDetune(
+        Phaser.Math.Linear(
+          Config.Sound.MainMaxDetune,
+          Config.Sound.MainMinDetune,
+          t
+        )
+      );
+
+    me._ambientSound.setVolume(
+      Phaser.Math.Linear(
+        Config.Sound.AmbientMinVolume,
+        Config.Sound.AmbientMaxVolume,
+        t
+      )
+    );
   }
 }
