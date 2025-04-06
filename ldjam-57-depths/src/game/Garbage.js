@@ -182,10 +182,10 @@ export default class Garbage {
     return bucket;
   }
 
-  createSpot(x, y) {
+  createSpot(x, y, withoutParticles) {
     const me = this;
 
-    me._graphics.spotParticles(x, y);
+    if (!withoutParticles) me._graphics.spotParticles(x, y);
 
     me._createSpotInternal(
       x,

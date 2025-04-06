@@ -8,7 +8,7 @@ export default class Config {
   };
 
   static Start = {
-    Mana: 10, //0
+    Mana: 4, //0
     PlayerX: 250,
     PlayerY: 400,
   };

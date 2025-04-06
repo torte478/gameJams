@@ -97,19 +97,19 @@ export default class Game {
     me._bucketFactories.push(new BucketFactory(200, 200, me._garbage));
 
     const tempCount = 10;
-    const rect = new Phaser.Geom.Rectangle(350, 350, 600, 200);
+    const rect = new Phaser.Geom.Rectangle(700, 400, 600, 200);
     for (let i = 0; i < tempCount; ++i) {
       const pos = Phaser.Geom.Rectangle.Random(rect);
       me._garbage.createGarbage(pos.x, pos.y);
     }
 
-    // for (let i = 0; i < tempCount; ++i) {
-    //   const pos = Phaser.Geom.Rectangle.Random(rect);
-    //   me._garbage.createSpot(pos.x, pos.y);
-    // }
+    for (let i = 0; i < tempCount; ++i) {
+      const pos = Phaser.Geom.Rectangle.Random(rect);
+      me._garbage.createSpot(pos.x, pos.y, true);
+    }
 
-    // me._garbage.createGarbageWall(500, 300);
-    // me._garbage.createGarbageWall(600, 300);
+    me._garbage.createGarbageWall(700, 300);
+    me._garbage.createGarbageWall(800, 300);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
