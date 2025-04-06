@@ -8,7 +8,7 @@ export default class Config {
   };
 
   static Start = {
-    Mana: 4, //0
+    Mana: 10, //0
     PlayerX: 250,
     PlayerY: 400,
   };
@@ -27,7 +27,7 @@ export default class Config {
     MaxGarbageCountAtBag: 2,
     MaxMopDirt: 4,
     MaxBucketDirt: 8,
-    FireballSpeed: 400,
+    FireballSpeed: 800,
     MaxMana: 10,
     FireballCost: 2,
     UtilizeBagCost: 1,

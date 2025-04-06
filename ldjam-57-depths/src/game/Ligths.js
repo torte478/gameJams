@@ -63,12 +63,21 @@ export default class Lights {
     me.updateTiles(null);
   }
 
-  updateTilesWithFireball(pos, lightPower) {
+  updateTilesWithFireball(firstPos, firstLight, secondPos, secondLight) {
     const me = this;
 
     Utils.clearMatrix(me._secondLightMatrix, 0);
-    const tilePos = me._tilemap.worldToTileXY(pos.x, pos.y);
-    me._recalculateLightSource(tilePos, me._secondLightMatrix, lightPower);
+    const firstTilePos = me._tilemap.worldToTileXY(firstPos.x, firstPos.y);
+    me._recalculateLightSource(firstTilePos, me._secondLightMatrix, firstLight);
+
+    if (!!secondPos) {
+      const secondTilePos = me._tilemap.worldToTileXY(secondPos.x, secondPos.y);
+      me._recalculateLightSource(
+        secondTilePos,
+        me._secondLightMatrix,
+        secondLight
+      );
+    }
 
     me.updateTiles(me._secondLightMatrix);
   }

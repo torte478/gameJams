@@ -41,6 +41,9 @@ export default class Tools {
   /** @type {Lights} */
   _lights;
 
+  /** @type {Phaser.Physics.Arcade.Image} */
+  _flyingFireball = null;
+
   /**
    * @param {Garbage} garbage
    * @param {Player} player
@@ -120,10 +123,12 @@ export default class Tools {
         : Config.Light.LitleFireballLight;
     }
 
-    if (me._fireballLight > 0)
+    if (me._fireballLight > 0 || !!me._flyingFireball)
       me._lights.updateTilesWithFireball(
         me._player.toMousePos(),
-        me._fireballLight
+        me._fireballLight,
+        me._flyingFireball,
+        Config.Light.BigFireballLight
       );
 
     if (input === -1) return;
@@ -194,8 +199,8 @@ export default class Tools {
     const fireball = me._fireballPool.create(
       cursorPos.x,
       cursorPos.y,
-      "items",
-      3
+      "hand",
+      11
     );
     fireball.isFireball = true;
     fireball.body.onWorldBounds = true;
@@ -207,6 +212,8 @@ export default class Tools {
       me._player._hand.setFrame(10);
       me._fireballLight = Config.Light.LitleFireballLight;
     }
+
+    me._flyingFireball = fireball;
   }
 
   _processHandClick(pos) {
@@ -358,6 +365,9 @@ export default class Tools {
     const me = this;
 
     fireball.destroy();
+    me._flyingFireball = null;
+    me._lights.updateTiles();
+    Here._.cameras.main.shake(500, 0.01);
 
     const bodies = Here._.physics.overlapCirc(
       fireball.x,
