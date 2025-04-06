@@ -33,4 +33,8 @@ export default class Config {
     UtilizeBagCost: 1,
     WallToGarbageCount: 4,
   };
+
+  static Light = {
+    MaxLight: 20,
+  };
 }

@@ -51,11 +51,11 @@ export default class Garbage {
     Here._.physics.add.collider(
       me._movablePool,
       me._movablePool,
-      null,
       (m1, m2) => {
-        me._onMovableCollideProcess(m1);
-        me._onMovableCollideProcess(m2);
+        me._createSpotOnCollide(m1);
+        me._createSpotOnCollide(m2);
       },
+      null,
       me
     );
 
@@ -63,7 +63,7 @@ export default class Garbage {
       playerGameObj,
       me._movablePool,
       null,
-      (p, movable) => me._onMovableCollideProcess(movable),
+      (p, movable) => me._createSpotOnCollide(movable),
       me
     );
     Here._.physics.add.collider(playerGameObj, me._wallPool);
@@ -193,7 +193,7 @@ export default class Garbage {
 
     const step = me._createSpotInternal(
       x,
-      y + 40,
+      y + 30,
       Utils.getRandom(9, 10),
       angle
     );
@@ -209,19 +209,16 @@ export default class Garbage {
     return spot;
   }
 
-  _onMovableCollideProcess(movable) {
+  _createSpotOnCollide(movable) {
     const me = this;
 
-    if (movable.isBag && movable.nextSpot < MyStaticTime.time) {
-      me.createSpot(movable.x, movable.y);
-      movable.nextSpot = MyStaticTime.time + Config.Player.SpotCreatePeriodSec;
-    }
-
-    if (
+    const isBag = movable.isBag && movable.nextSpot < MyStaticTime.time;
+    const isDirtyBucket =
       movable.isBucket &&
       movable.dirt >= Config.Tools.MaxBucketDirt &&
-      movable.nextSpot < MyStaticTime.time
-    ) {
+      movable.nextSpot < MyStaticTime.time;
+
+    if (isBag || isDirtyBucket) {
       me.createSpot(movable.x, movable.y);
       movable.nextSpot = MyStaticTime.time + Config.Player.SpotCreatePeriodSec;
     }
