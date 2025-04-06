@@ -82,8 +82,8 @@ export default class Game {
       config: { volume: Config.Sound.AmbientMinVolume },
     });
 
-    me._ambientSound.play();
-    me._themeSound.play();
+    // me._ambientSound.play();
+    // me._themeSound.play();
 
     const camera = Here._.cameras.main;
     camera
@@ -307,13 +307,13 @@ export default class Game {
 
     // // garbage
 
-    // me._addDungeonGarbage(1125, 2350, 1875, 2550, 20, 10);
-    // me._addDungeonGarbage(1770, 2650, 1930, 3080, 20, 10);
-    // me._addDungeonGarbage(160, 2300, 600, 2750, 20, 10);
+    me._addDungeonGarbage(1125, 2350, 1875, 2550, 20, 10);
+    me._addDungeonGarbage(1770, 2650, 1930, 3080, 20, 10);
+    me._addDungeonGarbage(160, 2300, 600, 2750, 20, 10);
 
-    // me._addDungeonGarbage(140, 3300, 360, 4500, 20, 10);
+    me._addDungeonGarbage(140, 3300, 360, 4500, 20, 10);
 
-    // me._addDungeonGarbage(140, 5450, 715, 5850, 40, 15);
+    me._addDungeonGarbage(140, 5450, 715, 5850, 40, 15);
 
     // humpscare
     me._garbage.createStep(1800, 3600, 90, true);

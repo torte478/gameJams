@@ -20,6 +20,7 @@ export default class Player {
 
   /** @type {Phaser.Geom.Point} */
   _previousMovementVector = Player._zeroVector;
+  _previousPos = Player._zeroVector;
 
   _nextStepSpotTimeSec = -1;
   _spotStepCount = 0;
@@ -120,7 +121,11 @@ export default class Player {
         me._nextStepSpotTimeSec = MyStaticTime.time;
         me._spotStepCount = 0;
 
-        if (MyStaticTime.time > me._nextSpotProblemAudioPlayTime) {
+        if (
+          MyStaticTime.time > me._nextSpotProblemAudioPlayTime &&
+          (me._container.x != me._previousPos.x ||
+            me._container.y != me._previousPos.y)
+        ) {
           Here._.sound.play("spot_problem");
           me._nextSpotProblemAudioPlayTime = MyStaticTime.time + 0.75;
         }
@@ -129,6 +134,8 @@ export default class Player {
     } else if (isGarbage) {
       speed = Config.Player.GarbageSpeed;
     }
+
+    me._previousPos = Utils.toPoint(me._container);
 
     if (dx === 0 && dy === 0) {
       if (isSpot) {

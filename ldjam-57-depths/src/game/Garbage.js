@@ -57,8 +57,8 @@ export default class Garbage {
       me._movablePool,
       me._movablePool,
       (m1, m2) => {
-        me._createSpotOnCollide(m1);
-        me._createSpotOnCollide(m2);
+        me._createSpotOnCollide(m1, true);
+        me._createSpotOnCollide(m2, true);
       },
       null,
       me
@@ -216,7 +216,7 @@ export default class Garbage {
     return spot;
   }
 
-  _createSpotOnCollide(movable) {
+  _createSpotOnCollide(movable, needFixBug) {
     const me = this;
 
     const isBag = movable.isBag && movable.nextSpot < MyStaticTime.time;
@@ -226,6 +226,18 @@ export default class Garbage {
       movable.nextSpot < MyStaticTime.time;
 
     if (isBag || isDirtyBucket) {
+      if (needFixBug) {
+        const bodies = Here._.physics.overlapCirc(
+          movable.x,
+          movable.y,
+          2,
+          false,
+          true
+        );
+        const alreadyHasSpot = Utils.any(bodies, (b) => !!b.gameObject.isSpot);
+        if (alreadyHasSpot) return;
+      }
+
       me.createSpot(movable.x, movable.y);
       movable.nextSpot = MyStaticTime.time + Config.Player.SpotCreatePeriodSec;
     }

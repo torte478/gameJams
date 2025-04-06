@@ -253,6 +253,10 @@ export default class Tools {
       return;
     }
 
+    if (!!me._flyingFireball) {
+      return;
+    }
+
     const dx = cursorPos.x - playerPos.x;
     const dy = cursorPos.y - playerPos.y;
     const angleRad = Math.atan2(dy, dx);
@@ -400,7 +404,7 @@ export default class Tools {
       me._player._hand.setFrame(4);
 
       me._graphics.waterParticles(bucket.x, bucket.y);
-      Here._.sound.play("mop_wash");
+      Here._.sound.play("mop_wash", { volume: 0.75 });
 
       if (bucket.dirt >= Config.Tools.MaxBucketDirt) {
         bucket.setFrame(2);
@@ -429,7 +433,7 @@ export default class Tools {
     const anim =
       me._mopDirt >= Config.Tools.MaxMopDirt ? "mop_dirt" : "mop_clean";
     me._player._hand.play(anim);
-    Here._.sound.play("mop");
+    Here._.sound.play("mop", { volume: 0.5 });
   }
 
   _createSpot(pos) {
