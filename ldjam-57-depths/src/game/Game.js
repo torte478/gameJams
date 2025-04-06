@@ -49,7 +49,13 @@ export default class Game {
 
     me._garbage = new Garbage(me._player.toGameObject(), me._mapLayer);
 
-    me._tools = new Tools(me._garbage, me._player, me._mapLayer, me._lights);
+    me._tools = new Tools(
+      me._garbage,
+      me._player,
+      me._lights,
+      map,
+      me._mapLayer
+    );
 
     me._dumpsters.push(new Dumpster(me._garbage, me._tools));
 
@@ -81,20 +87,22 @@ export default class Game {
 
     // ----
 
-    // const tempCount = 10;
-    // const rect = new Phaser.Geom.Rectangle(550, 400, 600, 200);
-    // for (let i = 0; i < tempCount; ++i) {
-    //   const pos = Phaser.Geom.Rectangle.Random(rect);
-    //   me._garbage.createGarbage(pos.x, pos.y);
-    // }
+    const tempCount = 10;
+    const rect = new Phaser.Geom.Rectangle(550, 400, 600, 200);
+    for (let i = 0; i < tempCount; ++i) {
+      const pos = Phaser.Geom.Rectangle.Random(rect);
+      me._garbage.createGarbage(pos.x, pos.y);
+    }
 
-    // for (let i = 0; i < tempCount; ++i) {
-    //   const pos = Phaser.Geom.Rectangle.Random(rect);
-    //   me._garbage.createSpot(pos.x, pos.y);
-    // }
+    for (let i = 0; i < tempCount; ++i) {
+      const pos = Phaser.Geom.Rectangle.Random(rect);
+      me._garbage.createSpot(pos.x, pos.y);
+    }
 
     me._bucketFactories.push(new BucketFactory(200, 200, me._garbage));
-    // me._garbage.createGarbageWall(500, 500);
+
+    me._garbage.createGarbageWall(500, 300);
+    me._garbage.createGarbageWall(600, 300);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -167,7 +175,7 @@ export default class Game {
     me._mapLayer = tilemap.createLayer(0, tileset, 0, 0);
     me._mapLayer.setDepth(Consts.Depth.Floor);
 
-    tilemap.setCollision(1);
+    tilemap.setCollision(Config.Tiles.Walls);
     Here._.physics.add.collider(me._player.toGameObject(), me._mapLayer);
 
     return tilemap;

@@ -37,14 +37,19 @@ export default class Animation {
       key: "mop_clean",
       frames: Animation.getFrames("hand", [5, 6, 5, 6, 4]),
       frameRate: 8,
-      // repeat: 0
     });
 
     Here._.anims.create({
       key: "mop_dirt",
       frames: Animation.getFrames("hand", [8, 9, 8, 9, 7]),
       frameRate: 8,
-      // repeat: 0
+    });
+
+    Here._.anims.create({
+      key: "fire",
+      frames: Animation.getFrames("fire", [0, 1]),
+      frameRate: 3,
+      repeat: -1,
     });
   }
 

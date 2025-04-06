@@ -1,6 +1,7 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Garbage from "./Garbage.js";
 import Lights from "./Ligths.js";
@@ -44,18 +45,37 @@ export default class Tools {
   /** @type {Phaser.Physics.Arcade.Image} */
   _flyingFireball = null;
 
-  /**
-   * @param {Garbage} garbage
-   * @param {Player} player
-   */
-  constructor(garbage, player, layer, lights) {
+  /** @type {Phaser.Tilemaps.Tilemap} */
+  _map;
+
+  /** @type {Phaser.Physics.Arcade.StaticGroup} */
+  _campfirePool;
+
+  constructor(garbage, player, lights, map, mapLayer) {
     const me = this;
 
     me._garbage = garbage;
     me._player = player;
     me._lights = lights;
+    me._map = map;
 
     me._fireballPool = Here._.physics.add.group({ collideWorldBounds: true });
+
+    me._campfirePool = Here._.physics.add.staticGroup();
+    for (let i = 0; i < me._map.height; ++i)
+      for (let j = 0; j < me._map.width; ++j) {
+        const tile = me._map.getTileAt(j, i, true);
+        if (tile.index != 3) continue;
+
+        const firecamp = me._campfirePool.create(
+          tile.getCenterX(),
+          tile.getCenterY(),
+          "fire",
+          0,
+          false
+        );
+        firecamp.isFirecamp = true;
+      }
 
     Here._.physics.world.on(
       "worldbounds",
@@ -78,7 +98,7 @@ export default class Tools {
 
     Here._.physics.add.collider(
       me._fireballPool,
-      layer,
+      mapLayer,
       (fireball, l) => me._onFireballHit(fireball),
       null,
       me
@@ -214,6 +234,9 @@ export default class Tools {
     }
 
     me._flyingFireball = fireball;
+    if (me._destroyAllThatFireballHits(fireball)) {
+      me._fireballExplosion(fireball);
+    }
   }
 
   _processHandClick(pos) {
@@ -364,10 +387,21 @@ export default class Tools {
   _onFireballHit(fireball) {
     const me = this;
 
+    me._destroyAllThatFireballHits(fireball);
+    me._fireballExplosion(fireball);
+  }
+
+  _fireballExplosion(fireball) {
+    const me = this;
+
     fireball.destroy();
     me._flyingFireball = null;
     me._lights.updateTiles();
     Here._.cameras.main.shake(500, 0.01);
+  }
+
+  _destroyAllThatFireballHits(fireball) {
+    const me = this;
 
     const bodies = Here._.physics.overlapCirc(
       fireball.x,
@@ -376,20 +410,51 @@ export default class Tools {
       true,
       true
     );
+    let hits = false;
     for (let i = 0; i < bodies.length; ++i) {
       const gameObj = bodies[i].gameObject;
 
+      const tileIndex = me._map.getTileAtWorldXY(
+        fireball.x,
+        fireball.y,
+        true
+      ).index;
+      if (tileIndex != -1 && tileIndex != 0) {
+        hits = true;
+      }
+
       if (!!gameObj.isBag) {
         me._garbage.removeBag(gameObj);
+        hits = true;
       }
 
       if (!!gameObj.isBucket) {
         me._garbage.removeBucket(gameObj);
+        hits = true;
       }
 
       if (!!gameObj.isWall) {
         me._garbage.removeWall(gameObj);
+        hits = true;
+      }
+
+      if (!!gameObj.isFirecamp) {
+        Here._.add
+          .sprite(gameObj.x, gameObj.y, "fire", 0)
+          .play("fire")
+          .setDepth(Consts.Depth.FloorPlusOne);
+
+        const tile = me._lights._tilemap.worldToTileXY(
+          gameObj.x - 10,
+          gameObj.y - 10
+        );
+        me._lights.addLightSources([{ x: tile.x + 1, y: tile.y + 1 }]);
+
+        gameObj.destroy();
+        hits = true;
       }
     }
+
+    return hits;
   }
 }

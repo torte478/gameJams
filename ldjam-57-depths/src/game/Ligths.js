@@ -82,10 +82,11 @@ export default class Lights {
     me.updateTiles(me._secondLightMatrix);
   }
 
-  addLightSource(x, y) {
+  addLightSources(arr) {
     const me = this;
 
-    me._lightSources.push(Utils.buildPoint(x, y));
+    for (let i = 0; i < arr.length; ++i) me._lightSources.push(arr[i]);
+
     me.recalculateLights();
   }
 

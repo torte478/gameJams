@@ -13,6 +13,10 @@ export default class Config {
     PlayerY: 400,
   };
 
+  static Tiles = {
+    Walls: [1, 3],
+  };
+
   static Player = {
     Speed: 400,
     SpotSpeed: 500,
