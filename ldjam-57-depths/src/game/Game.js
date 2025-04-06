@@ -147,10 +147,7 @@ export default class Game {
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `crs: ${playerCursorPos.x | 0} ${playerCursorPos.y | 0}\n` +
-        `tol: ${me._tools.currentTool}\n` +
-        `mop: ${me._tools._mopDirt}\n` +
-        `hand: ${me._tools._handContentType}\n` +
-        `mana: ${me._tools._mana}`;
+        `snd: ${me._themeSound.detune | 0}`;
 
       me._log.setText(text);
     });
@@ -310,7 +307,7 @@ export default class Game {
 
     // // garbage
 
-    // me._addDungeonGarbage(1125, 2350, 1875, 2550, 20, 10);
+    me._addDungeonGarbage(1125, 2350, 1875, 2550, 20, 10);
     // me._addDungeonGarbage(1770, 2650, 1930, 3080, 20, 10);
     // me._addDungeonGarbage(160, 2300, 600, 2750, 20, 10);
 

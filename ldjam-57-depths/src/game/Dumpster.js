@@ -68,6 +68,9 @@ export default class Dumpster {
     me._sprite.setFrame(frame);
   }
 
+  /**
+   * @param {Phaser.GameObjects.Sprite} movable
+   */
   _onMovableToShop(movable) {
     const me = this;
 
@@ -80,7 +83,13 @@ export default class Dumpster {
 
     if (!!movable.isBucket) {
       me._garbage.removeBucket(movable);
-      me._startManaBall(Config.Tools.UtilizeBucketCost);
+
+      if (movable.frame.name == 2)
+        me._startManaBall(Config.Tools.UtilizeBucketCost);
+      else {
+        Here._.sound.play("mop", { volume: 0.5 });
+        me._graphics.waterParticles(movable.x, movable.y);
+      }
       return;
     }
   }

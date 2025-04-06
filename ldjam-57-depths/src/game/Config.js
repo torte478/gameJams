@@ -8,19 +8,19 @@ export default class Config {
   };
 
   static Start = {
-    Mana: 1000,
+    Mana: 0,
 
     // start
     // PlayerX: 605,
     // PlayerY: 500,
 
     // dungeon
-    // PlayerX: 1000,
-    // PlayerY: 1800,
+    PlayerX: 1000,
+    PlayerY: 1800,
 
     //temp
-    PlayerX: 1700,
-    PlayerY: 5700,
+    // PlayerX: 1700,
+    // PlayerY: 5700,
   };
 
   static Tiles = {
