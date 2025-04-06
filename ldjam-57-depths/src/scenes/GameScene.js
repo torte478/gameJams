@@ -38,11 +38,13 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("fire", Consts.Unit.Big);
     Utils.loadSpriteSheet("icons", Consts.Unit.Normal);
     Utils.loadSpriteSheet("particles", 25);
+    Utils.loadSpriteSheet("boss", 100);
 
     Utils.loadImage("bar");
     Utils.loadImage("mana_ball");
     Utils.loadImage("title");
     Utils.loadImage("arch");
+    Utils.loadImage("gameOver");
 
     Utils.loadMp3("spot");
     Utils.loadMp3("sound");

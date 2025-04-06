@@ -69,6 +69,7 @@ export default class Game {
       me._mapLayer,
       me._graphics
     );
+    me._tools._superRef = me;
 
     Here._.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     Here._.sound.pauseOnBlur = true;
@@ -82,8 +83,8 @@ export default class Game {
       config: { volume: Config.Sound.AmbientMinVolume },
     });
 
-    // me._ambientSound.play();
-    // me._themeSound.play();
+    me._ambientSound.play();
+    me._themeSound.play();
 
     const camera = Here._.cameras.main;
     camera
@@ -123,21 +124,23 @@ export default class Game {
 
     const playerCursorPos = me._player.toMousePos();
 
-    const createSpotAngle = me._player.update(deltaSec);
+    if (!MyStaticTime.isGameOver) {
+      const createSpotAngle = me._player.update(deltaSec);
 
-    if (createSpotAngle != null)
-      me._garbage.createStep(
-        me._player.toGameObject().x,
-        me._player.toGameObject().y,
-        createSpotAngle
-      );
+      if (createSpotAngle != null)
+        me._garbage.createStep(
+          me._player.toGameObject().x,
+          me._player.toGameObject().y,
+          createSpotAngle
+        );
 
-    me._tools.update();
-    for (let i = 0; i < me._dumpsters.length; ++i)
-      me._dumpsters[i].update(playerCursorPos);
-    for (let i = 0; i < me._bucketFactories.length; ++i)
-      me._bucketFactories[i].update(timeSec);
-    me._updateSoundVolume();
+      me._tools.update();
+      for (let i = 0; i < me._dumpsters.length; ++i)
+        me._dumpsters[i].update(playerCursorPos);
+      for (let i = 0; i < me._bucketFactories.length; ++i)
+        me._bucketFactories[i].update(timeSec);
+      me._updateSoundVolume();
+    }
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
@@ -307,19 +310,36 @@ export default class Game {
 
     // // garbage
 
-    me._addDungeonGarbage(1125, 2350, 1875, 2550, 20, 10);
-    me._addDungeonGarbage(1770, 2650, 1930, 3080, 20, 10);
-    me._addDungeonGarbage(160, 2300, 600, 2750, 20, 10);
+    // me._addDungeonGarbage(1125, 2350, 1875, 2550, 20, 10);
+    // me._addDungeonGarbage(1770, 2650, 1930, 3080, 20, 10);
+    // me._addDungeonGarbage(160, 2300, 600, 2750, 20, 10);
 
-    me._addDungeonGarbage(140, 3300, 360, 4500, 20, 10);
+    // me._addDungeonGarbage(140, 3300, 360, 4500, 20, 10);
 
-    me._addDungeonGarbage(140, 5450, 715, 5850, 40, 15);
+    // me._addDungeonGarbage(140, 5450, 715, 5850, 40, 15);
 
     // humpscare
     me._garbage.createStep(1800, 3600, 90, true);
     me._garbage.createStep(1830, 3700, 90, true);
     me._garbage.createStep(1810, 3800, 90, true);
     me._garbage.createStep(1840, 3900, 90, true);
+
+    Here._.add.image(2000, 5900, "wall", 2).setDepth(Consts.Depth.UpperPlayer);
+
+    Here._.add
+      .image(2010, 5850, "wall", 2)
+      .setDepth(Consts.Depth.UpperPlayer)
+      .setAngle(30);
+
+    Here._.add
+      .image(1900, 5900, "wall", 2)
+      .setDepth(Consts.Depth.UpperPlayer)
+      .setAngle(-15);
+
+    Here._.add
+      .sprite(1900, 5800, "boss")
+      .setDepth(Consts.Depth.UpperPlayer)
+      .play("boss");
   }
 
   _addDungeonGarbage(x, y, toX, toY, garbageCount, spotCount) {
@@ -385,5 +405,22 @@ export default class Game {
         t
       )
     );
+  }
+
+  gameOver() {
+    const me = this;
+    Utils.debugLog("game over");
+    MyStaticTime.isGameOver = true;
+
+    Here._.add
+      .image(0, 0, "gameOver")
+      .setOrigin(0, 0)
+      .setDepth(Consts.Depth.UI + 1000)
+      .setScrollFactor(0);
+
+    me._themeSound
+      .setVolume(Config.Sound.MainMaxVolume)
+      .setDetune(Config.Sound.MainMaxDetune);
+    me._ambientSound.stop();
   }
 }

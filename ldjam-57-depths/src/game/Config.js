@@ -15,12 +15,12 @@ export default class Config {
     // PlayerY: 500,
 
     // dungeon
-    PlayerX: 1000,
-    PlayerY: 1800,
+    // PlayerX: 1000,
+    // PlayerY: 1800,
 
     //temp
-    // PlayerX: 1800,
-    // PlayerY: 4000,
+    PlayerX: 1700,
+    PlayerY: 5700,
   };
 
   static Tiles = {

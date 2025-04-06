@@ -202,6 +202,8 @@ export default class Tools {
   onPointerDown(pos, playerPos) {
     const me = this;
 
+    if (MyStaticTime.isGameOver) return;
+
     if (me.currentTool == Enums.Tools.HAND) {
       return me._processHandClick(pos);
     }
@@ -468,6 +470,12 @@ export default class Tools {
     const me = this;
 
     me._graphics.explosion(fireball.x, fireball.y);
+
+    if (
+      Phaser.Math.Distance.Between(fireball.x, fireball.y, 2000, 5900) < 200
+    ) {
+      me._superRef.gameOver();
+    }
 
     fireball.destroy();
     me._flyingFireball = null;
