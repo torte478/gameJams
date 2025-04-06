@@ -360,6 +360,7 @@ export default class Tools {
     if (!!bucket) return me._onBucketClickByMop(bucket.gameObject);
 
     if (me._mopDirt < Config.Tools.MaxMopDirt) {
+      me._graphics.waterParticles(mopPos.x, mopPos.y);
       return me._tryCleanSpot(mopPos);
     } else {
       me._player._hand.play("mop_dirt");
@@ -376,6 +377,8 @@ export default class Tools {
       bucket.dirt += me._mopDirt;
       me._mopDirt = 0;
       me._player._hand.setFrame(4);
+
+      me._graphics.waterParticles(bucket.x, bucket.y);
 
       if (bucket.dirt >= Config.Tools.MaxBucketDirt) {
         bucket.setFrame(2);

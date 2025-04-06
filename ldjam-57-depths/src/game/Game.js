@@ -64,7 +64,7 @@ export default class Game {
       me._graphics
     );
 
-    me._dumpsters.push(new Dumpster(me._garbage, me._tools));
+    me._dumpsters.push(new Dumpster(me._garbage, me._tools, me._graphics));
 
     Here._.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 

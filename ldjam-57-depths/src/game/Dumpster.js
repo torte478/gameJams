@@ -1,8 +1,10 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Garbage from "./Garbage.js";
+import Graphics from "./Graphics.js";
 import Tools from "./Tools.js";
 
 export default class Dumpster {
@@ -15,11 +17,22 @@ export default class Dumpster {
   /** @type {Phaser.Physics.Arcade.Image} */
   _sprite;
 
-  constructor(garbage, tools) {
+  /** @type {Graphics} */
+  _graphics;
+
+  /** @type {Phaser.GameObjects.Group} */
+  _manaBallPool;
+
+  constructor(garbage, tools, graphics) {
     const me = this;
 
     me._garbage = garbage;
     me._tools = tools;
+    me._graphics = graphics;
+    me._manaBallPool = Here._.add.group({
+      defaultKey: "mana_ball",
+      maxSize: 16,
+    });
 
     me._sprite = Here._.physics.add
       .staticImage(200, 600, "shop", 0)
@@ -60,12 +73,40 @@ export default class Dumpster {
 
     if (!!movable.isBag) {
       me._garbage.removeBag(movable);
-      me._tools.changeMana(Config.Tools.UtilizeBagCost);
+
+      me._startManaBall(Config.Tools.UtilizeBagCost);
       return;
     }
 
     if (!!movable.isBucket) {
       me._garbage.removeBucket(movable);
+      me._startManaBall(Config.Tools.UtilizeBucketCost);
+      return;
     }
+  }
+
+  _startManaBall(cost) {
+    const me = this;
+
+    /** @type {Phaser.GameObjects.Image} */
+    const manaBall = me._manaBallPool.get(me._sprite.x, me._sprite.y);
+
+    manaBall.setActive(true).setVisible(true).setDepth(Consts.Depth.UI);
+    const target = Utils.buildPoint(
+      Here._.cameras.main.scrollX + 50,
+      Here._.cameras.main.scrollY + 50
+    );
+
+    Here._.add.tween({
+      targets: manaBall,
+      duration: Utils.getTweenDuration(me._sprite, target, 1000),
+      x: target.x,
+      y: target.y,
+      onComplete: () => {
+        me._graphics.manaParticles();
+        me._manaBallPool.killAndHide(manaBall);
+        me._tools.changeMana(cost);
+      },
+    });
   }
 }

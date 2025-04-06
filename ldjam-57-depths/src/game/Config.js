@@ -35,6 +35,7 @@ export default class Config {
     MaxMana: 10,
     FireballCost: 2,
     UtilizeBagCost: 1,
+    UtilizeBucketCost: 1,
     WallToGarbageCount: 4,
   };
 

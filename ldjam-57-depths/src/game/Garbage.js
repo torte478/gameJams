@@ -185,6 +185,8 @@ export default class Garbage {
   createSpot(x, y) {
     const me = this;
 
+    me._graphics.spotParticles(x, y);
+
     me._createSpotInternal(
       x,
       y,
@@ -207,8 +209,6 @@ export default class Garbage {
 
   _createSpotInternal(x, y, frame, angle) {
     const me = this;
-
-    me._graphics.spotParticles(x, y);
 
     const spot = me._spotPool.create(x, y, "items", frame);
     spot.isSpot = true;
