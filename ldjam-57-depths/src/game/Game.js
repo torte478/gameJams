@@ -41,6 +41,12 @@ export default class Game {
   /** @type {Lights} */
   _lights;
 
+  /** @type {Phaser.Sound.HTML5AudioSound} */
+  _themeSound;
+
+  /** @type {Phaser.Sound.HTML5AudioSound} */
+  _ambientSound;
+
   constructor() {
     const me = this;
 
@@ -68,6 +74,28 @@ export default class Game {
 
     Here._.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     Here._.sound.pauseOnBlur = true;
+
+    me._themeSound = Here._.sound.add("sound", {
+      config: { loop: -1, volume: 0.5 },
+    });
+    me._ambientSound = Here._.sound.add("ambient", {
+      config: { loop: -1, volume: 0.75 },
+    });
+    // me._ambientSound.play();
+    // me._themeSound.play();
+
+    // Here._.tweens.add({
+    //   targets: me._themeSound,
+    //   detune: -200,
+    //   volume: 0.1,
+    //   duration: 20000,
+    // });
+
+    // Here._.tweens.add({
+    //   targets: me._ambientSound,
+    //   volume: { from: 0.1, to: 0.75 },
+    //   duration: 20000,
+    // });
 
     const camera = Here._.cameras.main;
     camera

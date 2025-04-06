@@ -43,6 +43,8 @@ export default class GameScene extends HereScene {
     Utils.loadImage("mana_ball");
 
     Utils.loadMp3("spot");
+    Utils.loadMp3("sound");
+    Utils.loadMp3("ambient");
 
     Utils.loadWav("bag_spawned");
     Utils.loadWav("take_garbage");
