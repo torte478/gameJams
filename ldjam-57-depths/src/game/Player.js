@@ -26,6 +26,8 @@ export default class Player {
 
   static _zeroVector = Utils.buildPoint(0, 0);
 
+  _nextSpotProblemAudioPlayTime = 0;
+
   constructor() {
     const me = this;
 
@@ -112,12 +114,18 @@ export default class Player {
     const isGarbage = Utils.any(otherBodies, (f) => !!f.gameObject.isGarbage);
 
     if (isSpot) {
-      me._sprite.play("player_at_spot", true);
       speed = Config.Player.SpotSpeed;
+
       if (!spot.gameObject.isStep) {
         me._nextStepSpotTimeSec = MyStaticTime.time;
         me._spotStepCount = 0;
+
+        if (MyStaticTime.time > me._nextSpotProblemAudioPlayTime) {
+          Here._.sound.play("spot_problem");
+          me._nextSpotProblemAudioPlayTime = MyStaticTime.time + 0.75;
+        }
       }
+      me._sprite.play("player_at_spot", true);
     } else if (isGarbage) {
       speed = Config.Player.GarbageSpeed;
     }

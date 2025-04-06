@@ -77,6 +77,7 @@ export default class Graphics {
     const me = this;
 
     me._spotEmitter.explode(20, x, y);
+    Here._.sound.play("spot");
   }
 
   waterParticles(x, y) {
@@ -88,6 +89,7 @@ export default class Graphics {
   manaParticles() {
     const me = this;
 
+    Here._.sound.play("mana");
     me._manaEmitter.explode(
       40,
       Here._.cameras.main.scrollX + 50,

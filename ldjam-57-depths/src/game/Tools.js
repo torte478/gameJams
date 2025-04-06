@@ -200,6 +200,7 @@ export default class Tools {
     if (input === -1) return;
 
     me.currentTool = input;
+    Here._.sound.play("take_garbage");
   }
 
   onPointerDown(pos, playerPos) {
@@ -252,6 +253,7 @@ export default class Tools {
     const me = this;
 
     if (me._mana < Config.Tools.FireballCost) {
+      Here._.sound.play("no_mana");
       return;
     }
 
@@ -274,6 +276,7 @@ export default class Tools {
     fireball.isFireball = true;
     fireball.body.onWorldBounds = true;
     fireball.setVelocity(velocity.x, velocity.y);
+    Here._.sound.play("fireball_start");
 
     me.changeMana(-Config.Tools.FireballCost);
 
@@ -313,6 +316,7 @@ export default class Tools {
     const me = this;
 
     me._garbage.createBucket(pos.x, pos.y, me._currentBucketDirt);
+    Here._.sound.play("take_garbage");
     me._currentBucketDirt = 0;
     me._handContentType = Enums.HandContent.EMPTY;
     me._player._hand.setFrame(0);
@@ -335,6 +339,7 @@ export default class Tools {
       me._handContentType = Enums.HandContent.BAG;
       me._garbage.removeBag(bag.gameObject);
       me._player._hand.setFrame(1);
+      Here._.sound.play("take_garbage");
       return;
     }
 
@@ -346,6 +351,7 @@ export default class Tools {
         me._currentBucketDirt >= Config.Tools.MaxBucketDirt ? 3 : 2;
       me._player._hand.setFrame(handFrame);
       me._garbage.removeBucket(bucket.gameObject);
+      Here._.sound.play("take_garbage");
       return;
     }
 
@@ -354,6 +360,8 @@ export default class Tools {
       if (!gameObj.isGarbage) continue;
 
       me._garbage.removeGarbage(gameObj);
+      Here._.sound.play("take_garbage");
+
       me._tryCreateBagFromGarbage();
       return;
     }
@@ -396,6 +404,7 @@ export default class Tools {
       me._player._hand.setFrame(4);
 
       me._graphics.waterParticles(bucket.x, bucket.y);
+      Here._.sound.play("mop_wash");
 
       if (bucket.dirt >= Config.Tools.MaxBucketDirt) {
         bucket.setFrame(2);
@@ -403,6 +412,8 @@ export default class Tools {
       }
     } else {
       me._garbage.createSpot(bucket.x, bucket.y);
+      me._mopDirt = Config.Tools.MaxMopDirt;
+      me._player._hand.setFrame(7);
     }
   }
 
@@ -422,6 +433,7 @@ export default class Tools {
     const anim =
       me._mopDirt >= Config.Tools.MaxMopDirt ? "mop_dirt" : "mop_clean";
     me._player._hand.play(anim);
+    Here._.sound.play("mop");
   }
 
   _createSpot(pos) {
@@ -442,6 +454,7 @@ export default class Tools {
 
     const playerPos = me._player.toGameObject();
     me._garbage.createBag(playerPos.x, playerPos.y, true, false);
+    Here._.sound.play("bag_spawned");
   }
 
   _onFireballHit(fireball) {
@@ -460,6 +473,7 @@ export default class Tools {
     me._flyingFireball = null;
     me._lights.updateTiles();
     Here._.cameras.main.shake(500, 0.01);
+    Here._.sound.play("fireball_explosion");
   }
 
   _destroyAllThatFireballHits(fireball) {

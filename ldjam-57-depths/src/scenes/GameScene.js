@@ -42,6 +42,18 @@ export default class GameScene extends HereScene {
     Utils.loadImage("bar");
     Utils.loadImage("mana_ball");
 
+    Utils.loadMp3("spot");
+
+    Utils.loadWav("bag_spawned");
+    Utils.loadWav("take_garbage");
+    Utils.loadWav("mana");
+    Utils.loadWav("spot_problem");
+    Utils.loadWav("mop");
+    Utils.loadWav("mop_wash");
+    Utils.loadWav("fireball_start");
+    Utils.loadWav("fireball_explosion");
+    Utils.loadWav("no_mana");
+
     me.load.tilemapCSV("map", "assets/map.csv");
   }
 

@@ -67,6 +67,7 @@ export default class Game {
     me._dumpsters.push(new Dumpster(me._garbage, me._tools, me._graphics));
 
     Here._.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    Here._.sound.pauseOnBlur = true;
 
     const camera = Here._.cameras.main;
     camera
