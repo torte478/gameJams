@@ -97,13 +97,9 @@ export default class Tools {
         const tile = me._map.getTileAt(j, i, true);
         if (tile.index != 3) continue;
 
-        const firecamp = me._campfirePool.create(
-          tile.getCenterX(),
-          tile.getCenterY(),
-          "fire",
-          0,
-          false
-        );
+        const firecamp = me._campfirePool
+          .create(tile.getCenterX(), tile.getCenterY(), "fire", 0, false)
+          .setDepth(Consts.Depth.UpperPlayer);
         firecamp.isFirecamp = true;
       }
 

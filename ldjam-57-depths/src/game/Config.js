@@ -9,8 +9,18 @@ export default class Config {
 
   static Start = {
     Mana: 1000,
-    PlayerX: 760, // 1000, //605,
-    PlayerY: 5800, //1800, //500,
+
+    // start
+    // PlayerX: 605,
+    // PlayerY: 500,
+
+    // dungeon
+    PlayerX: 1000,
+    PlayerY: 1800,
+
+    //temp
+    // PlayerX: 605,
+    // PlayerY: 500,
   };
 
   static Tiles = {
@@ -28,7 +38,7 @@ export default class Config {
   };
 
   static Tools = {
-    MaxGarbageCountAtBag: 4,
+    MaxGarbageCountAtBag: 3,
     MaxMopDirt: 8,
     MaxBucketDirt: 20,
     FireballSpeed: 800,

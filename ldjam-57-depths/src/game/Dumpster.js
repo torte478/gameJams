@@ -99,7 +99,7 @@ export default class Dumpster {
 
     Here._.add.tween({
       targets: manaBall,
-      duration: Utils.getTweenDuration(me._sprite, target, 1000),
+      duration: Utils.getTweenDuration(me._sprite, target, 2000),
       x: target.x,
       y: target.y,
       onComplete: () => {
