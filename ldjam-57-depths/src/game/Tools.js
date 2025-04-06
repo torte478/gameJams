@@ -69,7 +69,7 @@ export default class Tools {
       .setDepth(Consts.Depth.UI);
 
     me._barManaText = Here._.add
-      .text(55, 48, "1", {
+      .text(55, 50, "1", {
         fontFamily: "Arial Black",
         fontSize: 32,
         color: "#fceaff",
@@ -77,7 +77,12 @@ export default class Tools {
       .setOrigin(0.5, 0.5)
       .setScrollFactor(0)
       .setDepth(Consts.Depth.UI);
+
     me.changeMana(Config.Start.Mana);
+
+    me._createIcon(130, 36, 0);
+    me._createIcon(200, 36, 1);
+    me._createIcon(270, 36, 2);
 
     me._fireballPool = Here._.physics.add.group({ collideWorldBounds: true });
 
@@ -189,6 +194,15 @@ export default class Tools {
     if (me.currentTool == Enums.Tools.FIREBALL) {
       return me._processFireballClick(pos, playerPos);
     }
+  }
+
+  _createIcon(x, y, frame) {
+    const me = this;
+
+    Here._.add
+      .image(x, y, "icons", frame)
+      .setScrollFactor(0)
+      .setDepth(Consts.Depth.UI);
   }
 
   _tryThrowCurrentItem() {
