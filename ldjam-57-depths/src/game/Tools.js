@@ -4,6 +4,7 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Garbage from "./Garbage.js";
+import Graphics from "./Graphics.js";
 import Lights from "./Ligths.js";
 import MyStaticTime from "./MyStaticTime.js";
 import Player from "./Player.js";
@@ -54,13 +55,17 @@ export default class Tools {
   /** @type {Phaser.GameObjects.Text} */
   _barManaText;
 
-  constructor(garbage, player, lights, map, mapLayer) {
+  /** @type {Graphics} */
+  _graphics;
+
+  constructor(garbage, player, lights, map, mapLayer, graphics) {
     const me = this;
 
     me._garbage = garbage;
     me._player = player;
     me._lights = lights;
     me._map = map;
+    me._graphics = graphics;
 
     Here._.add
       .image(0, 0, "bar")

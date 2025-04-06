@@ -16,6 +16,7 @@ export default class Consts {
     Spot: -50000,
     Garbage: -40000,
     Movable: -30000,
+    UpperPlayer: 500,
     Ligths: 1000,
     UI: 10000,
     Max: 100000,

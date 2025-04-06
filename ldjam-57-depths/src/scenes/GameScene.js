@@ -37,6 +37,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("dark", Consts.Unit.Normal);
     Utils.loadSpriteSheet("fire", Consts.Unit.Big);
     Utils.loadSpriteSheet("icons", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("spot_particles", 25);
 
     Utils.loadImage("bar");
 

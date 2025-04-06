@@ -14,6 +14,7 @@ import Trigger from "./Trigger.js";
 import BucketFactory from "./BucketFactory.js";
 import MyStaticTime from "./MyStaticTime.js";
 import Lights from "./Ligths.js";
+import Graphics from "./Graphics.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -47,14 +48,20 @@ export default class Game {
     const map = me._initMap();
     me._lights = new Lights(map);
 
-    me._garbage = new Garbage(me._player.toGameObject(), me._mapLayer);
+    me._graphics = new Graphics();
+    me._garbage = new Garbage(
+      me._player.toGameObject(),
+      me._mapLayer,
+      me._graphics
+    );
 
     me._tools = new Tools(
       me._garbage,
       me._player,
       me._lights,
       map,
-      me._mapLayer
+      me._mapLayer,
+      me._graphics
     );
 
     me._dumpsters.push(new Dumpster(me._garbage, me._tools));

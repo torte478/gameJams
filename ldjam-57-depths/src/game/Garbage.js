@@ -2,6 +2,7 @@ import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
+import Graphics from "./Graphics.js";
 import MyStaticTime from "./MyStaticTime.js";
 
 export default class Garbage {
@@ -28,10 +29,14 @@ export default class Garbage {
     { x: 1, y: 1 },
   ];
 
-  constructor(playerGameObj, layer) {
+  /** @type {Graphics} */
+  _graphics;
+
+  constructor(playerGameObj, layer, graphics) {
     const me = this;
 
     me._garbagePool = Here._.physics.add.staticGroup();
+    me._graphics = graphics;
 
     const bounce = 0.25;
     const drag = 500;
@@ -202,6 +207,8 @@ export default class Garbage {
 
   _createSpotInternal(x, y, frame, angle) {
     const me = this;
+
+    me._graphics.spotParticles(x, y);
 
     const spot = me._spotPool.create(x, y, "items", frame);
     spot.isSpot = true;
