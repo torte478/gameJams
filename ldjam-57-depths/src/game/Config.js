@@ -8,9 +8,9 @@ export default class Config {
   };
 
   static Start = {
-    Mana: 0,
-    PlayerX: 605,
-    PlayerY: 500,
+    Mana: 1000,
+    PlayerX: 760, // 1000, //605,
+    PlayerY: 5800, //1800, //500,
   };
 
   static Tiles = {
@@ -41,7 +41,7 @@ export default class Config {
 
   static Light = {
     MaxLight: 20,
-    MaxAlpha: 0.9,
+    MaxAlpha: 0.95,
     LitleFireballLight: 10,
     BigFireballLight: 20,
   };

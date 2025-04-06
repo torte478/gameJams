@@ -70,9 +70,6 @@ export default class Game {
       me._graphics
     );
 
-    // me._dumpsters.push(
-    //   new Dumpster(200, 600, me._garbage, me._tools, me._graphics));
-
     Here._.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     Here._.sound.pauseOnBlur = true;
 
@@ -102,22 +99,9 @@ export default class Game {
     const camera = Here._.cameras.main;
     camera
       .setBackgroundColor(0xe2f0f7)
-      // .setBackgroundColor(0x1d083c) // main color
       .startFollow(me._player.toGameObject())
       .setBounds(0, 0, map.widthInPixels, map.heightInPixels)
       .setRoundPixels(true);
-
-    // new Trigger(
-    //   me._player,
-    //   600,
-    //   600,
-    //   200,
-    //   100,
-    //   () => {
-    //     console.log("trigger");
-    //   },
-    //   me
-    // );
 
     // ----
 
@@ -125,24 +109,8 @@ export default class Game {
 
     // ----
 
-    // me._bucketFactories.push(new BucketFactory(200, 200, me._garbage));
-
-    // const tempCount = 10;
-    // const rect = new Phaser.Geom.Rectangle(700, 400, 600, 200);
-    // for (let i = 0; i < tempCount; ++i) {
-    //   const pos = Phaser.Geom.Rectangle.Random(rect);
-    //   me._garbage.createGarbage(pos.x, pos.y);
-    // }
-
-    // for (let i = 0; i < tempCount; ++i) {
-    //   const pos = Phaser.Geom.Rectangle.Random(rect);
-    //   me._garbage.createSpot(pos.x, pos.y, true);
-    // }
-
-    // me._garbage.createGarbageWall(700, 300);
-    // me._garbage.createGarbageWall(800, 300);
-
     me._createTutorial();
+    me._initDungeon();
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -235,7 +203,7 @@ export default class Game {
       for (let j = 0; j < 2; ++j)
         me._garbage.createGarbage(500 + j * 50, 1025 + i * 50);
 
-    me._createText(900, 1050, "Use a mop (2)\nto clean spots");
+    me._createText(900, 1050, "Use mop (2)\nto clean spots");
 
     for (let i = 0; i < 6; ++i)
       me._garbage.createSpot(1225, 1025 + i * 50, true);
@@ -302,5 +270,74 @@ export default class Game {
         fontFamily: "Arial Black",
       })
       .setDepth(Consts.Depth.Floor);
+  }
+
+  _initDungeon() {
+    const me = this;
+
+    // items
+
+    Here._.add.image(1000, 1575, "title").setDepth(Consts.Depth.Floor);
+    Here._.add.image(1000, 2000, "arch").setDepth(Consts.Depth.UpperPlayer);
+
+    me._dumpsters.push(
+      new Dumpster(800, 1800, me._garbage, me._tools, me._graphics),
+      new Dumpster(600, 5100, me._garbage, me._tools, me._graphics)
+    );
+
+    me._bucketFactories.push(
+      new BucketFactory(1200, 1800, me._garbage),
+      new BucketFactory(800, 5500, me._garbage)
+    );
+
+    me._createText(1700, 2900, "Burn the firewood\nfor dungeon light", true);
+
+    // wall
+
+    me._garbage.createGarbageWall(700, 2300);
+    me._garbage.createGarbageWall(700, 2400);
+
+    me._garbage.createGarbageWall(100, 2800);
+    me._garbage.createGarbageWall(200, 2800);
+
+    me._garbage.createGarbageWall(1400, 2800);
+    me._garbage.createGarbageWall(1400, 2900);
+
+    me._garbage.createGarbageWall(100, 5250);
+    me._garbage.createGarbageWall(200, 5250);
+    me._garbage.createGarbageWall(300, 5250);
+    me._garbage.createGarbageWall(400, 5250);
+
+    me._garbage.createGarbageWall(950, 5600);
+    me._garbage.createGarbageWall(950, 5700);
+    me._garbage.createGarbageWall(1050, 5600);
+    me._garbage.createGarbageWall(1050, 5700);
+    me._garbage.createGarbageWall(1150, 5600);
+    me._garbage.createGarbageWall(1150, 5700);
+
+    // garbage
+
+    me._addDungeonGarbage(1125, 2350, 1875, 2550, 20, 10);
+    me._addDungeonGarbage(1770, 2650, 1930, 3080, 20, 10);
+    me._addDungeonGarbage(160, 2300, 600, 2750, 20, 10);
+
+    me._addDungeonGarbage(140, 3300, 360, 4500, 20, 10);
+
+    me._addDungeonGarbage(140, 5450, 715, 5850, 40, 15);
+  }
+
+  _addDungeonGarbage(x, y, toX, toY, garbageCount, spotCount) {
+    const me = this;
+
+    const rect = new Phaser.Geom.Rectangle(x, y, toX - x, toY - y);
+    for (let i = 0; i < garbageCount; ++i) {
+      const pos = Phaser.Geom.Rectangle.Random(rect);
+      me._garbage.createGarbage(pos.x, pos.y);
+    }
+
+    for (let i = 0; i < spotCount; ++i) {
+      const pos = Phaser.Geom.Rectangle.Random(rect);
+      me._garbage.createSpot(pos.x, pos.y, true);
+    }
   }
 }

@@ -39,7 +39,7 @@ export default class Lights {
       me._tilemap.height
     );
 
-    const persistentLight = new Phaser.Geom.Rectangle(0, 0, 42, 40);
+    const persistentLight = new Phaser.Geom.Rectangle(0, 0, 42, 42);
     for (let i = 0; i < persistentLight.height; ++i)
       for (let j = 0; j < persistentLight.width; ++j)
         me._lightMatrix[i + persistentLight.y][j + persistentLight.x] =
@@ -47,7 +47,12 @@ export default class Lights {
 
     me.updateTiles(null);
 
-    // me.addLightSource(5, 10);
+    me.addLightSources([
+      { x: 18, y: 41 },
+      { x: 19, y: 41 },
+      { x: 20, y: 41 },
+      { x: 21, y: 41 },
+    ]);
   }
 
   recalculateLights() {
