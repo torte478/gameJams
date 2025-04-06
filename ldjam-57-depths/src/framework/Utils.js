@@ -460,4 +460,9 @@ export default class Utils {
 
     return result;
   }
+
+  static clearMatrix(arr, value) {
+    for (let i = 0; i < arr.length; ++i)
+      for (let j = 0; j < arr[i].length; ++j) arr[i][j] = value;
+  }
 }

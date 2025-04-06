@@ -45,14 +45,13 @@ export default class Game {
 
     me._player = new Player();
     const map = me._initMap();
+    me._lights = new Lights(map);
 
     me._garbage = new Garbage(me._player.toGameObject(), me._mapLayer);
 
-    me._tools = new Tools(me._garbage, me._player, me._mapLayer);
+    me._tools = new Tools(me._garbage, me._player, me._mapLayer, me._lights);
 
     me._dumpsters.push(new Dumpster(me._garbage, me._tools));
-
-    me._lights = new Lights(map);
 
     Here._.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
@@ -82,13 +81,14 @@ export default class Game {
 
     // ----
 
-    // const rect = new Phaser.Geom.Rectangle(600, 300, 600, 200);
-    // for (let i = 0; i < 20; ++i) {
+    // const tempCount = 10;
+    // const rect = new Phaser.Geom.Rectangle(550, 400, 600, 200);
+    // for (let i = 0; i < tempCount; ++i) {
     //   const pos = Phaser.Geom.Rectangle.Random(rect);
     //   me._garbage.createGarbage(pos.x, pos.y);
     // }
 
-    // for (let i = 0; i < 20; ++i) {
+    // for (let i = 0; i < tempCount; ++i) {
     //   const pos = Phaser.Geom.Rectangle.Random(rect);
     //   me._garbage.createSpot(pos.x, pos.y);
     // }

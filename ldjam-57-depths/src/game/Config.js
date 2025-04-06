@@ -8,7 +8,7 @@ export default class Config {
   };
 
   static Start = {
-    Mana: 100, //0
+    Mana: 4, //0
     PlayerX: 250,
     PlayerY: 400,
   };
@@ -36,5 +36,8 @@ export default class Config {
 
   static Light = {
     MaxLight: 20,
+    MaxAlpha: 0.9,
+    LitleFireballLight: 10,
+    BigFireballLight: 20,
   };
 }

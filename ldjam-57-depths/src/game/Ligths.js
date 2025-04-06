@@ -45,24 +45,32 @@ export default class Lights {
     //     me._lightMatrix[i + persistentLight.y][j + persistentLight.x] =
     //       Config.Light.MaxLight;
 
-    // me.recalculateLights();
+    me.updateTiles(null);
 
-    me.addLightSource(5, 10);
-    me.addLightSource(6, 10);
+    // me.addLightSource(5, 10);
   }
 
   recalculateLights() {
     const me = this;
 
     for (let i = 0; i < me._lightSources.length; ++i)
-      me._recalculateLightSource(me._lightSources[i]);
+      me._recalculateLightSource(
+        me._lightSources[i],
+        me._lightMatrix,
+        Config.Light.MaxLight
+      );
 
-    for (let i = 0; i < me._lightMatrix.length; ++i)
-      for (let j = 0; j < me._lightMatrix[i].length; ++j) {
-        const lightValue = me._lightMatrix[i][j] + me._secondLightMatrix[i][j];
-        const alpha = me._lightValueToAlpha(lightValue);
-        me._tilemap.getTileAt(j, i).setAlpha(alpha);
-      }
+    me.updateTiles(null);
+  }
+
+  updateTilesWithFireball(pos, lightPower) {
+    const me = this;
+
+    Utils.clearMatrix(me._secondLightMatrix, 0);
+    const tilePos = me._tilemap.worldToTileXY(pos.x, pos.y);
+    me._recalculateLightSource(tilePos, me._secondLightMatrix, lightPower);
+
+    me.updateTiles(me._secondLightMatrix);
   }
 
   addLightSource(x, y) {
@@ -72,15 +80,15 @@ export default class Lights {
     me.recalculateLights();
   }
 
-  _recalculateLightSource(source) {
+  _recalculateLightSource(source, matrix, startLight) {
     const me = this;
 
-    const queue = [{ x: source.x, y: source.y, light: Config.Light.MaxLight }];
+    const queue = [{ x: source.x, y: source.y, light: startLight }];
     for (let i = 0; i < queue.length; ++i) {
       const current = queue[i];
-      me._lightMatrix[current.y][current.x] = Math.max(
+      matrix[current.y][current.x] = Math.max(
         current.light,
-        me._lightMatrix[current.y][current.x]
+        matrix[current.y][current.x]
       );
 
       const nextLight = current.light - 1;
@@ -94,11 +102,7 @@ export default class Lights {
       );
       if (worldTile.index == 1) continue;
 
-      const neigbours = Utils.getNeighbours(
-        me._lightMatrix,
-        current.y,
-        current.x
-      );
+      const neigbours = Utils.getNeighbours(matrix, current.y, current.x);
 
       for (let j = 0; j < neigbours.length; ++j) {
         const next = neigbours[j];
@@ -106,6 +110,18 @@ export default class Lights {
           queue.push({ x: next.j, y: next.i, light: nextLight });
       }
     }
+  }
+
+  updateTiles(secondMatrix) {
+    const me = this;
+
+    for (let i = 0; i < me._lightMatrix.length; ++i)
+      for (let j = 0; j < me._lightMatrix[i].length; ++j) {
+        const lightValue =
+          me._lightMatrix[i][j] + (!!secondMatrix ? secondMatrix[i][j] : 0);
+        const alpha = me._lightValueToAlpha(lightValue);
+        me._tilemap.getTileAt(j, i).setAlpha(alpha);
+      }
   }
 
   _initTileMap(map) {
@@ -129,7 +145,8 @@ export default class Lights {
     const me = this;
 
     if (value >= Config.Light.MaxLight) return 0;
+    if (value <= 0) return Config.Light.MaxAlpha;
 
-    return 1 - value / Config.Light.MaxLight;
+    return Config.Light.MaxAlpha - value / Config.Light.MaxLight;
   }
 }

@@ -3,6 +3,7 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Enums from "./Enums.js";
 import Garbage from "./Garbage.js";
+import Lights from "./Ligths.js";
 import MyStaticTime from "./MyStaticTime.js";
 import Player from "./Player.js";
 
@@ -34,15 +35,22 @@ export default class Tools {
   /** @type {Number} */
   _currentBucketDirt = 0;
 
+  /** @type {Number} */
+  _fireballLight = 0;
+
+  /** @type {Lights} */
+  _lights;
+
   /**
    * @param {Garbage} garbage
    * @param {Player} player
    */
-  constructor(garbage, player, layer) {
+  constructor(garbage, player, layer, lights) {
     const me = this;
 
     me._garbage = garbage;
     me._player = player;
+    me._lights = lights;
 
     me._fireballPool = Here._.physics.add.group({ collideWorldBounds: true });
 
@@ -85,22 +93,39 @@ export default class Tools {
   update() {
     const me = this;
 
+    me._fireballPosition = me._player.toMousePos();
+
     let input = -1;
     if (Here.Controls.isPressedOnce(Enums.Keyboard.HAND_TOOL)) {
       input = Enums.Tools.HAND;
       me._player._hand.stop();
       me._player._hand.setFrame(0);
+      me._fireballLight = 0;
+      me._lights.updateTiles(null);
     } else if (Here.Controls.isPressedOnce(Enums.Keyboard.MOP_TOOL)) {
       me._player._hand.stop();
       input = Enums.Tools.MOP;
       me._player._hand.setFrame(me._mopDirt >= Config.Tools.MaxMopDirt ? 7 : 4);
       me._tryThrowCurrentItem();
+      me._fireballLight = 0;
+      me._lights.updateTiles(null);
     } else if (Here.Controls.isPressedOnce(Enums.Keyboard.FIREBALL_TOOL)) {
       me._player._hand.stop();
       input = Enums.Tools.FIREBALL;
-      me._player._hand.setFrame(10);
+      const isBigFireball = me._mana >= Config.Tools.FireballCost;
+      me._player._hand.setFrame(isBigFireball ? 11 : 10);
       me._tryThrowCurrentItem();
+      me._fireballLight = isBigFireball
+        ? Config.Light.BigFireballLight
+        : Config.Light.LitleFireballLight;
     }
+
+    if (me._fireballLight > 0)
+      me._lights.updateTilesWithFireball(
+        me._player.toMousePos(),
+        me._fireballLight
+      );
+
     if (input === -1) return;
 
     me.currentTool = input;
@@ -177,6 +202,11 @@ export default class Tools {
     fireball.setVelocity(velocity.x, velocity.y);
 
     me._mana = Math.max(0, me._mana - Config.Tools.FireballCost);
+
+    if (me._mana < Config.Tools.FireballCost) {
+      me._player._hand.setFrame(10);
+      me._fireballLight = Config.Light.LitleFireballLight;
+    }
   }
 
   _processHandClick(pos) {
@@ -281,6 +311,8 @@ export default class Tools {
         bucket.setFrame(2);
         bucket.nextSpot = MyStaticTime.time + Config.Player.SpotCreatePeriodSec;
       }
+    } else {
+      me._garbage.createSpot(bucket.x, bucket.y);
     }
   }
 
