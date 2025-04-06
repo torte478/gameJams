@@ -146,7 +146,7 @@ export default class Tools {
   update() {
     const me = this;
 
-    me._fireballPosition = me._player.toMousePos();
+    const playerCursorPos = me._player.toMousePos();
 
     let input = -1;
     if (Here.Controls.isPressedOnce(Enums.Keyboard.HAND_TOOL)) {
@@ -154,6 +154,7 @@ export default class Tools {
       me._player._hand.stop();
       me._player._hand.setFrame(0);
       me._fireballLight = 0;
+      me._graphics._fireEmitter.stop();
       me._lights.updateTiles(null);
     } else if (Here.Controls.isPressedOnce(Enums.Keyboard.MOP_TOOL)) {
       me._player._hand.stop();
@@ -161,6 +162,7 @@ export default class Tools {
       me._player._hand.setFrame(me._mopDirt >= Config.Tools.MaxMopDirt ? 7 : 4);
       me._tryThrowCurrentItem();
       me._fireballLight = 0;
+      me._graphics._fireEmitter.stop();
       me._lights.updateTiles(null);
     } else if (Here.Controls.isPressedOnce(Enums.Keyboard.FIREBALL_TOOL)) {
       me._player._hand.stop();
@@ -171,15 +173,29 @@ export default class Tools {
       me._fireballLight = isBigFireball
         ? Config.Light.BigFireballLight
         : Config.Light.LitleFireballLight;
+      if (isBigFireball) me._graphics._fireEmitter.start();
+      else me._graphics._fireEmitter.stop();
     }
 
-    if (me._fireballLight > 0 || !!me._flyingFireball)
+    if (me._fireballLight > 0 || !!me._flyingFireball) {
       me._lights.updateTilesWithFireball(
         me._player.toMousePos(),
         me._fireballLight,
         me._flyingFireball,
         Config.Light.BigFireballLight
       );
+
+      if (!!me._flyingFireball)
+        me._graphics._fireEmitter.setPosition(
+          me._flyingFireball.x,
+          me._flyingFireball.y
+        );
+      else
+        me._graphics._fireEmitter.setPosition(
+          playerCursorPos.x,
+          playerCursorPos.y
+        );
+    }
 
     if (input === -1) return;
 
@@ -264,6 +280,7 @@ export default class Tools {
     if (me._mana < Config.Tools.FireballCost) {
       me._player._hand.setFrame(10);
       me._fireballLight = Config.Light.LitleFireballLight;
+      me._graphics._fireEmitter.stop();
     }
 
     me._flyingFireball = fireball;
@@ -436,6 +453,8 @@ export default class Tools {
 
   _fireballExplosion(fireball) {
     const me = this;
+
+    me._graphics.explosion(fireball.x, fireball.y);
 
     fireball.destroy();
     me._flyingFireball = null;
