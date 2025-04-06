@@ -87,26 +87,26 @@ export default class Game {
 
     // ----
 
+    me._bucketFactories.push(new BucketFactory(200, 200, me._garbage));
+
     const tempCount = 10;
-    const rect = new Phaser.Geom.Rectangle(550, 400, 600, 200);
+    const rect = new Phaser.Geom.Rectangle(350, 350, 600, 200);
     for (let i = 0; i < tempCount; ++i) {
       const pos = Phaser.Geom.Rectangle.Random(rect);
       me._garbage.createGarbage(pos.x, pos.y);
     }
 
-    for (let i = 0; i < tempCount; ++i) {
-      const pos = Phaser.Geom.Rectangle.Random(rect);
-      me._garbage.createSpot(pos.x, pos.y);
-    }
+    // for (let i = 0; i < tempCount; ++i) {
+    //   const pos = Phaser.Geom.Rectangle.Random(rect);
+    //   me._garbage.createSpot(pos.x, pos.y);
+    // }
 
-    me._bucketFactories.push(new BucketFactory(200, 200, me._garbage));
-
-    me._garbage.createGarbageWall(500, 300);
-    me._garbage.createGarbageWall(600, 300);
+    // me._garbage.createGarbageWall(500, 300);
+    // me._garbage.createGarbageWall(600, 300);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
-        .text(10, 10, "", { fontSize: 18, backgroundColor: "#000" })
+        .text(10, 700, "", { fontSize: 18, backgroundColor: "#000" })
         .setScrollFactor(0)
         .setDepth(Consts.Depth.Max);
     });

@@ -28,7 +28,7 @@ export default class Tools {
   _fireballPool;
 
   /** @type {Number} */
-  _mana = Config.Start.Mana;
+  _mana = 0;
 
   /** @type {Player} */
   _player;
@@ -51,6 +51,9 @@ export default class Tools {
   /** @type {Phaser.Physics.Arcade.StaticGroup} */
   _campfirePool;
 
+  /** @type {Phaser.GameObjects.Text} */
+  _barManaText;
+
   constructor(garbage, player, lights, map, mapLayer) {
     const me = this;
 
@@ -58,6 +61,23 @@ export default class Tools {
     me._player = player;
     me._lights = lights;
     me._map = map;
+
+    Here._.add
+      .image(0, 0, "bar")
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setDepth(Consts.Depth.UI);
+
+    me._barManaText = Here._.add
+      .text(55, 48, "1", {
+        fontFamily: "Arial Black",
+        fontSize: 32,
+        color: "#fceaff",
+      })
+      .setOrigin(0.5, 0.5)
+      .setScrollFactor(0)
+      .setDepth(Consts.Depth.UI);
+    me.changeMana(Config.Start.Mana);
 
     me._fireballPool = Here._.physics.add.group({ collideWorldBounds: true });
 
@@ -171,12 +191,6 @@ export default class Tools {
     }
   }
 
-  increaseMana(change) {
-    const me = this;
-
-    me._mana = Math.min(Config.Tools.MaxMana, me._mana + change);
-  }
-
   _tryThrowCurrentItem() {
     const me = this;
 
@@ -226,7 +240,7 @@ export default class Tools {
     fireball.body.onWorldBounds = true;
     fireball.setVelocity(velocity.x, velocity.y);
 
-    me._mana = Math.max(0, me._mana - Config.Tools.FireballCost);
+    me.changeMana(-Config.Tools.FireballCost);
 
     if (me._mana < Config.Tools.FireballCost) {
       me._player._hand.setFrame(10);
@@ -237,6 +251,13 @@ export default class Tools {
     if (me._destroyAllThatFireballHits(fireball)) {
       me._fireballExplosion(fireball);
     }
+  }
+
+  changeMana(change) {
+    const me = this;
+
+    me._mana = Math.max(0, me._mana + change);
+    me._barManaText.setText(me._mana);
   }
 
   _processHandClick(pos) {

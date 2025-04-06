@@ -60,7 +60,7 @@ export default class Dumpster {
 
     if (!!movable.isBag) {
       me._garbage.removeBag(movable);
-      me._tools.increaseMana(Config.Tools.UtilizeBagCost);
+      me._tools.changeMana(Config.Tools.UtilizeBagCost);
       return;
     }
 
