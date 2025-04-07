@@ -102,6 +102,7 @@ export default class Garbage {
     const me = this;
 
     wall.destroy();
+    MyStaticTime.walls += 1;
 
     const rect = new Phaser.Geom.Rectangle(
       wall.x,
@@ -118,24 +119,28 @@ export default class Garbage {
   removeGarbage(obj) {
     const me = this;
 
+    MyStaticTime.garbage += 1;
     obj.destroy();
   }
 
   removeSpot(spot) {
     const me = this;
 
+    MyStaticTime.spots += 1;
     spot.destroy();
   }
 
   removeBag(bag) {
     const me = this;
 
+    MyStaticTime.bags += 1;
     bag.destroy();
   }
 
   removeBucket(bucket) {
     const me = this;
 
+    if (bucket.frame.name == 2) MyStaticTime.buckets += 1;
     bucket.destroy();
   }
 
@@ -210,6 +215,7 @@ export default class Garbage {
   _createSpotInternal(x, y, frame, angle) {
     const me = this;
 
+    /** @type {Phaser.GameObjects.ima} */
     const spot = me._spotPool.create(x, y, "items", frame);
     spot.isSpot = true;
     spot.setDepth(Consts.Depth.Spot).setAngle(angle);

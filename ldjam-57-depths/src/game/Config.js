@@ -1,6 +1,6 @@
 export default class Config {
   static Debug = {
-    Global: true,
+    Global: false,
     Log: true,
     ShowSceneLog: true,
     PlaySound: true,
@@ -11,12 +11,12 @@ export default class Config {
     Mana: 0,
 
     // start
-    // PlayerX: 605,
-    // PlayerY: 500,
+    PlayerX: 605,
+    PlayerY: 500,
 
     // dungeon
-    PlayerX: 1000,
-    PlayerY: 1800,
+    // PlayerX: 1000,
+    // PlayerY: 1800,
 
     //temp
     // PlayerX: 1700,
@@ -63,7 +63,7 @@ export default class Config {
     MainMaxDetune: 0,
     AmbientMinVolume: 0,
     AmbientMaxVolume: 0.75,
-    StartHeight: 2100,
+    StartHeight: 3000,
     StopHeight: 5300,
   };
 }

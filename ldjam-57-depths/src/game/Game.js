@@ -253,7 +253,7 @@ export default class Game {
   _createText(x, y, text, small) {
     const me = this;
 
-    Here._.add
+    return Here._.add
       .text(x, y, text, {
         color: "#428aa7",
         fontSize: !!small ? 24 : 36,
@@ -284,36 +284,36 @@ export default class Game {
 
     // wall
 
-    // me._garbage.createGarbageWall(700, 2300);
-    // me._garbage.createGarbageWall(700, 2400);
+    me._garbage.createGarbageWall(700, 2300);
+    me._garbage.createGarbageWall(700, 2400);
 
-    // me._garbage.createGarbageWall(100, 2800);
-    // me._garbage.createGarbageWall(200, 2800);
+    me._garbage.createGarbageWall(100, 2800);
+    me._garbage.createGarbageWall(200, 2800);
 
-    // me._garbage.createGarbageWall(1400, 2800);
-    // me._garbage.createGarbageWall(1400, 2900);
+    me._garbage.createGarbageWall(1400, 2800);
+    me._garbage.createGarbageWall(1400, 2900);
 
-    // me._garbage.createGarbageWall(100, 5250);
-    // me._garbage.createGarbageWall(200, 5250);
-    // me._garbage.createGarbageWall(300, 5250);
-    // me._garbage.createGarbageWall(400, 5250);
+    me._garbage.createGarbageWall(100, 5250);
+    me._garbage.createGarbageWall(200, 5250);
+    me._garbage.createGarbageWall(300, 5250);
+    me._garbage.createGarbageWall(400, 5250);
 
-    // me._garbage.createGarbageWall(950, 5600);
-    // me._garbage.createGarbageWall(950, 5700);
-    // me._garbage.createGarbageWall(1050, 5600);
-    // me._garbage.createGarbageWall(1050, 5700);
-    // me._garbage.createGarbageWall(1150, 5600);
-    // me._garbage.createGarbageWall(1150, 5700);
+    me._garbage.createGarbageWall(950, 5600);
+    me._garbage.createGarbageWall(950, 5700);
+    me._garbage.createGarbageWall(1050, 5600);
+    me._garbage.createGarbageWall(1050, 5700);
+    me._garbage.createGarbageWall(1150, 5600);
+    me._garbage.createGarbageWall(1150, 5700);
 
     // // garbage
 
     me._addDungeonGarbage(1125, 2350, 1875, 2550, 20, 10);
-    // me._addDungeonGarbage(1770, 2650, 1930, 3080, 20, 10);
-    // me._addDungeonGarbage(160, 2300, 600, 2750, 20, 10);
+    me._addDungeonGarbage(1770, 2650, 1930, 3080, 20, 10);
+    me._addDungeonGarbage(160, 2300, 600, 2750, 20, 10);
 
-    // me._addDungeonGarbage(140, 3300, 360, 4500, 20, 10);
+    me._addDungeonGarbage(140, 3300, 360, 4500, 20, 10);
 
-    // me._addDungeonGarbage(140, 5450, 715, 5850, 40, 15);
+    me._addDungeonGarbage(140, 5450, 715, 5850, 40, 15);
 
     // humpscare
     me._garbage.createStep(1800, 3600, 90, true);
@@ -409,15 +409,61 @@ export default class Game {
     Utils.debugLog("game over");
     MyStaticTime.isGameOver = true;
 
+    const depth = Consts.Depth.UI + 1000;
     Here._.add
       .image(0, 0, "gameOver")
       .setOrigin(0, 0)
-      .setDepth(Consts.Depth.UI + 1000)
+      .setDepth(depth - 1)
       .setScrollFactor(0);
 
     me._themeSound
       .setVolume(Config.Sound.MainMaxVolume)
       .setDetune(Config.Sound.MainMaxDetune);
     me._ambientSound.stop();
+
+    const textConfig = {
+      color: "#428aa7",
+      fontSize: 36,
+      fontFamily: "Arial Black",
+    };
+
+    const min = Math.floor(MyStaticTime.time / 60);
+    const sec = Math.floor(MyStaticTime.time % 60);
+    const secStr = sec < 10 ? "0" + sec : sec;
+
+    Here._.add
+      .text(400, 380, `Time: ${min}:${secStr}`, textConfig)
+      .setDepth(depth)
+      .setScrollFactor(0)
+      .setOrigin(0, 0);
+
+    const movable = me._garbage._movablePool.getChildren();
+    const remainedText =
+      `garbage: ${me._garbage._garbagePool.getLength()}\n` +
+      `spots: ${me._garbage._spotPool.getLength()}\n` +
+      `walls: ${me._garbage._wallPool.getLength()}\n` +
+      `bags: ${movable.filter((m) => !!m.isBag).length}\n` +
+      `buckets: ${
+        movable.filter((m) => !!m.isBucket && m.frame.name == 2).length
+      }`;
+
+    Here._.add
+      .text(650, 500, remainedText, textConfig)
+      .setDepth(depth)
+      .setScrollFactor(0)
+      .setOrigin(0, 0);
+
+    const cleanedText =
+      `garbage: ${MyStaticTime.garbage}\n` +
+      `spots: ${MyStaticTime.spots}\n` +
+      `walls: ${MyStaticTime.walls}\n` +
+      `bags: ${MyStaticTime.bags}\n` +
+      `buckets: ${MyStaticTime.buckets}`;
+
+    Here._.add
+      .text(110, 500, cleanedText, textConfig)
+      .setDepth(depth)
+      .setScrollFactor(0)
+      .setOrigin(0, 0);
   }
 }
