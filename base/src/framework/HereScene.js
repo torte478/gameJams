@@ -1,25 +1,22 @@
-import Phaser from '../lib/phaser.js';
-
-import Here from './Here.js';
+import Here from "./Here.js";
 
 export default class HereScene extends Phaser.Scene {
+  /**
+   * @param {String} sceneName
+   */
+  constructor(sceneName) {
+    super(sceneName);
+  }
 
-    /**
-     * @param {String} sceneName
-     */
-    constructor(sceneName) {
-        super(sceneName);
-    }
+  preload() {
+    const me = this;
 
-    preload() {
-        const me = this;
+    Here.init(me);
+  }
 
-        Here.init(me);
-    }
+  update() {
+    const me = this;
 
-    update() {
-        const me = this;
-
-        Here.Controls.update();
-    }
+    Here.Controls.update();
+  }
 }
