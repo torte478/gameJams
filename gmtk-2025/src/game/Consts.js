@@ -21,4 +21,7 @@ export default class Consts {
     CellSize: 50,
     SampleCount: 4,
   };
+
+  static Tempo = 90;
+  static BitPerMs = (Consts.Tempo / 60 / 1000) * 4;
 }

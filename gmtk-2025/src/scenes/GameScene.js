@@ -44,11 +44,11 @@ export default class GameScene extends HereScene {
     me._game = new Game();
   }
 
-  update() {
+  update(time, delta) {
     super.update();
 
     const me = this;
 
-    me._game.update();
+    me._game.update(time, delta);
   }
 }

@@ -14,9 +14,9 @@ export default class HereScene extends Phaser.Scene {
     Here.init(me);
   }
 
-  update() {
+  update(time, delta) {
     const me = this;
 
-    Here.Controls.update();
+    Here.Controls.update(); // TODO: to template
   }
 }

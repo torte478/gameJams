@@ -43,7 +43,7 @@ export default class Game {
     });
   }
 
-  update() {
+  update(time, delta) {
     const me = this;
 
     if (
@@ -52,10 +52,15 @@ export default class Game {
     )
       Here._.scene.restart({ isRestart: true });
 
+    me._drumMachine.update(time);
+
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
 
-      let text = `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n`;
+      let text =
+        `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
+        `tme: ${(time / 1000) | 0} s.\n` +
+        `bit: ${me._drumMachine._currentBit}`;
 
       me._log.setText(text);
     });

@@ -1,7 +1,7 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
-import Config from "./Config.js";
 import Consts from "./Consts.js";
+import Enums from "./Enums.js";
 
 export default class DrumMachine {
   /** @type {Phaser.Cameras.Scene2D.Camera} */
@@ -17,6 +17,8 @@ export default class DrumMachine {
   _indicator;
 
   _loopLength = 16; // TODO ?
+
+  _currentBit = 0;
 
   constructor() {
     const me = this;
@@ -35,6 +37,12 @@ export default class DrumMachine {
     );
 
     me._moveIndicatorToBit(0);
+
+    me._loop = [];
+    for (let i = 0; i < Consts.DrumMachine.SampleCount; ++i) {
+      const line = Utils.buildArray(me._loopLength, false);
+      me._loop.push(line);
+    }
 
     me._graphics = Here._.add.graphics();
     me._graphics.lineStyle(2, "#000000", 1);
@@ -55,8 +63,25 @@ export default class DrumMachine {
     }
   }
 
-  update(time) {
+  update(timeMs) {
     const me = this;
+
+    const bit = Math.floor(timeMs * Consts.BitPerMs) % me._loopLength;
+    if (bit != me._currentBit) {
+      me._currentBit = bit;
+      me._moveIndicatorToBit(bit);
+
+      if (me._currentBit % 2 === 0) {
+        Here.Audio.play("closed_hihat");
+      }
+
+      for (let i = 0; i < Consts.DrumMachine.SampleCount; ++i) {
+        if (me._loop[i][bit]) {
+          const sample = me._getSampleName(i);
+          Here.Audio.play(sample);
+        }
+      }
+    }
   }
 
   onPointerDown(x, y) {
@@ -69,7 +94,6 @@ export default class DrumMachine {
       (x - Consts.DrumMachine.StartPosX) / Consts.DrumMachine.CellSize
     );
 
-    // TODO
     if (
       i < 0 ||
       i >= Consts.DrumMachine.SampleCount ||
@@ -79,13 +103,54 @@ export default class DrumMachine {
       return;
 
     const pos = me._cellToWorldPos(i, j);
-    me._graphics.fillStyle(0xff0000, 1);
-    me._graphics.fillRect(
-      pos.x,
-      pos.y,
-      Consts.DrumMachine.CellSize,
-      Consts.DrumMachine.CellSize
-    );
+
+    if (me._loop[i][j]) {
+      // clear bit
+      me._loop[i][j] = false;
+
+      me._graphics.fillStyle(0x84a591, 1);
+      me._graphics.fillRect(
+        pos.x,
+        pos.y,
+        Consts.DrumMachine.CellSize,
+        Consts.DrumMachine.CellSize
+      );
+
+      me._graphics.lineStyle(2, "#000000", 1);
+      me._graphics.strokeRect(
+        pos.x,
+        pos.y,
+        Consts.DrumMachine.CellSize,
+        Consts.DrumMachine.CellSize
+      );
+    } else {
+      // fill bit
+      me._loop[i][j] = true;
+
+      me._graphics.fillStyle(0xff0000, 1);
+      me._graphics.fillRect(
+        pos.x,
+        pos.y,
+        Consts.DrumMachine.CellSize,
+        Consts.DrumMachine.CellSize
+      );
+    }
+  }
+
+  _getSampleName(index) {
+    const me = this;
+    switch (index) {
+      case Enums.Samples.CRASH:
+        return "crash";
+      case Enums.Samples.KICK:
+        return "kick";
+      case Enums.Samples.TOM:
+        return "rack_tom";
+      case Enums.Samples.SNARE:
+        return "snare";
+      default:
+        throw index;
+    }
   }
 
   _moveIndicatorToBit(index) {
