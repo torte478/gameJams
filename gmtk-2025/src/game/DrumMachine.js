@@ -17,12 +17,14 @@ export default class DrumMachine {
   /** @type {Phaser.GameObjects.Image} */
   _indicator;
 
-  _loopLength = 8; // TODO ?
-
+  /** @type {Number} */
   _currentBit = 0;
 
   /** @type {Number[]} */
   _resultBuffer;
+
+  /** @type {Number} */
+  loopLength = 8; // TODO ?
 
   constructor() {
     const me = this;
@@ -46,7 +48,7 @@ export default class DrumMachine {
 
     me._loop = [];
     for (let i = 0; i < Consts.DrumMachine.SampleCount; ++i) {
-      const line = Utils.buildArray(me._loopLength, false);
+      const line = Utils.buildArray(me.loopLength, false);
       me._loop.push(line);
     }
 
@@ -62,7 +64,7 @@ export default class DrumMachine {
         me._getSampleText(i)
       );
 
-      for (let j = 0; j < me._loopLength; ++j) {
+      for (let j = 0; j < me.loopLength; ++j) {
         const posX =
           Consts.DrumMachine.StartPosX + j * Consts.DrumMachine.CellSize;
         me._graphics.strokeRect(
@@ -75,20 +77,15 @@ export default class DrumMachine {
     }
   }
 
-  update(overallBit, isWindowActive) {
+  update(bit, isWindowActive) {
     const me = this;
 
-    const bit = overallBit % me._loopLength;
     if (bit == me._currentBit) return null;
 
     me._currentBit = bit;
     me._moveIndicatorToBit(bit);
 
-    if (
-      !Utils.isDebug(Config.Debug.DisableHihats) &&
-      me._currentBit % 2 === 0 &&
-      isWindowActive
-    ) {
+    if (!Utils.isDebug(Config.Debug.DisableHihats) && isWindowActive) {
       Here.Audio.play("closed_hihat");
     }
 
@@ -119,7 +116,7 @@ export default class DrumMachine {
       i < 0 ||
       i >= Consts.DrumMachine.SampleCount ||
       j < 0 ||
-      j >= me._loopLength
+      j >= me.loopLength
     )
       return;
 

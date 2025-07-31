@@ -14,13 +14,7 @@ export default class LevelComponent {
   /** @type {Phaser.Tilemaps.TilemapLayer} */
   _tilemapLayer;
 
-  /** @type {Boolean} */
-  _isPlayerJumping;
-
-  /** @type {Number} */
-  _playerFallBit;
-
-  _playerGravityForce = -1;
+  _isReset = false;
 
   constructor() {
     const me = this;
@@ -38,17 +32,17 @@ export default class LevelComponent {
       Consts.Unit.Normal
     );
 
-    me._playerTilePos = { x: 2, y: 6 };
     me._player = new Player();
-    const pos = me._getTileCenter(me._playerTilePos.x, me._playerTilePos.y);
-    me._player.toGameObject().setPosition(pos.x, pos.y);
 
-    me._isPlayerJumping = false;
-    me._playerFallBit = 0;
+    me.reset();
   }
 
-  applyBitChange(commands) {
+  applyBitChange(commands, currentBit) {
     const me = this;
+
+    if (me._isReset && currentBit != 0) return;
+
+    me._isReset = false;
 
     if (Utils.all(commands, (c) => !c)) return me._player.toIdle();
 
@@ -59,6 +53,17 @@ export default class LevelComponent {
     if (commands[Enums.SampleCommands.SHIELD]) return me._player.toShield();
 
     if (commands[Enums.SampleCommands.ATTACK]) return me._player.toAttack();
+  }
+
+  reset() {
+    const me = this;
+
+    me._isReset = true;
+
+    me._playerTilePos = { x: 2, y: 6 };
+    const pos = me._getTileCenter(me._playerTilePos.x, me._playerTilePos.y);
+    me._player.toGameObject().setPosition(pos.x, pos.y);
+    me._player.toIdle();
   }
 
   _applyWalkCommand() {
@@ -75,6 +80,7 @@ export default class LevelComponent {
     // TODO: solid tiles
     if (!forwardTile || forwardTile.index === 1) return;
 
+    me._player.toIdle();
     me._playerTilePos = forwardTilePos;
     const pos = me._getTileCenter(me._playerTilePos.x, me._playerTilePos.y);
     me._player.toGameObject().setPosition(pos.x, pos.y);

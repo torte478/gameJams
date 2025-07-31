@@ -34,10 +34,21 @@ export default class Game {
     me._drumMachine = new DrumMachine();
     me._levelComponent = new LevelComponent();
 
+    const sceneCameraBounds = new Phaser.Geom.Rectangle(
+      sceneCamera.scrollX,
+      sceneCamera.scrollY,
+      sceneCamera.width,
+      sceneCamera.height
+    );
+
     Here._.input.on(
       "pointerdown",
-      (pointer) =>
-        me._drumMachine.onPointerDown(pointer.worldX, pointer.worldY),
+      (pointer) => {
+        const pos = Utils.buildPoint(pointer.worldX, pointer.worldY);
+        if (Phaser.Geom.Rectangle.ContainsPoint(sceneCameraBounds, pos))
+          me._levelComponent.reset();
+        else me._drumMachine.onPointerDown(pos.x, pos.y);
+      },
       me
     );
 
@@ -69,10 +80,11 @@ export default class Game {
     )
       Here._.scene.restart({ isRestart: true });
 
-    const currentBit = Math.floor(time * Consts.BitPerMs);
+    const overallBit = Math.floor(time * Consts.BitPerMs);
+    const currentBit = overallBit % me._drumMachine.loopLength;
 
     const samples = me._drumMachine.update(currentBit, me._isWindowActive);
-    if (!!samples) me._levelComponent.applyBitChange(samples);
+    if (!!samples) me._levelComponent.applyBitChange(samples, currentBit);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
