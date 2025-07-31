@@ -17,4 +17,11 @@ export default class Enums {
     SNARE: 2,
     KICK: 3,
   };
+
+  static SampleCommands = {
+    HIT: 0,
+    TURN: 1,
+    JUMP: 2,
+    WALK: 3,
+  };
 }

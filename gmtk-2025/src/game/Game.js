@@ -17,6 +17,9 @@ export default class Game {
   /** @type {LevelComponent} */
   _levelComponent;
 
+  /** @type {Boolean} */
+  _isWindowActive;
+
   constructor() {
     const me = this;
 
@@ -38,6 +41,15 @@ export default class Game {
       me
     );
 
+    me._isWindowActive = false;
+    window.addEventListener("focus", () => {
+      me._isWindowActive = true;
+    });
+
+    window.addEventListener("blur", () => {
+      me._isWindowActive = false;
+    });
+
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
         .text(10, 10, "", { fontSize: 18, backgroundColor: "#000" })
@@ -57,7 +69,8 @@ export default class Game {
     )
       Here._.scene.restart({ isRestart: true });
 
-    me._drumMachine.update(time);
+    const samples = me._drumMachine.update(time, me._isWindowActive);
+    if (!!samples) me._levelComponent.applySamples(samples);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
@@ -65,7 +78,8 @@ export default class Game {
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `tme: ${(time / 1000) | 0} s.\n` +
-        `bit: ${me._drumMachine._currentBit}`;
+        `bit: ${me._drumMachine._currentBit}\n` +
+        `act: ${this._isWindowActive}`;
 
       me._log.setText(text);
     });

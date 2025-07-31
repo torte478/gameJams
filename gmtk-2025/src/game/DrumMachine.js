@@ -49,14 +49,20 @@ export default class DrumMachine {
     me._graphics.lineStyle(2, "#000000", 1);
 
     for (let i = 0; i < Consts.DrumMachine.SampleCount; ++i) {
+      const posY =
+        Consts.DrumMachine.StartPosY + i * Consts.DrumMachine.CellSize;
+      const text = Here._.add.text(
+        Consts.DrumMachine.StartPosX - 50,
+        posY,
+        me._getSampleText(i)
+      );
+
       for (let j = 0; j < me._loopLength; ++j) {
-        const pos = {
-          x: Consts.DrumMachine.StartPosX + j * Consts.DrumMachine.CellSize,
-          y: Consts.DrumMachine.StartPosY + i * Consts.DrumMachine.CellSize,
-        };
+        const posX =
+          Consts.DrumMachine.StartPosX + j * Consts.DrumMachine.CellSize;
         me._graphics.strokeRect(
-          pos.x,
-          pos.y,
+          posX,
+          posY,
           Consts.DrumMachine.CellSize,
           Consts.DrumMachine.CellSize
         );
@@ -64,28 +70,34 @@ export default class DrumMachine {
     }
   }
 
-  update(timeMs) {
+  update(timeMs, isWindowActive) {
     const me = this;
 
     const bit = Math.floor(timeMs * Consts.BitPerMs) % me._loopLength;
-    if (bit != me._currentBit) {
-      me._currentBit = bit;
-      me._moveIndicatorToBit(bit);
+    if (bit == me._currentBit) return null;
 
-      if (
-        !Utils.isDebug(Config.Debug.DisableHihats) &&
-        me._currentBit % 2 === 0
-      ) {
-        Here.Audio.play("closed_hihat");
-      }
+    me._currentBit = bit;
+    me._moveIndicatorToBit(bit);
 
-      for (let i = 0; i < Consts.DrumMachine.SampleCount; ++i) {
-        if (me._loop[i][bit]) {
-          const sample = me._getSampleName(i);
-          Here.Audio.play(sample);
-        }
+    if (
+      !Utils.isDebug(Config.Debug.DisableHihats) &&
+      me._currentBit % 2 === 0 &&
+      isWindowActive
+    ) {
+      Here.Audio.play("closed_hihat");
+    }
+
+    const res = [];
+    for (let i = 0; i < Consts.DrumMachine.SampleCount; ++i) {
+      if (me._loop[i][bit]) {
+        const sample = me._getSampleAudioName(i);
+        res.push(i);
+
+        if (isWindowActive) Here.Audio.play(sample);
       }
     }
+
+    return res;
   }
 
   onPointerDown(x, y) {
@@ -141,7 +153,7 @@ export default class DrumMachine {
     }
   }
 
-  _getSampleName(index) {
+  _getSampleAudioName(index) {
     const me = this;
     switch (index) {
       case Enums.Samples.CRASH:
@@ -152,6 +164,22 @@ export default class DrumMachine {
         return "rack_tom";
       case Enums.Samples.SNARE:
         return "snare";
+      default:
+        throw index;
+    }
+  }
+
+  _getSampleText(index) {
+    const me = this;
+    switch (index) {
+      case Enums.Samples.CRASH:
+        return "hit";
+      case Enums.Samples.KICK:
+        return "walk";
+      case Enums.Samples.TOM:
+        return "turn";
+      case Enums.Samples.SNARE:
+        return "jump";
       default:
         throw index;
     }

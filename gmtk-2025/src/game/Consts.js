@@ -16,7 +16,7 @@ export default class Consts {
 
   static DrumMachine = {
     ViewHeight: 300,
-    StartPosX: -940,
+    StartPosX: -850,
     StartPosY: 40,
     CellSize: 50,
     SampleCount: 4,
