@@ -41,7 +41,7 @@ export default class Game {
       me
     );
 
-    me._isWindowActive = false;
+    me._isWindowActive = true;
     window.addEventListener("focus", () => {
       me._isWindowActive = true;
     });
@@ -69,8 +69,10 @@ export default class Game {
     )
       Here._.scene.restart({ isRestart: true });
 
-    const samples = me._drumMachine.update(time, me._isWindowActive);
-    if (!!samples) me._levelComponent.applySamples(samples);
+    const currentBit = Math.floor(time * Consts.BitPerMs);
+
+    const samples = me._drumMachine.update(currentBit, me._isWindowActive);
+    if (!!samples) me._levelComponent.applyBitChange(samples);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;

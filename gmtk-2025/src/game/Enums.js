@@ -19,9 +19,9 @@ export default class Enums {
   };
 
   static SampleCommands = {
-    HIT: 0,
+    ATTACK: 0,
     TURN: 1,
-    JUMP: 2,
+    SHIELD: 2,
     WALK: 3,
   };
 }

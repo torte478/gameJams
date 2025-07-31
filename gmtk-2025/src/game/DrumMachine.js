@@ -17,9 +17,12 @@ export default class DrumMachine {
   /** @type {Phaser.GameObjects.Image} */
   _indicator;
 
-  _loopLength = 16; // TODO ?
+  _loopLength = 8; // TODO ?
 
   _currentBit = 0;
+
+  /** @type {Number[]} */
+  _resultBuffer;
 
   constructor() {
     const me = this;
@@ -39,6 +42,8 @@ export default class DrumMachine {
 
     me._moveIndicatorToBit(0);
 
+    me._resultBuffer = Utils.buildArray(4, false);
+
     me._loop = [];
     for (let i = 0; i < Consts.DrumMachine.SampleCount; ++i) {
       const line = Utils.buildArray(me._loopLength, false);
@@ -52,7 +57,7 @@ export default class DrumMachine {
       const posY =
         Consts.DrumMachine.StartPosY + i * Consts.DrumMachine.CellSize;
       const text = Here._.add.text(
-        Consts.DrumMachine.StartPosX - 50,
+        Consts.DrumMachine.StartPosX - 60,
         posY,
         me._getSampleText(i)
       );
@@ -70,10 +75,10 @@ export default class DrumMachine {
     }
   }
 
-  update(timeMs, isWindowActive) {
+  update(overallBit, isWindowActive) {
     const me = this;
 
-    const bit = Math.floor(timeMs * Consts.BitPerMs) % me._loopLength;
+    const bit = overallBit % me._loopLength;
     if (bit == me._currentBit) return null;
 
     me._currentBit = bit;
@@ -87,17 +92,17 @@ export default class DrumMachine {
       Here.Audio.play("closed_hihat");
     }
 
-    const res = [];
     for (let i = 0; i < Consts.DrumMachine.SampleCount; ++i) {
+      me._resultBuffer[i] = false;
       if (me._loop[i][bit]) {
+        me._resultBuffer[i] = true;
         const sample = me._getSampleAudioName(i);
-        res.push(i);
 
         if (isWindowActive) Here.Audio.play(sample);
       }
     }
 
-    return res;
+    return me._resultBuffer;
   }
 
   onPointerDown(x, y) {
@@ -173,13 +178,13 @@ export default class DrumMachine {
     const me = this;
     switch (index) {
       case Enums.Samples.CRASH:
-        return "hit";
+        return "attack";
       case Enums.Samples.KICK:
         return "walk";
       case Enums.Samples.TOM:
         return "turn";
       case Enums.Samples.SNARE:
-        return "jump";
+        return "shield";
       default:
         throw index;
     }

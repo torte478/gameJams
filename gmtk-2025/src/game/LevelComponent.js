@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Player from "./Player.js";
@@ -12,6 +13,14 @@ export default class LevelComponent {
 
   /** @type {Phaser.Tilemaps.TilemapLayer} */
   _tilemapLayer;
+
+  /** @type {Boolean} */
+  _isPlayerJumping;
+
+  /** @type {Number} */
+  _playerFallBit;
+
+  _playerGravityForce = -1;
 
   constructor() {
     const me = this;
@@ -29,32 +38,27 @@ export default class LevelComponent {
       Consts.Unit.Normal
     );
 
-    me._playerTilePos = { x: 2, y: 7 };
+    me._playerTilePos = { x: 2, y: 6 };
     me._player = new Player();
     const pos = me._getTileCenter(me._playerTilePos.x, me._playerTilePos.y);
     me._player.toGameObject().setPosition(pos.x, pos.y);
+
+    me._isPlayerJumping = false;
+    me._playerFallBit = 0;
   }
 
-  applySamples(samples) {
+  applyBitChange(commands) {
     const me = this;
 
-    for (let i = 0; i < samples.length; ++i) {
-      const sample = samples[i];
-      switch (sample) {
-        case Enums.SampleCommands.HIT:
-          break;
-        case Enums.SampleCommands.TURN:
-          me._player.turn();
-          break;
-        case Enums.SampleCommands.JUMP:
-          break;
-        case Enums.SampleCommands.WALK:
-          me._applyWalkCommand();
-          break;
-        default:
-          throw sample;
-      }
-    }
+    if (Utils.all(commands, (c) => !c)) return me._player.toIdle();
+
+    if (commands[Enums.SampleCommands.WALK]) return me._applyWalkCommand();
+
+    if (commands[Enums.SampleCommands.TURN]) return me._player.turn();
+
+    if (commands[Enums.SampleCommands.SHIELD]) return me._player.toShield();
+
+    if (commands[Enums.SampleCommands.ATTACK]) return me._player.toAttack();
   }
 
   _applyWalkCommand() {
@@ -68,9 +72,8 @@ export default class LevelComponent {
       forwardTilePos.x,
       forwardTilePos.y
     );
-    if (!forwardTile || forwardTile.index === 1)
-      // TODO: solid tiles
-      return;
+    // TODO: solid tiles
+    if (!forwardTile || forwardTile.index === 1) return;
 
     me._playerTilePos = forwardTilePos;
     const pos = me._getTileCenter(me._playerTilePos.x, me._playerTilePos.y);

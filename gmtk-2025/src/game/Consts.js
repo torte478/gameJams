@@ -23,5 +23,6 @@ export default class Consts {
   };
 
   static Tempo = 90;
-  static BitPerMs = (Consts.Tempo / 60 / 1000) * 4;
+  static BitPerMs = (Consts.Tempo / 60 / 1000) * 2; // 2 - bit per tick
+  static FallPeriod = 2;
 }
