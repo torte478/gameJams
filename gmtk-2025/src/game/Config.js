@@ -1,10 +1,10 @@
 export default class Config {
-
-    static Debug = {
-        Global: true,
-        Log: true,
-        ShowSceneLog: true,
-        PlaySound: true,
-        Random: false
-    };
+  static Debug = {
+    Global: true,
+    Log: true,
+    ShowSceneLog: true,
+    PlaySound: true,
+    Random: false,
+    DisableHihats: true,
+  };
 }

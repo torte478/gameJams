@@ -1,5 +1,6 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
+import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 
@@ -71,7 +72,10 @@ export default class DrumMachine {
       me._currentBit = bit;
       me._moveIndicatorToBit(bit);
 
-      if (me._currentBit % 2 === 0) {
+      if (
+        !Utils.isDebug(Config.Debug.DisableHihats) &&
+        me._currentBit % 2 === 0
+      ) {
         Here.Audio.play("closed_hihat");
       }
 

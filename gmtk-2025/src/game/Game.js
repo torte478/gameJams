@@ -5,6 +5,7 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import DrumMachine from "./DrumMachine.js";
 import Enums from "./Enums.js";
+import LevelComponent from "./LevelComponent.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -12,6 +13,9 @@ export default class Game {
 
   /** @type {DrumMachine} */
   _drumMachine;
+
+  /** @type {LevelComponent} */
+  _levelComponent;
 
   constructor() {
     const me = this;
@@ -25,6 +29,7 @@ export default class Game {
       );
 
     me._drumMachine = new DrumMachine();
+    me._levelComponent = new LevelComponent();
 
     Here._.input.on(
       "pointerdown",

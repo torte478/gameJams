@@ -1,6 +1,7 @@
 import Animation from "../framework/Animation.js";
 import HereScene from "../framework/HereScene.js";
 import Utils from "../framework/Utils.js";
+import Consts from "../game/Consts.js";
 
 import Game from "../game/Game.js";
 
@@ -27,6 +28,9 @@ export default class GameScene extends HereScene {
 
     if (!me._isRestart) Utils.runLoadingBar();
 
+    Utils.loadSpriteSheet("tiles", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("player", Consts.Unit.Normal);
+
     Utils.loadImage("indicator");
 
     Utils.loadMp3("kick");
@@ -34,6 +38,8 @@ export default class GameScene extends HereScene {
     Utils.loadMp3("closed_hihat");
     Utils.loadMp3("rack_tom");
     Utils.loadMp3("snare");
+
+    this.load.tilemapCSV("test_level", "assets/test_level.csv");
   }
 
   create() {
