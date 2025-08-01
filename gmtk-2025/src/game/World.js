@@ -69,9 +69,12 @@ export default class World {
       if (
         !me._player.isDead &&
         me._spikes[i].isHitOn(me._playerTilePos.x, me._playerTilePos.y)
-      )
+      ) {
         me._player.die();
+        isDeath = true;
+      }
     }
+    return isDeath;
   }
 
   _doPlayerActions(commands) {

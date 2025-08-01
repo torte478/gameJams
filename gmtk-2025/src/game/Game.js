@@ -54,7 +54,7 @@ export default class Game {
     Here._.input.on(
       "pointerdown",
       (pointer) => {
-        if (pointer.rightButtonDown) me._tryProcessPause();
+        if (pointer.rightButtonDown()) me._tryProcessPause();
         else me._onLMBClick(pointer, sceneCameraBounds);
       },
       me
@@ -117,8 +117,13 @@ export default class Game {
     const overallBit = Math.floor(me._gameTimer * Consts.BitPerMs);
     const currentBit = overallBit % me._drumMachine.loopLength;
 
-    const samples = me._drumMachine.update(currentBit, me._isWindowActive);
-    if (!!samples) me._world.applyBitChange(samples, currentBit);
+    const commands = me._drumMachine.update(currentBit, me._isWindowActive);
+    if (!commands) return;
+
+    const isPlayerDeath = me._world.applyBitChange(commands, currentBit);
+    if (isPlayerDeath) {
+      me._isPaused = !me._isPaused;
+    }
   }
 
   _tryProcessPause() {
@@ -133,8 +138,9 @@ export default class Game {
     const me = this;
 
     const pos = Utils.buildPoint(pointer.worldX, pointer.worldY);
-    if (Phaser.Geom.Rectangle.ContainsPoint(sceneCameraBounds, pos))
+    if (Phaser.Geom.Rectangle.ContainsPoint(sceneCameraBounds, pos)) {
       me._world.reset();
-    else me._drumMachine.onPointerDown(pos.x, pos.y);
+      me._isPaused = false;
+    } else me._drumMachine.onPointerDown(pos.x, pos.y);
   }
 }

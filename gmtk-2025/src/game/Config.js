@@ -9,7 +9,7 @@ export default class Config {
     Random: false,
     StartFromSolution: true,
     PauseOnRightClick: true,
-    DisableHihats: true,
+    DisableHihats: false,
   };
 
   /** @type {LevelConfig[]} */
@@ -21,12 +21,16 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 1, 1, 0, 1, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0, 0],
       ],
       items: {
         spikes: [
-          { tileX: 6, tileY: 9, bits: [6, 7] },
-          { tileX: 13, tileY: 9, bits: [3, 4] },
+          { tileX: 6, tileY: 9, bits: [4, 5, 6, 7] },
+          { tileX: 10, tileY: 9, bits: [4, 5, 6, 7] },
+          { tileX: 11, tileY: 9, bits: [4, 5, 6, 7] },
+          { tileX: 14, tileY: 9, bits: [4, 5, 6, 7] },
+          { tileX: 15, tileY: 9, bits: [4, 5, 6, 7] },
+          { tileX: 16, tileY: 9, bits: [4, 5, 6, 7] },
         ],
       },
     },
