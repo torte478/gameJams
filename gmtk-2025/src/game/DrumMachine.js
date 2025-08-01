@@ -3,6 +3,7 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
+import LevelConfig from "./LevelConfig.js";
 
 export default class DrumMachine {
   /** @type {Phaser.Cameras.Scene2D.Camera} */
@@ -26,7 +27,10 @@ export default class DrumMachine {
   /** @type {Number} */
   loopLength = 8; // TODO ?
 
-  constructor() {
+  /**
+   * @param {LevelConfig} levelConfig
+   */
+  constructor(levelConfig) {
     const me = this;
     me._camera = Here._.cameras.add(
       0,
@@ -54,7 +58,7 @@ export default class DrumMachine {
 
     // solution
     if (Utils.isDebug(Config.Debug.StartFromSolution)) {
-      const solution = Config.Levels[0].solution;
+      const solution = levelConfig.solution;
       for (let i = 0; i < solution.length; ++i)
         for (let j = 0; j < solution[i].length; ++j)
           me._loop[i][j] = !!solution[i][j];
@@ -130,6 +134,14 @@ export default class DrumMachine {
       j >= me.loopLength
     )
       return;
+
+    // only one
+    if (!me._loop[i][j]) {
+      for (let k = 0; k < Consts.DrumMachine.SampleCount; ++k) {
+        me._loop[k][j] = false;
+        me._drawCell(k, j);
+      }
+    }
 
     me._loop[i][j] = !me._loop[i][j];
     me._drawCell(i, j);

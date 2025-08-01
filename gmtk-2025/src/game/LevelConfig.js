@@ -12,4 +12,10 @@ export default class LevelConfig {
 
   /** @type {ItemConfig[]} */
   spikes;
+
+  /** @type {ItemConfig[]} */
+  guns;
+
+  /** @type {ItemConfig[]} */
+  trampolins;
 }

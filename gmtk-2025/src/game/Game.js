@@ -5,6 +5,7 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import DrumMachine from "./DrumMachine.js";
 import Enums from "./Enums.js";
+import LevelConfig from "./LevelConfig.js";
 import World from "./World.js";
 
 export default class Game {
@@ -21,10 +22,13 @@ export default class Game {
   _isWindowActive;
 
   /** @type {Boolean} */
-  _isPaused;
+  _isPaused = false;
 
   /** @type {Number} */
   _gameTimer;
+
+  /** @type {LevelConfig} */
+  _currentLevelConfig;
 
   constructor() {
     const me = this;
@@ -39,9 +43,14 @@ export default class Game {
         Consts.Viewport.Height - Consts.DrumMachine.ViewHeight
       );
 
-    me._drumMachine = new DrumMachine();
-    me._world = new World();
-    me._isPaused = false;
+    me._currentLevelConfig = Utils.firstOrNull(
+      Config.Levels,
+      (c) => c.name == Config.LevelOrder[0]
+    ); // TODO
+    if (!me._currentLevelConfig) throw "error";
+
+    me._drumMachine = new DrumMachine(me._currentLevelConfig);
+    me._world = new World(me._currentLevelConfig);
     me._gameTimer = 0;
 
     const sceneCameraBounds = new Phaser.Geom.Rectangle(

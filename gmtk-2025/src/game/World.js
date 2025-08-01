@@ -5,7 +5,7 @@ import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import LevelConfig from "./LevelConfig.js";
 import Player from "./Player.js";
-import Spikes from "./Spikes.js";
+import LevelObject from "./LevelObject.js";
 
 export default class World {
   /** @type {Player} */
@@ -19,31 +19,37 @@ export default class World {
 
   _isReset = false;
 
-  /** @type {Spikes[]}*/
+  /** @type {LevelObject[]}*/
   _spikes;
 
   /** @type {LevelConfig} */
   _levelConfig;
 
-  constructor() {
+  constructor(levelConfig) {
     const me = this;
 
+    me._levelConfig = levelConfig;
+
     const map = Here._.add.tilemap(
-      "walk_spikes",
+      me._levelConfig.name,
       Consts.Unit.Normal,
       Consts.Unit.Normal
     );
     const tileset = map.addTilesetImage("tiles");
     me._tilemapLayer = map.createLayer(0, tileset, 0, 0);
 
-    me._levelConfig = Config.Levels[0];
-
     me._spikes = [];
-    for (let i = 0; i < me._levelConfig.items.spikes.length; ++i) {
-      const spikeConfig = me._levelConfig.items.spikes[i];
-      me._spikes.push(
-        new Spikes(spikeConfig.tileX, spikeConfig.tileY, spikeConfig.bits)
-      );
+    if (!!me._levelConfig.spikes) {
+      for (let i = 0; i < me._levelConfig.spikes.length; ++i) {
+        const spikeConfig = me._levelConfig.spikes[i];
+        me._spikes.push(
+          new LevelObject(
+            spikeConfig.tileX,
+            spikeConfig.tileY,
+            spikeConfig.bits
+          )
+        );
+      }
     }
 
     me._player = new Player();
@@ -68,7 +74,7 @@ export default class World {
     for (let i = 0; i < me._spikes.length; ++i) {
       if (
         !me._player.isDead &&
-        me._spikes[i].isHitOn(me._playerTilePos.x, me._playerTilePos.y)
+        me._spikes[i].checkPlayer(me._playerTilePos.x, me._playerTilePos.y)
       ) {
         me._player.die();
         isDeath = true;
@@ -105,6 +111,8 @@ export default class World {
   _applyWalkCommand() {
     const me = this;
 
+    me._player.toIdle();
+
     const forwardTilePos = {
       x: me._playerTilePos.x + me._player.direction,
       y: me._playerTilePos.y,
@@ -115,8 +123,6 @@ export default class World {
     );
     // TODO: solid tiles
     if (!forwardTile || forwardTile.index === 1) return;
-
-    me._player.toIdle();
     me._playerTilePos = forwardTilePos;
     const pos = me._getTileCenter(me._playerTilePos.x, me._playerTilePos.y);
     me._player.toGameObject().setPosition(pos.x, pos.y);

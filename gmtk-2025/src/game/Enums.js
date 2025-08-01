@@ -24,4 +24,10 @@ export default class Enums {
     SHIELD: 2,
     WALK: 3,
   };
+
+  static LevelObjectTypes = {
+    SPIKES: 0,
+    GUN: 1,
+    TRAMPOLINE: 2,
+  };
 }

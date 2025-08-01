@@ -42,6 +42,7 @@ export default class GameScene extends HereScene {
 
     Utils.loadCsv("test_level");
     Utils.loadCsv("walk_spikes");
+    Utils.loadCsv("shield_tutorial");
   }
 
   create() {
