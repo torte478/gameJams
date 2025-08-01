@@ -3,7 +3,7 @@ import Utils from "../framework/Utils.js";
 
 import Config from "./Config.js";
 import Consts from "./Consts.js";
-import DrumMachine from "./DrumMachine.js";
+import DrumKit from "./DrumKit.js";
 import Enums from "./Enums.js";
 import LevelConfig from "./LevelConfig.js";
 import World from "./World.js";
@@ -12,8 +12,8 @@ export default class Game {
   /** @type {Phaser.GameObjects.Text} */
   _log;
 
-  /** @type {DrumMachine} */
-  _drumMachine;
+  /** @type {DrumKit} */
+  _drumKit;
 
   /** @type {World} */
   _world;
@@ -49,7 +49,7 @@ export default class Game {
     ); // TODO
     if (!me._currentLevelConfig) throw "error";
 
-    me._drumMachine = new DrumMachine(me._currentLevelConfig);
+    me._drumKit = new DrumKit(me._currentLevelConfig);
     me._world = new World(me._currentLevelConfig);
     me._gameTimer = 0;
 
@@ -84,7 +84,7 @@ export default class Game {
         .setScrollFactor(0)
         .setDepth(Consts.Depth.Max);
 
-      me._drumMachine._camera.ignore(me._log);
+      me._drumKit._camera.ignore(me._log);
     });
   }
 
@@ -124,9 +124,9 @@ export default class Game {
     me._gameTimer += delta;
 
     const overallBit = Math.floor(me._gameTimer * Consts.BitPerMs);
-    const currentBit = overallBit % me._drumMachine.loopLength;
+    const currentBit = overallBit % me._drumKit.loopLength;
 
-    const commands = me._drumMachine.update(currentBit, me._isWindowActive);
+    const commands = me._drumKit.update(currentBit, me._isWindowActive);
     if (!commands) return;
 
     const isPlayerDeath = me._world.applyBitChange(commands, currentBit);
@@ -148,8 +148,10 @@ export default class Game {
 
     const pos = Utils.buildPoint(pointer.worldX, pointer.worldY);
     if (Phaser.Geom.Rectangle.ContainsPoint(sceneCameraBounds, pos)) {
+      me._gameTimer = 0;
+      me._drumKit.reset();
       me._world.reset();
       me._isPaused = false;
-    } else me._drumMachine.onPointerDown(pos.x, pos.y);
+    } else me._drumKit.onPointerDown(pos.x, pos.y);
   }
 }

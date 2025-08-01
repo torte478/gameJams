@@ -5,7 +5,7 @@ import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import LevelConfig from "./LevelConfig.js";
 
-export default class DrumMachine {
+export default class DrumKit {
   /** @type {Phaser.Cameras.Scene2D.Camera} */
   _camera;
 
@@ -19,7 +19,7 @@ export default class DrumMachine {
   _indicator;
 
   /** @type {Number} */
-  _currentBit = 0;
+  _currentBit = -1;
 
   /** @type {Number[]} */
   _resultBuffer;
@@ -90,6 +90,11 @@ export default class DrumMachine {
         `${j}`
       );
     }
+  }
+
+  reset() {
+    const me = this;
+    me._currentBit = -1;
   }
 
   update(bit, isWindowActive) {

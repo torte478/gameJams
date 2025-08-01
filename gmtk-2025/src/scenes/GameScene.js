@@ -30,7 +30,9 @@ export default class GameScene extends HereScene {
 
     Utils.loadSpriteSheet("tiles", Consts.Unit.Normal);
     Utils.loadSpriteSheet("player", Consts.Unit.Normal);
-    Utils.loadSpriteSheet("spikes", Consts.Unit.Normal, Consts.Unit.Normal * 2);
+    Utils.loadSpriteSheet("spikes", Consts.Unit.Normal, Consts.Unit.Big);
+    Utils.loadSpriteSheet("gun", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("trampoline", Consts.Unit.Normal, Consts.Unit.Big);
 
     Utils.loadImage("indicator");
 

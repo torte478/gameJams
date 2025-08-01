@@ -13,6 +13,9 @@ export default class Player {
   /** @type {Boolean} */
   isDead;
 
+  /** @type {Boolean} */
+  isShield;
+
   constructor() {
     const me = this;
 
@@ -34,12 +37,14 @@ export default class Player {
 
     me.direction *= -1;
     me._sprite.setFlipX(me.direction == -1);
+    me.isShield = false;
   }
 
   toIdle() {
     const me = this;
 
     me._sprite.setFrame(0);
+    me.isShield = false;
   }
 
   toAttack() {
@@ -52,6 +57,7 @@ export default class Player {
     const me = this;
 
     me._sprite.setFrame(1);
+    me.isShield = true;
   }
 
   reset() {
@@ -61,6 +67,7 @@ export default class Player {
 
     me.direction = 1;
     me.isDead = false;
+    me.isShield = false;
   }
 
   die() {
@@ -68,5 +75,6 @@ export default class Player {
 
     me._sprite.setFrame(3);
     me.isDead = true;
+    me.isShield = false;
   }
 }

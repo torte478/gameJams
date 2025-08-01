@@ -22,6 +22,9 @@ export default class World {
   /** @type {LevelObject[]}*/
   _spikes;
 
+  /** @type {LevelObject[]} */
+  _guns;
+
   /** @type {LevelConfig} */
   _levelConfig;
 
@@ -38,23 +41,33 @@ export default class World {
     const tileset = map.addTilesetImage("tiles");
     me._tilemapLayer = map.createLayer(0, tileset, 0, 0);
 
-    me._spikes = [];
-    if (!!me._levelConfig.spikes) {
-      for (let i = 0; i < me._levelConfig.spikes.length; ++i) {
-        const spikeConfig = me._levelConfig.spikes[i];
-        me._spikes.push(
-          new LevelObject(
-            spikeConfig.tileX,
-            spikeConfig.tileY,
-            spikeConfig.bits
-          )
-        );
-      }
-    }
+    me._spikes = me._createLevelObjects(
+      Enums.LevelObjectTypes.SPIKES,
+      me._levelConfig.spikes
+    );
+    me._guns = me._createLevelObjects(
+      Enums.LevelObjectTypes.GUN,
+      me._levelConfig.guns
+    );
 
     me._player = new Player();
 
     me.reset();
+  }
+
+  _createLevelObjects(objectType, configs) {
+    const me = this;
+
+    const res = [];
+
+    if (!configs) return res;
+
+    for (let i = 0; i < configs.length; ++i) {
+      const itemConfig = configs[i];
+      res.push(new LevelObject(objectType, itemConfig));
+    }
+
+    return res;
   }
 
   applyBitChange(commands, currentBit) {
@@ -62,25 +75,50 @@ export default class World {
 
     let isDeath = false;
 
-    for (let i = 0; i < me._spikes.length; ++i)
-      me._spikes[i].update(currentBit);
-
-    if (me._isReset && currentBit != 0) return isDeath;
-
-    me._isReset = false;
-
     if (!me._player.isDead) me._doPlayerActions(commands);
 
-    for (let i = 0; i < me._spikes.length; ++i) {
-      if (
-        !me._player.isDead &&
-        me._spikes[i].checkPlayer(me._playerTilePos.x, me._playerTilePos.y)
-      ) {
-        me._player.die();
-        isDeath = true;
+    me._updateObjectItems(me._spikes, currentBit);
+    me._updateObjectItems(me._guns, currentBit);
+
+    if (!me._player.isDead) {
+      for (let i = 0; i < me._spikes.length; ++i) {
+        if (
+          me._spikes[i].checkPlayer(
+            me._playerTilePos.x,
+            me._playerTilePos.y,
+            me._tilemapLayer,
+            me._player
+          )
+        ) {
+          me._player.die();
+          isDeath = true;
+        }
+      }
+
+      for (let i = 0; i < me._guns.length; ++i) {
+        if (
+          me._guns[i].checkPlayer(
+            me._playerTilePos.x,
+            me._playerTilePos.y,
+            me._tilemapLayer,
+            me._player
+          )
+        ) {
+          me._player.die();
+          isDeath = true;
+        }
       }
     }
+
     return isDeath;
+  }
+
+  _updateObjectItems(items, currentBit) {
+    const me = this;
+
+    for (let i = 0; i < items.length; ++i) {
+      items[i].update(currentBit);
+    }
   }
 
   _doPlayerActions(commands) {
