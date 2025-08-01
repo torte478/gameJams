@@ -34,15 +34,17 @@ export default class DrumKit {
     const me = this;
     me._camera = Here._.cameras.add(
       0,
-      Consts.Viewport.Height - Consts.DrumMachine.ViewHeight,
+      Consts.Viewport.Height - Consts.DrumKit.ViewHeight,
       Consts.Viewport.Width,
-      Consts.DrumMachine.ViewHeight
+      Consts.DrumKit.ViewHeight
     );
-    me._camera.setBackgroundColor("#84A591").setScroll(-1000, 0);
+    me._camera
+      .setBackgroundColor("#84A591")
+      .setScroll(Consts.DrumKit.ViewScrollX, 0);
 
     me._indicator = Here._.add.image(
-      Consts.DrumMachine.StartPosX,
-      Consts.DrumMachine.StartPosY - Consts.DrumMachine.CellSize / 2,
+      Consts.DrumKit.StartPosX,
+      Consts.DrumKit.StartPosY - Consts.DrumKit.CellSize / 2,
       "indicator"
     );
 
@@ -51,7 +53,7 @@ export default class DrumKit {
     me._resultBuffer = Utils.buildArray(4, false);
 
     me._loop = [];
-    for (let i = 0; i < Consts.DrumMachine.SampleCount; ++i) {
+    for (let i = 0; i < Consts.DrumKit.SampleCount; ++i) {
       const line = Utils.buildArray(me.loopLength, false);
       me._loop.push(line);
     }
@@ -67,11 +69,10 @@ export default class DrumKit {
     me._graphics = Here._.add.graphics();
     me._graphics.lineStyle(2, "#000000", 1);
 
-    for (let i = 0; i < Consts.DrumMachine.SampleCount; ++i) {
-      const posY =
-        Consts.DrumMachine.StartPosY + i * Consts.DrumMachine.CellSize;
+    for (let i = 0; i < Consts.DrumKit.SampleCount; ++i) {
+      const posY = Consts.DrumKit.StartPosY + i * Consts.DrumKit.CellSize;
       const text = Here._.add.text(
-        Consts.DrumMachine.StartPosX - 60,
+        Consts.DrumKit.StartPosX - 60,
         posY,
         me._getSampleText(i)
       );
@@ -81,11 +82,10 @@ export default class DrumKit {
       }
     }
 
-    const bitTextPosY =
-      Consts.DrumMachine.StartPosY + 4 * Consts.DrumMachine.CellSize;
+    const bitTextPosY = Consts.DrumKit.StartPosY + 4 * Consts.DrumKit.CellSize;
     for (let j = 0; j < me.loopLength; ++j) {
       Here._.add.text(
-        Consts.DrumMachine.StartPosX + j * Consts.DrumMachine.CellSize + 10,
+        Consts.DrumKit.StartPosX + j * Consts.DrumKit.CellSize + 10,
         bitTextPosY + 5,
         `${j}`
       );
@@ -109,7 +109,7 @@ export default class DrumKit {
       Here.Audio.play("closed_hihat");
     }
 
-    for (let i = 0; i < Consts.DrumMachine.SampleCount; ++i) {
+    for (let i = 0; i < Consts.DrumKit.SampleCount; ++i) {
       me._resultBuffer[i] = false;
       if (me._loop[i][bit]) {
         me._resultBuffer[i] = true;
@@ -126,23 +126,18 @@ export default class DrumKit {
     const me = this;
 
     const i = Math.floor(
-      (y - Consts.DrumMachine.StartPosY) / Consts.DrumMachine.CellSize
+      (y - Consts.DrumKit.StartPosY) / Consts.DrumKit.CellSize
     );
     const j = Math.floor(
-      (x - Consts.DrumMachine.StartPosX) / Consts.DrumMachine.CellSize
+      (x - Consts.DrumKit.StartPosX) / Consts.DrumKit.CellSize
     );
 
-    if (
-      i < 0 ||
-      i >= Consts.DrumMachine.SampleCount ||
-      j < 0 ||
-      j >= me.loopLength
-    )
+    if (i < 0 || i >= Consts.DrumKit.SampleCount || j < 0 || j >= me.loopLength)
       return;
 
     // only one
     if (!me._loop[i][j]) {
-      for (let k = 0; k < Consts.DrumMachine.SampleCount; ++k) {
+      for (let k = 0; k < Consts.DrumKit.SampleCount; ++k) {
         me._loop[k][j] = false;
         me._drawCell(k, j);
       }
@@ -150,6 +145,12 @@ export default class DrumKit {
 
     me._loop[i][j] = !me._loop[i][j];
     me._drawCell(i, j);
+  }
+
+  gotoNextLevel(nextLevelConfig) {
+    const me = this;
+
+    // TODO
   }
 
   _drawCell(i, j) {
@@ -162,24 +163,24 @@ export default class DrumKit {
       me._graphics.fillRect(
         pos.x,
         pos.y,
-        Consts.DrumMachine.CellSize,
-        Consts.DrumMachine.CellSize
+        Consts.DrumKit.CellSize,
+        Consts.DrumKit.CellSize
       );
     } else {
       me._graphics.fillStyle(0x84a591, 1);
       me._graphics.fillRect(
         pos.x,
         pos.y,
-        Consts.DrumMachine.CellSize,
-        Consts.DrumMachine.CellSize
+        Consts.DrumKit.CellSize,
+        Consts.DrumKit.CellSize
       );
 
       me._graphics.lineStyle(2, "#000000", 1);
       me._graphics.strokeRect(
         pos.x,
         pos.y,
-        Consts.DrumMachine.CellSize,
-        Consts.DrumMachine.CellSize
+        Consts.DrumKit.CellSize,
+        Consts.DrumKit.CellSize
       );
     }
   }
@@ -221,7 +222,7 @@ export default class DrumKit {
 
     const pos = me._cellToWorldPos(-1, index);
     me._indicator.setPosition(
-      pos.x + Consts.DrumMachine.CellSize / 2,
+      pos.x + Consts.DrumKit.CellSize / 2,
       me._indicator.y
     );
   }
@@ -230,8 +231,8 @@ export default class DrumKit {
     const me = this;
 
     return {
-      x: Consts.DrumMachine.StartPosX + j * Consts.DrumMachine.CellSize,
-      y: Consts.DrumMachine.StartPosY + i * Consts.DrumMachine.CellSize,
+      x: Consts.DrumKit.StartPosX + j * Consts.DrumKit.CellSize,
+      y: Consts.DrumKit.StartPosY + i * Consts.DrumKit.CellSize,
     };
   }
 }

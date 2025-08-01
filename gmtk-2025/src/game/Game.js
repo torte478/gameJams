@@ -27,8 +27,8 @@ export default class Game {
   /** @type {Number} */
   _gameTimer;
 
-  /** @type {LevelConfig} */
-  _currentLevelConfig;
+  /** @type {Number} */
+  _currentLevelIndex = 0;
 
   constructor() {
     const me = this;
@@ -40,17 +40,18 @@ export default class Game {
       .setBackgroundColor("#9084A5")
       .setSize(
         Consts.Viewport.Width,
-        Consts.Viewport.Height - Consts.DrumMachine.ViewHeight
+        Consts.Viewport.Height - Consts.DrumKit.ViewHeight
       );
 
-    me._currentLevelConfig = Utils.firstOrNull(
+    const levelConfig = Utils.firstOrNull(
       Config.Levels,
-      (c) => c.name == Config.LevelOrder[0]
-    ); // TODO
-    if (!me._currentLevelConfig) throw "error";
+      (c) => c.name == Config.LevelOrder[me._currentLevelIndex]
+    );
 
-    me._drumKit = new DrumKit(me._currentLevelConfig);
-    me._world = new World(me._currentLevelConfig);
+    if (!levelConfig) throw "error";
+
+    me._drumKit = new DrumKit(levelConfig);
+    me._world = new World(levelConfig);
     me._gameTimer = 0;
 
     const sceneCameraBounds = new Phaser.Geom.Rectangle(
@@ -139,6 +140,19 @@ export default class Game {
 
   _gotoNextLevel() {
     const me = this;
+
+    me._currentLevelIndex =
+      (me._currentLevelIndex + 1) % Config.LevelOrder.length;
+
+    const levelConfig = Utils.firstOrNull(
+      Config.Levels,
+      (c) => c.name == Config.LevelOrder[me._currentLevelIndex]
+    );
+
+    if (!levelConfig) throw "error";
+
+    me._world.gotoNextLevel(levelConfig);
+    me._drumKit.gotoNextLevel(levelConfig);
   }
 
   _tryProcessPause() {

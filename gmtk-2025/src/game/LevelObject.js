@@ -31,7 +31,7 @@ export default class LevelObject {
    * @param {ItemConfig} config
    * @param {Phaser.GameObjects.Group} pool
    */
-  constructor(type, config, pool) {
+  constructor(type, config, pool, startTileX) {
     const me = this;
 
     me._type = type;
@@ -39,11 +39,13 @@ export default class LevelObject {
     me._tileY = config.tileY;
     me._bitsToActive = config.bits;
 
+    const startPosX = startTileX * Consts.Unit.Normal;
+
     if (me._type == Enums.LevelObjectTypes.SPIKES) {
       me.sprite = pool.get();
       me.sprite
         .setPosition(
-          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          startPosX + me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
           me._tileY * Consts.Unit.Normal
         )
         .setTexture("spikes", 0)
@@ -52,7 +54,7 @@ export default class LevelObject {
       me.sprite = pool.get();
       me.sprite
         .setPosition(
-          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          startPosX + me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
           me._tileY * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal
         )
         .setTexture("gun", 0)
@@ -61,7 +63,7 @@ export default class LevelObject {
       me.sprite = pool.get();
       me.sprite
         .setPosition(
-          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          startPosX + me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
           me._tileY * Consts.Unit.Normal
         )
         .setTexture("trampoline", 0)

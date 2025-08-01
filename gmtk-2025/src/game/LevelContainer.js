@@ -3,16 +3,7 @@ import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import LevelObject from "./LevelObject.js";
 
-export class LevelContainer {
-  /** @type {Phaser.GameObjects.Container} */
-  _container;
-
-  /** @type {Phaser.Tilemaps.Tilemap} */
-  _tilemap;
-
-  /** @type {Phaser.Tilemaps.TilemapLayer} */
-  _tilemapLayer;
-
+export default class LevelContainer {
   /** @type {LevelObject[]}*/
   spikes = [];
 
@@ -28,46 +19,40 @@ export class LevelContainer {
   /** @type {Phaser.GameObjects.Group} */
   _spritePool;
 
+  /** @type {Number} */
+  _startTileX;
+
+  /** @type {Number} */
+  widthAtTiles = 0;
+
   constructor(spritePool) {
     const me = this;
 
     me._spritePool = spritePool;
-
-    me._tilemap = Here._.add.tilemap(
-      "test_level", // TODO: name
-      Consts.Unit.Normal,
-      Consts.Unit.Normal,
-      20,
-      10
-    );
-
-    const tileset = me._tilemap.addTilesetImage("tiles");
-
-    me._tilemapLayer = me._tilemap.createLayer(0, tileset, 0, 0);
-
-    me._tilemapLayer.setDepth(Consts.Depth.Tiles);
-
-    me._container = Here._.add.container(0, 0, [me._tilemapLayer]);
-  }
-
-  toObj() {
-    const me = this;
-
-    return me._container;
   }
 
   /**
    * @param {LevelConfig} levelConfig
+   * @param {Phaser.Tilemaps.Tilemap} tilemap
+   * @param {Number} startTileX
    */
-  init(levelConfig) {
+  init(levelConfig, tilemap, startTileX) {
     const me = this;
 
     me._clear();
 
+    me._startTileX = startTileX;
+
+    const copyFrom = startTileX == 0 ? 0 : Consts.LevelOverlayAtTiles;
+
     const tempMap = Here._.add.tilemap(levelConfig.name);
-    for (let tileX = 0; tileX < tempMap.width; ++tileX)
-      for (let tileY = 0; tileY < tempMap.height; ++tileY)
-        me._tilemap.putTileAt(tempMap.getTileAt(tileX, tileY), tileX, tileY);
+    for (let tileX = copyFrom; tileX < tempMap.width; ++tileX)
+      for (let tileY = 0; tileY < tempMap.height; ++tileY) {
+        const tile = tempMap.getTileAt(tileX, tileY);
+        tilemap.putTileAt(tile, me._startTileX + tileX, tileY);
+      }
+
+    me.widthAtTiles = tempMap.width - copyFrom;
 
     me.spikes = me._createLevelObjects(
       Enums.LevelObjectTypes.SPIKES,
@@ -83,7 +68,8 @@ export class LevelContainer {
     );
 
     me._finishFlag = me._spritePool.get(
-      levelConfig.finishTilePos.x * Consts.Unit.Normal +
+      startTileX * Consts.Unit.Normal +
+        levelConfig.finishTilePos.x * Consts.Unit.Normal +
         0.5 * Consts.Unit.Normal,
       levelConfig.finishTilePos.y * Consts.Unit.Normal +
         0.5 * Consts.Unit.Normal,
@@ -124,9 +110,13 @@ export class LevelContainer {
 
     for (let i = 0; i < configs.length; ++i) {
       const itemConfig = configs[i];
-      const obj = new LevelObject(objectType, itemConfig, me._spritePool);
+      const obj = new LevelObject(
+        objectType,
+        itemConfig,
+        me._spritePool,
+        me._startTileX
+      );
       res.push(obj);
-      me._container.add(obj);
     }
 
     return res;
@@ -134,10 +124,6 @@ export class LevelContainer {
 
   _clear() {
     const me = this;
-
-    for (let tileY = 0; tileY < me._tilemap.height; ++tileY)
-      for (let tileX = 0; tileX < me._tilemap.width; ++tileX)
-        me._tilemap.putTileAt(-1, tileX, tileY);
 
     for (let i = 0; i < me.spikes.length; ++i)
       me._spritePool.killAndHide(me.spikes[i].sprite);
@@ -147,7 +133,5 @@ export class LevelContainer {
       me._spritePool.killAndHide(me.trampolines[i].sprite);
 
     if (!!me._finishFlag) me._spritePool.killAndHide(me._finishFlag);
-
-    me._container.removeAll().add(me._tilemapLayer);
   }
 }

@@ -5,11 +5,15 @@ export default class Config {
     Global: true,
     Log: true,
     ShowSceneLog: true,
-    PlaySound: true,
+    PlaySound: false,
     Random: false,
     StartFromSolution: true,
     PauseOnRightClick: true,
     DisableHihats: false,
+  };
+
+  static DurationMs = {
+    LevelChange: 3000,
   };
 
   static LevelOrder = ["test_level", "walk_spikes", "shield_tutorial"];

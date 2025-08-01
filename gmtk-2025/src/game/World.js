@@ -5,8 +5,7 @@ import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import LevelConfig from "./LevelConfig.js";
 import Player from "./Player.js";
-import LevelObject from "./LevelObject.js";
-import { LevelContainer } from "./LevelContainer.js";
+import LevelContainer from "./LevelContainer.js";
 
 export default class World {
   /** @type {Player} */
@@ -14,6 +13,9 @@ export default class World {
 
   /** @type {Phaser.Math.Vector2} */
   playerTilePos;
+
+  /** @type {Phaser.Tilemaps.Tilemap} */
+  _tilemap;
 
   /** @type {Phaser.Tilemaps.TilemapLayer} */
   _tilemapLayer;
@@ -32,8 +34,36 @@ export default class World {
   /** @type {LevelContainer} */
   _secondaryLevelContainer;
 
+  /** @type {Boolean} */
+  _isBusy = false;
+
+  /** @type {Number} */
+  _currentLevelTileX = 0;
+
   constructor() {
     const me = this;
+
+    const tilemapHeight = 10;
+    const averageLevelWidth = 20;
+
+    const tilemapMock = [];
+    for (let i = 0; i < tilemapHeight; ++i)
+      tilemapMock.push(Utils.buildArray(averageLevelWidth * 20, -1));
+
+    me._tilemap = Here._.add.tilemap(
+      null,
+      Consts.Unit.Normal,
+      Consts.Unit.Normal,
+      20 * 20,
+      10,
+      tilemapMock
+    );
+
+    const tileset = me._tilemap.addTilesetImage("tiles");
+
+    me._tilemapLayer = me._tilemap.createLayer(0, tileset, 0, 0);
+
+    me._tilemapLayer.setDepth(Consts.Depth.Tiles);
 
     const spritePool = Here._.add.group();
     me._mainLevelContainer = new LevelContainer(spritePool);
@@ -46,13 +76,49 @@ export default class World {
 
     me.player = new Player();
 
-    me._mainLevelContainer.init(me._levelConfig);
+    me._mainLevelContainer.init(me._levelConfig, me._tilemap, 0);
 
     me.reset();
   }
 
+  gotoNextLevel(nextLevelConfig) {
+    const me = this;
+
+    me._isBusy = true;
+
+    me._currentLevelTileX +=
+      me._mainLevelContainer.widthAtTiles - Consts.LevelOverlayAtTiles;
+    me._secondaryLevelContainer.init(
+      nextLevelConfig,
+      me._tilemap,
+      me._currentLevelTileX
+    );
+
+    const camera = Here._.cameras.main;
+    Here._.tweens.addCounter({
+      from: camera.scrollX,
+      to:
+        camera.scrollX +
+        Consts.Viewport.Width -
+        Consts.LevelOverlayAtTiles * Consts.Unit.Normal,
+      duration: Config.DurationMs.LevelChange,
+      onUpdate: (tween) => {
+        camera.setScroll(tween.getValue(), 0);
+      },
+      onComplete: () => {
+        const t = me._secondaryLevelContainer;
+        me._secondaryLevelContainer = me._mainLevelContainer;
+        me._mainLevelContainer = t;
+
+        me._isBusy = false;
+      },
+    });
+  }
+
   applyBitChange(commands, currentBit) {
     const me = this;
+
+    if (me._isBusy) return;
 
     if (!me.player.isDead) me._doPlayerActions(commands);
 
@@ -113,7 +179,9 @@ export default class World {
   isSolidTile(tileX, tileY) {
     const me = this;
 
-    return me._mainLevelContainer.isSolidTile(tileX, tileY);
+    const tile = me._tilemapLayer.getTileAt(tileX, tileY);
+
+    return !tile || tile.index > 0;
   }
 
   _doPlayerActions(commands) {

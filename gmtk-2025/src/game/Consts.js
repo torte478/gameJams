@@ -15,9 +15,10 @@ export default class Consts {
     Max: 100000,
   };
 
-  static DrumMachine = {
+  static DrumKit = {
     ViewHeight: 300,
-    StartPosX: -850,
+    ViewScrollX: -5000,
+    StartPosX: -4900,
     StartPosY: 40,
     CellSize: 50,
     SampleCount: 4,
@@ -26,4 +27,5 @@ export default class Consts {
   static Tempo = 90;
   static BitPerMs = (Consts.Tempo / 60 / 1000) * 2; // 2 - bit per tick
   static FallPeriod = 2;
+  static LevelOverlayAtTiles = 3;
 }
