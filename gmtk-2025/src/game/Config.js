@@ -47,6 +47,10 @@ export default class Config {
         [1, 1, 0, 1, 1, 1, 0, 1],
       ],
       guns: [{ tileX: 17, tileY: 8, bits: [2, 6] }],
+      trampolins: [
+        { tileX: 3, tileY: 8, bits: [7] },
+        { tileX: 16, tileY: 8, bits: [7] },
+      ],
     },
   ];
 }

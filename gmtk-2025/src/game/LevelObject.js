@@ -4,6 +4,7 @@ import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import ItemConfig from "./ItemConfig.js";
 import Player from "./Player.js";
+import World from "./World.js";
 
 export default class LevelObject {
   /** @type {Phaser.GameObjects.Sprite} */
@@ -51,6 +52,13 @@ export default class LevelObject {
         "gun",
         0
       );
+    } else if (me._type == Enums.LevelObjectTypes.TRAMPOLINE) {
+      me._sprite = Here._.add.sprite(
+        me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+        me._tileY * Consts.Unit.Normal,
+        "trampoline",
+        0
+      );
     } else {
       throw "error";
     }
@@ -66,47 +74,45 @@ export default class LevelObject {
   }
 
   /**
-   * @param {Number} playerTileX
-   * @param {Number} playerTileY
-   * @param {Phaser.Tilemaps.TilemapLayer} tilemapLayer
-   * @param {Player} player
+   * @param {World} world
    * @returns {Boolean}
    */
-  checkPlayer(playerTileX, playerTileY, tilemapLayer, player) {
+  checkPlayer(world) {
     const me = this;
 
     if (!me._isActive) return false;
 
     if (me._type == Enums.LevelObjectTypes.SPIKES) {
-      return playerTileX === me._tileX && playerTileY === me._tileY - 1;
+      return (
+        world.playerTilePos.x === me._tileX &&
+        world.playerTilePos.y === me._tileY - 1
+      );
     }
     if (me._type == Enums.LevelObjectTypes.GUN) {
-      return me._checkGunHit(playerTileX, playerTileY, tilemapLayer, player);
+      return me._checkGunHit(world);
+    } else if (me._type == Enums.LevelObjectTypes.TRAMPOLINE) {
+      return (
+        world.playerTilePos.x == me._tileX && world.playerTilePos.y == me._tileY
+      );
     } else {
       throw "error";
     }
-
-    return false;
   }
 
   /**
-   * @param {Number} playerTileX
-   * @param {Number} playerTileY
-   * @param {Phaser.Tilemaps.TilemapLayer} tilemapLayer
-   * @param {Player} player
+   * @param {World} world
    * @returns {Boolean}
    */
-  _checkGunHit(playerTileX, playerTileY, tilemapLayer, player) {
+  _checkGunHit(world) {
     const me = this;
 
-    if (me._tileY != playerTileY) return false;
+    if (me._tileY != world.playerTilePos.y) return false;
 
     for (let currentX = me._tileX - 1; currentX >= 0; --currentX) {
-      const tile = tilemapLayer.getTileAt(currentX, me._tileY);
-      if (!!tile && tile.index > 0) return false;
+      if (world.isSolidTile(currentX, me._tileY)) return false;
 
-      if (currentX == playerTileX)
-        return !player.isShield || player.direction == -1;
+      if (currentX == world.playerTilePos.x)
+        return !world.player.isShield || world.player.direction == -1;
     }
 
     return false;

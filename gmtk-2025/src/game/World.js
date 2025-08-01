@@ -9,10 +9,10 @@ import LevelObject from "./LevelObject.js";
 
 export default class World {
   /** @type {Player} */
-  _player;
+  player;
 
   /** @type {Phaser.Math.Vector2} */
-  _playerTilePos;
+  playerTilePos;
 
   /** @type {Phaser.Tilemaps.TilemapLayer} */
   _tilemapLayer;
@@ -25,8 +25,14 @@ export default class World {
   /** @type {LevelObject[]} */
   _guns;
 
+  /** @type {LevelObject[]} */
+  _trampolines;
+
   /** @type {LevelConfig} */
   _levelConfig;
+
+  /** @type {Boolean} */
+  _isPlayerFalling;
 
   constructor(levelConfig) {
     const me = this;
@@ -49,10 +55,73 @@ export default class World {
       Enums.LevelObjectTypes.GUN,
       me._levelConfig.guns
     );
+    me._trampolines = me._createLevelObjects(
+      Enums.LevelObjectTypes.TRAMPOLINE,
+      me._levelConfig.trampolins
+    );
 
-    me._player = new Player();
+    me.player = new Player();
+    me._isPlayerFalling = false;
 
     me.reset();
+  }
+
+  applyBitChange(commands, currentBit) {
+    const me = this;
+
+    let isDeath = false;
+
+    if (!me.player.isDead) me._doPlayerActions(commands);
+
+    me._updateObjectItems(me._spikes, currentBit);
+    me._updateObjectItems(me._guns, currentBit);
+    me._updateObjectItems(me._trampolines, currentBit);
+
+    if (!me.player.isDead) {
+      for (let i = 0; i < me._trampolines.length; ++i) {
+        const trampoline = me._trampolines[i];
+        if (trampoline.checkPlayer(me)) {
+          const newPlayerTilePos = {
+            x: me.playerTilePos.x,
+            y: me.playerTilePos.y - 2,
+          };
+          me._movePlayerPosTo(newPlayerTilePos);
+          break;
+        }
+      }
+
+      for (let i = 0; i < me._spikes.length; ++i) {
+        if (me._spikes[i].checkPlayer(me)) {
+          me.player.die();
+          isDeath = true;
+        }
+      }
+
+      for (let i = 0; i < me._guns.length; ++i) {
+        if (me._guns[i].checkPlayer(me)) {
+          me.player.die();
+          isDeath = true;
+        }
+      }
+    }
+
+    return isDeath;
+  }
+
+  reset() {
+    const me = this;
+
+    me._isReset = true;
+
+    me._movePlayerPosTo(me._levelConfig.startTilePos);
+    me.player.reset();
+  }
+
+  isSolidTile(tileX, tileY) {
+    const me = this;
+    const tile = me._tilemapLayer.getTileAt(tileX, tileY);
+
+    return !!tile && tile.index > 0;
   }
 
   _createLevelObjects(objectType, configs) {
@@ -70,49 +139,6 @@ export default class World {
     return res;
   }
 
-  applyBitChange(commands, currentBit) {
-    const me = this;
-
-    let isDeath = false;
-
-    if (!me._player.isDead) me._doPlayerActions(commands);
-
-    me._updateObjectItems(me._spikes, currentBit);
-    me._updateObjectItems(me._guns, currentBit);
-
-    if (!me._player.isDead) {
-      for (let i = 0; i < me._spikes.length; ++i) {
-        if (
-          me._spikes[i].checkPlayer(
-            me._playerTilePos.x,
-            me._playerTilePos.y,
-            me._tilemapLayer,
-            me._player
-          )
-        ) {
-          me._player.die();
-          isDeath = true;
-        }
-      }
-
-      for (let i = 0; i < me._guns.length; ++i) {
-        if (
-          me._guns[i].checkPlayer(
-            me._playerTilePos.x,
-            me._playerTilePos.y,
-            me._tilemapLayer,
-            me._player
-          )
-        ) {
-          me._player.die();
-          isDeath = true;
-        }
-      }
-    }
-
-    return isDeath;
-  }
-
   _updateObjectItems(items, currentBit) {
     const me = this;
 
@@ -124,46 +150,59 @@ export default class World {
   _doPlayerActions(commands) {
     const me = this;
 
-    if (Utils.all(commands, (c) => !c)) return me._player.toIdle();
+    if (me._isPlayerFalling) {
+      me._movePlayerPosTo({ x: me.playerTilePos.x, y: me.playerTilePos.y + 1 });
+    }
 
-    if (commands[Enums.SampleCommands.WALK]) return me._applyWalkCommand();
+    if (Utils.all(commands, (c) => !c)) {
+      me.player.toIdle();
+    }
 
-    if (commands[Enums.SampleCommands.TURN]) return me._player.turn();
+    if (commands[Enums.SampleCommands.WALK]) {
+      me._applyWalkCommand();
+    }
 
-    if (commands[Enums.SampleCommands.SHIELD]) return me._player.toShield();
+    if (commands[Enums.SampleCommands.TURN]) {
+      me.player.turn();
+    }
 
-    if (commands[Enums.SampleCommands.ATTACK]) return me._player.toAttack();
-  }
+    if (commands[Enums.SampleCommands.SHIELD]) {
+      me.player.toShield();
+    }
 
-  reset() {
-    const me = this;
+    if (commands[Enums.SampleCommands.ATTACK]) {
+      me.player.toAttack();
+    }
 
-    me._isReset = true;
-
-    me._playerTilePos = me._levelConfig.startTilePos;
-    const pos = me._getTileCenter(me._playerTilePos.x, me._playerTilePos.y);
-    me._player.toGameObject().setPosition(pos.x, pos.y);
-    me._player.reset();
+    me._isPlayerFalling = !me.isSolidTile(
+      me.playerTilePos.x,
+      me.playerTilePos.y + 1
+    );
   }
 
   _applyWalkCommand() {
     const me = this;
 
-    me._player.toIdle();
+    if (me._isPlayerFalling) return;
+
+    me.player.toIdle();
 
     const forwardTilePos = {
-      x: me._playerTilePos.x + me._player.direction,
-      y: me._playerTilePos.y,
+      x: me.playerTilePos.x + me.player.direction,
+      y: me.playerTilePos.y,
     };
-    const forwardTile = me._tilemapLayer.getTileAt(
-      forwardTilePos.x,
-      forwardTilePos.y
-    );
-    // TODO: solid tiles
-    if (!forwardTile || forwardTile.index === 1) return;
-    me._playerTilePos = forwardTilePos;
-    const pos = me._getTileCenter(me._playerTilePos.x, me._playerTilePos.y);
-    me._player.toGameObject().setPosition(pos.x, pos.y);
+
+    if (me.isSolidTile(forwardTilePos.x, forwardTilePos.y)) return; // TODO: trampoline!
+
+    me._movePlayerPosTo(forwardTilePos);
+  }
+
+  _movePlayerPosTo(newPos) {
+    const me = this;
+
+    me.playerTilePos = newPos;
+    const pos = me._getTileCenter(me.playerTilePos.x, me.playerTilePos.y);
+    me.player.toGameObject().setPosition(pos.x, pos.y);
   }
 
   _getTileCenter(tileX, tileY) {
