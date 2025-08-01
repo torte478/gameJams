@@ -52,6 +52,14 @@ export default class DrumMachine {
       me._loop.push(line);
     }
 
+    // solution
+    if (Utils.isDebug(Config.Debug.StartFromSolution)) {
+      const solution = Config.Levels[0].solution;
+      for (let i = 0; i < solution.length; ++i)
+        for (let j = 0; j < solution[i].length; ++j)
+          me._loop[i][j] = !!solution[i][j];
+    }
+
     me._graphics = Here._.add.graphics();
     me._graphics.lineStyle(2, "#000000", 1);
 
@@ -65,14 +73,7 @@ export default class DrumMachine {
       );
 
       for (let j = 0; j < me.loopLength; ++j) {
-        const posX =
-          Consts.DrumMachine.StartPosX + j * Consts.DrumMachine.CellSize;
-        me._graphics.strokeRect(
-          posX,
-          posY,
-          Consts.DrumMachine.CellSize,
-          Consts.DrumMachine.CellSize
-        );
+        me._drawCell(i, j);
       }
     }
 
@@ -130,12 +131,24 @@ export default class DrumMachine {
     )
       return;
 
+    me._loop[i][j] = !me._loop[i][j];
+    me._drawCell(i, j);
+  }
+
+  _drawCell(i, j) {
+    const me = this;
+
     const pos = me._cellToWorldPos(i, j);
 
     if (me._loop[i][j]) {
-      // clear bit
-      me._loop[i][j] = false;
-
+      me._graphics.fillStyle(0x0000ff, 1);
+      me._graphics.fillRect(
+        pos.x,
+        pos.y,
+        Consts.DrumMachine.CellSize,
+        Consts.DrumMachine.CellSize
+      );
+    } else {
       me._graphics.fillStyle(0x84a591, 1);
       me._graphics.fillRect(
         pos.x,
@@ -146,17 +159,6 @@ export default class DrumMachine {
 
       me._graphics.lineStyle(2, "#000000", 1);
       me._graphics.strokeRect(
-        pos.x,
-        pos.y,
-        Consts.DrumMachine.CellSize,
-        Consts.DrumMachine.CellSize
-      );
-    } else {
-      // fill bit
-      me._loop[i][j] = true;
-
-      me._graphics.fillStyle(0xff0000, 1);
-      me._graphics.fillRect(
         pos.x,
         pos.y,
         Consts.DrumMachine.CellSize,

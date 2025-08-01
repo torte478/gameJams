@@ -1,11 +1,13 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
+import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
+import LevelConfig from "./LevelConfig.js";
 import Player from "./Player.js";
 import Spikes from "./Spikes.js";
 
-export default class LevelComponent {
+export default class World {
   /** @type {Player} */
   _player;
 
@@ -20,6 +22,9 @@ export default class LevelComponent {
   /** @type {Spikes[]}*/
   _spikes;
 
+  /** @type {LevelConfig} */
+  _levelConfig;
+
   constructor() {
     const me = this;
 
@@ -31,10 +36,15 @@ export default class LevelComponent {
     const tileset = map.addTilesetImage("tiles");
     me._tilemapLayer = map.createLayer(0, tileset, 0, 0);
 
+    me._levelConfig = Config.Levels[0];
+
     me._spikes = [];
-    me._spikes.push(new Spikes(3, 9, [3, 7]));
-    me._spikes.push(new Spikes(6, 9, [3, 7]));
-    me._spikes.push(new Spikes(12, 9, [3, 7]));
+    for (let i = 0; i < me._levelConfig.items.spikes.length; ++i) {
+      const spikeConfig = me._levelConfig.items.spikes[i];
+      me._spikes.push(
+        new Spikes(spikeConfig.tileX, spikeConfig.tileY, spikeConfig.bits)
+      );
+    }
 
     me._player = new Player();
 
@@ -83,7 +93,7 @@ export default class LevelComponent {
 
     me._isReset = true;
 
-    me._playerTilePos = { x: 1, y: 8 };
+    me._playerTilePos = me._levelConfig.startTilePos;
     const pos = me._getTileCenter(me._playerTilePos.x, me._playerTilePos.y);
     me._player.toGameObject().setPosition(pos.x, pos.y);
     me._player.reset();

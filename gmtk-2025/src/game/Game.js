@@ -5,7 +5,7 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import DrumMachine from "./DrumMachine.js";
 import Enums from "./Enums.js";
-import LevelComponent from "./LevelComponent.js";
+import World from "./World.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -14,14 +14,22 @@ export default class Game {
   /** @type {DrumMachine} */
   _drumMachine;
 
-  /** @type {LevelComponent} */
-  _levelComponent;
+  /** @type {World} */
+  _world;
 
   /** @type {Boolean} */
   _isWindowActive;
 
+  /** @type {Boolean} */
+  _isPaused;
+
+  /** @type {Number} */
+  _gameTimer;
+
   constructor() {
     const me = this;
+
+    Here._.input.mouse.disableContextMenu();
 
     const sceneCamera = Here._.cameras.main;
     sceneCamera
@@ -32,7 +40,9 @@ export default class Game {
       );
 
     me._drumMachine = new DrumMachine();
-    me._levelComponent = new LevelComponent();
+    me._world = new World();
+    me._isPaused = false;
+    me._gameTimer = 0;
 
     const sceneCameraBounds = new Phaser.Geom.Rectangle(
       sceneCamera.scrollX,
@@ -44,10 +54,8 @@ export default class Game {
     Here._.input.on(
       "pointerdown",
       (pointer) => {
-        const pos = Utils.buildPoint(pointer.worldX, pointer.worldY);
-        if (Phaser.Geom.Rectangle.ContainsPoint(sceneCameraBounds, pos))
-          me._levelComponent.reset();
-        else me._drumMachine.onPointerDown(pos.x, pos.y);
+        if (pointer.rightButtonDown) me._tryProcessPause();
+        else me._onLMBClick(pointer, sceneCameraBounds);
       },
       me
     );
@@ -77,14 +85,11 @@ export default class Game {
     if (
       Here.Controls.isPressedOnce(Enums.Keyboard.RESTART) &&
       Utils.isDebug(Config.Debug.Global)
-    )
+    ) {
       Here._.scene.restart({ isRestart: true });
+    }
 
-    const overallBit = Math.floor(time * Consts.BitPerMs);
-    const currentBit = overallBit % me._drumMachine.loopLength;
-
-    const samples = me._drumMachine.update(currentBit, me._isWindowActive);
-    if (!!samples) me._levelComponent.applyBitChange(samples, currentBit);
+    me._gameLoop(delta);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
@@ -94,9 +99,42 @@ export default class Game {
 
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `tle: ${tileX} ${tileY}`;
+        `tle: ${tileX} ${tileY}\n` +
+        `pse: ${me._isPaused}\n` +
+        `tme: ${(me._gameTimer / 1000) | 0} sec`;
 
       me._log.setText(text);
     });
+  }
+
+  _gameLoop(delta) {
+    const me = this;
+
+    if (me._isPaused) return;
+
+    me._gameTimer += delta;
+
+    const overallBit = Math.floor(me._gameTimer * Consts.BitPerMs);
+    const currentBit = overallBit % me._drumMachine.loopLength;
+
+    const samples = me._drumMachine.update(currentBit, me._isWindowActive);
+    if (!!samples) me._world.applyBitChange(samples, currentBit);
+  }
+
+  _tryProcessPause() {
+    const me = this;
+
+    if (!Utils.isDebug(Config.Debug.PauseOnRightClick)) return;
+
+    me._isPaused = !me._isPaused;
+  }
+
+  _onLMBClick(pointer, sceneCameraBounds) {
+    const me = this;
+
+    const pos = Utils.buildPoint(pointer.worldX, pointer.worldY);
+    if (Phaser.Geom.Rectangle.ContainsPoint(sceneCameraBounds, pos))
+      me._world.reset();
+    else me._drumMachine.onPointerDown(pos.x, pos.y);
   }
 }
