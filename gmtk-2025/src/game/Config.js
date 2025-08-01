@@ -12,16 +12,25 @@ export default class Config {
     DisableHihats: false,
   };
 
-  static LevelOrder = [
-    // "walk_spikes",
-    "shield_tutorial",
-  ];
+  static LevelOrder = ["test_level", "walk_spikes", "shield_tutorial"];
 
   /** @type {LevelConfig[]} */
   static Levels = [
     {
+      name: "test_level",
+      startTilePos: { x: 15, y: 8 },
+      finishTilePos: { x: 18, y: 8 },
+      solution: [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+    },
+    {
       name: "walk_spikes",
       startTilePos: { x: 1, y: 8 },
+      finishTilePos: { x: 18, y: 8 },
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
@@ -40,6 +49,7 @@ export default class Config {
     {
       name: "shield_tutorial",
       startTilePos: { x: 1, y: 8 },
+      finishTilePos: { x: 18, y: 8 },
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],

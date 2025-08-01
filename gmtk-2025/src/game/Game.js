@@ -129,10 +129,16 @@ export default class Game {
     const commands = me._drumKit.update(currentBit, me._isWindowActive);
     if (!commands) return;
 
-    const isPlayerDeath = me._world.applyBitChange(commands, currentBit);
-    if (isPlayerDeath) {
+    const bitResult = me._world.applyBitChange(commands, currentBit);
+    if (bitResult == Enums.BitResult.DEATH) {
       me._isPaused = !me._isPaused;
+    } else if (bitResult == Enums.BitResult.WIN) {
+      me._gotoNextLevel();
     }
+  }
+
+  _gotoNextLevel() {
+    const me = this;
   }
 
   _tryProcessPause() {

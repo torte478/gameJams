@@ -30,4 +30,10 @@ export default class Enums {
     GUN: 1,
     TRAMPOLINE: 2,
   };
+
+  static BitResult = {
+    NONE: 0,
+    DEATH: 1,
+    WIN: 2,
+  };
 }

@@ -6,6 +6,7 @@ import Enums from "./Enums.js";
 import LevelConfig from "./LevelConfig.js";
 import Player from "./Player.js";
 import LevelObject from "./LevelObject.js";
+import { LevelContainer } from "./LevelContainer.js";
 
 export default class World {
   /** @type {Player} */
@@ -19,49 +20,33 @@ export default class World {
 
   _isReset = false;
 
-  /** @type {LevelObject[]}*/
-  _spikes;
-
-  /** @type {LevelObject[]} */
-  _guns;
-
-  /** @type {LevelObject[]} */
-  _trampolines;
-
   /** @type {LevelConfig} */
   _levelConfig;
 
   /** @type {Boolean} */
   _isPlayerFalling;
 
-  constructor(levelConfig) {
+  /** @type {LevelContainer} */
+  _mainLevelContainer;
+
+  /** @type {LevelContainer} */
+  _secondaryLevelContainer;
+
+  constructor() {
     const me = this;
 
-    me._levelConfig = levelConfig;
+    const spritePool = Here._.add.group();
+    me._mainLevelContainer = new LevelContainer(spritePool);
+    me._secondaryLevelContainer = new LevelContainer(spritePool);
 
-    const map = Here._.add.tilemap(
-      me._levelConfig.name,
-      Consts.Unit.Normal,
-      Consts.Unit.Normal
-    );
-    const tileset = map.addTilesetImage("tiles");
-    me._tilemapLayer = map.createLayer(0, tileset, 0, 0);
-
-    me._spikes = me._createLevelObjects(
-      Enums.LevelObjectTypes.SPIKES,
-      me._levelConfig.spikes
-    );
-    me._guns = me._createLevelObjects(
-      Enums.LevelObjectTypes.GUN,
-      me._levelConfig.guns
-    );
-    me._trampolines = me._createLevelObjects(
-      Enums.LevelObjectTypes.TRAMPOLINE,
-      me._levelConfig.trampolins
+    me._levelConfig = Utils.firstOrNull(
+      Config.Levels,
+      (c) => c.name == Config.LevelOrder[0]
     );
 
     me.player = new Player();
-    me._isPlayerFalling = false;
+
+    me._mainLevelContainer.init(me._levelConfig);
 
     me.reset();
   }
@@ -69,43 +54,50 @@ export default class World {
   applyBitChange(commands, currentBit) {
     const me = this;
 
-    let isDeath = false;
-
     if (!me.player.isDead) me._doPlayerActions(commands);
 
-    me._updateObjectItems(me._spikes, currentBit);
-    me._updateObjectItems(me._guns, currentBit);
-    me._updateObjectItems(me._trampolines, currentBit);
+    me._mainLevelContainer.update(currentBit);
 
-    if (!me.player.isDead) {
-      for (let i = 0; i < me._trampolines.length; ++i) {
-        const trampoline = me._trampolines[i];
-        if (trampoline.checkPlayer(me)) {
-          const newPlayerTilePos = {
-            x: me.playerTilePos.x,
-            y: me.playerTilePos.y - 2,
-          };
-          me._movePlayerPosTo(newPlayerTilePos);
-          break;
-        }
-      }
+    if (me.player.isDead) return Enums.BitResult.NONE;
 
-      for (let i = 0; i < me._spikes.length; ++i) {
-        if (me._spikes[i].checkPlayer(me)) {
-          me.player.die();
-          isDeath = true;
-        }
-      }
+    // win
+    if (
+      me.playerTilePos.x == me._levelConfig.finishTilePos.x &&
+      me.playerTilePos.y == me._levelConfig.finishTilePos.y
+    ) {
+      return Enums.BitResult.WIN;
+    }
 
-      for (let i = 0; i < me._guns.length; ++i) {
-        if (me._guns[i].checkPlayer(me)) {
-          me.player.die();
-          isDeath = true;
-        }
+    // trampolines
+    for (let i = 0; i < me._mainLevelContainer.trampolines.length; ++i) {
+      const trampoline = me._mainLevelContainer.trampolines[i];
+      if (trampoline.checkPlayer(me)) {
+        const newPlayerTilePos = {
+          x: me.playerTilePos.x,
+          y: me.playerTilePos.y - 2,
+        };
+        me._movePlayerPosTo(newPlayerTilePos);
+        break;
       }
     }
 
-    return isDeath;
+    // spikes
+    for (let i = 0; i < me._mainLevelContainer.spikes.length; ++i) {
+      if (me._mainLevelContainer.spikes[i].checkPlayer(me)) {
+        me.player.die();
+        return Enums.BitResult.DEATH;
+      }
+    }
+
+    // guns
+    for (let i = 0; i < me._mainLevelContainer.guns.length; ++i) {
+      if (me._mainLevelContainer.guns[i].checkPlayer(me)) {
+        me.player.die();
+        return Enums.BitResult.DEATH;
+      }
+    }
+
+    return Enums.BitResult.NONE;
   }
 
   reset() {
@@ -115,36 +107,13 @@ export default class World {
 
     me._movePlayerPosTo(me._levelConfig.startTilePos);
     me.player.reset();
+    me._isPlayerFalling = false;
   }
 
   isSolidTile(tileX, tileY) {
     const me = this;
-    const tile = me._tilemapLayer.getTileAt(tileX, tileY);
 
-    return !!tile && tile.index > 0;
-  }
-
-  _createLevelObjects(objectType, configs) {
-    const me = this;
-
-    const res = [];
-
-    if (!configs) return res;
-
-    for (let i = 0; i < configs.length; ++i) {
-      const itemConfig = configs[i];
-      res.push(new LevelObject(objectType, itemConfig));
-    }
-
-    return res;
-  }
-
-  _updateObjectItems(items, currentBit) {
-    const me = this;
-
-    for (let i = 0; i < items.length; ++i) {
-      items[i].update(currentBit);
-    }
+    return me._mainLevelContainer.isSolidTile(tileX, tileY);
   }
 
   _doPlayerActions(commands) {
@@ -208,10 +177,9 @@ export default class World {
   _getTileCenter(tileX, tileY) {
     const me = this;
 
-    const pos = me._tilemapLayer.tileToWorldXY(tileX, tileY);
     return {
-      x: pos.x + Consts.Unit.Normal / 2,
-      y: pos.y + Consts.Unit.Normal / 2,
+      x: tileX * Consts.Unit.Normal + Consts.Unit.Normal / 2,
+      y: tileY * Consts.Unit.Normal + Consts.Unit.Normal / 2,
     };
   }
 }

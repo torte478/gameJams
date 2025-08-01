@@ -8,7 +8,7 @@ import World from "./World.js";
 
 export default class LevelObject {
   /** @type {Phaser.GameObjects.Sprite} */
-  _sprite;
+  sprite;
 
   /** @type {Number} */
   _tileX;
@@ -29,8 +29,9 @@ export default class LevelObject {
    *
    * @param {Number} type
    * @param {ItemConfig} config
+   * @param {Phaser.GameObjects.Group} pool
    */
-  constructor(type, config) {
+  constructor(type, config, pool) {
     const me = this;
 
     me._type = type;
@@ -39,26 +40,32 @@ export default class LevelObject {
     me._bitsToActive = config.bits;
 
     if (me._type == Enums.LevelObjectTypes.SPIKES) {
-      me._sprite = Here._.add.sprite(
-        me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
-        me._tileY * Consts.Unit.Normal,
-        "spikes",
-        0
-      );
+      me.sprite = pool.get();
+      me.sprite
+        .setPosition(
+          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          me._tileY * Consts.Unit.Normal
+        )
+        .setTexture("spikes", 0)
+        .setActive(true);
     } else if (me._type == Enums.LevelObjectTypes.GUN) {
-      me._sprite = Here._.add.sprite(
-        me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
-        me._tileY * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
-        "gun",
-        0
-      );
+      me.sprite = pool.get();
+      me.sprite
+        .setPosition(
+          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          me._tileY * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal
+        )
+        .setTexture("gun", 0)
+        .setActive(true);
     } else if (me._type == Enums.LevelObjectTypes.TRAMPOLINE) {
-      me._sprite = Here._.add.sprite(
-        me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
-        me._tileY * Consts.Unit.Normal,
-        "trampoline",
-        0
-      );
+      me.sprite = pool.get();
+      me.sprite
+        .setPosition(
+          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          me._tileY * Consts.Unit.Normal
+        )
+        .setTexture("trampoline", 0)
+        .setActive(true);
     } else {
       throw "error";
     }
@@ -70,7 +77,7 @@ export default class LevelObject {
     const me = this;
 
     me._isActive = Utils.any(me._bitsToActive, (bit) => bit === currentBit);
-    me._sprite.setFrame(me._isActive ? 1 : 0);
+    me.sprite.setFrame(me._isActive ? 1 : 0);
   }
 
   /**
