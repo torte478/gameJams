@@ -10,6 +10,9 @@ export default class Player {
   /** @type {Number} */
   direction;
 
+  /** @type {Boolean} */
+  isDead;
+
   constructor() {
     const me = this;
 
@@ -17,6 +20,7 @@ export default class Player {
     me._container = Here._.add.container(0, 0, [me._sprite]);
 
     me.direction = 1;
+    me.isDead = false;
   }
 
   toGameObject() {
@@ -48,5 +52,21 @@ export default class Player {
     const me = this;
 
     me._sprite.setFrame(1);
+  }
+
+  reset() {
+    const me = this;
+
+    me._sprite.setFrame(0).setFlipX(false);
+
+    me.direction = 1;
+    me.isDead = false;
+  }
+
+  die() {
+    const me = this;
+
+    me._sprite.setFrame(3);
+    me.isDead = true;
   }
 }

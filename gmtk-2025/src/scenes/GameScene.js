@@ -30,6 +30,7 @@ export default class GameScene extends HereScene {
 
     Utils.loadSpriteSheet("tiles", Consts.Unit.Normal);
     Utils.loadSpriteSheet("player", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("spikes", Consts.Unit.Normal, Consts.Unit.Normal * 2);
 
     Utils.loadImage("indicator");
 
@@ -39,7 +40,8 @@ export default class GameScene extends HereScene {
     Utils.loadMp3("rack_tom");
     Utils.loadMp3("snare");
 
-    this.load.tilemapCSV("test_level", "assets/test_level.csv");
+    Utils.loadCsv("test_level");
+    Utils.loadCsv("walk_spikes");
   }
 
   create() {

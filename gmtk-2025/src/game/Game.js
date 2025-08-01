@@ -89,11 +89,12 @@ export default class Game {
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
 
+      const tileX = Math.floor(mouse.worldX / Consts.Unit.Normal);
+      const tileY = Math.floor(mouse.worldY / Consts.Unit.Normal);
+
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `tme: ${(time / 1000) | 0} s.\n` +
-        `bit: ${me._drumMachine._currentBit}\n` +
-        `act: ${this._isWindowActive}`;
+        `tle: ${tileX} ${tileY}`;
 
       me._log.setText(text);
     });

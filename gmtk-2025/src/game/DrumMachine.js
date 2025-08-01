@@ -75,6 +75,16 @@ export default class DrumMachine {
         );
       }
     }
+
+    const bitTextPosY =
+      Consts.DrumMachine.StartPosY + 4 * Consts.DrumMachine.CellSize;
+    for (let j = 0; j < me.loopLength; ++j) {
+      Here._.add.text(
+        Consts.DrumMachine.StartPosX + j * Consts.DrumMachine.CellSize + 10,
+        bitTextPosY + 5,
+        `${j}`
+      );
+    }
   }
 
   update(bit, isWindowActive) {

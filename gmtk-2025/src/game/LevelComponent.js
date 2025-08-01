@@ -3,6 +3,7 @@ import Utils from "../framework/Utils.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Player from "./Player.js";
+import Spikes from "./Spikes.js";
 
 export default class LevelComponent {
   /** @type {Player} */
@@ -16,21 +17,24 @@ export default class LevelComponent {
 
   _isReset = false;
 
+  /** @type {Spikes[]}*/
+  _spikes;
+
   constructor() {
     const me = this;
 
     const map = Here._.add.tilemap(
-      "test_level",
+      "walk_spikes",
       Consts.Unit.Normal,
       Consts.Unit.Normal
     );
     const tileset = map.addTilesetImage("tiles");
-    me._tilemapLayer = map.createLayer(
-      0,
-      tileset,
-      Consts.Unit.Normal * 2,
-      Consts.Unit.Normal
-    );
+    me._tilemapLayer = map.createLayer(0, tileset, 0, 0);
+
+    me._spikes = [];
+    me._spikes.push(new Spikes(3, 9, [3, 7]));
+    me._spikes.push(new Spikes(6, 9, [3, 7]));
+    me._spikes.push(new Spikes(12, 9, [3, 7]));
 
     me._player = new Player();
 
@@ -40,9 +44,28 @@ export default class LevelComponent {
   applyBitChange(commands, currentBit) {
     const me = this;
 
-    if (me._isReset && currentBit != 0) return;
+    let isDeath = false;
+
+    for (let i = 0; i < me._spikes.length; ++i)
+      me._spikes[i].update(currentBit);
+
+    if (me._isReset && currentBit != 0) return isDeath;
 
     me._isReset = false;
+
+    if (!me._player.isDead) me._doPlayerActions(commands);
+
+    for (let i = 0; i < me._spikes.length; ++i) {
+      if (
+        !me._player.isDead &&
+        me._spikes[i].isHitOn(me._playerTilePos.x, me._playerTilePos.y)
+      )
+        me._player.die();
+    }
+  }
+
+  _doPlayerActions(commands) {
+    const me = this;
 
     if (Utils.all(commands, (c) => !c)) return me._player.toIdle();
 
@@ -60,10 +83,10 @@ export default class LevelComponent {
 
     me._isReset = true;
 
-    me._playerTilePos = { x: 2, y: 6 };
+    me._playerTilePos = { x: 1, y: 8 };
     const pos = me._getTileCenter(me._playerTilePos.x, me._playerTilePos.y);
     me._player.toGameObject().setPosition(pos.x, pos.y);
-    me._player.toIdle();
+    me._player.reset();
   }
 
   _applyWalkCommand() {
