@@ -20,7 +20,7 @@ export default class Config {
   };
 
   static LevelOrder = [
-    "cool_bit",
+    "rock_you",
     // "protec_tutorial",
     //"attack_tutorial",
     // "turn_tutorial",
@@ -36,13 +36,82 @@ export default class Config {
   static Levels = [
     {
       name: "test_level",
-      startTilePos: { x: 17, y: 8 },
+      startTilePos: { x: 15, y: 8 },
       finishTilePos: { x: 18, y: 8 },
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+    },
+    {
+      name: "rock_you",
+      startTilePos: { x: 1, y: 8 },
+      finishTilePos: { x: 18, y: 6 },
+      length: 16,
+      solution: [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+        [1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0],
+      ],
+      trampolins: [
+        //...
+        { tileX: 3, tileY: 8, bits: [3, 15] },
+        { tileX: 15, tileY: 6, bits: [3, 15] },
+      ],
+      guns: [
+        // ...
+        { tileX: 16, tileY: 6, bits: [2, 6, 10, 14] },
+      ],
+      spikes: [
+        // ...
+        {
+          tileX: 5,
+          tileY: 7,
+          bits: [0, 1, 2, 3, 8, 9, 10, 11, 12, 13, 14, 15],
+        },
+        {
+          tileX: 6,
+          tileY: 7,
+          bits: [0, 1, 2, 3, 4, 9, 10, 11, 12, 13, 14, 15],
+        },
+        {
+          tileX: 7,
+          tileY: 7,
+          bits: [0, 1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15],
+        },
+        {
+          tileX: 8,
+          tileY: 7,
+          bits: [0, 1, 2, 3, 4, 5, 6, 7, 12, 13, 14, 15],
+        },
+        {
+          tileX: 9,
+          tileY: 7,
+          bits: [0, 1, 2, 3, 4, 5, 6, 7, 8, 13, 14, 15],
+        },
+        {
+          tileX: 10,
+          tileY: 7,
+          bits: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        },
+        {
+          tileX: 11,
+          tileY: 7,
+          bits: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        },
+        {
+          tileX: 12,
+          tileY: 7,
+          bits: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        },
+        {
+          tileX: 13,
+          tileY: 7,
+          bits: [0, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        },
       ],
     },
     {

@@ -10,6 +10,9 @@ export default class LevelConfig {
   /** @type {Phaser.Geom.Point} */
   finishTilePos;
 
+  /** @type {Number} */
+  length;
+
   /** @type {Number[][]} */
   solution;
 

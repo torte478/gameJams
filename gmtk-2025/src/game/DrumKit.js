@@ -25,13 +25,16 @@ export default class DrumKit {
   _resultBuffer;
 
   /** @type {Number} */
-  loopLength = 8; // TODO ?
+  loopLength;
 
   /** @type {Phaser.GameObjects.Image} */
   _deathIcon;
 
   /** @type {Boolean} */
   completeLevelTransition = true;
+
+  /** @type {Phaser.GameObjects.Text[]} */
+  _bitTextPool;
 
   /**
    * @param {LevelConfig} levelConfig
@@ -65,7 +68,7 @@ export default class DrumKit {
 
     me._loop = [];
     for (let i = 0; i < Consts.DrumKit.SampleCount; ++i) {
-      const line = Utils.buildArray(me.loopLength, false);
+      const line = Utils.buildArray(Consts.DrumKit.MaxBitCount, false);
       me._loop.push(line);
     }
 
@@ -77,8 +80,38 @@ export default class DrumKit {
           me._loop[i][j] = !!solution[i][j];
     }
 
+    // bit text
+    me._bitTextPool = [];
+    const bitTextPosY = Consts.DrumKit.StartPosY + 4 * Consts.DrumKit.CellSize;
+    for (let i = 0; i < Consts.DrumKit.MaxBitCount; ++i) {
+      const bitText = Here._.add
+        .text(
+          Consts.DrumKit.StartPosX + i * Consts.DrumKit.CellSize + 10,
+          bitTextPosY + 5,
+          `${i}`
+        )
+        .setVisible(false);
+
+      me._bitTextPool.push(bitText);
+    }
+
+    // draw cells
     me._graphics = Here._.add.graphics();
+    me._initAllCells(levelConfig);
+  }
+
+  _initAllCells(levelConfig) {
+    const me = this;
+
+    me.loopLength = !!levelConfig.length
+      ? levelConfig.length
+      : Consts.DrumKit.DefaultBitLength;
+
+    me._graphics.clear();
     me._graphics.lineStyle(2, "#000000", 1);
+
+    const foo = Here._.add.group();
+    foo.get();
 
     for (let i = 0; i < Consts.DrumKit.SampleCount; ++i) {
       const posY = Consts.DrumKit.StartPosY + i * Consts.DrumKit.CellSize;
@@ -93,13 +126,8 @@ export default class DrumKit {
       }
     }
 
-    const bitTextPosY = Consts.DrumKit.StartPosY + 4 * Consts.DrumKit.CellSize;
-    for (let j = 0; j < me.loopLength; ++j) {
-      Here._.add.text(
-        Consts.DrumKit.StartPosX + j * Consts.DrumKit.CellSize + 10,
-        bitTextPosY + 5,
-        `${j}`
-      );
+    for (let i = 0; i < Consts.DrumKit.MaxBitCount; ++i) {
+      me._bitTextPool[i].setVisible(i < me.loopLength);
     }
   }
 
@@ -163,8 +191,8 @@ export default class DrumKit {
 
     me.completeLevelTransition = false;
 
-    // TODO : some logic
     me._deathIcon.setVisible(false);
+    me._initAllCells(nextLevelConfig);
 
     me.completeLevelTransition = true;
   }
