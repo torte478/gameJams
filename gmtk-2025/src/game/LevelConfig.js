@@ -13,6 +13,9 @@ export default class LevelConfig {
   /** @type {Number} */
   length;
 
+  /** @type {String} */
+  csvName;
+
   /** @type {Number[][]} */
   solution;
 

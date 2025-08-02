@@ -55,7 +55,10 @@ export default class LevelContainer {
 
     const copyFrom = startTileX == 0 ? 0 : Consts.LevelOverlayAtTiles;
 
-    const tempMap = Here._.add.tilemap(levelConfig.name);
+    const csvName = !!levelConfig.csvName
+      ? levelConfig.csvName
+      : levelConfig.name;
+    const tempMap = Here._.add.tilemap(csvName);
     for (let tileX = copyFrom; tileX < tempMap.width; ++tileX)
       for (let tileY = 0; tileY < tempMap.height; ++tileY) {
         const tile = tempMap.getTileAt(tileX, tileY);

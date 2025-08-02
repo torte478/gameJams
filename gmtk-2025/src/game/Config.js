@@ -6,7 +6,7 @@ export default class Config {
     Global: true,
     Log: true,
     ShowSceneLog: true,
-    PlaySound: false,
+    PlaySound: true,
     Random: false,
     StartFromSolution: true,
     PauseOnRightClick: true,
@@ -21,18 +21,22 @@ export default class Config {
   };
 
   static LevelOrder = [
-    "test_level",
-    //"cool_16",
-    //"rock_you",
-    // "protec_tutorial",
-    //"attack_tutorial",
-    // "turn_tutorial",
-    // "trampoline_hell",
-    // "shield_tutorial",
+    // "test_level",
+    "walk_tutorial",
     // "walk_spikes",
     // "trampoline_tutorial",
     // "trampoline_hell",
     // "shield_tutorial",
+    // "TODO_transmit",
+    // "turn_tutorial",
+    // "attack_tutorial",
+    // el problemo
+    // "cool_bit",
+    // "TODO_transmit",
+    // "protec_tutorial",
+    // "rock_you",
+    // "TODO_transmit",
+    // "cool_16",
   ];
 
   /** @type {LevelConfig[]} */
@@ -53,6 +57,30 @@ export default class Config {
         { tileX: 3, tileY: 7 },
         { tileX: 4, tileY: 7 },
         { tileX: 5, tileY: 7 },
+      ],
+    },
+    {
+      name: "walk_tutorial",
+      csvName: "plain",
+      startTilePos: { x: 1, y: 8 },
+      finishTilePos: { x: 18, y: 8 },
+      solution: [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+    },
+    {
+      name: "TODO_transmit",
+      csvName: "transmit",
+      startTilePos: { x: 1, y: 6 },
+      finishTilePos: { x: 18, y: 8 },
+      solution: [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1],
       ],
     },
     {
@@ -210,6 +238,7 @@ export default class Config {
     },
     {
       name: "protec_tutorial",
+      csvName: "plain",
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
       solution: [
@@ -239,6 +268,7 @@ export default class Config {
     },
     {
       name: "attack_tutorial",
+      csvName: "plain",
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
       solution: [
@@ -275,6 +305,7 @@ export default class Config {
     },
     {
       name: "walk_spikes",
+      csvName: "plain",
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
       solution: [

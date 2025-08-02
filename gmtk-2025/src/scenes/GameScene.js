@@ -50,7 +50,7 @@ export default class GameScene extends HereScene {
     Utils.loadMp3("snare");
 
     Utils.loadCsv("test_level");
-    Utils.loadCsv("walk_spikes");
+    Utils.loadCsv("plain");
     Utils.loadCsv("shield_tutorial");
     Utils.loadCsv("trampoline_tutorial");
     Utils.loadCsv("trampoline_hell");
@@ -60,6 +60,7 @@ export default class GameScene extends HereScene {
     Utils.loadCsv("cool_bit");
     Utils.loadCsv("rock_you");
     Utils.loadCsv("cool_16");
+    Utils.loadCsv("transmit");
   }
 
   create() {

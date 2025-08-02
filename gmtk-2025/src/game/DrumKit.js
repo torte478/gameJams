@@ -54,7 +54,7 @@ export default class DrumKit {
       Consts.DrumKit.ViewHeight
     );
     me._camera
-      .setBackgroundColor("#022518")
+      .setBackgroundColor("#021e14")
       .setScroll(Consts.DrumKit.ViewScrollX, 0);
 
     me._indicator = Here._.add.image(
@@ -83,14 +83,6 @@ export default class DrumKit {
     for (let i = 0; i < Consts.DrumKit.SampleCount; ++i) {
       const line = Utils.buildArray(Consts.DrumKit.MaxBitCount, false);
       me._loop.push(line);
-    }
-
-    // solution
-    if (Utils.isDebug(Config.Debug.StartFromSolution)) {
-      const solution = levelConfig.solution;
-      for (let i = 0; i < solution.length; ++i)
-        for (let j = 0; j < solution[i].length; ++j)
-          me._loop[i][j] = !!solution[i][j];
     }
 
     // bit text
@@ -135,6 +127,17 @@ export default class DrumKit {
     }
 
     me._initAllCells(levelConfig);
+
+    // solution
+    if (Utils.isDebug(Config.Debug.StartFromSolution)) {
+      const solution = levelConfig.solution;
+      for (let i = 0; i < solution.length; ++i)
+        for (let j = 0; j < solution[i].length; ++j) {
+          me._loop[i][j] = !!solution[i][j];
+
+          if (me._loop[i][j]) me._toggleCell(i, j);
+        }
+    }
   }
 
   _initAllCells(levelConfig) {

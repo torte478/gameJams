@@ -24,19 +24,18 @@ export default class Consts {
     StartPosY: 40,
     CellSize: 50,
     SampleCount: 4,
-    MaxBitCount: 16,
+    MaxBitCount: 32,
     DefaultBitLength: 8,
   };
 
-  static Tempo = 45;
+  static Tempo = 120;
   static BitPerMs = (Consts.Tempo / 60 / 1000) * 2; // 2 - bit per tick
   static FallPeriod = 2;
   static LevelOverlayAtTiles = 3;
 
   // yellow: #E6EE3D
   // black #022518
-  // white #83a897
+  // white #fcfae8
   // blue #2f83db
   // red #cd1e22
-  // purple #9e557f
 }
