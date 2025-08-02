@@ -53,6 +53,7 @@ export default class GameScene extends HereScene {
     Utils.loadCsv("turn_tutorial");
     Utils.loadCsv("attack_tutorial");
     Utils.loadCsv("protec_tutorial");
+    Utils.loadCsv("cool_bit");
   }
 
   create() {

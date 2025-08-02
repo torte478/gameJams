@@ -284,13 +284,28 @@ export default class World {
       me.player.toAttack();
 
       const forwardTileX = me.playerTilePos.x + me.player.direction;
-      const barrel = me._findBarrelAtPosition(forwardTileX, me.playerTilePos.y);
-      if (!!barrel) {
-        barrel.explode();
-        if (barrel._type == Enums.LevelObjectTypes.BAD_BARREL) {
-          return me._processDeath();
-        }
+      const firstBarrel = me._findBarrelAtPosition(
+        forwardTileX,
+        me.playerTilePos.y
+      );
+      const secondBarrel = me._findBarrelAtPosition(
+        forwardTileX,
+        me.playerTilePos.y - 1
+      );
+
+      let isPlayerDeath = false;
+      if (!!firstBarrel) {
+        firstBarrel.explode();
+        if (firstBarrel._type == Enums.LevelObjectTypes.BAD_BARREL)
+          isPlayerDeath = true;
       }
+      if (!!secondBarrel) {
+        secondBarrel.explode();
+        if (secondBarrel._type == Enums.LevelObjectTypes.BAD_BARREL)
+          isPlayerDeath = true;
+      }
+
+      if (isPlayerDeath) return me._processDeath();
     }
 
     me._isPlayerFalling = !me.isSolidTile(

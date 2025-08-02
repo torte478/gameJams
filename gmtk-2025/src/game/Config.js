@@ -20,8 +20,9 @@ export default class Config {
   };
 
   static LevelOrder = [
-    "protec_tutorial",
-    // "attack_tutorial",
+    "cool_bit",
+    // "protec_tutorial",
+    //"attack_tutorial",
     // "turn_tutorial",
     // "trampoline_hell",
     // "shield_tutorial",
@@ -42,6 +43,45 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+    },
+    {
+      name: "cool_bit",
+      startTilePos: { x: 1, y: 6 },
+      finishTilePos: { x: 18, y: 6 },
+      solution: [
+        [1, 0, 1, 0, 1, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0, 1, 0, 1],
+        [1, 1, 0, 1, 1, 0, 1, 0],
+      ],
+      guns: [
+        // ...
+        { tileX: 7, tileY: 7, bits: [1, 3, 5, 7] },
+        { tileX: 17, tileY: 8, bits: [2, 5, 7] },
+        { tileX: 15, tileY: 5, bits: [2, 5, 7] },
+      ],
+      goodBarrels: [
+        // ...
+        { tileX: 3, tileY: 6 },
+        { tileX: 9, tileY: 4 },
+        { tileX: 11, tileY: 8 },
+        { tileX: 13, tileY: 8 },
+        { tileX: 15, tileY: 8 },
+      ],
+      trampolins: [
+        //...
+        { tileX: 6, tileY: 8, bits: [2] },
+        { tileX: 8, tileY: 6, bits: [2] },
+        { tileX: 10, tileY: 8, bits: [2] },
+        { tileX: 12, tileY: 8, bits: [2] },
+        { tileX: 14, tileY: 8, bits: [2] },
+        { tileX: 16, tileY: 8, bits: [2] },
+      ],
+      spikes: [
+        { tileX: 11, tileY: 7, bits: [0, 6] },
+        { tileX: 13, tileY: 7, bits: [2, 6] },
+        { tileX: 15, tileY: 7, bits: [4, 6] },
       ],
     },
     {
@@ -85,8 +125,11 @@ export default class Config {
       ],
       goodBarrels: [
         { tileX: 4, tileY: 8 },
+        { tileX: 7, tileY: 7 },
         { tileX: 7, tileY: 8 },
+        { tileX: 10, tileY: 7 },
         { tileX: 10, tileY: 8 },
+        { tileX: 13, tileY: 7 },
         { tileX: 13, tileY: 8 },
         { tileX: 16, tileY: 8 },
       ],
