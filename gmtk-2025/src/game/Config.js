@@ -1,3 +1,4 @@
+import Enums from "./Enums.js";
 import LevelConfig from "./LevelConfig.js";
 
 export default class Config {
@@ -12,13 +13,19 @@ export default class Config {
     DisableHihats: false,
   };
 
+  static StartState = Enums.GameStates.PLAY;
+
   static DurationMs = {
-    LevelChange: 3000,
+    LevelChange: 500,
   };
 
   static LevelOrder = [
-    //"test_level",
     "walk_spikes",
+    "walk_spikes",
+    "walk_spikes",
+    //"test_level",
+    "shield_tutorial",
+    "test_level",
     "walk_spikes",
     "shield_tutorial",
   ];
@@ -27,7 +34,7 @@ export default class Config {
   static Levels = [
     {
       name: "test_level",
-      startTilePos: { x: 15, y: 8 },
+      startTilePos: { x: 17, y: 8 },
       finishTilePos: { x: 18, y: 8 },
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
@@ -44,7 +51,7 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1], //[1, 1, 1, 1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0, 0],
       ],
       spikes: [
         { tileX: 6, tileY: 9, bits: [4, 5, 6, 7] },
@@ -58,7 +65,7 @@ export default class Config {
     {
       name: "shield_tutorial",
       startTilePos: { x: 1, y: 8 },
-      finishTilePos: { x: 18, y: 8 },
+      finishTilePos: { x: 18, y: 6 },
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],

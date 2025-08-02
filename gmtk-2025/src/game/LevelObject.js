@@ -35,38 +35,39 @@ export default class LevelObject {
     const me = this;
 
     me._type = type;
-    me._tileX = config.tileX;
+    me._tileX = startTileX + config.tileX;
     me._tileY = config.tileY;
     me._bitsToActive = config.bits;
-
-    const startPosX = startTileX * Consts.Unit.Normal;
 
     if (me._type == Enums.LevelObjectTypes.SPIKES) {
       me.sprite = pool.get();
       me.sprite
         .setPosition(
-          startPosX + me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
           me._tileY * Consts.Unit.Normal
         )
         .setTexture("spikes", 0)
+        .setVisible(true)
         .setActive(true);
     } else if (me._type == Enums.LevelObjectTypes.GUN) {
       me.sprite = pool.get();
       me.sprite
         .setPosition(
-          startPosX + me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
           me._tileY * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal
         )
         .setTexture("gun", 0)
+        .setVisible(true)
         .setActive(true);
     } else if (me._type == Enums.LevelObjectTypes.TRAMPOLINE) {
       me.sprite = pool.get();
       me.sprite
         .setPosition(
-          startPosX + me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
           me._tileY * Consts.Unit.Normal
         )
         .setTexture("trampoline", 0)
+        .setVisible(true)
         .setActive(true);
     } else {
       throw "error";

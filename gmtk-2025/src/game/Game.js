@@ -28,7 +28,7 @@ export default class Game {
   _currentLevelIndex = 0;
 
   /** @type {Number} */
-  _gameState = Enums.GameStates.EDIT;
+  _gameState = Config.StartState;
 
   constructor() {
     const me = this;
@@ -118,9 +118,19 @@ export default class Game {
     const currentBit = overallBit % me._drumKit.loopLength;
 
     const commands = me._drumKit.update(currentBit, me._isWindowActive);
-    if (!commands) return;
-
     const bitResult = me._world.update(commands, currentBit, me._gameState);
+
+    if (me._gameState == Enums.GameStates.BUSY) {
+      if (
+        !me._world.completeLevelTransition ||
+        !me._drumKit.completeLevelTransition
+      )
+        return;
+
+      me._gameState = Enums.GameStates.PLAY;
+      me._world.runWithNextLoop();
+    }
+
     if (bitResult == Enums.BitResult.WIN) {
       me._gotoNextLevel();
     } else if (bitResult == Enums.BitResult.DEATH) {
@@ -142,6 +152,7 @@ export default class Game {
 
     if (!levelConfig) throw "error";
 
+    me._gameState = Enums.GameStates.BUSY;
     me._world.gotoNextLevel(levelConfig);
     me._drumKit.gotoNextLevel(levelConfig);
   }

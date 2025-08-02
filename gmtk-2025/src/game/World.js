@@ -44,6 +44,9 @@ export default class World {
   /** @type {Boolean} */
   _runWithNextLoop = false;
 
+  /** @type {Boolean} */
+  completeLevelTransition = true;
+
   constructor() {
     const me = this;
 
@@ -100,7 +103,11 @@ export default class World {
       me._runWithNextLoop = false;
     }
 
-    if (gameState == Enums.GameStates.PLAY && !me._runWithNextLoop)
+    if (
+      gameState == Enums.GameStates.PLAY &&
+      !me._runWithNextLoop &&
+      !!commands
+    )
       me._doPlayerActions(commands);
 
     me._mainLevelContainer.update(currentBit);
@@ -109,9 +116,11 @@ export default class World {
 
     // win
     if (
-      me.playerTilePos.x == me._levelConfig.finishTilePos.x &&
+      me.playerTilePos.x ==
+        me._currentLevelTileX + me._levelConfig.finishTilePos.x &&
       me.playerTilePos.y == me._levelConfig.finishTilePos.y
     ) {
+      me._mainLevelContainer.runFinishFlagAnimation();
       return Enums.BitResult.WIN;
     }
 
@@ -135,6 +144,7 @@ export default class World {
     const me = this;
 
     me._isBusy = true;
+    me.completeLevelTransition = false;
 
     me._currentLevelTileX +=
       me._mainLevelContainer.widthAtTiles - Consts.LevelOverlayAtTiles;
@@ -159,8 +169,10 @@ export default class World {
         const t = me._secondaryLevelContainer;
         me._secondaryLevelContainer = me._mainLevelContainer;
         me._mainLevelContainer = t;
+        me._levelConfig = nextLevelConfig;
 
         me._isBusy = false;
+        me.completeLevelTransition = true;
       },
     });
   }
@@ -168,7 +180,10 @@ export default class World {
   resetPlayer() {
     const me = this;
 
-    me._movePlayerPosTo(me._levelConfig.startTilePos);
+    me._movePlayerPosTo({
+      x: me._currentLevelTileX + me._levelConfig.startTilePos.x,
+      y: me._levelConfig.startTilePos.y,
+    });
     me.player.reset();
     me._isPlayerFalling = false;
   }

@@ -52,7 +52,7 @@ export default class LevelContainer {
         tilemap.putTileAt(tile, me._startTileX + tileX, tileY);
       }
 
-    me.widthAtTiles = tempMap.width - copyFrom;
+    me.widthAtTiles = tempMap.width; // - copyFrom;
 
     me.spikes = me._createLevelObjects(
       Enums.LevelObjectTypes.SPIKES,
@@ -67,15 +67,18 @@ export default class LevelContainer {
       levelConfig.trampolins
     );
 
-    me._finishFlag = me._spritePool.get(
-      startTileX * Consts.Unit.Normal +
-        levelConfig.finishTilePos.x * Consts.Unit.Normal +
-        0.5 * Consts.Unit.Normal,
-      levelConfig.finishTilePos.y * Consts.Unit.Normal +
-        0.5 * Consts.Unit.Normal,
-      "finish_flag",
-      0
-    );
+    me._finishFlag = me._spritePool.get();
+    me._finishFlag
+      .setPosition(
+        startTileX * Consts.Unit.Normal +
+          levelConfig.finishTilePos.x * Consts.Unit.Normal +
+          0.5 * Consts.Unit.Normal,
+        levelConfig.finishTilePos.y * Consts.Unit.Normal +
+          0.5 * Consts.Unit.Normal
+      )
+      .setTexture("finish_flag", 0)
+      .setActive(true)
+      .setVisible(true);
   }
 
   update(currentBit) {
@@ -86,11 +89,10 @@ export default class LevelContainer {
     me._updateObjectItems(me.trampolines, currentBit);
   }
 
-  isSolidTile(tileX, tileY) {
+  runFinishFlagAnimation() {
     const me = this;
-    const tile = me._tilemapLayer.getTileAt(tileX, tileY);
 
-    return !tile || tile.index > 0;
+    me._finishFlag.setVisible(false);
   }
 
   _updateObjectItems(items, currentBit) {

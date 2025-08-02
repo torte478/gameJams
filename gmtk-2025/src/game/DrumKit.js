@@ -30,6 +30,9 @@ export default class DrumKit {
   /** @type {Phaser.GameObjects.Image} */
   _deathIcon;
 
+  /** @type {Boolean} */
+  completeLevelTransition = true;
+
   /**
    * @param {LevelConfig} levelConfig
    */
@@ -158,7 +161,12 @@ export default class DrumKit {
   gotoNextLevel(nextLevelConfig) {
     const me = this;
 
-    // TODO
+    me.completeLevelTransition = false;
+
+    // TODO : some logic
+    me._deathIcon.setVisible(false);
+
+    me.completeLevelTransition = true;
   }
 
   isInsideView(pos) {
