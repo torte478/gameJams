@@ -6,11 +6,12 @@ export default class Config {
     Global: true,
     Log: true,
     ShowSceneLog: true,
-    PlaySound: true,
+    PlaySound: false,
     Random: false,
     StartFromSolution: true,
     PauseOnRightClick: true,
     DisableHihats: false,
+    DetailLog: true,
   };
 
   static StartState = Enums.GameStates.PLAY;
@@ -20,7 +21,9 @@ export default class Config {
   };
 
   static LevelOrder = [
-    "rock_you",
+    "test_level",
+    //"cool_16",
+    //"rock_you",
     // "protec_tutorial",
     //"attack_tutorial",
     // "turn_tutorial",
@@ -36,13 +39,58 @@ export default class Config {
   static Levels = [
     {
       name: "test_level",
-      startTilePos: { x: 15, y: 8 },
-      finishTilePos: { x: 18, y: 8 },
+      startTilePos: { x: 2, y: 6 },
+      finishTilePos: { x: 18, y: 6 },
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+      tempPlatforms: [
+        // ...
+        { tileX: 3, tileY: 7 },
+        { tileX: 4, tileY: 7 },
+        { tileX: 5, tileY: 7 },
+      ],
+    },
+    {
+      name: "cool_16",
+      startTilePos: { x: 1, y: 8 },
+      finishTilePos: { x: 18, y: 8 },
+      length: 16,
+      solution: [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+        [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0],
+        [1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+      ],
+      spikes: [
+        // ...
+        { tileX: 5, tileY: 9, bits: [4, 5, 6, 7] },
+      ],
+      trampolins: [
+        //...
+        { tileX: 6, tileY: 8, bits: [15] },
+        { tileX: 5, tileY: 6, bits: [0] },
+        {
+          tileX: 9,
+          tileY: 6,
+          bits: [7, 8, 9, 10, 11, 12, 13],
+        },
+        { tileX: 11, tileY: 8, bits: [0, 1, 4, 8, 9, 15] },
+      ],
+      goodBarrels: [
+        // ...
+        // { tileX: 4, tileY: 6 },
+      ],
+      guns: [
+        // ...
+        // 2
+        // 6
+        // 10
+        { tileX: 8, tileY: 6, bits: [12] },
+        // 14
       ],
     },
     {

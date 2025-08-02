@@ -20,6 +20,9 @@ export default class LevelContainer {
   /** @type {LevelObject[]} */
   badBarrels = [];
 
+  /** @type {LevelObject[]} */
+  tempPlatforms = [];
+
   /** @type {Phaser.GameObjects.Sprite} */
   _finishFlag;
 
@@ -80,6 +83,10 @@ export default class LevelContainer {
     me.badBarrels = me._createLevelObjects(
       Enums.LevelObjectTypes.BAD_BARREL,
       levelConfig.badBarrels
+    );
+    me.tempPlatforms = me._createLevelObjects(
+      Enums.LevelObjectTypes.TEMP_PLATFORM,
+      levelConfig.tempPlatforms
     );
 
     me._finishFlag = me._spritePool.get();

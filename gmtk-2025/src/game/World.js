@@ -112,6 +112,13 @@ export default class World {
 
     me._mainLevelContainer.update(currentBit);
 
+    if (isNewBit && gameState == Enums.GameStates.PLAY)
+      Utils.debugLog(
+        `${currentBit}: ${me.playerTilePos.x} ${me.playerTilePos.y} ${
+          me.player.direction == 1 ? "->" : "<-"
+        }`
+      );
+
     if (gameState !== Enums.GameStates.PLAY) return Enums.BitResult.NONE;
 
     // win
@@ -180,6 +187,8 @@ export default class World {
   resetCurrentLevel() {
     const me = this;
 
+    Utils.debugLog("=====================");
+
     me._movePlayerPosTo({
       x: me._currentLevelTileX + me._levelConfig.startTilePos.x,
       y: me._levelConfig.startTilePos.y,
@@ -189,9 +198,12 @@ export default class World {
 
     // TODO: learn foreach for god sake
     for (let i = 0; i < me._mainLevelContainer.goodBarrels.length; ++i)
-      me._mainLevelContainer.goodBarrels[i].restore();
+      me._mainLevelContainer.goodBarrels[i].restoreBarrel();
     for (let i = 0; i < me._mainLevelContainer.badBarrels.length; ++i)
-      me._mainLevelContainer.badBarrels[i].restore();
+      me._mainLevelContainer.badBarrels[i].restoreBarrel();
+
+    for (let i = 0; i < me._mainLevelContainer.tempPlatforms.length; ++i)
+      me._mainLevelContainer.tempPlatforms[i].restoreTempPlatform();
   }
 
   isSolidTile(tileX, tileY) {
@@ -200,9 +212,46 @@ export default class World {
     const barrel = me._findBarrelAtPosition(tileX, tileY);
     if (!!barrel) return true;
 
+    const isTrampoline = me._hasActiveTrampolineAtPos(tileX, tileY);
+    if (isTrampoline) return true;
+
+    const isTempPlatform = me._hasTempPlatformAtPos(tileX, tileY);
+    if (isTempPlatform) return true;
+
     const tile = me._tilemapLayer.getTileAt(tileX, tileY);
 
     return !tile || tile.index > 0;
+  }
+
+  _hasActiveTrampolineAtPos(tileX, tileY) {
+    const me = this;
+
+    for (let i = 0; i < me._mainLevelContainer.trampolines.length; ++i) {
+      const trampoline = me._mainLevelContainer.trampolines[i];
+      if (!trampoline._isActive || trampoline._tileX != tileX) continue;
+
+      const isTrampolineCell =
+        tileY == trampoline._tileY || tileY == trampoline._tileY - 1;
+
+      if (isTrampolineCell) return true;
+    }
+
+    return false;
+  }
+
+  _hasTempPlatformAtPos(tileX, tileY) {
+    const me = this;
+    for (let i = 0; i < me._mainLevelContainer.tempPlatforms.length; ++i) {
+      const tempPlatform = me._mainLevelContainer.tempPlatforms[i];
+      if (
+        tempPlatform._tileX == tileX &&
+        tempPlatform._tileY == tileY &&
+        tempPlatform._isActive
+      )
+        return true;
+    }
+
+    return false;
   }
 
   runWithNextLoop() {
@@ -228,6 +277,11 @@ export default class World {
         me._movePlayerPosTo(newPlayerTilePos);
         break;
       }
+    }
+
+    for (let i = 0; i < me._mainLevelContainer.tempPlatforms.length; ++i) {
+      const tempPlatform = me._mainLevelContainer.tempPlatforms[i];
+      if (tempPlatform._isActive) tempPlatform.checkPlayer(me);
     }
 
     // spikes

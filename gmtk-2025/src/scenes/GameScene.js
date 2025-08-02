@@ -35,6 +35,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("trampoline", Consts.Unit.Normal, Consts.Unit.Big);
     Utils.loadSpriteSheet("finish_flag", Consts.Unit.Normal);
     Utils.loadSpriteSheet("barrels", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("temp_platform", Consts.Unit.Normal);
 
     Utils.loadImage("indicator");
     Utils.loadImage("death_icon");
@@ -55,6 +56,7 @@ export default class GameScene extends HereScene {
     Utils.loadCsv("protec_tutorial");
     Utils.loadCsv("cool_bit");
     Utils.loadCsv("rock_you");
+    Utils.loadCsv("cool_16");
   }
 
   create() {

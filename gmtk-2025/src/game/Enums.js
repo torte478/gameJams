@@ -31,6 +31,7 @@ export default class Enums {
     TRAMPOLINE: 2,
     GOOD_BARREL: 3,
     BAD_BARREL: 4,
+    TEMP_PLATFORM: 5,
   };
 
   static BitResult = {

@@ -90,6 +90,17 @@ export default class LevelObject {
         .setVisible(true)
         .setActive(true);
       me._isActive = true;
+    } else if (me._type == Enums.LevelObjectTypes.TEMP_PLATFORM) {
+      me.sprite = pool.get();
+      me.sprite
+        .setPosition(
+          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          me._tileY * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal
+        )
+        .setTexture("temp_platform", 1)
+        .setVisible(true)
+        .setActive(true);
+      me._isActive = true;
     } else {
       throw "error";
     }
@@ -124,8 +135,18 @@ export default class LevelObject {
       return me._checkGunHit(world);
     } else if (me._type == Enums.LevelObjectTypes.TRAMPOLINE) {
       return (
-        world.playerTilePos.x == me._tileX && world.playerTilePos.y == me._tileY
+        world.playerTilePos.y == me._tileY &&
+        (world.playerTilePos.x == me._tileX ||
+          world.playerTilePos.x == me._tileX - 1)
       );
+    } else if (me._type == Enums.LevelObjectTypes.TEMP_PLATFORM) {
+      if (
+        world.playerTilePos.x == me._tileX &&
+        world.playerTilePos.y == me._tileY - 1
+      ) {
+        me._isActive = false;
+        me.sprite.setVisible(false);
+      }
     } else {
       throw "error";
     }
@@ -144,13 +165,24 @@ export default class LevelObject {
     me.sprite.setVisible(false);
   }
 
-  restore() {
+  restoreBarrel() {
     const me = this;
 
     const canRestore =
       (me._type == Enums.LevelObjectTypes.GOOD_BARREL ||
         me._type == Enums.LevelObjectTypes.BAD_BARREL) &&
       !me._isActive;
+
+    if (!canRestore) return;
+
+    me._isActive = true;
+    me.sprite.setVisible(true);
+  }
+
+  restoreTempPlatform() {
+    const me = this;
+
+    const canRestore = !me._isActive;
 
     if (!canRestore) return;
 

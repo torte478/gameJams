@@ -30,4 +30,7 @@ export default class LevelConfig {
 
   /** @type {ItemConfig[]} */
   badBarrels;
+
+  /** @type {ItemConfig[]} */
+  tempPlatforms;
 }

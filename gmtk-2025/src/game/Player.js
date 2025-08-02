@@ -34,6 +34,7 @@ export default class Player {
     me.direction *= -1;
     me._sprite.setFlipX(me.direction == -1);
     me.isShield = false;
+    me._sprite.setFrame(0);
   }
 
   toIdle() {
