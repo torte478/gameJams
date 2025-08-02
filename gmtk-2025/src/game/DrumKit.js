@@ -146,9 +146,9 @@ export default class DrumKit {
     if (i < 0 || i >= Consts.DrumKit.SampleCount || j < 0 || j >= me.loopLength)
       return;
 
-    // only one
-    if (!me._loop[i][j]) {
-      for (let k = 0; k < Consts.DrumKit.SampleCount; ++k) {
+    // only one (ignore crash)
+    if (!me._loop[i][j] && i > 0) {
+      for (let k = 1; k < Consts.DrumKit.SampleCount; ++k) {
         me._loop[k][j] = false;
         me._drawCell(k, j);
       }

@@ -3,7 +3,6 @@ import Utils from "../framework/Utils.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import ItemConfig from "./ItemConfig.js";
-import Player from "./Player.js";
 import World from "./World.js";
 
 export default class LevelObject {
@@ -69,6 +68,17 @@ export default class LevelObject {
         .setTexture("trampoline", 0)
         .setVisible(true)
         .setActive(true);
+    } else if (me._type == Enums.LevelObjectTypes.GOOD_BARREL) {
+      me.sprite = pool.get();
+      me.sprite
+        .setPosition(
+          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          me._tileY * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal
+        )
+        .setTexture("barrels", 0)
+        .setVisible(true)
+        .setActive(true);
+      me._isActive = true;
     } else {
       throw "error";
     }
@@ -79,8 +89,10 @@ export default class LevelObject {
   update(currentBit) {
     const me = this;
 
-    me._isActive = Utils.any(me._bitsToActive, (bit) => bit === currentBit);
-    me.sprite.setFrame(me._isActive ? 1 : 0);
+    if (!!me._bitsToActive) {
+      me._isActive = Utils.any(me._bitsToActive, (bit) => bit === currentBit);
+      me.sprite.setFrame(me._isActive ? 1 : 0);
+    }
   }
 
   /**
@@ -97,8 +109,7 @@ export default class LevelObject {
         world.playerTilePos.x === me._tileX &&
         world.playerTilePos.y === me._tileY - 1
       );
-    }
-    if (me._type == Enums.LevelObjectTypes.GUN) {
+    } else if (me._type == Enums.LevelObjectTypes.GUN) {
       return me._checkGunHit(world);
     } else if (me._type == Enums.LevelObjectTypes.TRAMPOLINE) {
       return (
@@ -107,6 +118,33 @@ export default class LevelObject {
     } else {
       throw "error";
     }
+  }
+
+  explode() {
+    const me = this;
+
+    const canExplode =
+      (me._type == Enums.LevelObjectTypes.GOOD_BARREL ||
+        me._type == Enums.LevelObjectTypes.BAD_BARREL) &&
+      me._isActive;
+    if (!canExplode) throw "error";
+
+    me._isActive = false;
+    me.sprite.setVisible(false);
+  }
+
+  restore() {
+    const me = this;
+
+    const canRestore =
+      (me._type == Enums.LevelObjectTypes.GOOD_BARREL ||
+        me._type == Enums.LevelObjectTypes.BAD_BARREL) &&
+      !me._isActive;
+
+    if (!canRestore) return;
+
+    me._isActive = true;
+    me.sprite.setVisible(true);
   }
 
   /**

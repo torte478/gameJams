@@ -91,7 +91,7 @@ export default class World {
 
     me._mainLevelContainer.init(me._levelConfig, me._tilemap, 0);
 
-    me.resetPlayer();
+    me.resetCurrentLevel();
   }
 
   update(commands, currentBit, gameState, isNewBit) {
@@ -177,7 +177,7 @@ export default class World {
     });
   }
 
-  resetPlayer() {
+  resetCurrentLevel() {
     const me = this;
 
     me._movePlayerPosTo({
@@ -186,10 +186,20 @@ export default class World {
     });
     me.player.reset();
     me._isPlayerFalling = false;
+
+    for (
+      let i = 0;
+      i < me._mainLevelContainer.goodBarrels.length;
+      ++i // TODO: learn foreach for god sake
+    )
+      me._mainLevelContainer.goodBarrels[i].restore();
   }
 
   isSolidTile(tileX, tileY) {
     const me = this;
+
+    const barrel = me._findBarrelAtPosition(tileX, tileY);
+    if (!!barrel) return true;
 
     const tile = me._tilemapLayer.getTileAt(tileX, tileY);
 
@@ -244,7 +254,7 @@ export default class World {
     const playerObj = me.player.toGameObject();
     me._phantomDeath.setPosition(playerObj.x, playerObj.y).setVisible(true);
 
-    me.resetPlayer();
+    me.resetCurrentLevel();
     return Enums.BitResult.DEATH;
   }
 
@@ -273,12 +283,33 @@ export default class World {
 
     if (commands[Enums.SampleCommands.ATTACK]) {
       me.player.toAttack();
+
+      const forwardTileX = me.playerTilePos.x + me.player.direction;
+      const barrel = me._findBarrelAtPosition(forwardTileX, me.playerTilePos.y);
+      if (!!barrel) {
+        barrel.explode();
+      }
     }
 
     me._isPlayerFalling = !me.isSolidTile(
       me.playerTilePos.x,
       me.playerTilePos.y + 1
     );
+  }
+
+  _findBarrelAtPosition(tileX, tileY) {
+    const me = this;
+    for (let i = 0; i < me._mainLevelContainer.goodBarrels.length; ++i) {
+      const goodBarrel = me._mainLevelContainer.goodBarrels[i];
+      if (
+        goodBarrel._tileX == tileX &&
+        goodBarrel._tileY == tileY &&
+        goodBarrel._isActive
+      )
+        return goodBarrel;
+    }
+
+    return null;
   }
 
   _applyWalkCommand() {

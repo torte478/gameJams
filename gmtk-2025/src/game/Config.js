@@ -6,7 +6,7 @@ export default class Config {
     Global: true,
     Log: true,
     ShowSceneLog: true,
-    PlaySound: false,
+    PlaySound: true,
     Random: false,
     StartFromSolution: true,
     PauseOnRightClick: true,
@@ -20,7 +20,8 @@ export default class Config {
   };
 
   static LevelOrder = [
-    "turn_tutorial",
+    "attack_tutorial",
+    // "turn_tutorial",
     // "trampoline_hell",
     // "shield_tutorial",
     // "walk_spikes",
@@ -40,6 +41,24 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+    },
+    {
+      name: "attack_tutorial",
+      startTilePos: { x: 1, y: 8 },
+      finishTilePos: { x: 18, y: 8 },
+      solution: [
+        [0, 0, 1, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 0, 1, 1, 1, 0, 1],
+      ],
+      goodBarrels: [
+        { tileX: 4, tileY: 8 },
+        { tileX: 7, tileY: 8 },
+        { tileX: 10, tileY: 8 },
+        { tileX: 13, tileY: 8 },
+        { tileX: 16, tileY: 8 },
       ],
     },
     {

@@ -1,6 +1,7 @@
 import Here from "../framework/Here.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
+import LevelConfig from "./LevelConfig.js";
 import LevelObject from "./LevelObject.js";
 
 export default class LevelContainer {
@@ -12,6 +13,12 @@ export default class LevelContainer {
 
   /** @type {LevelObject[]} */
   trampolines = [];
+
+  /** @type {LevelObject[]} */
+  goodBarrels = [];
+
+  /** @type {LevelObject[]} */
+  badBarrels = [];
 
   /** @type {Phaser.GameObjects.Sprite} */
   _finishFlag;
@@ -65,6 +72,10 @@ export default class LevelContainer {
     me.trampolines = me._createLevelObjects(
       Enums.LevelObjectTypes.TRAMPOLINE,
       levelConfig.trampolins
+    );
+    me.goodBarrels = me._createLevelObjects(
+      Enums.LevelObjectTypes.GOOD_BARREL,
+      levelConfig.goodBarrels
     );
 
     me._finishFlag = me._spritePool.get();
@@ -133,6 +144,10 @@ export default class LevelContainer {
       me._spritePool.killAndHide(me.guns[i].sprite);
     for (let i = 0; i < me.trampolines.length; ++i)
       me._spritePool.killAndHide(me.trampolines[i].sprite);
+    for (let i = 0; i < me.goodBarrels.length; ++i)
+      me._spritePool.killAndHide(me.goodBarrels[i].sprite);
+    for (let i = 0; i < me.badBarrels.length; ++i)
+      me._spritePool.killAndHide(me.badBarrels[i].sprite);
 
     if (!!me._finishFlag) me._spritePool.killAndHide(me._finishFlag);
   }

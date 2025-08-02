@@ -170,7 +170,7 @@ export default class Game {
     if (me._gameState == Enums.GameStates.PLAY) {
       // play state
       if (me._drumKit.isInsideView(pos)) {
-        me._world.resetPlayer();
+        me._world.resetCurrentLevel();
         me._gameState = Enums.GameStates.EDIT;
       }
       me._drumKit.onPointerDown(pos.x, pos.y);

@@ -34,6 +34,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("gun", Consts.Unit.Normal);
     Utils.loadSpriteSheet("trampoline", Consts.Unit.Normal, Consts.Unit.Big);
     Utils.loadSpriteSheet("finish_flag", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("barrels", Consts.Unit.Normal);
 
     Utils.loadImage("indicator");
     Utils.loadImage("death_icon");
@@ -50,6 +51,7 @@ export default class GameScene extends HereScene {
     Utils.loadCsv("trampoline_tutorial");
     Utils.loadCsv("trampoline_hell");
     Utils.loadCsv("turn_tutorial");
+    Utils.loadCsv("attack_tutorial");
   }
 
   create() {

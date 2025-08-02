@@ -29,6 +29,8 @@ export default class Enums {
     SPIKES: 0,
     GUN: 1,
     TRAMPOLINE: 2,
+    GOOD_BARREL: 3,
+    BAD_BARREL: 4,
   };
 
   static BitResult = {

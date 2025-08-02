@@ -21,4 +21,10 @@ export default class LevelConfig {
 
   /** @type {ItemConfig[]} */
   trampolins;
+
+  /** @type {ItemConfig[]} */
+  goodBarrels;
+
+  /** @type {ItemConfig[]} */
+  badBarrels;
 }
