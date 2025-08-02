@@ -9,9 +9,6 @@ export default class DrumKit {
   /** @type {Phaser.Cameras.Scene2D.Camera} */
   _camera;
 
-  /** @type {Phaser.GameObjects.Graphics} */
-  _graphics;
-
   /** @type {Boolean[][]} */
   _loop;
 
@@ -36,6 +33,9 @@ export default class DrumKit {
   /** @type {Phaser.GameObjects.Text[]} */
   _bitTextPool;
 
+  /** @type {Phaser.GameObjects.Image[][]} */
+  _padButtons;
+
   /**
    * @param {LevelConfig} levelConfig
    */
@@ -48,7 +48,7 @@ export default class DrumKit {
       Consts.DrumKit.ViewHeight
     );
     me._camera
-      .setBackgroundColor("#84A591")
+      .setBackgroundColor("#022518")
       .setScroll(Consts.DrumKit.ViewScrollX, 0);
 
     me._indicator = Here._.add.image(
@@ -82,21 +82,45 @@ export default class DrumKit {
 
     // bit text
     me._bitTextPool = [];
+    /** @type {Phaser.Types.GameObjects.Text.TextStyle} */
+    const bitTextStyle = {
+      color: "#83a897",
+      fontSize: 25,
+      fontFamily: "Arial Black",
+    };
     const bitTextPosY = Consts.DrumKit.StartPosY + 4 * Consts.DrumKit.CellSize;
     for (let i = 0; i < Consts.DrumKit.MaxBitCount; ++i) {
+      const bitIndexToShow = Utils.isDebug(Config.Debug.Global) ? i : i + 1;
       const bitText = Here._.add
         .text(
-          Consts.DrumKit.StartPosX + i * Consts.DrumKit.CellSize + 10,
-          bitTextPosY + 5,
-          `${i}`
+          Consts.DrumKit.StartPosX + i * Consts.DrumKit.CellSize + 25,
+          bitTextPosY + 15,
+          bitIndexToShow,
+          bitTextStyle
         )
+        .setOrigin(0.5)
         .setVisible(false);
 
       me._bitTextPool.push(bitText);
     }
 
-    // draw cells
-    me._graphics = Here._.add.graphics();
+    // buttons
+    me._padButtons = [];
+    for (let i = 0; i < Consts.DrumKit.SampleCount; ++i) {
+      const row = [];
+      for (let j = 0; j < Consts.DrumKit.MaxBitCount; ++j) {
+        const pos = me._cellToWorldPos(i, j);
+        const button = Here._.add.image(
+          pos.x + 0.5 * Consts.Unit.Normal,
+          pos.y + 0.5 * Consts.Unit.Normal,
+          "pads",
+          0
+        );
+        row.push(button);
+      }
+      me._padButtons.push(row);
+    }
+
     me._initAllCells(levelConfig);
   }
 
@@ -107,27 +131,14 @@ export default class DrumKit {
       ? levelConfig.length
       : Consts.DrumKit.DefaultBitLength;
 
-    me._graphics.clear();
-    me._graphics.lineStyle(2, "#000000", 1);
-
-    const foo = Here._.add.group();
-    foo.get();
-
-    for (let i = 0; i < Consts.DrumKit.SampleCount; ++i) {
-      const posY = Consts.DrumKit.StartPosY + i * Consts.DrumKit.CellSize;
-      const text = Here._.add.text(
-        Consts.DrumKit.StartPosX - 60,
-        posY,
-        me._getSampleText(i)
-      );
-
-      for (let j = 0; j < me.loopLength; ++j) {
-        me._drawCell(i, j);
-      }
-    }
-
     for (let i = 0; i < Consts.DrumKit.MaxBitCount; ++i) {
       me._bitTextPool[i].setVisible(i < me.loopLength);
+    }
+
+    for (let i = 0; i < Consts.DrumKit.SampleCount; ++i) {
+      for (let j = 0; j < Consts.DrumKit.MaxBitCount; ++j) {
+        me._padButtons[i][j].setVisible(j < me.loopLength);
+      }
     }
   }
 
@@ -178,12 +189,12 @@ export default class DrumKit {
     if (!me._loop[i][j] && i > 0) {
       for (let k = 1; k < Consts.DrumKit.SampleCount; ++k) {
         me._loop[k][j] = false;
-        me._drawCell(k, j);
+        me._toggleCell(k, j);
       }
     }
 
     me._loop[i][j] = !me._loop[i][j];
-    me._drawCell(i, j);
+    me._toggleCell(i, j);
   }
 
   gotoNextLevel(nextLevelConfig) {
@@ -218,35 +229,26 @@ export default class DrumKit {
       .setVisible(true);
   }
 
-  _drawCell(i, j) {
+  _getFrame(sample) {
     const me = this;
 
-    const pos = me._cellToWorldPos(i, j);
+    if (sample == Enums.Samples.CRASH) return 4;
+    else if (sample == Enums.Samples.KICK) return 3;
+    else if (sample == Enums.Samples.SNARE) return 2;
+    else if (sample == Enums.Samples.TOM) return 1;
+    else throw "error";
+  }
+
+  _toggleCell(i, j) {
+    const me = this;
+
+    const button = me._padButtons[i][j];
 
     if (me._loop[i][j]) {
-      me._graphics.fillStyle(0x0000ff, 1);
-      me._graphics.fillRect(
-        pos.x,
-        pos.y,
-        Consts.DrumKit.CellSize,
-        Consts.DrumKit.CellSize
-      );
+      const frame = me._getFrame(i);
+      button.setFrame(frame);
     } else {
-      me._graphics.fillStyle(0x84a591, 1);
-      me._graphics.fillRect(
-        pos.x,
-        pos.y,
-        Consts.DrumKit.CellSize,
-        Consts.DrumKit.CellSize
-      );
-
-      me._graphics.lineStyle(2, "#000000", 1);
-      me._graphics.strokeRect(
-        pos.x,
-        pos.y,
-        Consts.DrumKit.CellSize,
-        Consts.DrumKit.CellSize
-      );
+      button.setFrame(0);
     }
   }
 

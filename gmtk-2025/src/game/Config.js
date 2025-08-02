@@ -3,7 +3,7 @@ import LevelConfig from "./LevelConfig.js";
 
 export default class Config {
   static Debug = {
-    Global: true,
+    Global: false,
     Log: true,
     ShowSceneLog: true,
     PlaySound: false,
@@ -21,8 +21,8 @@ export default class Config {
   };
 
   static LevelOrder = [
-    // "test_level",
-    "cool_16",
+    "test_level",
+    //"cool_16",
     //"rock_you",
     // "protec_tutorial",
     //"attack_tutorial",
@@ -39,7 +39,7 @@ export default class Config {
   static Levels = [
     {
       name: "test_level",
-      startTilePos: { x: 2, y: 6 },
+      startTilePos: { x: 1, y: 6 },
       finishTilePos: { x: 18, y: 6 },
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
@@ -47,6 +47,7 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 1, 1, 1, 1, 1, 1],
       ],
+      length: 16,
       tempPlatforms: [
         // ...
         { tileX: 3, tileY: 7 },
@@ -66,7 +67,7 @@ export default class Config {
         [1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
       ],
       spikes: [
-        // ...
+        // TODO : mooooooooooooooooooooooooooooore spikes!!!!!!!!!!!!!!!!!!!
         { tileX: 5, tileY: 9, bits: [4, 5, 6, 7] },
       ],
       trampolins: [
