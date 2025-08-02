@@ -36,4 +36,10 @@ export default class Enums {
     DEATH: 1,
     WIN: 2,
   };
+
+  static GameStates = {
+    PLAY: 0,
+    EDIT: 1,
+    BUSY: 2,
+  };
 }

@@ -16,7 +16,12 @@ export default class Config {
     LevelChange: 3000,
   };
 
-  static LevelOrder = ["test_level", "walk_spikes", "shield_tutorial"];
+  static LevelOrder = [
+    //"test_level",
+    "walk_spikes",
+    "walk_spikes",
+    "shield_tutorial",
+  ];
 
   /** @type {LevelConfig[]} */
   static Levels = [
@@ -39,7 +44,7 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1], //[1, 1, 1, 1, 0, 0, 0, 0],
       ],
       spikes: [
         { tileX: 6, tileY: 9, bits: [4, 5, 6, 7] },

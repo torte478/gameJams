@@ -11,9 +11,6 @@ export default class Player {
   direction;
 
   /** @type {Boolean} */
-  isDead;
-
-  /** @type {Boolean} */
   isShield;
 
   constructor() {
@@ -23,7 +20,6 @@ export default class Player {
     me._container = Here._.add.container(0, 0, [me._sprite]);
 
     me.direction = 1;
-    me.isDead = false;
   }
 
   toGameObject() {
@@ -66,15 +62,6 @@ export default class Player {
     me._sprite.setFrame(0).setFlipX(false);
 
     me.direction = 1;
-    me.isDead = false;
-    me.isShield = false;
-  }
-
-  die() {
-    const me = this;
-
-    me._sprite.setFrame(3);
-    me.isDead = true;
     me.isShield = false;
   }
 }

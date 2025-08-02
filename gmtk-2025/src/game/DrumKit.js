@@ -27,6 +27,9 @@ export default class DrumKit {
   /** @type {Number} */
   loopLength = 8; // TODO ?
 
+  /** @type {Phaser.GameObjects.Image} */
+  _deathIcon;
+
   /**
    * @param {LevelConfig} levelConfig
    */
@@ -47,6 +50,11 @@ export default class DrumKit {
       Consts.DrumKit.StartPosY - Consts.DrumKit.CellSize / 2,
       "indicator"
     );
+
+    me._deathIcon = Here._.add
+      .image(0, 0, "death_icon")
+      .setDepth(Consts.Depth.OverOverlay)
+      .setVisible(false);
 
     me._moveIndicatorToBit(0);
 
@@ -151,6 +159,27 @@ export default class DrumKit {
     const me = this;
 
     // TODO
+  }
+
+  isInsideView(pos) {
+    const me = this;
+
+    return (
+      pos.x >= me._camera.scrollX &&
+      pos.x <= me._camera.scrollX + me._camera.width &&
+      pos.y >= me._camera.scrollY &&
+      pos.y <= me._camera.scrollY + me._camera.height
+    );
+  }
+
+  showDeathIcon(bit) {
+    const me = this;
+
+    const pos = me._cellToWorldPos(0, bit);
+
+    me._deathIcon
+      .setPosition(pos.x + Consts.DrumKit.CellSize / 2, pos.y - 10)
+      .setVisible(true);
   }
 
   _drawCell(i, j) {

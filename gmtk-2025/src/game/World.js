@@ -20,8 +20,6 @@ export default class World {
   /** @type {Phaser.Tilemaps.TilemapLayer} */
   _tilemapLayer;
 
-  _isReset = false;
-
   /** @type {LevelConfig} */
   _levelConfig;
 
@@ -39,6 +37,12 @@ export default class World {
 
   /** @type {Number} */
   _currentLevelTileX = 0;
+
+  /** @type {Phaser.GameObjects.Sprite} */
+  _phantomDeath;
+
+  /** @type {Boolean} */
+  _runWithNextLoop = false;
 
   constructor() {
     const me = this;
@@ -76,9 +80,55 @@ export default class World {
 
     me.player = new Player();
 
+    me._phantomDeath = Here._.add
+      .sprite(0, 0, "player", 3)
+      .setAlpha(0.5)
+      .setDepth(Consts.Depth.Overlay)
+      .setVisible(false);
+
     me._mainLevelContainer.init(me._levelConfig, me._tilemap, 0);
 
-    me.reset();
+    me.resetPlayer();
+  }
+
+  update(commands, currentBit, gameState) {
+    const me = this;
+
+    if (me._isBusy) return;
+
+    if (me._runWithNextLoop && currentBit == 0) {
+      me._runWithNextLoop = false;
+    }
+
+    if (gameState == Enums.GameStates.PLAY && !me._runWithNextLoop)
+      me._doPlayerActions(commands);
+
+    me._mainLevelContainer.update(currentBit);
+
+    if (gameState !== Enums.GameStates.PLAY) return Enums.BitResult.NONE;
+
+    // win
+    if (
+      me.playerTilePos.x == me._levelConfig.finishTilePos.x &&
+      me.playerTilePos.y == me._levelConfig.finishTilePos.y
+    ) {
+      return Enums.BitResult.WIN;
+    }
+
+    return me._updateLevelObjects(gameState);
+  }
+
+  isInsideView(pos) {
+    const me = this;
+
+    const camera = Here._.cameras.main;
+
+    return (
+      pos.x >= camera.scrollX &&
+      pos.x <= camera.scrollX + camera.width &&
+      pos.y >= camera.scrollY &&
+      pos.y <= camera.scrollY + camera.height
+    );
   }
 
   gotoNextLevel(nextLevelConfig) {
@@ -115,24 +165,33 @@ export default class World {
     });
   }
 
-  applyBitChange(commands, currentBit) {
+  resetPlayer() {
     const me = this;
 
-    if (me._isBusy) return;
+    me._movePlayerPosTo(me._levelConfig.startTilePos);
+    me.player.reset();
+    me._isPlayerFalling = false;
+  }
 
-    if (!me.player.isDead) me._doPlayerActions(commands);
+  isSolidTile(tileX, tileY) {
+    const me = this;
 
-    me._mainLevelContainer.update(currentBit);
+    const tile = me._tilemapLayer.getTileAt(tileX, tileY);
 
-    if (me.player.isDead) return Enums.BitResult.NONE;
+    return !tile || tile.index > 0;
+  }
 
-    // win
-    if (
-      me.playerTilePos.x == me._levelConfig.finishTilePos.x &&
-      me.playerTilePos.y == me._levelConfig.finishTilePos.y
-    ) {
-      return Enums.BitResult.WIN;
-    }
+  runWithNextLoop() {
+    const me = this;
+
+    me._runWithNextLoop = true;
+  }
+
+  _updateLevelObjects(gameState) {
+    const me = this;
+
+    if (gameState != Enums.GameStates.PLAY || me._runWithNextLoop)
+      return Enums.BitResult.NONE;
 
     // trampolines
     for (let i = 0; i < me._mainLevelContainer.trampolines.length; ++i) {
@@ -150,38 +209,28 @@ export default class World {
     // spikes
     for (let i = 0; i < me._mainLevelContainer.spikes.length; ++i) {
       if (me._mainLevelContainer.spikes[i].checkPlayer(me)) {
-        me.player.die();
-        return Enums.BitResult.DEATH;
+        return me._processDeath();
       }
     }
 
     // guns
     for (let i = 0; i < me._mainLevelContainer.guns.length; ++i) {
       if (me._mainLevelContainer.guns[i].checkPlayer(me)) {
-        me.player.die();
-        return Enums.BitResult.DEATH;
+        return me._processDeath();
       }
     }
 
     return Enums.BitResult.NONE;
   }
 
-  reset() {
+  _processDeath() {
     const me = this;
 
-    me._isReset = true;
+    const playerObj = me.player.toGameObject();
+    me._phantomDeath.setPosition(playerObj.x, playerObj.y).setVisible(true);
 
-    me._movePlayerPosTo(me._levelConfig.startTilePos);
-    me.player.reset();
-    me._isPlayerFalling = false;
-  }
-
-  isSolidTile(tileX, tileY) {
-    const me = this;
-
-    const tile = me._tilemapLayer.getTileAt(tileX, tileY);
-
-    return !tile || tile.index > 0;
+    me.resetPlayer();
+    return Enums.BitResult.DEATH;
   }
 
   _doPlayerActions(commands) {

@@ -12,6 +12,8 @@ export default class Consts {
 
   static Depth = {
     Tiles: -5000,
+    Overlay: -1000,
+    OverOverlay: 5000,
     Max: 100000,
   };
 

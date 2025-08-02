@@ -21,14 +21,14 @@ export default class Game {
   /** @type {Boolean} */
   _isWindowActive;
 
-  /** @type {Boolean} */
-  _isPaused = false;
-
   /** @type {Number} */
   _gameTimer;
 
   /** @type {Number} */
   _currentLevelIndex = 0;
+
+  /** @type {Number} */
+  _gameState = Enums.GameStates.EDIT;
 
   constructor() {
     const me = this;
@@ -54,18 +54,10 @@ export default class Game {
     me._world = new World(levelConfig);
     me._gameTimer = 0;
 
-    const sceneCameraBounds = new Phaser.Geom.Rectangle(
-      sceneCamera.scrollX,
-      sceneCamera.scrollY,
-      sceneCamera.width,
-      sceneCamera.height
-    );
-
     Here._.input.on(
       "pointerdown",
       (pointer) => {
-        if (pointer.rightButtonDown()) me._tryProcessPause();
-        else me._onLMBClick(pointer, sceneCameraBounds);
+        me._onLMBClick(pointer);
       },
       me
     );
@@ -110,8 +102,8 @@ export default class Game {
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `tle: ${tileX} ${tileY}\n` +
-        `pse: ${me._isPaused}\n` +
-        `tme: ${(me._gameTimer / 1000) | 0} sec`;
+        `tme: ${(me._gameTimer / 1000) | 0} sec\n` +
+        `ste: ${me._gameState}`;
 
       me._log.setText(text);
     });
@@ -119,8 +111,6 @@ export default class Game {
 
   _gameLoop(delta) {
     const me = this;
-
-    if (me._isPaused) return;
 
     me._gameTimer += delta;
 
@@ -130,11 +120,12 @@ export default class Game {
     const commands = me._drumKit.update(currentBit, me._isWindowActive);
     if (!commands) return;
 
-    const bitResult = me._world.applyBitChange(commands, currentBit);
-    if (bitResult == Enums.BitResult.DEATH) {
-      me._isPaused = !me._isPaused;
-    } else if (bitResult == Enums.BitResult.WIN) {
+    const bitResult = me._world.update(commands, currentBit, me._gameState);
+    if (bitResult == Enums.BitResult.WIN) {
       me._gotoNextLevel();
+    } else if (bitResult == Enums.BitResult.DEATH) {
+      me._gameState = Enums.GameStates.EDIT;
+      me._drumKit.showDeathIcon(currentBit);
     }
   }
 
@@ -155,23 +146,23 @@ export default class Game {
     me._drumKit.gotoNextLevel(levelConfig);
   }
 
-  _tryProcessPause() {
-    const me = this;
-
-    if (!Utils.isDebug(Config.Debug.PauseOnRightClick)) return;
-
-    me._isPaused = !me._isPaused;
-  }
-
-  _onLMBClick(pointer, sceneCameraBounds) {
+  _onLMBClick(pointer) {
     const me = this;
 
     const pos = Utils.buildPoint(pointer.worldX, pointer.worldY);
-    if (Phaser.Geom.Rectangle.ContainsPoint(sceneCameraBounds, pos)) {
-      me._gameTimer = 0;
-      me._drumKit.reset();
-      me._world.reset();
-      me._isPaused = false;
-    } else me._drumKit.onPointerDown(pos.x, pos.y);
+    if (me._gameState == Enums.GameStates.PLAY) {
+      // play state
+      if (me._drumKit.isInsideView(pos)) {
+        me._world.resetPlayer();
+        me._gameState = Enums.GameStates.EDIT;
+      }
+      me._drumKit.onPointerDown(pos.x, pos.y);
+    } else if (me._gameState == Enums.GameStates.EDIT) {
+      // edit state
+      if (me._world.isInsideView(pos)) {
+        me._world.runWithNextLoop();
+        me._gameState = Enums.GameStates.PLAY;
+      } else me._drumKit.onPointerDown(pos.x, pos.y);
+    }
   }
 }

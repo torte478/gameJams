@@ -36,6 +36,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("finish_flag", Consts.Unit.Normal);
 
     Utils.loadImage("indicator");
+    Utils.loadImage("death_icon");
 
     Utils.loadMp3("kick");
     Utils.loadMp3("crash");
