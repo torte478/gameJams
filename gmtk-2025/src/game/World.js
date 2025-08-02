@@ -114,7 +114,7 @@ export default class World {
 
     if (isNewBit && gameState == Enums.GameStates.PLAY)
       Utils.debugLog(
-        `${currentBit}: ${me.playerTilePos.x} ${me.playerTilePos.y} ${
+        `${currentBit}: x${me.playerTilePos.x} y${me.playerTilePos.y} ${
           me.player.direction == 1 ? "->" : "<-"
         }`
       );
@@ -272,7 +272,7 @@ export default class World {
       if (trampoline.checkPlayer(me)) {
         const newPlayerTilePos = {
           x: me.playerTilePos.x,
-          y: me.playerTilePos.y - 2,
+          y: trampoline._tileY - 2,
         };
         me._movePlayerPosTo(newPlayerTilePos);
         break;

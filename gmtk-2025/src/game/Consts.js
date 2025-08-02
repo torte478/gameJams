@@ -28,7 +28,7 @@ export default class Consts {
     DefaultBitLength: 8,
   };
 
-  static Tempo = 120;
+  static Tempo = 200;
   static BitPerMs = (Consts.Tempo / 60 / 1000) * 2; // 2 - bit per tick
   static FallPeriod = 2;
   static LevelOverlayAtTiles = 3;

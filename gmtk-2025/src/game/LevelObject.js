@@ -135,9 +135,9 @@ export default class LevelObject {
       return me._checkGunHit(world);
     } else if (me._type == Enums.LevelObjectTypes.TRAMPOLINE) {
       return (
-        world.playerTilePos.y == me._tileY &&
-        (world.playerTilePos.x == me._tileX ||
-          world.playerTilePos.x == me._tileX - 1)
+        world.playerTilePos.x == me._tileX &&
+        (world.playerTilePos.y == me._tileY ||
+          world.playerTilePos.y == me._tileY - 1)
       );
     } else if (me._type == Enums.LevelObjectTypes.TEMP_PLATFORM) {
       if (

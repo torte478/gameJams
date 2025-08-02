@@ -21,8 +21,8 @@ export default class Config {
   };
 
   static LevelOrder = [
-    "test_level",
-    //"cool_16",
+    // "test_level",
+    "cool_16",
     //"rock_you",
     // "protec_tutorial",
     //"attack_tutorial",
@@ -60,7 +60,7 @@ export default class Config {
       finishTilePos: { x: 18, y: 8 },
       length: 16,
       solution: [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], //[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
         [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0],
         [1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
@@ -73,24 +73,30 @@ export default class Config {
         //...
         { tileX: 6, tileY: 8, bits: [15] },
         { tileX: 5, tileY: 6, bits: [0] },
-        {
-          tileX: 9,
-          tileY: 6,
-          bits: [7, 8, 9, 10, 11, 12, 13],
-        },
-        { tileX: 11, tileY: 8, bits: [0, 1, 4, 8, 9, 15] },
+        { tileX: 11, tileY: 6, bits: [7] },
+        { tileX: 12, tileY: 4, bits: [8] },
+      ],
+      tempPlatforms: [
+        // ...
+        { tileX: 9, tileY: 5 },
       ],
       goodBarrels: [
         // ...
-        // { tileX: 4, tileY: 6 },
+        { tileX: 10, tileY: 6 },
+        { tileX: 14, tileY: 7 },
+        { tileX: 14, tileY: 8 },
+      ],
+      badBarrels: [
+        // ...
+        { tileX: 7, tileY: 3 },
+        { tileX: 14, tileY: 5 },
       ],
       guns: [
         // ...
-        // 2
-        // 6
-        // 10
+        { tileX: 16, tileY: 4, bits: [2, 6] },
+        { tileX: 16, tileY: 3, bits: [10] },
         { tileX: 8, tileY: 6, bits: [12] },
-        // 14
+        { tileX: 16, tileY: 7, bits: [14] },
       ],
     },
     {
