@@ -36,6 +36,12 @@ export default class DrumKit {
   /** @type {Phaser.GameObjects.Image[][]} */
   _padButtons;
 
+  /** @type {Phaser.GameObjects.Image} */
+  _infoImage;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _selection;
+
   /**
    * @param {LevelConfig} levelConfig
    */
@@ -65,6 +71,13 @@ export default class DrumKit {
     me._moveIndicatorToBit(0);
 
     me._resultBuffer = Utils.buildArray(4, false);
+
+    me._infoImage = Here._.add.image(-4900, 140, "info");
+
+    me._selection = Here._.add
+      .image(0, 0, "selection")
+      .setVisible(false)
+      .setDepth(Consts.Depth.OverOverlay);
 
     me._loop = [];
     for (let i = 0; i < Consts.DrumKit.SampleCount; ++i) {
@@ -150,6 +163,20 @@ export default class DrumKit {
   update(bit, isWindowActive) {
     const me = this;
 
+    const pointer = Here._.input.activePointer;
+    const cell = me._tryGetCellFromWorldPos(pointer.worldX, pointer.worldY);
+    if (!!cell) {
+      const pos = me._cellToWorldPos(cell.i, cell.j);
+      me._selection
+        .setVisible(true)
+        .setPosition(
+          pos.x + 0.5 * Consts.Unit.Normal,
+          pos.y + 0.5 * Consts.Unit.Normal
+        );
+    } else {
+      me._selection.setVisible(false);
+    }
+
     if (bit == me._currentBit) return null;
 
     me._currentBit = bit;
@@ -175,6 +202,24 @@ export default class DrumKit {
   onPointerDown(x, y) {
     const me = this;
 
+    const cell = me._tryGetCellFromWorldPos(x, y);
+    if (!cell) return;
+
+    // only one (ignore crash)
+    if (!me._loop[cell.i][cell.j] && cell.i > 0) {
+      for (let k = 1; k < Consts.DrumKit.SampleCount; ++k) {
+        me._loop[k][cell.j] = false;
+        me._toggleCell(k, cell.j);
+      }
+    }
+
+    me._loop[cell.i][cell.j] = !me._loop[cell.i][cell.j];
+    me._toggleCell(cell.i, cell.j);
+  }
+
+  _tryGetCellFromWorldPos(x, y) {
+    const me = this;
+
     const i = Math.floor(
       (y - Consts.DrumKit.StartPosY) / Consts.DrumKit.CellSize
     );
@@ -183,18 +228,9 @@ export default class DrumKit {
     );
 
     if (i < 0 || i >= Consts.DrumKit.SampleCount || j < 0 || j >= me.loopLength)
-      return;
+      return null;
 
-    // only one (ignore crash)
-    if (!me._loop[i][j] && i > 0) {
-      for (let k = 1; k < Consts.DrumKit.SampleCount; ++k) {
-        me._loop[k][j] = false;
-        me._toggleCell(k, j);
-      }
-    }
-
-    me._loop[i][j] = !me._loop[i][j];
-    me._toggleCell(i, j);
+    return { i: i, j: j };
   }
 
   gotoNextLevel(nextLevelConfig) {

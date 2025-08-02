@@ -3,7 +3,7 @@ import LevelConfig from "./LevelConfig.js";
 
 export default class Config {
   static Debug = {
-    Global: false,
+    Global: true,
     Log: true,
     ShowSceneLog: true,
     PlaySound: false,

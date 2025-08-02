@@ -35,7 +35,7 @@ export default class Consts {
 
   // yellow: #E6EE3D
   // black #022518
-  // white #fcfae8
+  // white #83a897
   // blue #2f83db
   // red #cd1e22
   // purple #9e557f

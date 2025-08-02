@@ -40,6 +40,8 @@ export default class GameScene extends HereScene {
 
     Utils.loadImage("indicator");
     Utils.loadImage("death_icon");
+    Utils.loadImage("info");
+    Utils.loadImage("selection");
 
     Utils.loadMp3("kick");
     Utils.loadMp3("crash");
