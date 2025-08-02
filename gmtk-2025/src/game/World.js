@@ -187,12 +187,11 @@ export default class World {
     me.player.reset();
     me._isPlayerFalling = false;
 
-    for (
-      let i = 0;
-      i < me._mainLevelContainer.goodBarrels.length;
-      ++i // TODO: learn foreach for god sake
-    )
+    // TODO: learn foreach for god sake
+    for (let i = 0; i < me._mainLevelContainer.goodBarrels.length; ++i)
       me._mainLevelContainer.goodBarrels[i].restore();
+    for (let i = 0; i < me._mainLevelContainer.badBarrels.length; ++i)
+      me._mainLevelContainer.badBarrels[i].restore();
   }
 
   isSolidTile(tileX, tileY) {
@@ -288,6 +287,9 @@ export default class World {
       const barrel = me._findBarrelAtPosition(forwardTileX, me.playerTilePos.y);
       if (!!barrel) {
         barrel.explode();
+        if (barrel._type == Enums.LevelObjectTypes.BAD_BARREL) {
+          return me._processDeath();
+        }
       }
     }
 
@@ -307,6 +309,16 @@ export default class World {
         goodBarrel._isActive
       )
         return goodBarrel;
+    }
+
+    for (let i = 0; i < me._mainLevelContainer.badBarrels.length; ++i) {
+      const badBarrel = me._mainLevelContainer.badBarrels[i];
+      if (
+        badBarrel._tileX == tileX &&
+        badBarrel._tileY == tileY &&
+        badBarrel._isActive
+      )
+        return badBarrel;
     }
 
     return null;

@@ -79,6 +79,17 @@ export default class LevelObject {
         .setVisible(true)
         .setActive(true);
       me._isActive = true;
+    } else if (me._type == Enums.LevelObjectTypes.BAD_BARREL) {
+      me.sprite = pool.get();
+      me.sprite
+        .setPosition(
+          me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
+          me._tileY * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal
+        )
+        .setTexture("barrels", 1)
+        .setVisible(true)
+        .setActive(true);
+      me._isActive = true;
     } else {
       throw "error";
     }

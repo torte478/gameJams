@@ -77,6 +77,10 @@ export default class LevelContainer {
       Enums.LevelObjectTypes.GOOD_BARREL,
       levelConfig.goodBarrels
     );
+    me.badBarrels = me._createLevelObjects(
+      Enums.LevelObjectTypes.BAD_BARREL,
+      levelConfig.badBarrels
+    );
 
     me._finishFlag = me._spritePool.get();
     me._finishFlag

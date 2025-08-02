@@ -20,7 +20,8 @@ export default class Config {
   };
 
   static LevelOrder = [
-    "attack_tutorial",
+    "protec_tutorial",
+    // "attack_tutorial",
     // "turn_tutorial",
     // "trampoline_hell",
     // "shield_tutorial",
@@ -41,6 +42,35 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+    },
+    {
+      name: "protec_tutorial",
+      startTilePos: { x: 1, y: 8 },
+      finishTilePos: { x: 18, y: 8 },
+      solution: [
+        [0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 0, 1, 1, 1, 0, 1],
+      ],
+      goodBarrels: [
+        // ...
+        { tileX: 6, tileY: 8 },
+        { tileX: 11, tileY: 8 },
+        { tileX: 16, tileY: 8 },
+      ],
+      badBarrels: [
+        // ...
+        { tileX: 4, tileY: 8 },
+        { tileX: 9, tileY: 8 },
+        { tileX: 14, tileY: 8 },
+      ],
+      trampolins: [
+        //...
+        { tileX: 3, tileY: 8, bits: [2] },
+        { tileX: 8, tileY: 8, bits: [2] },
+        { tileX: 13, tileY: 8, bits: [2] },
       ],
     },
     {
