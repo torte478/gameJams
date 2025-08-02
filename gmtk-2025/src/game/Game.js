@@ -117,8 +117,14 @@ export default class Game {
     const overallBit = Math.floor(me._gameTimer * Consts.BitPerMs);
     const currentBit = overallBit % me._drumKit.loopLength;
 
+    const isNewBit = currentBit != me._drumKit._currentBit;
     const commands = me._drumKit.update(currentBit, me._isWindowActive);
-    const bitResult = me._world.update(commands, currentBit, me._gameState);
+    const bitResult = me._world.update(
+      commands,
+      currentBit,
+      me._gameState,
+      isNewBit
+    );
 
     if (me._gameState == Enums.GameStates.BUSY) {
       if (

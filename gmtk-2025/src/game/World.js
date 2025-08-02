@@ -94,12 +94,12 @@ export default class World {
     me.resetPlayer();
   }
 
-  update(commands, currentBit, gameState) {
+  update(commands, currentBit, gameState, isNewBit) {
     const me = this;
 
     if (me._isBusy) return;
 
-    if (me._runWithNextLoop && currentBit == 0) {
+    if (me._runWithNextLoop && currentBit == 0 && isNewBit) {
       me._runWithNextLoop = false;
     }
 

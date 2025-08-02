@@ -20,14 +20,13 @@ export default class Config {
   };
 
   static LevelOrder = [
-    "walk_spikes",
-    "walk_spikes",
-    "walk_spikes",
-    //"test_level",
-    "shield_tutorial",
-    "test_level",
-    "walk_spikes",
-    "shield_tutorial",
+    "turn_tutorial",
+    // "trampoline_hell",
+    // "shield_tutorial",
+    // "walk_spikes",
+    // "trampoline_tutorial",
+    // "trampoline_hell",
+    // "shield_tutorial",
   ];
 
   /** @type {LevelConfig[]} */
@@ -41,6 +40,21 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+    },
+    {
+      name: "turn_tutorial",
+      startTilePos: { x: 1, y: 8 },
+      finishTilePos: { x: 18, y: 8 },
+      solution: [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 0],
+      ],
+      trampolins: [
+        { tileX: 8, tileY: 8, bits: [7] },
+        { tileX: 4, tileY: 6, bits: [7] },
       ],
     },
     {
@@ -64,7 +78,7 @@ export default class Config {
     },
     {
       name: "shield_tutorial",
-      startTilePos: { x: 1, y: 8 },
+      startTilePos: { x: 1, y: 6 },
       finishTilePos: { x: 18, y: 6 },
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
@@ -73,9 +87,42 @@ export default class Config {
         [1, 1, 0, 1, 1, 1, 0, 1],
       ],
       guns: [{ tileX: 17, tileY: 8, bits: [2, 6] }],
+      trampolins: [{ tileX: 16, tileY: 8, bits: [7] }],
+    },
+    {
+      name: "trampoline_hell",
+      startTilePos: { x: 1, y: 8 },
+      finishTilePos: { x: 18, y: 6 },
+      solution: [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 1, 0, 1, 1, 0, 0],
+      ],
+      spikes: [
+        { tileX: 13, tileY: 5, bits: [0, 1, 4, 5] },
+        { tileX: 14, tileY: 5, bits: [0, 1, 4, 5] },
+      ],
       trampolins: [
-        { tileX: 3, tileY: 8, bits: [7] },
-        { tileX: 16, tileY: 8, bits: [7] },
+        { tileX: 5, tileY: 8, bits: [3, 7] },
+        { tileX: 9, tileY: 6, bits: [3, 7] },
+        { tileX: 11, tileY: 4, bits: [3, 7] },
+      ],
+    },
+    {
+      name: "trampoline_tutorial",
+      startTilePos: { x: 1, y: 8 },
+      finishTilePos: { x: 18, y: 8 },
+      solution: [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 1, 0, 1, 1, 1, 0],
+      ],
+      trampolins: [
+        { tileX: 5, tileY: 8, bits: [3] },
+        { tileX: 10, tileY: 8, bits: [3] },
+        { tileX: 14, tileY: 8, bits: [3] },
       ],
     },
   ];
