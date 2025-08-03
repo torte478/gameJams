@@ -37,11 +37,15 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("barrels", Consts.Unit.Normal);
     Utils.loadSpriteSheet("temp_platform", Consts.Unit.Normal);
     Utils.loadSpriteSheet("pads", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("control", Consts.Unit.Normal);
 
     Utils.loadImage("indicator");
     Utils.loadImage("death_icon");
     Utils.loadImage("info");
     Utils.loadImage("selection");
+    Utils.loadImage("logo");
+    Utils.loadImage("fade");
+    Utils.loadImage("controlPanel");
 
     Utils.loadMp3("kick");
     Utils.loadMp3("crash");
@@ -55,8 +59,6 @@ export default class GameScene extends HereScene {
     Utils.loadCsv("trampoline_tutorial");
     Utils.loadCsv("trampoline_hell");
     Utils.loadCsv("turn_tutorial");
-    Utils.loadCsv("attack_tutorial");
-    Utils.loadCsv("protec_tutorial");
     Utils.loadCsv("cool_bit");
     Utils.loadCsv("rock_you");
     Utils.loadCsv("cool_16");

@@ -8,13 +8,13 @@ export default class Config {
     ShowSceneLog: true,
     PlaySound: false,
     Random: false,
-    StartFromSolution: true,
+    StartFromSolution: false,
     PauseOnRightClick: true,
     DisableHihats: false,
     DetailLog: true,
   };
 
-  static StartState = Enums.GameStates.PLAY;
+  static StartState = Enums.GameStates.EDIT;
 
   static DurationMs = {
     LevelChange: 500,
@@ -62,6 +62,7 @@ export default class Config {
     {
       name: "walk_tutorial",
       csvName: "plain",
+      availableCommands: [Enums.SampleCommands.WALK],
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
       solution: [

@@ -14,6 +14,8 @@ export default class Consts {
     Tiles: -5000,
     Overlay: -1000,
     OverOverlay: 5000,
+    Fade: 10000,
+    PanelControl: 20000,
     Max: 100000,
   };
 

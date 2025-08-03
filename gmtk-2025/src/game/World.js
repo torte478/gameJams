@@ -47,6 +47,9 @@ export default class World {
   /** @type {Boolean} */
   completeLevelTransition = true;
 
+  /** @type {Phaser.GameObjects.Image} */
+  _fade;
+
   constructor() {
     const me = this;
 
@@ -83,8 +86,15 @@ export default class World {
 
     me.player = new Player();
 
+    me._fade = Here._.add
+      .image(0, 0, "fade")
+      .setAlpha(0.25)
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setDepth(Consts.Depth.Fade);
+
     me._phantomDeath = Here._.add
-      .sprite(0, 0, "player", 3)
+      .sprite(0, 0, "player", 0)
       .setAlpha(0.5)
       .setDepth(Consts.Depth.Overlay)
       .setVisible(false);

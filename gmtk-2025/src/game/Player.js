@@ -45,7 +45,7 @@ export default class Player {
   toAttack() {
     const me = this;
 
-    me._sprite.setFrame(2);
+    // TODO
   }
 
   toShield() {
@@ -58,7 +58,7 @@ export default class Player {
   reset() {
     const me = this;
 
-    me._sprite.setFrame(0).setFlipX(false);
+    me._sprite.setFlipX(false);
 
     me.direction = 1;
     me.isShield = false;

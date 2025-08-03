@@ -6,6 +6,7 @@ import Consts from "./Consts.js";
 import DrumKit from "./DrumKit.js";
 import Enums from "./Enums.js";
 import LevelConfig from "./LevelConfig.js";
+import PanelControl from "./PanelControl.js";
 import World from "./World.js";
 
 export default class Game {
@@ -30,6 +31,9 @@ export default class Game {
   /** @type {Number} */
   _gameState = Config.StartState;
 
+  /** @type {PanelControl} */
+  _panelControl;
+
   constructor() {
     const me = this;
 
@@ -52,6 +56,11 @@ export default class Game {
 
     me._drumKit = new DrumKit(levelConfig);
     me._world = new World(levelConfig);
+    me._panelControl = new PanelControl(me);
+
+    me._drumKit._camera.ignore(me._world._fade);
+    sceneCamera.ignore(me._drumKit._fade);
+
     me._gameTimer = 0;
 
     Here._.input.on(
@@ -167,19 +176,41 @@ export default class Game {
     const me = this;
 
     const pos = Utils.buildPoint(pointer.worldX, pointer.worldY);
-    if (me._gameState == Enums.GameStates.PLAY) {
-      // play state
-      if (me._drumKit.isInsideView(pos)) {
-        me._world.resetCurrentLevel();
-        me._gameState = Enums.GameStates.EDIT;
-      }
-      me._drumKit.onPointerDown(pos.x, pos.y);
-    } else if (me._gameState == Enums.GameStates.EDIT) {
-      // edit state
-      if (me._world.isInsideView(pos)) {
-        me._world.runWithNextLoop();
-        me._gameState = Enums.GameStates.PLAY;
-      } else me._drumKit.onPointerDown(pos.x, pos.y);
+    const isDrumKitClick = me._drumKit.onPointerDown(pos.x, pos.y);
+    if (me._gameState == Enums.GameStates.PLAY && isDrumKitClick) {
+      me._world.resetCurrentLevel();
+      me._gameState = Enums.GameStates.EDIT;
+      me._panelControl.toEditMode();
     }
+    // if (me._gameState == Enums.GameStates.PLAY) {
+    //   // play state
+    //   if (me._drumKit.isInsideView(pos)) {
+    //     me._world.resetCurrentLevel();
+    //     me._gameState = Enums.GameStates.EDIT;
+    //   }
+    //   me._drumKit.onPointerDown(pos.x, pos.y);
+    // } else if (me._gameState == Enums.GameStates.EDIT) {
+    //   // edit state
+    //   if (me._world.isInsideView(pos)) {
+    //     me._world.runWithNextLoop();
+    //     me._gameState = Enums.GameStates.PLAY;
+    //   } else me._drumKit.onPointerDown(pos.x, pos.y);
+    // }
+  }
+
+  toggleGameState() {
+    const me = this;
+
+    if (me._gameState == Enums.GameStates.BUSY) return true;
+
+    if (me._gameState == Enums.GameStates.PLAY) {
+      me._world.resetCurrentLevel();
+      me._gameState = Enums.GameStates.EDIT;
+    } else if (me._gameState == Enums.GameStates.EDIT) {
+      me._world.runWithNextLoop();
+      me._gameState = Enums.GameStates.PLAY;
+    }
+
+    return true;
   }
 }

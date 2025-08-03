@@ -4,6 +4,7 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import LevelConfig from "./LevelConfig.js";
+import LevelObject from "./LevelObject.js";
 
 export default class DrumKit {
   /** @type {Phaser.Cameras.Scene2D.Camera} */
@@ -42,6 +43,15 @@ export default class DrumKit {
   /** @type {Phaser.GameObjects.Image} */
   _selection;
 
+  /** @type {Number[]} */
+  _availableSamples;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _logo;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _fade;
+
   /**
    * @param {LevelConfig} levelConfig
    */
@@ -62,6 +72,15 @@ export default class DrumKit {
       Consts.DrumKit.StartPosY - Consts.DrumKit.CellSize / 2,
       "indicator"
     );
+
+    me._logo = Here._.add.image(-4200, 150, "logo");
+
+    me._fade = Here._.add
+      .image(0, 0, "fade")
+      .setAlpha(0.25)
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setDepth(Consts.Depth.Fade);
 
     me._deathIcon = Here._.add
       .image(0, 0, "death_icon")
@@ -140,6 +159,9 @@ export default class DrumKit {
     }
   }
 
+  /**
+   * @param {LevelConfig} levelConfig
+   */
   _initAllCells(levelConfig) {
     const me = this;
 
@@ -147,13 +169,21 @@ export default class DrumKit {
       ? levelConfig.length
       : Consts.DrumKit.DefaultBitLength;
 
+    me._availableSamples = !!levelConfig.availableCommands
+      ? levelConfig.availableCommands
+      : [0, 1, 2, 3];
+
     for (let i = 0; i < Consts.DrumKit.MaxBitCount; ++i) {
       me._bitTextPool[i].setVisible(i < me.loopLength);
     }
 
     for (let i = 0; i < Consts.DrumKit.SampleCount; ++i) {
+      const isAvaibleSample = me._isAvaiableSample(i);
       for (let j = 0; j < Consts.DrumKit.MaxBitCount; ++j) {
-        me._padButtons[i][j].setVisible(j < me.loopLength);
+        me._padButtons[i][j]
+          .setVisible(j < me.loopLength)
+          .setAlpha(isAvaibleSample ? 1 : 0.25);
+        if (!isAvaibleSample) me._padButtons[i][j].setFrame(10);
       }
     }
   }
@@ -206,7 +236,7 @@ export default class DrumKit {
     const me = this;
 
     const cell = me._tryGetCellFromWorldPos(x, y);
-    if (!cell) return;
+    if (!cell) return false;
 
     // only one (ignore crash)
     if (!me._loop[cell.i][cell.j] && cell.i > 0) {
@@ -218,6 +248,8 @@ export default class DrumKit {
 
     me._loop[cell.i][cell.j] = !me._loop[cell.i][cell.j];
     me._toggleCell(cell.i, cell.j);
+
+    return true;
   }
 
   _tryGetCellFromWorldPos(x, y) {
@@ -232,6 +264,8 @@ export default class DrumKit {
 
     if (i < 0 || i >= Consts.DrumKit.SampleCount || j < 0 || j >= me.loopLength)
       return null;
+
+    if (!me._isAvaiableSample(i)) return null;
 
     return { i: i, j: j };
   }
@@ -287,8 +321,16 @@ export default class DrumKit {
       const frame = me._getFrame(i);
       button.setFrame(frame);
     } else {
-      button.setFrame(0);
+      // disable
+      const frame = me._isAvaiableSample(i) ? 0 : 10;
+      button.setFrame(frame);
     }
+  }
+
+  _isAvaiableSample(sample) {
+    const me = this;
+
+    return Utils.any(me._availableSamples, (s) => s === sample);
   }
 
   _getSampleAudioName(index) {
