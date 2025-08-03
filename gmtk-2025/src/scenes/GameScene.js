@@ -38,6 +38,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("temp_platform", Consts.Unit.Normal);
     Utils.loadSpriteSheet("pads", Consts.Unit.Normal);
     Utils.loadSpriteSheet("control", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("dragon_head", 300);
 
     Utils.loadImage("indicator");
     Utils.loadImage("death_icon");
@@ -46,6 +47,7 @@ export default class GameScene extends HereScene {
     Utils.loadImage("logo");
     Utils.loadImage("fade");
     Utils.loadImage("controlPanel");
+    Utils.loadImage("dragon_hint");
 
     Utils.loadMp3("kick");
     Utils.loadMp3("crash");

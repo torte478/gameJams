@@ -50,6 +50,15 @@ export default class World {
   /** @type {Phaser.GameObjects.Image} */
   _fade;
 
+  /** @type {Phaser.GameObjects.Image} */
+  _dragonHead;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _dragonTextPointer;
+
+  /** @type {Phaser.GameObjects.Text} */
+  _dragonText;
+
   constructor() {
     const me = this;
 
@@ -84,6 +93,17 @@ export default class World {
       (c) => c.name == Config.LevelOrder[0]
     );
 
+    me._dragonHead = Here._.add.image(450, -300, "dragon_head");
+    me._dragonTextPointer = Here._.add.image(0, -300, "dragon_hint");
+    me._dragonText = Here._.add
+      .text(580, -300, "TEST TEXT", {
+        fontFamily: "Arial Black",
+        fontSize: 24,
+        color: "#9e557f",
+      })
+      .setAlign("right")
+      .setOrigin(1, 1);
+
     me.player = new Player();
 
     me._fade = Here._.add
@@ -102,6 +122,25 @@ export default class World {
     me._mainLevelContainer.init(me._levelConfig, me._tilemap, 0);
 
     me.resetCurrentLevel();
+
+    // TODO: start animation
+    me._dragonHead
+      .setPosition(me._currentLevelTileX * Consts.Unit.Normal + 850, -150)
+      .setAngle(180);
+    Here._.tweens.add({
+      targets: me._dragonHead,
+      y: 170,
+      duration: Config.DurationMs.DragonHead,
+      ease: "sine.out",
+      onComplete: () => {
+        me._dragonTextPointer.setAngle(30).setPosition(670, 150);
+        me._dragonText
+          .setPosition(600, 175)
+          .setText(
+            "Foolish Knight!\n\nDo NOT fill the Drum Kit\nand do NOT press the Play button!"
+          );
+      },
+    });
   }
 
   update(commands, currentBit, gameState, isNewBit) {

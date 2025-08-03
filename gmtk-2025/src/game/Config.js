@@ -18,6 +18,7 @@ export default class Config {
 
   static DurationMs = {
     LevelChange: 500,
+    DragonHead: 10, //1000,
   };
 
   static LevelOrder = [
