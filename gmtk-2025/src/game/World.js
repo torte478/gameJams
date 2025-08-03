@@ -110,6 +110,8 @@ export default class World {
     )
       me._doPlayerActions(commands);
 
+    if (!me.player.isShield) me.player._sprite.setFrame(currentBit % 2);
+
     me._mainLevelContainer.update(currentBit);
 
     if (isNewBit && gameState == Enums.GameStates.PLAY)

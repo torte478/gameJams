@@ -34,13 +34,11 @@ export default class Player {
     me.direction *= -1;
     me._sprite.setFlipX(me.direction == -1);
     me.isShield = false;
-    me._sprite.setFrame(0);
   }
 
   toIdle() {
     const me = this;
 
-    me._sprite.setFrame(0);
     me.isShield = false;
   }
 
@@ -53,7 +51,7 @@ export default class Player {
   toShield() {
     const me = this;
 
-    me._sprite.setFrame(1);
+    me._sprite.setFrame(2);
     me.isShield = true;
   }
 

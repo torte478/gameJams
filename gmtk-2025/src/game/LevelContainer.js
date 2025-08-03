@@ -112,6 +112,8 @@ export default class LevelContainer {
     me._updateObjectItems(me.spikes, currentBit);
     me._updateObjectItems(me.guns, currentBit);
     me._updateObjectItems(me.trampolines, currentBit);
+
+    me._finishFlag.setFrame(currentBit % 4);
   }
 
   runFinishFlagAnimation() {
