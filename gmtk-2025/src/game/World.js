@@ -231,7 +231,7 @@ export default class World {
       text =
         "Foolish Knight!\n\nNever use your attack at the same time\nas other actions!";
     if (me._levelConfig.name == "before_protec")
-      text = "Foolish Knight!\n\nOnly 9,999 levels ahead\n(definitely not 5)";
+      text = "Foolish Knight!\n\nOnly 9,999 levels ahead\n(definitely not 4)";
 
     if (text === null) return;
 
@@ -336,12 +336,13 @@ export default class World {
       me._runWithNextLoop = false;
     }
 
+    let isDeathFromBarrel = false;
     if (
       gameState == Enums.GameStates.PLAY &&
       !me._runWithNextLoop &&
       !!commands
     )
-      me._doPlayerActions(commands);
+      isDeathFromBarrel = me._doPlayerActions(commands);
 
     if (!me.player.isShield) me.player._sprite.setFrame(currentBit % 2);
 
@@ -365,6 +366,8 @@ export default class World {
       me._mainLevelContainer.runFinishFlagAnimation();
       return Enums.BitResult.WIN;
     }
+
+    if (isDeathFromBarrel) return Enums.BitResult.DEATH;
 
     return me._updateLevelObjects(gameState);
   }
@@ -542,7 +545,7 @@ export default class World {
       const spike = me._mainLevelContainer.spikes[i];
       if (spike.checkPlayer(me)) {
         for (let j = 0; j < me._mainLevelContainer.spikes.length; ++j)
-          me._mainLevelContainer.spikes[j]._isBlood = j == i;
+          me._mainLevelContainer.spikes[j]._isPlayerDeathCause = j == i;
         return me._processDeath(true);
       }
     }

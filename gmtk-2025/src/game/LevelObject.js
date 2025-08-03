@@ -25,7 +25,7 @@ export default class LevelObject {
   _type;
 
   /** @type {Boolean} */
-  _isBlood = false;
+  _isPlayerDeathCause = false;
 
   /** @type {Phaser.GameObjects.Group} */
   _pool;
@@ -135,7 +135,7 @@ export default class LevelObject {
     }
 
     if (me._type == Enums.LevelObjectTypes.SPIKES) {
-      const offset = me._isBlood ? 5 : 0;
+      const offset = me._isPlayerDeathCause ? 5 : 0;
       if (me._isActive) {
         me.sprite.setFrame(offset + 4);
       } else {

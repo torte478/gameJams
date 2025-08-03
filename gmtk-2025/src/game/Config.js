@@ -35,7 +35,7 @@ export default class Config {
     // "turn_tutorial",
     // "attack_tutorial",
     // "cool_bit",
-    "before_protec",
+    // "before_protec",
     "protec_tutorial",
     // "rock_you",
     // "TODO_transmit",
@@ -270,7 +270,7 @@ export default class Config {
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
       solution: [
-        [0, 0, 0, 0, 0, 0, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1], //[0, 0, 0, 0, 0, 0, 1, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 0, 1, 1, 1, 0, 1],
@@ -283,13 +283,11 @@ export default class Config {
       ],
       badBarrels: [
         // ...
-        { tileX: 4, tileY: 8 },
         { tileX: 9, tileY: 8 },
         { tileX: 14, tileY: 8 },
       ],
       trampolins: [
         //...
-        { tileX: 3, tileY: 8, bits: [2] },
         { tileX: 8, tileY: 8, bits: [2] },
         { tileX: 13, tileY: 8, bits: [2] },
       ],
