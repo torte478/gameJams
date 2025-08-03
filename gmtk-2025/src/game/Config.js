@@ -23,7 +23,7 @@ export default class Config {
 
   static LevelOrder = [
     // "test_level",
-    "walk_tutorial",
+    // "walk_tutorial",
     "walk_spikes",
     // "trampoline_tutorial",
     // "trampoline_hell",
@@ -308,6 +308,7 @@ export default class Config {
     {
       name: "walk_spikes",
       csvName: "plain",
+      availableCommands: [Enums.SampleCommands.WALK],
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
       solution: [

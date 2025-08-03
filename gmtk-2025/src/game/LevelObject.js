@@ -30,7 +30,7 @@ export default class LevelObject {
    * @param {ItemConfig} config
    * @param {Phaser.GameObjects.Group} pool
    */
-  constructor(type, config, pool, startTileX) {
+  constructor(type, config, pool, startTileX, totalBitCount) {
     const me = this;
 
     me._type = type;
@@ -105,14 +105,30 @@ export default class LevelObject {
       throw "error";
     }
 
-    me.update(0);
+    me.update(0, totalBitCount);
   }
 
-  update(currentBit) {
+  update(currentBit, totalBitCount) {
     const me = this;
 
     if (!!me._bitsToActive) {
       me._isActive = Utils.any(me._bitsToActive, (bit) => bit === currentBit);
+    }
+
+    if (me._type == Enums.LevelObjectTypes.SPIKES) {
+      if (me._isActive) {
+        me.sprite.setFrame(4);
+      } else {
+        const nextActive = me._bitsToActive.find((index) => index > currentBit);
+        const diff =
+          nextActive !== undefined
+            ? nextActive - currentBit
+            : totalBitCount - currentBit + me._bitsToActive[0];
+
+        const frame = diff > 3 ? 0 : 3 - diff + 1;
+        me.sprite.setFrame(frame);
+      }
+    } else {
       me.sprite.setFrame(me._isActive ? 1 : 0);
     }
   }

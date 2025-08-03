@@ -35,6 +35,8 @@ export default class LevelContainer {
   /** @type {Number} */
   widthAtTiles = 0;
 
+  totalBitCount = 0;
+
   constructor(spritePool) {
     const me = this;
 
@@ -92,6 +94,10 @@ export default class LevelContainer {
       levelConfig.tempPlatforms
     );
 
+    me.totalBitCount = !!levelConfig.length
+      ? levelConfig.length
+      : Consts.DrumKit.DefaultBitLength;
+
     me._finishFlag = me._spritePool.get();
     me._finishFlag
       .setPosition(
@@ -126,7 +132,7 @@ export default class LevelContainer {
     const me = this;
 
     for (let i = 0; i < items.length; ++i) {
-      items[i].update(currentBit);
+      items[i].update(currentBit, me.totalBitCount);
     }
   }
 
@@ -143,7 +149,8 @@ export default class LevelContainer {
         objectType,
         itemConfig,
         me._spritePool,
-        me._startTileX
+        me._startTileX,
+        me.totalBitCount
       );
       res.push(obj);
     }

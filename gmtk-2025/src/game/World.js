@@ -126,7 +126,14 @@ export default class World {
 
     me.resetCurrentLevel();
 
-    // TODO: start animation
+    me._runDragonHead();
+  }
+
+  _runDragonHead() {
+    const me = this;
+
+    if (me._levelConfig.name != "walk_tutorial") return;
+
     me._isDragonHeadShown = true;
     me._dragonHead
       .setPosition(me._currentLevelTileX * Consts.Unit.Normal + 850, -150)
@@ -220,6 +227,18 @@ export default class World {
       me._currentLevelTileX
     );
 
+    if (me._isDragonHeadShown) {
+      me._isDragonHeadShown = false;
+      me._dragonText.setVisible(false);
+      me._dragonTextPointer.setVisible(false);
+      Here._.add.tween({
+        targets: me._dragonHead,
+        y: -150,
+        duration: Config.DurationMs.DragonHead,
+        ease: "sine.out",
+      });
+    }
+
     const camera = Here._.cameras.main;
     Here._.tweens.addCounter({
       from: camera.scrollX,
@@ -239,20 +258,10 @@ export default class World {
 
         me._isBusy = false;
         me.completeLevelTransition = true;
+
+        me._runDragonHead();
       },
     });
-
-    if (me._isDragonHeadShown) {
-      me._isDragonHeadShown = false;
-      me._dragonText.setVisible(false);
-      me._dragonTextPointer.setVisible(false);
-      Here._.add.tween({
-        targets: me._dragonHead,
-        y: -150,
-        duration: Config.DurationMs.DragonHead,
-        ease: "sine.out",
-      });
-    }
   }
 
   resetCurrentLevel() {
