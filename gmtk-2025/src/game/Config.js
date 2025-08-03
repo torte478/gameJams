@@ -15,6 +15,7 @@ export default class Config {
   };
 
   static StartState = Enums.GameStates.EDIT;
+  static StartHintCount = 100;
 
   static DurationMs = {
     LevelChange: 500,

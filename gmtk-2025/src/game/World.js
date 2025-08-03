@@ -76,8 +76,11 @@ export default class World {
 
   _lastTime = 0;
 
-  constructor() {
+  _game;
+
+  constructor(game) {
     const me = this;
+    me._game = game;
 
     const tilemapHeight = 10;
     const averageLevelWidth = 20;
@@ -206,7 +209,7 @@ export default class World {
     if (!!me._dragonTailTween) me._dragonTailTween.stop();
 
     me._dragonTail.canBeClickedByPlayer = false;
-    console.log("Dragon click!!!!");
+    me._game.processDragonTailClick();
 
     me._dragonTailTween = Here._.add.tween({
       targets: me._dragonTail,

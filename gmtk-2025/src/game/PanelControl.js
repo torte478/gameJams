@@ -19,6 +19,12 @@ export default class PanelControl {
   /** @type {Phaser.GameObjects.Text} */
   _hintCountText;
 
+  /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+  _hintParticles;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _hintButton;
+
   constructor(game) {
     const me = this;
 
@@ -42,15 +48,36 @@ export default class PanelControl {
       .text(-20, 0, "TEST", textStyle)
       .setOrigin(0, 0.5);
 
-    const hintButton = Here._.add.image(100, 0, "control", 2).setInteractive();
+    me._hintButton = Here._.add.image(80, 0, "control", 2).setInteractive();
+
+    const anotherTextStyle = {
+      color: "#022518",
+      fontSize: 24,
+      fontFamily: "Arial Black",
+    };
+
+    me._hintCountText = Here._.add
+      .text(100, 0, `${me._game._hintCount}`, anotherTextStyle)
+      .setOrigin(0, 0.5)
+      .setAlign("right");
+
+    me._hintParticles = Here._.add.particles(110, 0, "particles", {
+      frames: [4],
+      speed: { min: 150, max: 250 },
+      scale: { start: 0.8, end: 0 },
+      gravityY: 150,
+      blendMode: "ADD",
+      emitting: false,
+    });
 
     me._container = Here._.add
       .container(80, 480, [
         panel,
         me._playStopButton,
         me._playStopText,
-        hintButton,
-        //me._hintCountText,
+        me._hintButton,
+        me._hintCountText,
+        me._hintParticles,
       ])
       .setDepth(Consts.Depth.PanelControl)
       .setScrollFactor(0);
@@ -63,7 +90,24 @@ export default class PanelControl {
     );
     me._playStopButton.on("pointerdown", () => me._onPlayStopPointerDown());
 
+    // ====================================
+
+    me._hintButton.on("pointerover", () => me._selectButton(me._hintButton));
+    me._hintButton.on("pointerout", () => me._unselectButton(me._hintButton));
+    me._hintButton.on("pointerdown", () => me._onHintButtonClick());
+
+    me._hintButton.input.hitArea.setTo(0, 0, 100, 50);
+
+    // ====================================
+
     me._applyState();
+  }
+
+  updateHintCount(ignoreExplode) {
+    const me = this;
+
+    me._hintCountText.setText(me._game._hintCount);
+    if (!ignoreExplode) me._hintParticles.explode(32);
   }
 
   _applyState() {
@@ -123,6 +167,26 @@ export default class PanelControl {
     }
 
     me._applyState();
+  }
+
+  _onHintButtonClick() {
+    const me = this;
+
+    me._hintButton.setScale(0.5);
+    me._hintButton.isPlayingDamnAnimation = true;
+    Here._.time.delayedCall(
+      250,
+      () => {
+        me._hintButton.setScale(1);
+        me._hintButton.isPlayingDamnAnimation = false;
+        me._unselectButton(me._hintButton);
+
+        me._hintButton.input.hitArea.setTo(0, 0, 100, 50);
+      },
+      me
+    );
+
+    me._game.processHintButtonClick();
   }
 
   /**

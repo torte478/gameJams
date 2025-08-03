@@ -34,7 +34,7 @@ export default class Game {
   /** @type {PanelControl} */
   _panelControl;
 
-  _hintCount = 0;
+  _hintCount = Config.StartHintCount;
 
   constructor() {
     const me = this;
@@ -57,7 +57,7 @@ export default class Game {
     if (!levelConfig) throw "error";
 
     me._drumKit = new DrumKit(levelConfig);
-    me._world = new World(levelConfig);
+    me._world = new World(me);
     me._panelControl = new PanelControl(me);
 
     me._drumKit._camera.ignore(me._world._fade);
@@ -90,6 +90,13 @@ export default class Game {
 
       me._drumKit._camera.ignore(me._log);
     });
+  }
+
+  processDragonTailClick() {
+    const me = this;
+
+    me._hintCount += 1;
+    me._panelControl.updateHintCount();
   }
 
   update(time, delta) {
@@ -216,5 +223,12 @@ export default class Game {
     }
 
     return true;
+  }
+
+  processHintButtonClick() {
+    const me = this;
+
+    me._hintCount -= 1;
+    me._panelControl.updateHintCount(true);
   }
 }
