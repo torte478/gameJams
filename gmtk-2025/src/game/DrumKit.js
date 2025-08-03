@@ -179,6 +179,8 @@ export default class DrumKit {
       ? levelConfig.length
       : Consts.DrumKit.DefaultBitLength;
 
+    me._logo.setVisible(me.loopLength < 16);
+
     me._availableSamples = !!levelConfig.availableCommands
       ? levelConfig.availableCommands
       : [0, 1, 2, 3];

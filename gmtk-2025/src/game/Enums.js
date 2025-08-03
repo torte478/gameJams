@@ -44,5 +44,6 @@ export default class Enums {
     PLAY: 0,
     EDIT: 1,
     BUSY: 2,
+    DONT_DO_ANYTHING: 3,
   };
 }

@@ -232,13 +232,15 @@ export default class World {
         "Foolish Knight!\n\nNever use your attack at the same time\nas other actions!";
     if (me._levelConfig.name == "before_protec")
       text = "Foolish Knight!\n\nOnly 9,999 levels ahead\n(definitely not 4)";
+    if (me._levelConfig.name == "TODO_transmit")
+      text = "Foolish Knight!\n\nfOoLiSh KnIgHt\n\nhe he he";
 
     if (text === null) return;
 
+    const originX = me._currentLevelTileX * Consts.Unit.Normal;
+
     me._isDragonHeadShown = true;
-    me._dragonHead
-      .setPosition(me._currentLevelTileX * Consts.Unit.Normal + 850, -150)
-      .setAngle(180);
+    me._dragonHead.setPosition(originX + 850, -150).setAngle(180);
     Here._.tweens.add({
       targets: me._dragonHead,
       y: 150,
@@ -247,9 +249,12 @@ export default class World {
       onComplete: () => {
         me._dragonTextPointer
           .setAngle(30)
-          .setPosition(670, 125)
+          .setPosition(originX + 670, 125)
           .setVisible(true);
-        me._dragonText.setPosition(600, 80).setText(text).setVisible(true);
+        me._dragonText
+          .setPosition(originX + 600, 80)
+          .setText(text)
+          .setVisible(true);
       },
     });
   }

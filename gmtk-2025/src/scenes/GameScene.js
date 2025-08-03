@@ -57,6 +57,7 @@ export default class GameScene extends HereScene {
     Utils.loadMp3("closed_hihat");
     Utils.loadMp3("rack_tom");
     Utils.loadMp3("snare");
+    Utils.loadMp3("final_final");
 
     Utils.loadCsv("test_level");
     Utils.loadCsv("plain");

@@ -6,7 +6,7 @@ export default class Config {
     Global: true,
     Log: true,
     ShowSceneLog: true,
-    PlaySound: false,
+    PlaySound: true,
     Random: true,
     StartFromSolution: true,
     PauseOnRightClick: true,
@@ -15,7 +15,7 @@ export default class Config {
   };
 
   static StartState = Enums.GameStates.PLAY;
-  static StartHintCount = 0;
+  static StartHintCount = 20;
 
   static DurationMs = {
     LevelChange: 500,
@@ -26,7 +26,8 @@ export default class Config {
   };
 
   static LevelOrder = [
-    // "test_level",
+    "intro",
+    "test_level",
     // "walk_tutorial",
     // "walk_spikes",
     // "trampoline_tutorial",
@@ -36,31 +37,42 @@ export default class Config {
     // "attack_tutorial",
     // "cool_bit",
     // "before_protec",
-    "protec_tutorial",
+    // "protec_tutorial",
     // "rock_you",
     // "TODO_transmit",
     // "cool_16",
+    "final",
   ];
 
   /** @type {LevelConfig[]} */
   static Levels = [
     {
       name: "test_level",
-      startTilePos: { x: 1, y: 6 },
-      finishTilePos: { x: 18, y: 6 },
+      csvName: "plain",
+      startTilePos: { x: 17, y: 8 },
+      finishTilePos: { x: 18, y: 8 },
+      ignoreDragonTail: true,
       solution: [
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       ],
       length: 16,
-      tempPlatforms: [
-        // ...
-        { tileX: 3, tileY: 7 },
-        { tileX: 4, tileY: 7 },
-        { tileX: 5, tileY: 7 },
+    },
+    {
+      name: "final",
+      csvName: "plain",
+      startTilePos: { x: 1, y: 8 },
+      finishTilePos: { x: 18, y: 8 },
+      ignoreDragonTail: true,
+      solution: [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       ],
+      length: 16,
     },
     {
       name: "walk_tutorial",
@@ -81,11 +93,12 @@ export default class Config {
       csvName: "transmit",
       startTilePos: { x: 1, y: 6 },
       finishTilePos: { x: 18, y: 8 },
+      length: 16,
       solution: [
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       ],
     },
     {
@@ -270,7 +283,7 @@ export default class Config {
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
       solution: [
-        [1, 1, 1, 1, 1, 1, 1, 1], //[0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 1, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 0, 1, 1, 1, 0, 1],

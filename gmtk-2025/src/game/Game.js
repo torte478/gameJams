@@ -130,6 +130,8 @@ export default class Game {
   _gameLoop(time, delta) {
     const me = this;
 
+    if (me._gameState == Enums.GameStates.DONT_DO_ANYTHING) return;
+
     me._gameTimer += delta;
 
     const overallBit = Math.floor(me._gameTimer * Consts.BitPerMs);
@@ -151,6 +153,12 @@ export default class Game {
         !me._drumKit.completeLevelTransition
       )
         return;
+
+      if (me._drumKit._currentLevelConfig.name == "final") {
+        me._gameState = Enums.GameStates.DONT_DO_ANYTHING;
+        me._runGameOver();
+        return;
+      }
 
       me._gameState = Enums.GameStates.EDIT;
       me._world.runWithNextLoop();
@@ -186,6 +194,8 @@ export default class Game {
 
   _onLMBClick(pointer) {
     const me = this;
+
+    if (me._gameState == Enums.GameStates.DONT_DO_ANYTHING) return;
 
     const pos = Utils.buildPoint(pointer.worldX, pointer.worldY);
     const isDrumKitClick = me._drumKit.onPointerDown(pos.x, pos.y);
@@ -235,5 +245,48 @@ export default class Game {
       me._hintCount -= 1;
       me._panelControl.updateHintCount(true);
     }
+  }
+
+  _runGameOver() {
+    const me = this;
+
+    me._drumKit._fade.setVisible(true).setAlpha(1);
+    me._panelControl._container.setVisible(false);
+
+    const startPosX = me._world._currentLevelTileX * Consts.Unit.Normal;
+    const head = Here._.add
+      .image(startPosX + 800, 700, "dragon_head")
+      .setFlipX(true);
+    Here._.tweens.add({
+      targets: head,
+      y: 350,
+      duration: 4000,
+      ease: "sine.out",
+      onComplete: () => {
+        me._world._dragonTextPointer
+          .setPosition(startPosX + 670, 350)
+          .setAngle(30)
+          .setVisible(true);
+
+        me._world._dragonText
+          .setText("Oh-oh...")
+          .setPosition(startPosX + 600, 300);
+
+        Here._.time.delayedCall(
+          1000,
+          () => {
+            me._world._fade.setVisible(true).setAlpha(1);
+            Here.Audio.play("final_final");
+
+            Here._.time.delayedCall(
+              5000,
+              () => Here._.scene.restart({ isRestart: true }),
+              me
+            );
+          },
+          me
+        );
+      },
+    });
   }
 }
