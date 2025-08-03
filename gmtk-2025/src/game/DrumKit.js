@@ -84,7 +84,7 @@ export default class DrumKit {
 
     me._deathIcon = Here._.add
       .image(0, 0, "death_icon")
-      .setDepth(Consts.Depth.OverOverlay)
+      .setDepth(Consts.Depth.Overlay)
       .setVisible(false);
 
     me._moveIndicatorToBit(0);

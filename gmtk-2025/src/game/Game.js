@@ -151,6 +151,7 @@ export default class Game {
     } else if (bitResult == Enums.BitResult.DEATH) {
       me._gameState = Enums.GameStates.EDIT;
       me._drumKit.showDeathIcon(currentBit);
+      me._panelControl._applyState();
     }
   }
 

@@ -24,6 +24,9 @@ export default class LevelObject {
   /** @type {Number} */
   _type;
 
+  /** @type {Boolean} */
+  _isBlood = false;
+
   /**
    *
    * @param {Number} type
@@ -107,7 +110,6 @@ export default class LevelObject {
 
     me.update(0, totalBitCount);
   }
-
   update(currentBit, totalBitCount) {
     const me = this;
 
@@ -116,8 +118,9 @@ export default class LevelObject {
     }
 
     if (me._type == Enums.LevelObjectTypes.SPIKES) {
+      const offset = me._isBlood ? 5 : 0;
       if (me._isActive) {
-        me.sprite.setFrame(4);
+        me.sprite.setFrame(offset + 4);
       } else {
         const nextActive = me._bitsToActive.find((index) => index > currentBit);
         const diff =
@@ -126,7 +129,7 @@ export default class LevelObject {
             : totalBitCount - currentBit + me._bitsToActive[0];
 
         const frame = diff > 3 ? 0 : 3 - diff + 1;
-        me.sprite.setFrame(frame);
+        me.sprite.setFrame(offset + frame);
       }
     } else {
       me.sprite.setFrame(me._isActive ? 1 : 0);

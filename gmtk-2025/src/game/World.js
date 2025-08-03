@@ -62,6 +62,9 @@ export default class World {
   /** @type {Boolean} */
   _isDragonHeadShown = false;
 
+  /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+  _bloodParticles;
+
   constructor() {
     const me = this;
 
@@ -80,6 +83,15 @@ export default class World {
       10,
       tilemapMock
     );
+
+    me._bloodParticles = Here._.add.particles(0, 0, "particles", {
+      frames: [0, 1, 2, 3],
+      speed: { min: 150, max: 250 },
+      scale: { start: 0.8, end: 0 },
+      gravityY: 150,
+      blendMode: "ADD",
+      emitting: false,
+    });
 
     const tileset = me._tilemap.addTilesetImage("tiles");
 
@@ -366,7 +378,10 @@ export default class World {
 
     // spikes
     for (let i = 0; i < me._mainLevelContainer.spikes.length; ++i) {
-      if (me._mainLevelContainer.spikes[i].checkPlayer(me)) {
+      const spike = me._mainLevelContainer.spikes[i];
+      if (spike.checkPlayer(me)) {
+        for (let j = 0; j < me._mainLevelContainer.spikes.length; ++j)
+          me._mainLevelContainer.spikes[j]._isBlood = j == i;
         return me._processDeath();
       }
     }
@@ -381,11 +396,15 @@ export default class World {
     return Enums.BitResult.NONE;
   }
 
-  _processDeath() {
+  _processDeath(ignorePhantom) {
     const me = this;
 
     const playerObj = me.player.toGameObject();
-    me._phantomDeath.setPosition(playerObj.x, playerObj.y).setVisible(true);
+    if (!!ignorePhantom) {
+      me._phantomDeath.setPosition(playerObj.x, playerObj.y).setVisible(true);
+    }
+
+    me._bloodParticles.setPosition(playerObj.x, playerObj.y).explode(32);
 
     me.resetCurrentLevel();
     return Enums.BitResult.DEATH;

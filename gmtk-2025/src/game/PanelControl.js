@@ -75,11 +75,13 @@ export default class PanelControl {
       me._game._world._fade.setVisible(true);
       me._game._drumKit._fade.setVisible(false);
 
+      me._playStopButton.setFrame(0);
       me._playStopText.text = "PLAY";
     } else if (gameState == Enums.GameStates.PLAY) {
       me._game._world._fade.setVisible(false);
       me._game._drumKit._fade.setVisible(true);
 
+      me._playStopButton.setFrame(1);
       me._playStopText.text = "EDIT";
     } else {
       throw "error";
@@ -119,14 +121,6 @@ export default class PanelControl {
     }
 
     me._applyState();
-
-    if (me._game._gameState == Enums.GameStates.PLAY) {
-      me._playStopButton.setFrame(1);
-    } else if (me._game._gameState == Enums.GameStates.EDIT) {
-      me._playStopButton.setFrame(0);
-    } else {
-      throw "error";
-    }
 
     me._playStopButton.input.hitArea.setTo(0, 0, 100, 50);
   }

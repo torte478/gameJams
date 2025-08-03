@@ -8,13 +8,13 @@ export default class Config {
     ShowSceneLog: true,
     PlaySound: false,
     Random: false,
-    StartFromSolution: false,
+    StartFromSolution: true,
     PauseOnRightClick: true,
     DisableHihats: false,
     DetailLog: true,
   };
 
-  static StartState = Enums.GameStates.EDIT;
+  static StartState = Enums.GameStates.PLAY;
 
   static DurationMs = {
     LevelChange: 500,
@@ -315,7 +315,7 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1], // [1, 1, 1, 1, 0, 0, 0, 0],
       ],
       spikes: [
         { tileX: 6, tileY: 9, bits: [4, 5, 6, 7] },
