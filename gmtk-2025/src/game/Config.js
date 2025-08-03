@@ -14,7 +14,7 @@ export default class Config {
     DetailLog: true,
   };
 
-  static StartState = Enums.GameStates.PLAY;
+  static StartState = Enums.GameStates.EDIT;
   static StartHintCount = 20;
 
   static DurationMs = {
@@ -27,8 +27,8 @@ export default class Config {
 
   static LevelOrder = [
     "intro",
-    "test_level",
-    // "walk_tutorial",
+    // "test_level",
+    "walk_tutorial",
     // "walk_spikes",
     // "trampoline_tutorial",
     // "trampoline_hell",
@@ -57,6 +57,19 @@ export default class Config {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+      // length: 16,
+    },
+    {
+      name: "intro",
+      startTilePos: { x: 2, y: 8 },
+      finishTilePos: { x: 58, y: 8 },
+      ignoreDragonTail: true,
+      solution: [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+        [1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0],
       ],
       length: 16,
     },

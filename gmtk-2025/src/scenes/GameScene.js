@@ -51,6 +51,8 @@ export default class GameScene extends HereScene {
     Utils.loadImage("controlPanel");
     Utils.loadImage("dragon_hint");
     Utils.loadImage("dragon_tail");
+    Utils.loadImage("intro_screen");
+    Utils.loadImage("dragon_head_bad");
 
     Utils.loadMp3("kick");
     Utils.loadMp3("crash");
@@ -71,6 +73,7 @@ export default class GameScene extends HereScene {
     Utils.loadCsv("transmit");
     Utils.loadCsv("attack_tutorial");
     Utils.loadCsv("before_protec");
+    Utils.loadCsv("intro");
   }
 
   create() {

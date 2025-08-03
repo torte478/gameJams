@@ -3,6 +3,7 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
+import Game from "./Game.js";
 import LevelConfig from "./LevelConfig.js";
 import LevelObject from "./LevelObject.js";
 
@@ -208,21 +209,31 @@ export default class DrumKit {
     me._currentBit = -1;
   }
 
-  update(bit, isWindowActive) {
+  /**
+   *
+   * @param {*} bit
+   * @param {*} isWindowActive
+   * @param {Game} game
+   * @returns
+   */
+  update(bit, isWindowActive, game) {
     const me = this;
 
     const pointer = Here._.input.activePointer;
-    const cell = me._tryGetCellFromWorldPos(pointer.worldX, pointer.worldY);
-    if (!!cell) {
-      const pos = me._cellToWorldPos(cell.i, cell.j);
-      me._selection
-        .setVisible(true)
-        .setPosition(
-          pos.x + 0.5 * Consts.Unit.Normal,
-          pos.y + 0.5 * Consts.Unit.Normal
-        );
-    } else {
-      me._selection.setVisible(false);
+
+    if (!game.one_more_tail || !game.one_more_tail.visible) {
+      const cell = me._tryGetCellFromWorldPos(pointer.worldX, pointer.worldY);
+      if (!!cell) {
+        const pos = me._cellToWorldPos(cell.i, cell.j);
+        me._selection
+          .setVisible(true)
+          .setPosition(
+            pos.x + 0.5 * Consts.Unit.Normal,
+            pos.y + 0.5 * Consts.Unit.Normal
+          );
+      } else {
+        me._selection.setVisible(false);
+      }
     }
 
     if (bit == me._currentBit) return null;

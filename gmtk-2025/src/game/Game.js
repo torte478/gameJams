@@ -90,6 +90,8 @@ export default class Game {
 
       me._drumKit._camera.ignore(me._log);
     });
+
+    me.startGame();
   }
 
   processDragonTailClick() {
@@ -138,7 +140,17 @@ export default class Game {
     const currentBit = overallBit % me._drumKit.loopLength;
 
     const isNewBit = currentBit != me._drumKit._currentBit;
-    const commands = me._drumKit.update(currentBit, me._isWindowActive);
+    const commands = me._drumKit.update(currentBit, me._isWindowActive, me);
+
+    if (!!me.one_more_tail && me.one_more_tail.visible && !!commands) {
+      const isHitttttt = commands[Enums.SampleCommands.SHIELD];
+      const yyyyyyy = isHitttttt ? 350 : 300;
+      me.one_more_tail.setPosition(me.one_more_tail.x, yyyyyyy);
+      me._world.player._sprite.setFrame(isHitttttt ? 1 : 0);
+    }
+
+    if (!!me.one_more_tail && me.one_more_tail.visible) return;
+
     const bitResult = me._world.update(
       commands,
       currentBit,
@@ -155,9 +167,7 @@ export default class Game {
         return;
 
       if (me._drumKit._currentLevelConfig.name == "final") {
-        me._gameState = Enums.GameStates.DONT_DO_ANYTHING;
-        me._runGameOver();
-        return;
+        return me._runGameOver();
       }
 
       me._gameState = Enums.GameStates.EDIT;
@@ -188,6 +198,17 @@ export default class Game {
     if (!levelConfig) throw "error";
 
     me._gameState = Enums.GameStates.BUSY;
+
+    if (levelConfig.name == "walk_tutorial") {
+      me._drumKit._infoImage.setVisible(true);
+      me._drumKit._indicator.setVisible(true);
+      me._drumKit._selection.setAlpha(1);
+      me._panelControl._container.setVisible(true);
+
+      for (let i = 0; i < 4; ++i)
+        for (let j = 0; j < 16; ++j) me._drumKit._loop[i][j] = false;
+    }
+
     me._world.gotoNextLevel(levelConfig, time);
     me._drumKit.gotoNextLevel(levelConfig);
   }
@@ -195,7 +216,15 @@ export default class Game {
   _onLMBClick(pointer) {
     const me = this;
 
-    if (me._gameState == Enums.GameStates.DONT_DO_ANYTHING) return;
+    if (me.finalfinalfinalflag) {
+      return me.aaaaaaaaaaaaaaaaaaaaaa();
+    }
+
+    if (
+      me._gameState == Enums.GameStates.DONT_DO_ANYTHING &&
+      me._drumKit._currentLevelConfig.name == "intro"
+    )
+      return me.startIntro();
 
     const pos = Utils.buildPoint(pointer.worldX, pointer.worldY);
     const isDrumKitClick = me._drumKit.onPointerDown(pos.x, pos.y);
@@ -250,6 +279,8 @@ export default class Game {
   _runGameOver() {
     const me = this;
 
+    me._gameState = Enums.GameStates.DONT_DO_ANYTHING;
+
     me._drumKit._fade.setVisible(true).setAlpha(1);
     me._panelControl._container.setVisible(false);
 
@@ -270,7 +301,8 @@ export default class Game {
 
         me._world._dragonText
           .setText("Oh-oh...")
-          .setPosition(startPosX + 600, 300);
+          .setPosition(startPosX + 600, 300)
+          .setVisible(true);
 
         Here._.time.delayedCall(
           1000,
@@ -289,4 +321,128 @@ export default class Game {
       },
     });
   }
+
+  startGame() {
+    const me = this;
+
+    if (me._drumKit._currentLevelConfig.name != "intro") return;
+
+    me._gameState = Enums.GameStates.DONT_DO_ANYTHING;
+
+    me.introScreen = Here._.add
+      .image(0, 0, "intro_screen")
+      .setOrigin(0, 0)
+      .setScrollFactor(0, 0)
+      .setDepth(Consts.Depth.Max);
+
+    //====================
+
+    me._drumKit._camera.ignore(me.introScreen);
+
+    me._panelControl._container.setVisible(false);
+
+    me._drumKit._indicator.setVisible(false);
+    me._drumKit._infoImage.setVisible(false);
+
+    for (let i = 0; i < 4; ++i) {
+      for (let j = 0; j < 16; ++j) {
+        me._drumKit._padButtons[i][j].setVisible(false);
+      }
+    }
+
+    for (let j = 0; j < 16; ++j) me._drumKit._bitTextPool[j].setVisible(false);
+
+    me._world._movePlayerPosTo({ x: 53, y: 8 }); //._container.setVisible(false);
+    me._world._mainLevelContainer._finishFlag.setVisible(false);
+    me._drumKit._selection.setAlpha(0);
+
+    //======================
+
+    Here._.add
+      .image(700, 400, "dragon_head_bad")
+      .setFlipX(true)
+      .setScale(1.5)
+      .setAngle(35);
+
+    Here._.add.image(350, 200, "dragon_tail").setScale(1).setAngle(215);
+
+    const textStyle = {
+      fontFamily: "Arial Black",
+      fontSize: 48,
+      color: "#83a897",
+    };
+
+    Here._.add
+      .text(
+        1200,
+        200,
+        "Thank you for playing!\n\nCreated solo in 96 hours",
+        textStyle
+      )
+      .setAlign("center");
+
+    me.one_more_tail = Here._.add
+      .image(2800, 350, "dragon_tail")
+      .setScale(0.75);
+  }
+
+  startIntro() {
+    const me = this;
+
+    me._gameState = Enums.GameStates.EDIT;
+
+    Here._.add.tween({
+      targets: me.introScreen,
+      alpha: { from: 1, to: 0 },
+      duration: 50, //5000,
+      onComplete: () => {
+        // =================
+        Here._.add.tween({
+          targets: Here._.cameras.main,
+          scrollX: 2000,
+          duration: 1000, // TODO
+          onComplete: () => {
+            // ===================
+            me._gameState = Enums.GameStates.EDIT;
+
+            me._drumKit._logo.setVisible(true).setAlpha(0);
+
+            Here._.add.tween({
+              targets: me._drumKit._logo,
+              alpha: { from: 0, to: 1 },
+              duration: 1000,
+              onComplete: () => {
+                //===============
+
+                const textStyle = {
+                  fontFamily: "Arial Black",
+                  fontSize: 48,
+                  color: "#83a897",
+                };
+
+                me._lastText = Here._.add
+                  .text(-4900, 100, "Click anywhere\nto start", textStyle)
+                  .setAlign("center");
+
+                me.finalfinalfinalflag = true;
+              },
+            });
+          },
+        });
+      },
+    });
+  }
+
+  aaaaaaaaaaaaaaaaaaaaaa() {
+    const me = this;
+
+    this.finalfinalfinalflag = false;
+    if (!!me._lastText) me._lastText.setVisible(false).destroy();
+
+    me._gameState = Enums.GameStates.PLAY;
+    me.one_more_tail.setVisible(false).destroy();
+    me.one_more_tail = null;
+  }
+
+  finalfinalfinalflag = false;
 }
