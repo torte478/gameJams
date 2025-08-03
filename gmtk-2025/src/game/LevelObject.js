@@ -27,14 +27,20 @@ export default class LevelObject {
   /** @type {Boolean} */
   _isBlood = false;
 
+  /** @type {Phaser.GameObjects.Group} */
+  _pool;
+
+  _fireLine = [];
+
   /**
    *
    * @param {Number} type
    * @param {ItemConfig} config
    * @param {Phaser.GameObjects.Group} pool
    */
-  constructor(type, config, pool, startTileX, totalBitCount) {
+  constructor(type, config, pool, startTileX, totalBitCount, world) {
     const me = this;
+    me._pool = pool;
 
     me._type = type;
     me._tileX = startTileX + config.tileX;
@@ -108,10 +114,19 @@ export default class LevelObject {
       throw "error";
     }
 
-    me.update(0, totalBitCount);
+    me.update(0, totalBitCount, world, true);
   }
-  update(currentBit, totalBitCount) {
+
+  /**
+   *
+   * @param {*} currentBit
+   * @param {*} totalBitCount
+   * @param {World} world
+   */
+  update(currentBit, totalBitCount, world, isNewBit) {
     const me = this;
+
+    if (!isNewBit) return;
 
     if (!!me._bitsToActive) {
       me._isActive = Utils.any(me._bitsToActive, (bit) => bit === currentBit);
@@ -143,6 +158,51 @@ export default class LevelObject {
 
         const frame = diff > 3 ? 0 : 3 - diff + 1;
         me.sprite.setFrame(frame);
+      }
+    } else if (me._type == Enums.LevelObjectTypes.GUN) {
+      if (me._isActive) {
+        me.sprite.setFrame(4);
+
+        let tileX = me._tileX;
+        while (tileX >= world._currentLevelTileX) {
+          tileX -= 1;
+
+          const isSolid =
+            world.isSolidTile(tileX, me._tileY) ||
+            (tileX == world.playerTilePos.x &&
+              me._tileY == world.playerTilePos.y);
+
+          const pos = world._getTileCenter(tileX, me._tileY);
+          if (isSolid) {
+            world._gunParticles.explode(32, pos.x, pos.y);
+            break;
+          }
+
+          /** @type {Phaser.GameObjects.Sprite} */
+          const fireLine = me._pool.get();
+          fireLine
+            .setPosition(pos.x, pos.y)
+            .setTexture("gun", 5)
+            .setActive(true)
+            .setVisible(true);
+
+          me._fireLine.push(fireLine);
+        }
+      } else {
+        const nextActive = me._bitsToActive.find((index) => index > currentBit);
+        const diff =
+          nextActive !== undefined
+            ? nextActive - currentBit
+            : totalBitCount - currentBit + me._bitsToActive[0];
+
+        const frame = diff > 3 ? 0 : 3 - diff + 1;
+        me.sprite.setFrame(frame);
+
+        if (me._fireLine.length > 0) {
+          for (let i = 0; i < me._fireLine.length; ++i)
+            me._pool.killAndHide(me._fireLine[i]);
+          me._fireLine = [];
+        }
       }
     } else {
       me.sprite.setFrame(me._isActive ? 1 : 0);

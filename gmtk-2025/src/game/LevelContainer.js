@@ -37,9 +37,12 @@ export default class LevelContainer {
 
   totalBitCount = 0;
 
-  constructor(spritePool) {
+  _world;
+
+  constructor(spritePool, world) {
     const me = this;
 
+    me._world = world;
     me._spritePool = spritePool;
   }
 
@@ -112,12 +115,12 @@ export default class LevelContainer {
       .setVisible(true);
   }
 
-  update(currentBit) {
+  update(currentBit, isNewBit) {
     const me = this;
 
-    me._updateObjectItems(me.spikes, currentBit);
-    me._updateObjectItems(me.guns, currentBit);
-    me._updateObjectItems(me.trampolines, currentBit);
+    me._updateObjectItems(me.spikes, currentBit, isNewBit);
+    me._updateObjectItems(me.guns, currentBit, isNewBit);
+    me._updateObjectItems(me.trampolines, currentBit, isNewBit);
 
     me._finishFlag.setFrame(currentBit % 4);
   }
@@ -128,11 +131,11 @@ export default class LevelContainer {
     me._finishFlag.setVisible(false);
   }
 
-  _updateObjectItems(items, currentBit) {
+  _updateObjectItems(items, currentBit, isNewBit) {
     const me = this;
 
     for (let i = 0; i < items.length; ++i) {
-      items[i].update(currentBit, me.totalBitCount);
+      items[i].update(currentBit, me.totalBitCount, me._world, isNewBit);
     }
   }
 
@@ -150,7 +153,8 @@ export default class LevelContainer {
         itemConfig,
         me._spritePool,
         me._startTileX,
-        me.totalBitCount
+        me.totalBitCount,
+        me._world
       );
       res.push(obj);
     }
@@ -163,8 +167,15 @@ export default class LevelContainer {
 
     for (let i = 0; i < me.spikes.length; ++i)
       me._spritePool.killAndHide(me.spikes[i].sprite);
-    for (let i = 0; i < me.guns.length; ++i)
-      me._spritePool.killAndHide(me.guns[i].sprite);
+
+    for (let i = 0; i < me.guns.length; ++i) {
+      const gun = me.guns[i];
+      me._spritePool.killAndHide(gun.sprite);
+
+      for (let j = 0; j < gun._fireLine.length; ++i)
+        me._spritePool.killAndHide(gun._fireLine[j]);
+    }
+
     for (let i = 0; i < me.trampolines.length; ++i)
       me._spritePool.killAndHide(me.trampolines[i].sprite);
     for (let i = 0; i < me.goodBarrels.length; ++i)

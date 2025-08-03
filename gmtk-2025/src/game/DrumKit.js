@@ -368,7 +368,7 @@ export default class DrumKit {
     const button = me._padButtons[i][j];
 
     let offset = 0;
-    if (me._hintArray[i]) {
+    if (me._hintArray[j]) {
       offset = me._currentLevelConfig.solution[i][j] ? 5 : 10;
     }
 

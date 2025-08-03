@@ -78,6 +78,9 @@ export default class World {
 
   _game;
 
+  /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+  _gunParticles;
+
   constructor(game) {
     const me = this;
     me._game = game;
@@ -99,8 +102,17 @@ export default class World {
     );
 
     me._bloodParticles = Here._.add.particles(0, 0, "particles", {
-      frames: [0, 1, 2, 3],
+      frame: [0, 1, 2, 3],
       speed: { min: 150, max: 250 },
+      scale: { start: 0.8, end: 0 },
+      gravityY: 150,
+      blendMode: "ADD",
+      emitting: false,
+    });
+
+    me._gunParticles = Here._.add.particles(0, 0, "particles", {
+      frame: [5],
+      speed: { min: 200, max: 250 },
       scale: { start: 0.8, end: 0 },
       gravityY: 150,
       blendMode: "ADD",
@@ -128,8 +140,8 @@ export default class World {
     me._tilemapLayer.setDepth(Consts.Depth.Tiles);
 
     const spritePool = Here._.add.group();
-    me._mainLevelContainer = new LevelContainer(spritePool);
-    me._secondaryLevelContainer = new LevelContainer(spritePool);
+    me._mainLevelContainer = new LevelContainer(spritePool, me);
+    me._secondaryLevelContainer = new LevelContainer(spritePool, me);
 
     me._levelConfig = Utils.firstOrNull(
       Config.Levels,
@@ -157,7 +169,7 @@ export default class World {
       .setDepth(Consts.Depth.Fade);
 
     me._phantomDeath = Here._.add
-      .sprite(0, 0, "player", 0)
+      .sprite(0, 0, "player", 3)
       .setAlpha(0.5)
       .setDepth(Consts.Depth.Overlay)
       .setVisible(false);
@@ -292,7 +304,7 @@ export default class World {
 
     if (!me.player.isShield) me.player._sprite.setFrame(currentBit % 2);
 
-    me._mainLevelContainer.update(currentBit);
+    me._mainLevelContainer.update(currentBit, isNewBit);
 
     if (isNewBit && gameState == Enums.GameStates.PLAY)
       Utils.debugLog(
@@ -416,6 +428,8 @@ export default class World {
     const isTempPlatform = me._hasTempPlatformAtPos(tileX, tileY);
     if (isTempPlatform) return true;
 
+    if (tileX < me._currentLevelTileX) return true;
+
     const tile = me._tilemapLayer.getTileAt(tileX, tileY);
 
     return !tile || tile.index > 0;
@@ -488,7 +502,7 @@ export default class World {
       if (spike.checkPlayer(me)) {
         for (let j = 0; j < me._mainLevelContainer.spikes.length; ++j)
           me._mainLevelContainer.spikes[j]._isBlood = j == i;
-        return me._processDeath();
+        return me._processDeath(true);
       }
     }
 
@@ -506,7 +520,7 @@ export default class World {
     const me = this;
 
     const playerObj = me.player.toGameObject();
-    if (!!ignorePhantom) {
+    if (!ignorePhantom) {
       me._phantomDeath.setPosition(playerObj.x, playerObj.y).setVisible(true);
     }
 
@@ -523,9 +537,7 @@ export default class World {
       me._movePlayerPosTo({ x: me.playerTilePos.x, y: me.playerTilePos.y + 1 });
     }
 
-    if (Utils.all(commands, (c) => !c)) {
-      me.player.toIdle();
-    }
+    me.player.toIdle();
 
     if (commands[Enums.SampleCommands.WALK]) {
       me._applyWalkCommand();

@@ -37,7 +37,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("barrels", Consts.Unit.Normal);
     Utils.loadSpriteSheet("temp_platform", Consts.Unit.Normal);
     Utils.loadSpriteSheet("pads", Consts.Unit.Normal);
-    Utils.loadSpriteSheet("control", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("control", 100, 50);
     Utils.loadSpriteSheet("dragon_head", 300);
     Utils.loadSpriteSheet("particles", 25);
 

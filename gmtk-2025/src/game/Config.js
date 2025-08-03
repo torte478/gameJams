@@ -29,12 +29,11 @@ export default class Config {
     // "test_level",
     // "walk_tutorial",
     // "walk_spikes",
-    "trampoline_tutorial",
-    "trampoline_hell",
+    // "trampoline_tutorial",
+    // "trampoline_hell",
     // "shield_tutorial",
-    // "TODO_transmit",
     // "turn_tutorial",
-    // "attack_tutorial",
+    "attack_tutorial",
     // el problemo
     // "cool_bit",
     // "TODO_transmit",
@@ -297,8 +296,13 @@ export default class Config {
     },
     {
       name: "turn_tutorial",
-      startTilePos: { x: 1, y: 8 },
+      startTilePos: { x: 1, y: 6 },
       finishTilePos: { x: 18, y: 8 },
+      availableCommands: [
+        Enums.SampleCommands.WALK,
+        Enums.SampleCommands.SHIELD,
+        Enums.SampleCommands.TURN,
+      ],
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 1],
@@ -306,8 +310,8 @@ export default class Config {
         [1, 1, 1, 1, 1, 1, 1, 0],
       ],
       trampolins: [
-        { tileX: 8, tileY: 8, bits: [7] },
-        { tileX: 4, tileY: 6, bits: [7] },
+        { tileX: 8, tileY: 6, bits: [7] },
+        { tileX: 4, tileY: 4, bits: [7] },
       ],
     },
     {
@@ -334,6 +338,10 @@ export default class Config {
     },
     {
       name: "shield_tutorial",
+      availableCommands: [
+        Enums.SampleCommands.WALK,
+        Enums.SampleCommands.SHIELD,
+      ],
       startTilePos: { x: 1, y: 6 },
       finishTilePos: { x: 18, y: 6 },
       solution: [
@@ -347,6 +355,7 @@ export default class Config {
     },
     {
       name: "trampoline_hell",
+      availableCommands: [Enums.SampleCommands.WALK],
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 6 },
       solution: [
@@ -369,7 +378,7 @@ export default class Config {
       name: "trampoline_tutorial",
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
-      // availableCommands: [Enums.SampleCommands.WALK],
+      availableCommands: [Enums.SampleCommands.WALK],
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
