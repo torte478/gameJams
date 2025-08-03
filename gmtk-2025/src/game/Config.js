@@ -14,13 +14,13 @@ export default class Config {
     DetailLog: true,
   };
 
-  static StartState = Enums.GameStates.EDIT;
-  static StartHintCount = 100;
+  static StartState = Enums.GameStates.PLAY;
+  static StartHintCount = 0;
 
   static DurationMs = {
     LevelChange: 500,
     DragonHead: 1000,
-    MinDragonTailPeriod: 1000, //5000,
+    MinDragonTailPeriod: 5000,
     MaxDragonTailPeriod: 10000,
     DragonTailShowcase: 1000,
   };
@@ -30,7 +30,7 @@ export default class Config {
     // "walk_tutorial",
     // "walk_spikes",
     "trampoline_tutorial",
-    // "trampoline_hell",
+    "trampoline_hell",
     // "shield_tutorial",
     // "TODO_transmit",
     // "turn_tutorial",

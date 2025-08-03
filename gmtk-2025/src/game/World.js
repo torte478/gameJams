@@ -145,7 +145,7 @@ export default class World {
         color: "#9e557f",
       })
       .setAlign("right")
-      .setOrigin(1, 1);
+      .setOrigin(1, 0);
 
     me.player = new Player();
 
@@ -173,7 +173,14 @@ export default class World {
   _runDragonHead() {
     const me = this;
 
-    if (me._levelConfig.name != "walk_tutorial") return;
+    let text = null;
+    if (me._levelConfig.name == "walk_tutorial")
+      text =
+        "Foolish Knight!\n\nDo NOT fill the Drum Kit\nand do NOT press the Play button!";
+    if (me._levelConfig.name == "trampoline_tutorial")
+      text = "Foolish Knight!\n\nDo NOT click on my tail to get hints!";
+
+    if (text === null) return;
 
     me._isDragonHeadShown = true;
     me._dragonHead
@@ -181,20 +188,15 @@ export default class World {
       .setAngle(180);
     Here._.tweens.add({
       targets: me._dragonHead,
-      y: 170,
+      y: 150,
       duration: Config.DurationMs.DragonHead,
       ease: "sine.out",
       onComplete: () => {
         me._dragonTextPointer
           .setAngle(30)
-          .setPosition(670, 150)
+          .setPosition(670, 125)
           .setVisible(true);
-        me._dragonText
-          .setPosition(600, 175)
-          .setText(
-            "Foolish Knight!\n\nDo NOT fill the Drum Kit\nand do NOT press the Play button!"
-          )
-          .setVisible(true);
+        me._dragonText.setPosition(600, 80).setText(text).setVisible(true);
       },
     });
   }
@@ -219,6 +221,8 @@ export default class World {
         me._dragonTailTween = null;
         me._dragonTail.canBeClickedByPlayer = true;
         me._resetNextDragonTailTime();
+
+        me._dragonTail.clearTint();
       },
     });
   }
@@ -266,6 +270,8 @@ export default class World {
             duration: Config.DurationMs.DragonTailShowcase,
             onComplete: () => {
               me._dragonTailTween = null;
+
+              me._dragonTail.clearTint();
             },
           });
         },
