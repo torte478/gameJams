@@ -228,7 +228,11 @@ export default class Game {
   processHintButtonClick() {
     const me = this;
 
-    me._hintCount -= 1;
-    me._panelControl.updateHintCount(true);
+    if (me._hintCount == 0) return;
+
+    if (me._drumKit.showHint()) {
+      me._hintCount -= 1;
+      me._panelControl.updateHintCount(true);
+    }
   }
 }

@@ -369,7 +369,7 @@ export default class Config {
       name: "trampoline_tutorial",
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
-      availableCommands: [Enums.SampleCommands.WALK],
+      // availableCommands: [Enums.SampleCommands.WALK],
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],

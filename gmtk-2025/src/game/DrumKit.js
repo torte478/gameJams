@@ -52,11 +52,19 @@ export default class DrumKit {
   /** @type {Phaser.GameObjects.Image} */
   _fade;
 
+  _hintArray;
+
+  _currentHintIndex = 0;
+
+  /** @type {LevelConfig} */
+  _currentLevelConfig;
+
   /**
    * @param {LevelConfig} levelConfig
    */
   constructor(levelConfig) {
     const me = this;
+    me._currentLevelConfig = levelConfig;
     me._camera = Here._.cameras.add(
       0,
       Consts.Viewport.Height - Consts.DrumKit.ViewHeight,
@@ -103,6 +111,8 @@ export default class DrumKit {
       const line = Utils.buildArray(Consts.DrumKit.MaxBitCount, false);
       me._loop.push(line);
     }
+
+    me._hintArray = Utils.buildArray(Consts.DrumKit.MaxBitCount, false);
 
     // bit text
     me._bitTextPool = [];
@@ -270,15 +280,55 @@ export default class DrumKit {
     return { i: i, j: j };
   }
 
+  showHint() {
+    const me = this;
+
+    let isAllHints = true;
+    for (let i = 0; i < me.loopLength; ++i)
+      if (!me._hintArray[i]) {
+        isAllHints = false;
+        break;
+      }
+
+    if (isAllHints) return false;
+
+    const j = me._currentHintIndex;
+
+    me._hintArray[j] = true;
+    for (let i = 0; i < 4; ++i) {
+      if (!me._isAvaiableSample(i)) continue;
+
+      let frame = -1;
+      if (me._loop[i][j]) {
+        frame = me._getFrame(i);
+      } else {
+        frame = 0;
+      }
+
+      const offset = me._currentLevelConfig.solution[i][j] ? 5 : 10;
+      me._padButtons[i][j].setFrame(frame + offset);
+    }
+
+    me._currentHintIndex = me._currentHintIndex + 4;
+    if (me._currentHintIndex >= me.loopLength)
+      me._currentHintIndex = (me._currentHintIndex % me.loopLength) + 1;
+
+    return true;
+  }
+
   gotoNextLevel(nextLevelConfig) {
     const me = this;
 
     me.completeLevelTransition = false;
 
+    for (let i = 0; i < me._hintArray.length; ++i) me._hintArray[i] = false;
+    me._currentHintIndex = 0;
+
     me._deathIcon.setVisible(false);
     me._initAllCells(nextLevelConfig);
 
     me.completeLevelTransition = true;
+    me._currentLevelConfig = nextLevelConfig;
   }
 
   isInsideView(pos) {
@@ -317,12 +367,17 @@ export default class DrumKit {
 
     const button = me._padButtons[i][j];
 
+    let offset = 0;
+    if (me._hintArray[i]) {
+      offset = me._currentLevelConfig.solution[i][j] ? 5 : 10;
+    }
+
     if (me._loop[i][j]) {
       const frame = me._getFrame(i);
-      button.setFrame(frame);
+      button.setFrame(frame + offset);
     } else {
       // disable
-      const frame = me._isAvaiableSample(i) ? 0 : 10;
+      const frame = me._isAvaiableSample(i) ? 0 + offset : 10;
       button.setFrame(frame);
     }
   }
