@@ -14,7 +14,7 @@ export default class Config {
     DetailLog: true,
   };
 
-  static StartState = Enums.GameStates.EDIT;
+  static StartState = Enums.GameStates.PLAY;
   static StartHintCount = 0;
 
   static DurationMs = {
@@ -32,12 +32,11 @@ export default class Config {
     // "trampoline_tutorial",
     // "trampoline_hell",
     // "shield_tutorial",
-    "turn_tutorial",
-    "attack_tutorial",
-    // el problemo
+    // "turn_tutorial",
+    // "attack_tutorial",
     // "cool_bit",
-    // "TODO_transmit",
-    // "protec_tutorial",
+    "before_protec",
+    "protec_tutorial",
     // "rock_you",
     // "TODO_transmit",
     // "cool_16",
@@ -243,6 +242,29 @@ export default class Config {
       ],
     },
     {
+      name: "before_protec",
+      startTilePos: { x: 1, y: 6 },
+      finishTilePos: { x: 18, y: 8 },
+      solution: [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+      spikes: [
+        { tileX: 6, tileY: 9, bits: [0, 1, 2, 3, 4, 5, 6, 7] },
+        { tileX: 7, tileY: 9, bits: [0, 1, 2, 3, 4, 5, 6, 7] },
+        { tileX: 8, tileY: 9, bits: [0, 1, 2, 3, 4, 5, 6, 7] },
+        { tileX: 9, tileY: 9, bits: [0, 1, 2, 3, 4, 5, 6, 7] },
+      ],
+      tempPlatforms: [
+        { tileX: 6, tileY: 7 },
+        { tileX: 7, tileY: 7 },
+        { tileX: 8, tileY: 7 },
+        { tileX: 9, tileY: 7 },
+      ],
+    },
+    {
       name: "protec_tutorial",
       csvName: "plain",
       startTilePos: { x: 1, y: 8 },
@@ -274,9 +296,8 @@ export default class Config {
     },
     {
       name: "attack_tutorial",
-      csvName: "plain",
       startTilePos: { x: 1, y: 8 },
-      finishTilePos: { x: 18, y: 8 },
+      finishTilePos: { x: 18, y: 6 },
       solution: [
         [0, 0, 1, 0, 0, 0, 1, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
@@ -291,7 +312,10 @@ export default class Config {
         { tileX: 10, tileY: 8 },
         { tileX: 13, tileY: 7 },
         { tileX: 13, tileY: 8 },
-        { tileX: 16, tileY: 8 },
+      ],
+      trampolins: [
+        //...
+        { tileX: 16, tileY: 8, bits: [4] },
       ],
     },
     {

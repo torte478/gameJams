@@ -152,8 +152,9 @@ export default class Game {
       )
         return;
 
-      me._gameState = Enums.GameStates.PLAY;
+      me._gameState = Enums.GameStates.EDIT;
       me._world.runWithNextLoop();
+      me._panelControl._applyState();
     }
 
     if (bitResult == Enums.BitResult.WIN) {

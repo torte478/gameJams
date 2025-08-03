@@ -87,6 +87,9 @@ export default class World {
   /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
   _badBarrelParticles;
 
+  /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+  _tempPlatformParticles;
+
   constructor(game) {
     const me = this;
     me._game = game;
@@ -139,6 +142,15 @@ export default class World {
       speed: { min: 150, max: 250 },
       scale: { start: 0.8, end: 0 },
       gravityY: 150,
+      blendMode: "ADD",
+      emitting: false,
+    });
+
+    me._tempPlatformParticles = Here._.add.particles(0, 0, "particles", {
+      frame: [5],
+      speed: { min: 100, max: 200 },
+      scale: { start: 2, end: 0 },
+      gravityY: 100,
       blendMode: "ADD",
       emitting: false,
     });
@@ -218,6 +230,8 @@ export default class World {
     if (me._levelConfig.name == "attack_tutorial")
       text =
         "Foolish Knight!\n\nNever use your attack at the same time\nas other actions!";
+    if (me._levelConfig.name == "before_protec")
+      text = "Foolish Knight!\n\nOnly 9,999 levels ahead\n(definitely not 5)";
 
     if (text === null) return;
 

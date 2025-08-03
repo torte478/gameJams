@@ -68,6 +68,8 @@ export default class GameScene extends HereScene {
     Utils.loadCsv("rock_you");
     Utils.loadCsv("cool_16");
     Utils.loadCsv("transmit");
+    Utils.loadCsv("attack_tutorial");
+    Utils.loadCsv("before_protec");
   }
 
   create() {

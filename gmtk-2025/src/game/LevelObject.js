@@ -108,7 +108,7 @@ export default class LevelObject {
           me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
           me._tileY * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal
         )
-        .setTexture("temp_platform", 1)
+        .setTexture("temp_platform", 0)
         .setVisible(true)
         .setActive(true);
       me._isActive = true;
@@ -208,11 +208,12 @@ export default class LevelObject {
       }
     } else if (
       me._type == Enums.LevelObjectTypes.GOOD_BARREL ||
-      me._type == Enums.LevelObjectTypes.BAD_BARREL
+      me._type == Enums.LevelObjectTypes.BAD_BARREL ||
+      me._type == Enums.LevelObjectTypes.TEMP_PLATFORM
     ) {
       // literaly nothing
     } else {
-      me.sprite.setFrame(me._isActive ? 1 : 0);
+      throw "error";
     }
   }
 
@@ -245,6 +246,9 @@ export default class LevelObject {
       ) {
         me._isActive = false;
         me.sprite.setVisible(false);
+
+        const pos = world._getTileCenter(me._tileX, me._tileY);
+        world._tempPlatformParticles.explode(20, pos.x, pos.y);
       }
     } else {
       throw "error";
