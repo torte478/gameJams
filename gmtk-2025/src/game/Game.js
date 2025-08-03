@@ -394,13 +394,13 @@ export default class Game {
     Here._.add.tween({
       targets: me.introScreen,
       alpha: { from: 1, to: 0 },
-      duration: 50, //5000,
+      duration: 3000,
       onComplete: () => {
         // =================
         Here._.add.tween({
           targets: Here._.cameras.main,
           scrollX: 2000,
-          duration: 1000, // TODO
+          duration: 10000,
           onComplete: () => {
             // ===================
             me._gameState = Enums.GameStates.EDIT;
@@ -410,7 +410,7 @@ export default class Game {
             Here._.add.tween({
               targets: me._drumKit._logo,
               alpha: { from: 0, to: 1 },
-              duration: 1000,
+              duration: 5000,
               onComplete: () => {
                 //===============
 

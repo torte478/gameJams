@@ -159,15 +159,15 @@ export default class DrumKit {
     me._initAllCells(levelConfig);
 
     // solution
-    if (Utils.isDebug(Config.Debug.StartFromSolution)) {
-      const solution = levelConfig.solution;
-      for (let i = 0; i < solution.length; ++i)
-        for (let j = 0; j < solution[i].length; ++j) {
-          me._loop[i][j] = !!solution[i][j];
+    // if (Utils.isDebug(Config.Debug.StartFromSolution)) {
+    const solution = levelConfig.solution;
+    for (let i = 0; i < solution.length; ++i)
+      for (let j = 0; j < solution[i].length; ++j) {
+        me._loop[i][j] = !!solution[i][j];
 
-          if (me._loop[i][j]) me._invalidateCell(i, j);
-        }
-    }
+        if (me._loop[i][j]) me._invalidateCell(i, j);
+      }
+    // }
   }
 
   /**
@@ -251,7 +251,9 @@ export default class DrumKit {
         me._resultBuffer[i] = true;
         const sample = me._getSampleAudioName(i);
 
-        if (isWindowActive) Here.Audio.play(sample);
+        if (isWindowActive) {
+          Here.Audio.play(sample);
+        }
       }
     }
 

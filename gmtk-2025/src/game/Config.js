@@ -3,7 +3,7 @@ import LevelConfig from "./LevelConfig.js";
 
 export default class Config {
   static Debug = {
-    Global: true,
+    Global: false,
     Log: true,
     ShowSceneLog: true,
     PlaySound: true,
@@ -15,13 +15,13 @@ export default class Config {
   };
 
   static StartState = Enums.GameStates.EDIT;
-  static StartHintCount = 20;
+  static StartHintCount = 0;
 
   static DurationMs = {
-    LevelChange: 500,
-    DragonHead: 1000,
+    LevelChange: 2000,
+    DragonHead: 2000,
     MinDragonTailPeriod: 5000,
-    MaxDragonTailPeriod: 10000,
+    MaxDragonTailPeriod: 15000,
     DragonTailShowcase: 1000,
   };
 
@@ -29,18 +29,18 @@ export default class Config {
     "intro",
     // "test_level",
     "walk_tutorial",
-    // "walk_spikes",
-    // "trampoline_tutorial",
-    // "trampoline_hell",
-    // "shield_tutorial",
-    // "turn_tutorial",
-    // "attack_tutorial",
-    // "cool_bit",
-    // "before_protec",
-    // "protec_tutorial",
-    // "rock_you",
-    // "TODO_transmit",
-    // "cool_16",
+    "walk_spikes",
+    "trampoline_tutorial",
+    "trampoline_hell",
+    "shield_tutorial",
+    "turn_tutorial",
+    "attack_tutorial",
+    "cool_bit",
+    "before_protec",
+    "protec_tutorial",
+    "rock_you",
+    "TODO_transmit",
+    "cool_16",
     "final",
   ];
 
