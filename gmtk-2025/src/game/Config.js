@@ -7,25 +7,28 @@ export default class Config {
     Log: true,
     ShowSceneLog: true,
     PlaySound: false,
-    Random: false,
+    Random: true,
     StartFromSolution: true,
     PauseOnRightClick: true,
     DisableHihats: false,
     DetailLog: true,
   };
 
-  static StartState = Enums.GameStates.PLAY;
+  static StartState = Enums.GameStates.EDIT;
 
   static DurationMs = {
     LevelChange: 500,
     DragonHead: 1000,
+    MinDragonTailPeriod: 1000, //5000,
+    MaxDragonTailPeriod: 10000,
+    DragonTailShowcase: 1000,
   };
 
   static LevelOrder = [
     // "test_level",
     // "walk_tutorial",
-    "walk_spikes",
-    // "trampoline_tutorial",
+    // "walk_spikes",
+    "trampoline_tutorial",
     // "trampoline_hell",
     // "shield_tutorial",
     // "TODO_transmit",
@@ -64,6 +67,7 @@ export default class Config {
       name: "walk_tutorial",
       csvName: "plain",
       availableCommands: [Enums.SampleCommands.WALK],
+      ignoreDragonTail: true,
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
       solution: [
@@ -309,13 +313,14 @@ export default class Config {
       name: "walk_spikes",
       csvName: "plain",
       availableCommands: [Enums.SampleCommands.WALK],
+      ignoreDragonTail: true,
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1], // [1, 1, 1, 1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0, 0],
       ],
       spikes: [
         { tileX: 6, tileY: 9, bits: [4, 5, 6, 7] },
@@ -363,6 +368,7 @@ export default class Config {
       name: "trampoline_tutorial",
       startTilePos: { x: 1, y: 8 },
       finishTilePos: { x: 18, y: 8 },
+      availableCommands: [Enums.SampleCommands.WALK],
       solution: [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],

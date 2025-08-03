@@ -66,7 +66,7 @@ export default class LevelObject {
       me.sprite
         .setPosition(
           me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
-          me._tileY * Consts.Unit.Normal
+          me._tileY * Consts.Unit.Normal + 25
         )
         .setTexture("trampoline", 0)
         .setVisible(true)
@@ -130,6 +130,19 @@ export default class LevelObject {
 
         const frame = diff > 3 ? 0 : 3 - diff + 1;
         me.sprite.setFrame(offset + frame);
+      }
+    } else if (me._type == Enums.LevelObjectTypes.TRAMPOLINE) {
+      if (me._isActive) {
+        me.sprite.setFrame(4);
+      } else {
+        const nextActive = me._bitsToActive.find((index) => index > currentBit);
+        const diff =
+          nextActive !== undefined
+            ? nextActive - currentBit
+            : totalBitCount - currentBit + me._bitsToActive[0];
+
+        const frame = diff > 3 ? 0 : 3 - diff + 1;
+        me.sprite.setFrame(frame);
       }
     } else {
       me.sprite.setFrame(me._isActive ? 1 : 0);

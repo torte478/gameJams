@@ -19,6 +19,9 @@ export default class LevelConfig {
   /** @type {Number[]} */
   availableCommands;
 
+  /** @type {Boolean} */
+  ignoreDragonTail;
+
   /** @type {Number[][]} */
   solution;
 

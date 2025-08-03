@@ -34,6 +34,8 @@ export default class Game {
   /** @type {PanelControl} */
   _panelControl;
 
+  _hintCount = 0;
+
   constructor() {
     const me = this;
 
@@ -100,7 +102,7 @@ export default class Game {
       Here._.scene.restart({ isRestart: true });
     }
 
-    me._gameLoop(delta);
+    me._gameLoop(time, delta);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
@@ -118,7 +120,7 @@ export default class Game {
     });
   }
 
-  _gameLoop(delta) {
+  _gameLoop(time, delta) {
     const me = this;
 
     me._gameTimer += delta;
@@ -132,7 +134,8 @@ export default class Game {
       commands,
       currentBit,
       me._gameState,
-      isNewBit
+      isNewBit,
+      time
     );
 
     if (me._gameState == Enums.GameStates.BUSY) {
@@ -147,7 +150,7 @@ export default class Game {
     }
 
     if (bitResult == Enums.BitResult.WIN) {
-      me._gotoNextLevel();
+      me._gotoNextLevel(time);
     } else if (bitResult == Enums.BitResult.DEATH) {
       me._gameState = Enums.GameStates.EDIT;
       me._drumKit.showDeathIcon(currentBit);
@@ -155,7 +158,7 @@ export default class Game {
     }
   }
 
-  _gotoNextLevel() {
+  _gotoNextLevel(time) {
     const me = this;
 
     me._currentLevelIndex =
@@ -169,7 +172,7 @@ export default class Game {
     if (!levelConfig) throw "error";
 
     me._gameState = Enums.GameStates.BUSY;
-    me._world.gotoNextLevel(levelConfig);
+    me._world.gotoNextLevel(levelConfig, time);
     me._drumKit.gotoNextLevel(levelConfig);
   }
 

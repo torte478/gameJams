@@ -65,6 +65,17 @@ export default class World {
   /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
   _bloodParticles;
 
+  /** @type {Phaser.GameObjects.Image} */
+  _dragonTail;
+
+  /** @type {Number} */
+  _nextTimeToShowDragonTailMs = 0;
+
+  /** @type {Phaser.Tweens.Tween} */
+  _dragonTailTween = null;
+
+  _lastTime = 0;
+
   constructor() {
     const me = this;
 
@@ -92,6 +103,20 @@ export default class World {
       blendMode: "ADD",
       emitting: false,
     });
+
+    me._dragonTail = Here._.add
+      .image(0, -300, "dragon_tail")
+      .setScale(0.5)
+      .setFlipX(true)
+      .setInteractive();
+
+    me._dragonTail.canBeClickedByPlayer = true;
+
+    me._dragonTail.on("pointerover", () =>
+      me._dragonTail.setTintFill(0xff0000)
+    );
+    me._dragonTail.on("pointerout", () => me._dragonTail.clearTint());
+    me._dragonTail.on("pointerdown", () => me._onDragonTailClick());
 
     const tileset = me._tilemap.addTilesetImage("tiles");
 
@@ -135,6 +160,7 @@ export default class World {
       .setVisible(false);
 
     me._mainLevelContainer.init(me._levelConfig, me._tilemap, 0);
+    me._resetNextDragonTailTime();
 
     me.resetCurrentLevel();
 
@@ -170,10 +196,79 @@ export default class World {
     });
   }
 
-  update(commands, currentBit, gameState, isNewBit) {
+  _onDragonTailClick() {
     const me = this;
 
+    if (!me._dragonTail.canBeClickedByPlayer) {
+      return;
+    }
+
+    if (!!me._dragonTailTween) me._dragonTailTween.stop();
+
+    me._dragonTail.canBeClickedByPlayer = false;
+    console.log("Dragon click!!!!");
+
+    me._dragonTailTween = Here._.add.tween({
+      targets: me._dragonTail,
+      x: me._currentLevelTileX * Consts.Unit.Normal - 150,
+      duration: Config.DurationMs.DragonTailShowcase / 2,
+      onComplete: () => {
+        me._dragonTailTween = null;
+        me._dragonTail.canBeClickedByPlayer = true;
+        me._resetNextDragonTailTime();
+      },
+    });
+  }
+
+  _resetNextDragonTailTime() {
+    const me = this;
+
+    me._nextTimeToShowDragonTailMs =
+      me._lastTime +
+      Utils.getRandom(
+        Config.DurationMs.MinDragonTailPeriod,
+        Config.DurationMs.MaxDragonTailPeriod,
+        Config.DurationMs.MinDragonTailPeriod
+      );
+  }
+
+  update(commands, currentBit, gameState, isNewBit, time) {
+    const me = this;
+
+    me._lastTime = time;
+
     if (me._isBusy) return;
+
+    // begin dragon tail
+    if (
+      !me._levelConfig.ignoreDragonTail &&
+      !me._dragonTailTween &&
+      time > me._nextTimeToShowDragonTailMs
+    ) {
+      me._resetNextDragonTailTime();
+
+      const startTailPosX = me._currentLevelTileX * Consts.Unit.Normal - 50;
+      me._dragonTail.setPosition(startTailPosX, 50);
+
+      me._dragonTailTween = Here._.tweens.add({
+        targets: me._dragonTail,
+        x: startTailPosX + 150,
+        y: 250,
+        duration: Config.DurationMs.DragonTailShowcase,
+        onComplete: () => {
+          me._dragonTailTween = Here._.tweens.add({
+            targets: me._dragonTail,
+            x: startTailPosX,
+            y: 500,
+            duration: Config.DurationMs.DragonTailShowcase,
+            onComplete: () => {
+              me._dragonTailTween = null;
+            },
+          });
+        },
+      });
+    }
+    // end dragon tail
 
     if (me._runWithNextLoop && currentBit == 0 && isNewBit) {
       me._runWithNextLoop = false;
@@ -225,7 +320,7 @@ export default class World {
     );
   }
 
-  gotoNextLevel(nextLevelConfig) {
+  gotoNextLevel(nextLevelConfig, time) {
     const me = this;
 
     me._isBusy = true;
@@ -247,7 +342,7 @@ export default class World {
         targets: me._dragonHead,
         y: -150,
         duration: Config.DurationMs.DragonHead,
-        ease: "sine.out",
+        ease: "sine.in",
       });
     }
 
@@ -270,6 +365,8 @@ export default class World {
 
         me._isBusy = false;
         me.completeLevelTransition = true;
+
+        me._resetNextDragonTailTime();
 
         me._runDragonHead();
       },

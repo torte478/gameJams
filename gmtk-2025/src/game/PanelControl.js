@@ -45,7 +45,7 @@ export default class PanelControl {
     const hintButton = Here._.add.image(100, 0, "control", 2).setInteractive();
 
     me._container = Here._.add
-      .container(100, 480, [
+      .container(80, 480, [
         panel,
         me._playStopButton,
         me._playStopText,
@@ -86,6 +86,8 @@ export default class PanelControl {
     } else {
       throw "error";
     }
+
+    me._playStopButton.input.hitArea.setTo(0, 0, 100, 50);
   }
 
   toObj() {
@@ -121,8 +123,6 @@ export default class PanelControl {
     }
 
     me._applyState();
-
-    me._playStopButton.input.hitArea.setTo(0, 0, 100, 50);
   }
 
   /**

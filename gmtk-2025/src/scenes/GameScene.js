@@ -32,7 +32,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("player", 70);
     Utils.loadSpriteSheet("spikes", Consts.Unit.Normal, Consts.Unit.Big);
     Utils.loadSpriteSheet("gun", Consts.Unit.Normal);
-    Utils.loadSpriteSheet("trampoline", Consts.Unit.Normal, Consts.Unit.Big);
+    Utils.loadSpriteSheet("trampoline", Consts.Unit.Normal, 150);
     Utils.loadSpriteSheet("finish_flag", Consts.Unit.Normal);
     Utils.loadSpriteSheet("barrels", Consts.Unit.Normal);
     Utils.loadSpriteSheet("temp_platform", Consts.Unit.Normal);
@@ -49,6 +49,7 @@ export default class GameScene extends HereScene {
     Utils.loadImage("fade");
     Utils.loadImage("controlPanel");
     Utils.loadImage("dragon_hint");
+    Utils.loadImage("dragon_tail");
 
     Utils.loadMp3("kick");
     Utils.loadMp3("crash");
