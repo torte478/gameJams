@@ -18,13 +18,13 @@ export default class Config {
 
   static DurationMs = {
     LevelChange: 500,
-    DragonHead: 10, //1000,
+    DragonHead: 1000,
   };
 
   static LevelOrder = [
     // "test_level",
     "walk_tutorial",
-    // "walk_spikes",
+    "walk_spikes",
     // "trampoline_tutorial",
     // "trampoline_hell",
     // "shield_tutorial",

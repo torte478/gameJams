@@ -36,6 +36,8 @@ export default class PanelControl {
       .image(-40, 0, "control", 0)
       .setInteractive();
 
+    me._playStopButton.input.hitArea.setTo(0, 0, 100, 50);
+
     me._playStopText = Here._.add
       .text(-20, 0, "TEST", textStyle)
       .setOrigin(0, 0.5);
@@ -125,6 +127,8 @@ export default class PanelControl {
     } else {
       throw "error";
     }
+
+    me._playStopButton.input.hitArea.setTo(0, 0, 100, 50);
   }
 
   /**

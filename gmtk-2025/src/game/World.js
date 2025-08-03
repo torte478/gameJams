@@ -59,6 +59,9 @@ export default class World {
   /** @type {Phaser.GameObjects.Text} */
   _dragonText;
 
+  /** @type {Boolean} */
+  _isDragonHeadShown = false;
+
   constructor() {
     const me = this;
 
@@ -124,6 +127,7 @@ export default class World {
     me.resetCurrentLevel();
 
     // TODO: start animation
+    me._isDragonHeadShown = true;
     me._dragonHead
       .setPosition(me._currentLevelTileX * Consts.Unit.Normal + 850, -150)
       .setAngle(180);
@@ -133,12 +137,16 @@ export default class World {
       duration: Config.DurationMs.DragonHead,
       ease: "sine.out",
       onComplete: () => {
-        me._dragonTextPointer.setAngle(30).setPosition(670, 150);
+        me._dragonTextPointer
+          .setAngle(30)
+          .setPosition(670, 150)
+          .setVisible(true);
         me._dragonText
           .setPosition(600, 175)
           .setText(
             "Foolish Knight!\n\nDo NOT fill the Drum Kit\nand do NOT press the Play button!"
-          );
+          )
+          .setVisible(true);
       },
     });
   }
@@ -233,6 +241,18 @@ export default class World {
         me.completeLevelTransition = true;
       },
     });
+
+    if (me._isDragonHeadShown) {
+      me._isDragonHeadShown = false;
+      me._dragonText.setVisible(false);
+      me._dragonTextPointer.setVisible(false);
+      Here._.add.tween({
+        targets: me._dragonHead,
+        y: -150,
+        duration: Config.DurationMs.DragonHead,
+        ease: "sine.out",
+      });
+    }
   }
 
   resetCurrentLevel() {
