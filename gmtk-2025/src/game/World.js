@@ -81,6 +81,12 @@ export default class World {
   /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
   _gunParticles;
 
+  /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+  _goodBarrelParticles;
+
+  /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+  _badBarrelParticles;
+
   constructor(game) {
     const me = this;
     me._game = game;
@@ -113,6 +119,24 @@ export default class World {
     me._gunParticles = Here._.add.particles(0, 0, "particles", {
       frame: [5],
       speed: { min: 200, max: 250 },
+      scale: { start: 0.8, end: 0 },
+      gravityY: 150,
+      blendMode: "ADD",
+      emitting: false,
+    });
+
+    me._goodBarrelParticles = Here._.add.particles(0, 0, "particles", {
+      frame: [6],
+      speed: { min: 150, max: 250 },
+      scale: { start: 0.8, end: 0 },
+      gravityY: 150,
+      blendMode: "ADD",
+      emitting: false,
+    });
+
+    me._badBarrelParticles = Here._.add.particles(0, 0, "particles", {
+      frame: [7],
+      speed: { min: 150, max: 250 },
       scale: { start: 0.8, end: 0 },
       gravityY: 150,
       blendMode: "ADD",
@@ -191,6 +215,9 @@ export default class World {
         "Foolish Knight!\n\nDo NOT fill the Drum Kit\nand do NOT press the Play button!";
     if (me._levelConfig.name == "trampoline_tutorial")
       text = "Foolish Knight!\n\nDo NOT click on my tail to get hints!";
+    if (me._levelConfig.name == "attack_tutorial")
+      text =
+        "Foolish Knight!\n\nNever use your attack at the same time\nas other actions!";
 
     if (text === null) return;
 
@@ -566,12 +593,12 @@ export default class World {
 
       let isPlayerDeath = false;
       if (!!firstBarrel) {
-        firstBarrel.explode();
+        firstBarrel.explode(me);
         if (firstBarrel._type == Enums.LevelObjectTypes.BAD_BARREL)
           isPlayerDeath = true;
       }
       if (!!secondBarrel) {
-        secondBarrel.explode();
+        secondBarrel.explode(me);
         if (secondBarrel._type == Enums.LevelObjectTypes.BAD_BARREL)
           isPlayerDeath = true;
       }

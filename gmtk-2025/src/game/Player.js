@@ -4,6 +4,9 @@ export default class Player {
   /** @type {Phaser.GameObjects.Sprite} */
   _sprite;
 
+  /** @type {Phaser.GameObjects.Sprite} */
+  _sword;
+
   /** @type {Phaser.GameObjects.Container} */
   _container;
 
@@ -17,7 +20,8 @@ export default class Player {
     const me = this;
 
     me._sprite = Here._.add.sprite(0, 0, "player", 0);
-    me._container = Here._.add.container(0, 0, [me._sprite]);
+    me._sword = Here._.add.sprite(0, 0, "sword", 4);
+    me._container = Here._.add.container(0, 0, [me._sprite, me._sword]);
 
     me.direction = 1;
   }
@@ -33,6 +37,7 @@ export default class Player {
 
     me.direction *= -1;
     me._sprite.setFlipX(me.direction == -1);
+    me._sword.setFlipX(me.direction == -1);
     me.isShield = false;
   }
 
@@ -45,7 +50,7 @@ export default class Player {
   toAttack() {
     const me = this;
 
-    // TODO
+    me._sword.play("sword_attack");
   }
 
   toShield() {
@@ -59,6 +64,7 @@ export default class Player {
     const me = this;
 
     me._sprite.setFlipX(false);
+    me._sword.setFlipX(false);
 
     me.direction = 1;
     me.isShield = false;

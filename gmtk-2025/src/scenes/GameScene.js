@@ -40,6 +40,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("control", 100, 50);
     Utils.loadSpriteSheet("dragon_head", 300);
     Utils.loadSpriteSheet("particles", 25);
+    Utils.loadSpriteSheet("sword", 100, 100);
 
     Utils.loadImage("indicator");
     Utils.loadImage("death_icon");

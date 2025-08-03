@@ -164,7 +164,7 @@ export default class DrumKit {
         for (let j = 0; j < solution[i].length; ++j) {
           me._loop[i][j] = !!solution[i][j];
 
-          if (me._loop[i][j]) me._toggleCell(i, j);
+          if (me._loop[i][j]) me._invalidateCell(i, j);
         }
     }
   }
@@ -193,6 +193,9 @@ export default class DrumKit {
         me._padButtons[i][j]
           .setVisible(j < me.loopLength)
           .setAlpha(isAvaibleSample ? 1 : 0.25);
+
+        me._invalidateCell(i, j);
+
         if (!isAvaibleSample) me._padButtons[i][j].setFrame(10);
       }
     }
@@ -252,12 +255,12 @@ export default class DrumKit {
     if (!me._loop[cell.i][cell.j] && cell.i > 0) {
       for (let k = 1; k < Consts.DrumKit.SampleCount; ++k) {
         me._loop[k][cell.j] = false;
-        me._toggleCell(k, cell.j);
+        me._invalidateCell(k, cell.j);
       }
     }
 
     me._loop[cell.i][cell.j] = !me._loop[cell.i][cell.j];
-    me._toggleCell(cell.i, cell.j);
+    me._invalidateCell(cell.i, cell.j);
 
     return true;
   }
@@ -362,7 +365,7 @@ export default class DrumKit {
     else throw "error";
   }
 
-  _toggleCell(i, j) {
+  _invalidateCell(i, j) {
     const me = this;
 
     const button = me._padButtons[i][j];

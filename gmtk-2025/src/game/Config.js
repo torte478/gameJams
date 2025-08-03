@@ -14,7 +14,7 @@ export default class Config {
     DetailLog: true,
   };
 
-  static StartState = Enums.GameStates.PLAY;
+  static StartState = Enums.GameStates.EDIT;
   static StartHintCount = 0;
 
   static DurationMs = {
@@ -32,7 +32,7 @@ export default class Config {
     // "trampoline_tutorial",
     // "trampoline_hell",
     // "shield_tutorial",
-    // "turn_tutorial",
+    "turn_tutorial",
     "attack_tutorial",
     // el problemo
     // "cool_bit",

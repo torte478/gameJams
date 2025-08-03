@@ -85,6 +85,7 @@ export default class LevelObject {
           me._tileY * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal
         )
         .setTexture("barrels", 0)
+        .setDepth(Consts.Depth.Overlay)
         .setVisible(true)
         .setActive(true);
       me._isActive = true;
@@ -95,7 +96,8 @@ export default class LevelObject {
           me._tileX * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal,
           me._tileY * Consts.Unit.Normal + 0.5 * Consts.Unit.Normal
         )
-        .setTexture("barrels", 1)
+        .setTexture("barrels", 2)
+        .setDepth(Consts.Depth.Overlay)
         .setVisible(true)
         .setActive(true);
       me._isActive = true;
@@ -204,6 +206,11 @@ export default class LevelObject {
           me._fireLine = [];
         }
       }
+    } else if (
+      me._type == Enums.LevelObjectTypes.GOOD_BARREL ||
+      me._type == Enums.LevelObjectTypes.BAD_BARREL
+    ) {
+      // literaly nothing
     } else {
       me.sprite.setFrame(me._isActive ? 1 : 0);
     }
@@ -244,7 +251,10 @@ export default class LevelObject {
     }
   }
 
-  explode() {
+  /**
+   * @param {World} world
+   */
+  explode(world) {
     const me = this;
 
     const canExplode =
@@ -254,7 +264,12 @@ export default class LevelObject {
     if (!canExplode) throw "error";
 
     me._isActive = false;
-    me.sprite.setVisible(false);
+    me.sprite.setFrame(me._type == Enums.LevelObjectTypes.GOOD_BARREL ? 1 : 3);
+
+    const pos = world._getTileCenter(me._tileX, me._tileY);
+    if (me._type == Enums.LevelObjectTypes.GOOD_BARREL)
+      world._goodBarrelParticles.explode(20, pos.x, pos.y);
+    else world._badBarrelParticles.explode(40, pos.x, pos.y);
   }
 
   restoreBarrel() {
@@ -268,7 +283,7 @@ export default class LevelObject {
     if (!canRestore) return;
 
     me._isActive = true;
-    me.sprite.setVisible(true);
+    me.sprite.setFrame(me._type == Enums.LevelObjectTypes.GOOD_BARREL ? 0 : 2);
   }
 
   restoreTempPlatform() {
