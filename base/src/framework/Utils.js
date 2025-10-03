@@ -333,6 +333,13 @@ export default class Utils {
         return Here._.load.audio(name, `assets/${name}.mp3`);
     }
 
+    /**
+    * @param {String} name
+    */
+    static loadCsv(name) {
+        return Here._.load.tilemapCSV(name, `assets/${name}.csv`);
+    }
+
     // --- Debug ---
 
     /**
