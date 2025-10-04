@@ -31,6 +31,7 @@ export default class GameScene extends HereScene {
 
     Utils.loadImage("shelf");
     Utils.loadImage("order");
+    Utils.loadImage("background");
 
     Utils.loadWav("button_click");
   }

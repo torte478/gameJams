@@ -5,6 +5,7 @@ import Collection from "./Collection.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
+import Transport from "./Transport.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -13,13 +14,39 @@ export default class Game {
   /** @type {Collection} */
   _collection;
 
+  /** @type {Phaser.GameObjects.Sprite} */
+  _gnome;
+
+  /** @type {Phaser.Cameras.Scene2D.Camera} */
+  _camera;
+
+  /** @type {Transport} */
+  _transport;
+
+  /** @type {Number} */
+  _scrollX = 0;
+
   constructor() {
     const me = this;
 
+    me._camera = Here._.cameras.main;
+    me._camera.setBounds(-1000, 0, 2000, 800);
+
     me._collection = new Collection();
 
-    Here._.add.sprite(160, 500, "gnome").play("gnome_idle");
-    Here._.add.image(850, 600, "order");
+    me._transport = new Transport(10, 0.01, 0.01);
+
+    const background = Here._.add
+      .image(0, 0, "background")
+      .setOrigin(0, 0)
+      .setPosition(-Consts.Viewport.Width, 100)
+      .setDepth(Consts.Depth.Background);
+
+    me._gnome = Here._.add.sprite(500, 400, "gnome").play("gnome_idle");
+
+    me._camera.startFollow(me._gnome, true);
+
+    //Here._.add.image(850, 600, "order");
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -29,7 +56,7 @@ export default class Game {
     });
   }
 
-  update(time, delta) {
+  update(time, deltaTime) {
     const me = this;
 
     if (
@@ -38,16 +65,32 @@ export default class Game {
     )
       Here._.scene.restart({ isRestart: true });
 
-    me._collection.update(delta);
+    me._gameLoop(deltaTime);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
 
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `pos: ${me._collection._positionX | 0}`;
+        `pos: ${me._scrollX | 0}`;
 
       me._log.setText(text);
     });
+  }
+
+  _gameLoop(deltaTime) {
+    const me = this;
+
+    let velocityX = me._transport.getVelocity(deltaTime);
+
+    if (velocityX !== 0) {
+      me._scrollX += velocityX;
+      if (me._scrollX >= 0) {
+        me._gnome.setPosition(500, me._gnome.y);
+        me._collection.updatePos(me._scrollX);
+      } else {
+        me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
+      }
+    }
   }
 }

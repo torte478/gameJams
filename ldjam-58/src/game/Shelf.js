@@ -16,9 +16,14 @@ export default class Shelf {
   constructor() {
     const me = this;
 
-    me._image = Here._.add.image(Consts.Shelf.Width / 2, 0, "shelf", 0);
+    me._image = Here._.add.image(
+      Consts.Shelf.Width / 2,
+      Consts.Shelf.Height / 2,
+      "shelf",
+      0
+    );
     me._text = Here._.add
-      .text(Consts.Shelf.Width / 2, -60, "TEST", {
+      .text(Consts.Shelf.Width / 2, 100, "TEST", {
         fontSize: 48,
         color: "#000000",
         fontStyle: "bold",
@@ -37,7 +42,14 @@ export default class Shelf {
   init(index) {
     const me = this;
     me._index = index;
+
     me._text.setText(index);
+    // if (index >= 0) {
+    //   me._container.setVisible(true).setActive(true);
+    //   me._text.setText(index);
+    // } else {
+    //   me._container.setVisible(false).setActive(false);
+    // }
   }
 
   /** @type {Number} */
