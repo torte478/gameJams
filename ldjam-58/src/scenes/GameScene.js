@@ -1,4 +1,5 @@
 import Animation from "../framework/Animation.js";
+import Here from "../framework/Here.js";
 import HereScene from "../framework/HereScene.js";
 import Utils from "../framework/Utils.js";
 
@@ -28,11 +29,16 @@ export default class GameScene extends HereScene {
     if (!me._isRestart) Utils.runLoadingBar();
 
     Utils.loadSpriteSheet("gnome", 200, 200);
-    Utils.loadSpriteSheet("shelf", 200, 300);
+    Utils.loadSpriteSheet("shelf", 200, 400);
     Utils.loadSpriteSheet("buttons", 100, 100);
 
     Utils.loadImage("order");
     Utils.loadImage("background");
+
+    me.load.script(
+      "webfont",
+      "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"
+    );
   }
 
   create() {

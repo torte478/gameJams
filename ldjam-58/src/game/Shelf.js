@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 import Consts from "./Consts.js";
 
 export default class Shelf {
@@ -22,11 +23,13 @@ export default class Shelf {
       "shelf",
       0
     );
+
     me._text = Here._.add
-      .text(Consts.Shelf.Width / 2, 100, "TEST", {
-        fontSize: 24,
+      .text(Consts.Shelf.Width / 2 + 2, 25, "ABCDEFG", {
+        fontSize: 18,
         color: "#000000",
         fontStyle: "bold",
+        fontFamily: "Pixelify Sans",
       })
       .setOrigin(0.5, 0.5);
     me._container = Here._.add.container(0, 0, [me._image, me._text]);
@@ -43,14 +46,8 @@ export default class Shelf {
     const me = this;
     me._index = index;
 
-    me._text.setText(index);
+    me._text.setText(Utils.intToBase26(index));
     me._image.setFrame(isComplete ? 1 : 0);
-    // if (index >= 0) {
-    //   me._container.setVisible(true).setActive(true);
-    //   me._text.setText(index);
-    // } else {
-    //   me._container.setVisible(false).setActive(false);
-    // }
   }
 
   /** @type {Number} */

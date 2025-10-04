@@ -25,7 +25,7 @@ export default class Game {
   _scrollX = 0;
 
   /** @type {Number | Null} */
-  _order = null;
+  _order = 2;
 
   /** @type {Button[]} */
   _buttons = [];
@@ -35,6 +35,8 @@ export default class Game {
 
   /** @type {Number} */
   _currentTransportIndex = Enums.Transport.Walk;
+
+  // color red: #C61831
 
   constructor() {
     const me = this;
@@ -88,15 +90,16 @@ export default class Game {
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
 
+      const todoCurrentIndex = ((me._scrollX + 100) / 200 + 2) | 0;
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `pos: ${me._scrollX | 0} || ${((me._scrollX + 100) / 200 + 2) | 0}\n` +
+        `pos: ${me._scrollX | 0} || ${Utils.intToBase26(todoCurrentIndex)}\n` +
         `acc: ${
           (me._transports[me._currentTransportIndex]._accelerationProgress *
             100) |
           0
         }\n` +
-        `ord: ${me._order}\n` +
+        `ord: ${me._order} || ${Utils.intToBase26(me._order)}\n` +
         `trn: ${me._currentTransportIndex}`;
 
       me._log.setText(text);
