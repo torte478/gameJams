@@ -24,7 +24,7 @@ export default class Shelf {
     );
     me._text = Here._.add
       .text(Consts.Shelf.Width / 2, 100, "TEST", {
-        fontSize: 48,
+        fontSize: 24,
         color: "#000000",
         fontStyle: "bold",
       })

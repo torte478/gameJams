@@ -21,17 +21,20 @@ export default class Game {
   /** @type {Phaser.Cameras.Scene2D.Camera} */
   _camera;
 
-  /** @type {Transport} */
-  _transport;
-
   /** @type {Number} */
   _scrollX = 0;
 
   /** @type {Number | Null} */
-  _order = 2;
+  _order = null;
 
   /** @type {Button[]} */
   _buttons = [];
+
+  /** @type {Transport[]} */
+  _transports = [];
+
+  /** @type {Number} */
+  _currentTransportIndex = Enums.Transport.Walk;
 
   constructor() {
     const me = this;
@@ -41,7 +44,10 @@ export default class Game {
 
     me._collection = new Collection();
 
-    me._transport = new Transport(4, 0.01, 0.01);
+    me._transports = Utils.buildArray(4, null);
+    me._transports[Enums.Transport.Walk] = new Transport(2, 0.01, 0.01);
+    me._transports[Enums.Transport.Scooter] = new Transport(10, 1, 3);
+    me._transports[Enums.Transport.Car] = new Transport(1000, 10, 4);
 
     const background = Here._.add
       .image(0, 0, "background")
@@ -56,7 +62,79 @@ export default class Game {
 
     me._camera.startFollow(me._gnome, true);
 
+    me._initButtons();
+
+    //Here._.add.image(850, 600, "order");
+
+    Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
+      me._log = Here._.add
+        .text(10, 10, "", { fontSize: 18, backgroundColor: "#000" })
+        .setScrollFactor(0)
+        .setDepth(Consts.Depth.Max);
+    });
+  }
+
+  update(time, deltaTime) {
+    const me = this;
+
+    if (
+      Here.Controls.isPressedOnce(Enums.Keyboard.RESTART) &&
+      Utils.isDebug(Config.Debug.Global)
+    )
+      Here._.scene.restart({ isRestart: true });
+
+    me._gameLoop(deltaTime);
+
+    Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
+      const mouse = Here._.input.activePointer;
+
+      let text =
+        `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
+        `pos: ${me._scrollX | 0} || ${((me._scrollX + 100) / 200 + 2) | 0}\n` +
+        `acc: ${
+          (me._transports[me._currentTransportIndex]._accelerationProgress *
+            100) |
+          0
+        }\n` +
+        `ord: ${me._order}\n` +
+        `trn: ${me._currentTransportIndex}`;
+
+      me._log.setText(text);
+    });
+  }
+
+  _gameLoop(deltaTime) {
+    const me = this;
+
+    for (let i = 0; i < me._buttons.length; ++i) {
+      const button = me._buttons[i];
+      if (!!button && !!button._onPress) button.update();
+    }
+
+    const transport = me._transports[me._currentTransportIndex];
+    let velocityX = transport.getVelocity(me._buttons, deltaTime);
+
+    if (velocityX !== 0) {
+      me._scrollX += velocityX;
+      if (me._scrollX >= 0) {
+        me._gnome.setPosition(500, me._gnome.y);
+        me._collection.updatePos(me._scrollX);
+      } else {
+        me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
+      }
+    }
+
+    // new order
+    if (me._order === null && me._scrollX <= Config.TakeOrderPosition) {
+      me._order = Utils.getRandom(0, 3000);
+    }
+  }
+
+  _initButtons() {
+    const me = this;
+
     me._buttons = Utils.buildArray(10, null); // TODO
+
     me._buttons[Enums.Button.WalkMoveLeft] = new Button(
       400,
       600,
@@ -85,63 +163,35 @@ export default class Game {
       me
     );
 
-    //Here._.add.image(850, 600, "order");
+    me._buttons[Enums.Button.SelectTransportWalk] = new Button(
+      150,
+      550,
+      3,
+      () => me._trySelectTransport(Enums.Transport.Walk),
+      null,
+      null,
+      me
+    );
 
-    Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
-      me._log = Here._.add
-        .text(10, 10, "", { fontSize: 18, backgroundColor: "#000" })
-        .setScrollFactor(0)
-        .setDepth(Consts.Depth.Max);
-    });
-  }
+    me._buttons[Enums.Button.SelectTransportScooter] = new Button(
+      150,
+      650,
+      4,
+      () => me._trySelectTransport(Enums.Transport.Scooter),
+      null,
+      null,
+      me
+    );
 
-  update(time, deltaTime) {
-    const me = this;
-
-    if (
-      Here.Controls.isPressedOnce(Enums.Keyboard.RESTART) &&
-      Utils.isDebug(Config.Debug.Global)
-    )
-      Here._.scene.restart({ isRestart: true });
-
-    me._gameLoop(deltaTime);
-
-    Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
-      const mouse = Here._.input.activePointer;
-
-      let text =
-        `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `pos: ${me._scrollX | 0}\n` +
-        `acc: ${(me._transport._accelerationProgress * 100) | 0}\n` +
-        `ord: ${me._order}`;
-
-      me._log.setText(text);
-    });
-  }
-
-  _gameLoop(deltaTime) {
-    const me = this;
-
-    for (let i = 0; i < me._buttons.length; ++i) {
-      const button = me._buttons[i];
-      if (!!button && !!button._onPress) button.update();
-    }
-
-    let velocityX = me._transport.getVelocity(me._buttons, deltaTime);
-
-    if (velocityX !== 0) {
-      me._scrollX += velocityX;
-      if (me._scrollX >= 0) {
-        me._gnome.setPosition(500, me._gnome.y);
-        me._collection.updatePos(me._scrollX);
-      } else {
-        me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
-      }
-    }
-
-    if (me._order === null && me._scrollX <= Config.TakeOrderPosition) {
-      me._order = Utils.getRandom(0, 10);
-    }
+    me._buttons[Enums.Button.SelectTransportScooter] = new Button(
+      150,
+      750,
+      5,
+      () => me._trySelectTransport(Enums.Transport.Car),
+      null,
+      null,
+      me
+    );
   }
 
   _tryCompleteOrder() {
@@ -151,5 +201,10 @@ export default class Game {
     if (success) {
       me._order = null;
     }
+  }
+
+  _trySelectTransport(trasnportIndex) {
+    const me = this;
+    me._currentTransportIndex = trasnportIndex;
   }
 }
