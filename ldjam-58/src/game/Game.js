@@ -34,7 +34,7 @@ export default class Game {
 
     me._collection = new Collection();
 
-    me._transport = new Transport(10, 0.01, 0.01);
+    me._transport = new Transport(1, 0.01, 0.01);
 
     const background = Here._.add
       .image(0, 0, "background")
@@ -72,7 +72,8 @@ export default class Game {
 
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `pos: ${me._scrollX | 0}`;
+        `pos: ${me._scrollX | 0}\n` +
+        `acc: ${(me._transport._accelerationProgress * 100) | 0}`;
 
       me._log.setText(text);
     });

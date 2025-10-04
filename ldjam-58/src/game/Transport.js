@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 
 export default class Transport {
@@ -13,10 +14,10 @@ export default class Transport {
 
   _currentMovementDirection = 0;
 
-  constructor(maxSpeed, accelerationTime, decelerationTime) {
+  constructor(shelfsPerSecond, accelerationTime, decelerationTime) {
     const me = this;
 
-    me._maxSpeed = maxSpeed;
+    me._maxSpeed = shelfsPerSecond * Consts.Shelf.Width;
     me._accelerationTime = accelerationTime;
     me._decelerationTime = decelerationTime;
   }
@@ -25,16 +26,17 @@ export default class Transport {
     const me = this;
 
     let pressedDirection = 0;
-    if (Here.Controls.isPressing(Enums.Keyboard.RIGHT)) pressedDirection = 1;
-    else if (Here.Controls.isPressing(Enums.Keyboard.LEFT))
+    if (Here.Controls.isPressing(Enums.Keyboard.RIGHT)) {
+      pressedDirection = 1;
+    } else if (Here.Controls.isPressing(Enums.Keyboard.LEFT)) {
       pressedDirection = -1;
+    }
 
     const isAcceleration =
       pressedDirection !== 0 &&
       (me._currentMovementDirection === 0 ||
         pressedDirection === me._currentMovementDirection);
 
-    let velocityX = 0;
     if (isAcceleration) {
       me._currentMovementDirection = pressedDirection;
 
@@ -42,22 +44,22 @@ export default class Transport {
         1,
         me._accelerationProgress + deltaTime / 1000 / me._accelerationTime
       );
-      const easeOut = 1 - Math.pow(1 - me._accelerationProgress, 2);
-      velocityX = easeOut * me._maxSpeed;
     } else {
       me._accelerationProgress = Math.max(
         0,
         me._accelerationProgress - deltaTime / 1000 / me._decelerationTime
       );
-      const easeIn = Math.pow(me._accelerationProgress, 2);
-      velocityX = easeIn * me._maxSpeed;
 
       if (me._accelerationProgress === 0) {
-        velocityX = 0;
         me._currentMovementDirection = 0;
       }
     }
 
-    return velocityX * me._currentMovementDirection;
+    return (
+      me._accelerationProgress *
+      me._maxSpeed *
+      me._currentMovementDirection *
+      (deltaTime / 1000)
+    );
   }
 }
