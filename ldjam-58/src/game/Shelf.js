@@ -17,10 +17,13 @@ export default class Shelf {
     const me = this;
 
     me._image = Here._.add.image(Consts.Shelf.Width / 2, 0, "shelf", 0);
-    me._text = Here._.add.text(Consts.Shelf.Width / 2, -60, "TEST", {
-      fontSize: 32,
-      color: "#000000",
-    });
+    me._text = Here._.add
+      .text(Consts.Shelf.Width / 2, -60, "TEST", {
+        fontSize: 48,
+        color: "#000000",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5, 0.5);
     me._container = Here._.add.container(0, 0, [me._image, me._text]);
   }
 

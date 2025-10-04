@@ -27,7 +27,10 @@ export default class GameScene extends HereScene {
 
     if (!me._isRestart) Utils.runLoadingBar();
 
+    Utils.loadSpriteSheet("gnome", 200, 200);
+
     Utils.loadImage("shelf");
+    Utils.loadImage("order");
 
     Utils.loadWav("button_click");
   }

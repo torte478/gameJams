@@ -18,6 +18,9 @@ export default class Game {
 
     me._collection = new Collection();
 
+    Here._.add.sprite(160, 500, "gnome").play("gnome_idle");
+    Here._.add.image(850, 600, "order");
+
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
         .text(10, 10, "", { fontSize: 18, backgroundColor: "#000" })
