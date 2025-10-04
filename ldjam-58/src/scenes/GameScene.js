@@ -28,12 +28,11 @@ export default class GameScene extends HereScene {
     if (!me._isRestart) Utils.runLoadingBar();
 
     Utils.loadSpriteSheet("gnome", 200, 200);
+    Utils.loadSpriteSheet("shelf", 200, 300);
+    Utils.loadSpriteSheet("buttons", 100, 100);
 
-    Utils.loadImage("shelf");
     Utils.loadImage("order");
     Utils.loadImage("background");
-
-    Utils.loadWav("button_click");
   }
 
   create() {
@@ -45,6 +44,7 @@ export default class GameScene extends HereScene {
   }
 
   // TODO: to framework
+  // TODO: I need my own button framework
   update(time, delta) {
     super.update();
 

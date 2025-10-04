@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Button from "./Button.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 
@@ -22,13 +23,18 @@ export default class Transport {
     me._decelerationTime = decelerationTime;
   }
 
-  getVelocity(deltaTime) {
+  /**
+   * @param {Button[]} buttons
+   * @param {Number} deltaTime
+   * @returns {Number}
+   */
+  getVelocity(buttons, deltaTime) {
     const me = this;
 
     let pressedDirection = 0;
-    if (Here.Controls.isPressing(Enums.Keyboard.RIGHT)) {
+    if (buttons[Enums.Button.WalkMoveRight].isPressed()) {
       pressedDirection = 1;
-    } else if (Here.Controls.isPressing(Enums.Keyboard.LEFT)) {
+    } else if (buttons[Enums.Button.WalkMoveLeft].isPressed()) {
       pressedDirection = -1;
     }
 

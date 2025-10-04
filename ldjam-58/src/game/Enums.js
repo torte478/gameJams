@@ -5,4 +5,9 @@ export default class Enums {
 
     RESTART: 2,
   };
+
+  static Button = {
+    WalkMoveLeft: 0,
+    WalkMoveRight: 1,
+  };
 }

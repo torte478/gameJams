@@ -11,6 +11,9 @@ export default class Collection {
   /** @type {Transport} */
   _transport;
 
+  /** @type {Set} */
+  _collectedIndexes = new Set();
+
   constructor() {
     const me = this;
 

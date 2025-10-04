@@ -1,5 +1,6 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
+import Button from "./Button.js";
 import Collection from "./Collection.js";
 
 import Config from "./Config.js";
@@ -26,6 +27,11 @@ export default class Game {
   /** @type {Number} */
   _scrollX = 0;
 
+  _currentOrder = 10;
+
+  /** @type {Button[]} */
+  _buttons = [];
+
   constructor() {
     const me = this;
 
@@ -34,7 +40,7 @@ export default class Game {
 
     me._collection = new Collection();
 
-    me._transport = new Transport(1, 0.01, 0.01);
+    me._transport = new Transport(10, 0.01, 0.01);
 
     const background = Here._.add
       .image(0, 0, "background")
@@ -42,9 +48,32 @@ export default class Game {
       .setPosition(-Consts.Viewport.Width, 100)
       .setDepth(Consts.Depth.Background);
 
-    me._gnome = Here._.add.sprite(500, 400, "gnome").play("gnome_idle");
+    me._gnome = Here._.add
+      .sprite(Config.Positions.Start, 400, "gnome")
+      .play("gnome_idle");
+    me._scrollX = Config.Positions.Start - 500;
 
     me._camera.startFollow(me._gnome, true);
+
+    me._buttons = Utils.buildArray(10, null); // TODO
+    me._buttons[Enums.Button.WalkMoveLeft] = new Button(
+      400,
+      600,
+      0,
+      null,
+      null,
+      null,
+      me
+    );
+    me._buttons[Enums.Button.WalkMoveRight] = new Button(
+      500,
+      600,
+      1,
+      null,
+      null,
+      null,
+      me
+    );
 
     //Here._.add.image(850, 600, "order");
 
@@ -73,7 +102,8 @@ export default class Game {
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `pos: ${me._scrollX | 0}\n` +
-        `acc: ${(me._transport._accelerationProgress * 100) | 0}`;
+        `acc: ${(me._transport._accelerationProgress * 100) | 0}\n` +
+        `ord: ${me._currentOrder}`;
 
       me._log.setText(text);
     });
@@ -82,7 +112,12 @@ export default class Game {
   _gameLoop(deltaTime) {
     const me = this;
 
-    let velocityX = me._transport.getVelocity(deltaTime);
+    for (let i = 0; i < me._buttons.length; ++i) {
+      const button = me._buttons[i];
+      if (!!button && !!button._onPress) button.update();
+    }
+
+    let velocityX = me._transport.getVelocity(me._buttons, deltaTime);
 
     if (velocityX !== 0) {
       me._scrollX += velocityX;
