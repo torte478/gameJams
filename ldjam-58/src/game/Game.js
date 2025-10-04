@@ -25,7 +25,7 @@ export default class Game {
   _scrollX = 0;
 
   /** @type {Number | Null} */
-  _order = 2;
+  _order = null;
 
   /** @type {Button[]} */
   _buttons = [];
@@ -42,19 +42,21 @@ export default class Game {
     const me = this;
 
     me._camera = Here._.cameras.main;
-    me._camera.setBounds(-1000, 0, 2000, 800);
+    me._camera.setBounds(-1200, 0, 4000, 800);
+
+    Here._.add.image(-510, 300, "wall").setDepth(Consts.Depth.Wall);
 
     me._collection = new Collection();
 
     me._transports = Utils.buildArray(4, null);
-    me._transports[Enums.Transport.Walk] = new Transport(2, 0.01, 0.01);
+    me._transports[Enums.Transport.Walk] = new Transport(1, 0.01, 0.01);
     me._transports[Enums.Transport.Scooter] = new Transport(10, 1, 3);
-    me._transports[Enums.Transport.Car] = new Transport(1000, 10, 4);
+    me._transports[Enums.Transport.Car] = new Transport(1000, 4, 5);
 
     const background = Here._.add
       .image(0, 0, "background")
       .setOrigin(0, 0)
-      .setPosition(-Consts.Viewport.Width, 100)
+      .setPosition(-1200, 100)
       .setDepth(Consts.Depth.Background);
 
     me._gnome = Here._.add
@@ -93,7 +95,9 @@ export default class Game {
       const todoCurrentIndex = ((me._scrollX + 100) / 200 + 2) | 0;
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `pos: ${me._scrollX | 0} || ${Utils.intToBase26(todoCurrentIndex)}\n` +
+        `pos: ${Utils.intToBase26(todoCurrentIndex)} || ${
+          me._scrollX | 0
+        } || \n` +
         `acc: ${
           (me._transports[me._currentTransportIndex]._accelerationProgress *
             100) |
@@ -127,7 +131,7 @@ export default class Game {
       }
     }
 
-    // new order
+    // =================== new order
     if (me._order === null && me._scrollX <= Config.TakeOrderPosition) {
       me._order = Utils.getRandom(0, 3000);
     }
