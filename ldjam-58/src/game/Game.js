@@ -27,7 +27,8 @@ export default class Game {
   /** @type {Number} */
   _scrollX = 0;
 
-  _currentOrder = 10;
+  /** @type {Number | Null} */
+  _order = 2;
 
   /** @type {Button[]} */
   _buttons = [];
@@ -40,7 +41,7 @@ export default class Game {
 
     me._collection = new Collection();
 
-    me._transport = new Transport(10, 0.01, 0.01);
+    me._transport = new Transport(4, 0.01, 0.01);
 
     const background = Here._.add
       .image(0, 0, "background")
@@ -74,6 +75,15 @@ export default class Game {
       null,
       me
     );
+    me._buttons[Enums.Button.CompleteOrder] = new Button(
+      700,
+      600,
+      2,
+      () => me._tryCompleteOrder(),
+      null,
+      null,
+      me
+    );
 
     //Here._.add.image(850, 600, "order");
 
@@ -103,7 +113,7 @@ export default class Game {
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `pos: ${me._scrollX | 0}\n` +
         `acc: ${(me._transport._accelerationProgress * 100) | 0}\n` +
-        `ord: ${me._currentOrder}`;
+        `ord: ${me._order}`;
 
       me._log.setText(text);
     });
@@ -127,6 +137,19 @@ export default class Game {
       } else {
         me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
       }
+    }
+
+    if (me._order === null && me._scrollX <= Config.TakeOrderPosition) {
+      me._order = Utils.getRandom(0, 10);
+    }
+  }
+
+  _tryCompleteOrder() {
+    const me = this;
+
+    const success = me._collection.tryCompleteOrder(me._scrollX, me._order);
+    if (success) {
+      me._order = null;
     }
   }
 }

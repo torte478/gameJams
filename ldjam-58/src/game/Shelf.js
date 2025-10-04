@@ -39,11 +39,12 @@ export default class Shelf {
   }
 
   /** @type {Number} */
-  init(index) {
+  init(index, isComplete) {
     const me = this;
     me._index = index;
 
     me._text.setText(index);
+    me._image.setFrame(isComplete ? 1 : 0);
     // if (index >= 0) {
     //   me._container.setVisible(true).setActive(true);
     //   me._text.setText(index);
@@ -57,5 +58,11 @@ export default class Shelf {
     const me = this;
 
     return me._index;
+  }
+
+  complete() {
+    const me = this;
+
+    me._image.setFrame(1);
   }
 }

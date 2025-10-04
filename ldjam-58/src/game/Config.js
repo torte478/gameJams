@@ -7,8 +7,9 @@ export default class Config {
     Random: false,
   };
 
+  static TakeOrderPosition = -1200;
+
   static Positions = {
-    Start: -700, //500,
-    TakeOrder: -700,
+    Start: 0,
   };
 }
