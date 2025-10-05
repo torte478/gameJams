@@ -1,13 +1,13 @@
 export default class Config {
   static Debug = {
-    Global: true,
+    Global: false,
     Log: true,
     ShowSceneLog: true,
     IgnoreSound: false,
     Random: false,
     Delays: false,
-    StartAct: 0,
-    WalkSpeed: 3,
+    StartAct: 3,
+    WalkSpeed: 1.5,
     GameOverLimit: 0,
     GameOver: false,
   };
@@ -21,10 +21,11 @@ export default class Config {
   };
 
   static Orders = [
+    // [0], //--
     [5], // 0
-    [1], //[2, 1, 6], // 1
-    [1], //, 1, 1], // 2
-    [1], // 3
+    [2, 1, 6], // 1
+    [50, 35, 87], // 2
+    [4586, 731, 6998], // 3 car
     [8031810176 - 1], // 4
   ];
 }

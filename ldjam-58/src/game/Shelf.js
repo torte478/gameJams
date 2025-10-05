@@ -28,8 +28,8 @@ export default class Shelf {
       .text(Consts.Shelf.Width / 2 + 2, 25, "ABCDEFG", {
         fontSize: 18,
         color: "#000000",
-        fontStyle: "bold",
-        fontFamily: "Archivo Black",
+        // fontStyle: "bold",
+        fontFamily: "Arial",
       })
       .setOrigin(0.5, 0.5);
     me._container = Here._.add.container(0, 0, [me._image, me._text]);

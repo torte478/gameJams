@@ -930,6 +930,9 @@ export default class Game {
     me._gobletContainer.setVisible(false);
     me._pauseGobletTween();
 
+    for (let i = 0; i < me._speedometerText.length; ++i)
+      me._speedometerText[i].setText("A");
+
     // ==== 0 =====
     if (me._act === 0) {
       for (let i = 0; i < me._buttons.length; ++i)
