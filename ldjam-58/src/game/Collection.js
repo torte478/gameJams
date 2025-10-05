@@ -98,6 +98,10 @@ export default class Collection {
       return true;
     }
 
+    if (act >= 4) {
+      return shelfIndex < 8031810176 - 1;
+    }
+
     return false;
   }
 }

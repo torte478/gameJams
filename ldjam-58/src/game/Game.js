@@ -110,6 +110,9 @@ export default class Game {
   /** @type {Phaser.GameObjects.Sprite} */
   _car;
 
+  /** @type {Phaser.GameObjects.Image} */
+  _rocket;
+
   // color red: #C61831
 
   constructor() {
@@ -117,6 +120,11 @@ export default class Game {
 
     me._car = Here._.add
       .sprite(0, 400, "car")
+      .setVisible(false)
+      .setDepth(Consts.Depth.Panel);
+
+    me._rocket = Here._.add
+      .image(0, 400, "rocket")
       .setVisible(false)
       .setDepth(Consts.Depth.Panel);
 
@@ -139,7 +147,7 @@ export default class Game {
     me._act1Title = me._createActTitle("act1");
     me._act2Title = me._createActTitle("act2");
     me._act3Title = me._createActTitle("act3");
-    // me._act4Title = me._createActTitle("act4");
+    me._act4Title = me._createActTitle("act4");
 
     me._camera = Here._.cameras.main;
     me._camera.setBounds(-1200, 0, 4000, 800).setBackgroundColor("#011427");
@@ -155,7 +163,7 @@ export default class Game {
     me._transports[Enums.Transport.Walk] = new Transport(walkSpeed, 0.01, 0.01); // 1 ?
     me._transports[Enums.Transport.Skate] = new Transport(10, 1, 3);
     me._transports[Enums.Transport.Car] = new Transport(1000, 4, 5);
-    me._transports[Enums.Transport.Rocket] = new Transport(1000, 4, 5);
+    me._transports[Enums.Transport.Rocket] = new Transport(2000, 0.5, 60);
 
     const background = Here._.add
       .image(0, 0, "background")
@@ -386,7 +394,7 @@ export default class Game {
     const me = this;
 
     const transport = me._transports[me._currentTransportIndex];
-    let velocityX = transport.getVelocity(deltaTime);
+    let velocityX = transport.getVelocity(deltaTime, me._currentTransportIndex);
 
     if (velocityX !== 0) {
       me._playMoveSound();
@@ -410,6 +418,7 @@ export default class Game {
         .setPosition(me._gnome.x, me._car.y)
         .setFlipX(me._gnome.flipX)
         .play("car_ride", true);
+      me._rocket.setPosition(me._gnome.x, me._gnome.y);
     } else {
       me._playIdleAnimation();
       me._stopMoveSound();
@@ -446,6 +455,8 @@ export default class Game {
         ? "gnome_skate_idle"
         : me._currentTransportIndex === Enums.Transport.Car
         ? "gnome_nothing"
+        : me._currentTransportIndex === Enums.Transport.Rocket
+        ? "gnome_nothing"
         : null;
 
     if (key === null) throw "null animation";
@@ -462,6 +473,8 @@ export default class Game {
         : me._currentTransportIndex === Enums.Transport.Skate
         ? "gnome_skate_walk"
         : me._currentTransportIndex === Enums.Transport.Car
+        ? "gnome_nothing"
+        : me._currentTransportIndex === Enums.Transport.Rocket
         ? "gnome_nothing"
         : null;
 
@@ -480,6 +493,8 @@ export default class Game {
         ? "skate"
         : me._currentTransportIndex === Enums.Transport.Car
         ? "car"
+        : me._currentTransportIndex === Enums.Transport.Rocket
+        ? "rocket"
         : null;
 
     if (key === null) throw "null sound";
@@ -493,6 +508,7 @@ export default class Game {
     Here.Audio.stop("walk");
     Here.Audio.stop("skate");
     Here.Audio.stop("car");
+    Here.Audio.stop("rocket");
   }
 
   _checkGobletAnimation() {
@@ -760,6 +776,7 @@ export default class Game {
     );
 
     me._car.setVisible(trasnportIndex === Enums.Transport.Car);
+    me._rocket.setVisible(trasnportIndex === Enums.Transport.Rocket);
   }
 
   _setSpeedometerVisible(visible) {
@@ -823,7 +840,7 @@ export default class Game {
       return;
     }
 
-    if (me._act === 1 || me._act === 2) {
+    if (me._act === 1 || me._act === 2 || me._act === 3) {
       if (me._orderIterator < Config.Orders[me._act].length) return;
 
       me._isBusy = true;
@@ -956,6 +973,27 @@ export default class Game {
       );
 
       return; // ==== 3 =====
+    }
+
+    // ==== 4 =====
+    if (me._act === 4) {
+      me._completedOrderCount = 8031810176 - 1;
+      me._updateMainText();
+
+      // show title screen
+      me._act4Title.setVisible(true);
+      const duration = Utils.isDebug(Config.Debug.Delays) ? 10 : 1000;
+      Here._.time.delayedCall(
+        duration,
+        () => {
+          // end title
+          me._act4Title.setVisible(false);
+          me._isBusy = false;
+        },
+        me
+      );
+
+      return; // ==== 4 =====
     }
 
     throw `unexpected act ${me._act}`;

@@ -6,7 +6,7 @@ export default class Config {
     IgnoreSound: false,
     Random: false,
     Delays: true,
-    StartAct: 3,
+    StartAct: 4,
     WalkSpeed: 3,
   };
 
@@ -23,5 +23,6 @@ export default class Config {
     [2, 1, 6], // 1
     [1], //, 1, 1], // 2
     [1], // 3
+    [8031810176 - 1], // 4
   ];
 }

@@ -27,13 +27,16 @@ export default class Transport {
    * @param {Number} deltaTime
    * @returns {Number}
    */
-  getVelocity(deltaTime) {
+  getVelocity(deltaTime, transport) {
     const me = this;
 
     let pressedDirection = 0;
     if (Here.Controls.isPressing(Enums.Keyboard.RIGHT)) {
       pressedDirection = 1;
-    } else if (Here.Controls.isPressing(Enums.Keyboard.LEFT)) {
+    } else if (
+      Here.Controls.isPressing(Enums.Keyboard.LEFT) &&
+      transport != Enums.Transport.Rocket
+    ) {
       pressedDirection = -1;
     }
 
