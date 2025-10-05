@@ -158,9 +158,8 @@ export default class Game {
       .setDepth(Consts.Depth.Table);
 
     me._isOnMarketZone = Config.Positions.Start < Config.Positions.Hole;
-    me._gnome = Here._.add
-      .sprite(Config.Positions.Start, 395, "gnome")
-      .play("gnome_idle");
+    me._gnome = Here._.add.sprite(Config.Positions.Start, 395, "gnome");
+    me._playIdleAnimation();
     me._scrollX = Config.Positions.Start - 500;
 
     me._camera.startFollow(me._gnome, true);
@@ -219,8 +218,10 @@ export default class Game {
     if (
       Here.Controls.isPressedOnce(Enums.Keyboard.RESTART) &&
       Utils.isDebug(Config.Debug.Global)
-    )
+    ) {
+      Here._.sound.stopAll();
       Here._.scene.restart({ isRestart: true });
+    }
 
     me._gameLoop(deltaTime);
 
@@ -372,11 +373,14 @@ export default class Game {
     let velocityX = transport.getVelocity(deltaTime);
 
     if (velocityX !== 0) {
-      Here.Audio.playIfNotPlaying("walk", { loop: true });
+      me._playMoveSound();
       me._scrollX = Math.max(me._scrollX + velocityX, Config.TakeOrderPosition);
 
       me._gnome.setFlipX(velocityX < 0);
-      me._gnome.play("gnome_walk", true);
+      me._playMoveAnimation();
+
+      for (let i = 0; i < me._buttons.length; ++i)
+        me._buttons[i].setEnable(false);
 
       if (me._scrollX >= 0) {
         me._gnome.setPosition(500, me._gnome.y);
@@ -386,11 +390,80 @@ export default class Game {
         me._checkHole(velocityX);
       }
     } else {
-      me._gnome.play("gnome_idle", true);
-      Here.Audio.stop("walk");
+      me._playIdleAnimation();
+      me._stopMoveSound();
+
+      me._invalidateButtonEnable();
     }
 
     me._checkGobletAnimation();
+  }
+
+  _invalidateButtonEnable() {
+    const me = this;
+
+    me._buttons[Enums.Transport.Walk].setEnable(true);
+    me._buttons[Enums.Transport.Skate].setEnable(
+      !me._isOnMarketZone && me._act >= 2
+    );
+    me._buttons[Enums.Transport.Car].setEnable(
+      !me._isOnMarketZone && me._act >= 3
+    );
+    me._buttons[Enums.Transport.Rocket].setEnable(
+      !me._isOnMarketZone && me._act >= 4
+    );
+  }
+
+  _playIdleAnimation() {
+    const me = this;
+
+    const key =
+      me._currentTransportIndex === Enums.Transport.Walk
+        ? "gnome_idle"
+        : me._currentTransportIndex === Enums.Transport.Skate
+        ? "gnome_skate_idle"
+        : null;
+
+    if (key === null) throw "null animation";
+
+    me._gnome.play(key, true);
+  }
+
+  _playMoveSound() {
+    const me = this;
+
+    const key =
+      me._currentTransportIndex === Enums.Transport.Walk
+        ? "walk"
+        : me._currentTransportIndex === Enums.Transport.Skate
+        ? "skate"
+        : null;
+
+    if (key === null) throw "null sound";
+
+    Here.Audio.playIfNotPlaying(key, { loop: true });
+  }
+
+  _stopMoveSound() {
+    const me = this;
+
+    Here.Audio.stop("walk");
+    Here.Audio.stop("skate");
+  }
+
+  _playMoveAnimation() {
+    const me = this;
+
+    const key =
+      me._currentTransportIndex === Enums.Transport.Walk
+        ? "gnome_walk"
+        : me._currentTransportIndex === Enums.Transport.Skate
+        ? "gnome_skate_walk"
+        : null;
+
+    if (key === null) throw "null animation";
+
+    me._gnome.play(key, true);
   }
 
   _checkGobletAnimation() {
@@ -460,12 +533,6 @@ export default class Game {
     Here.Audio.play("coin", { volume: 0.7 });
   }
 
-  _stopWalkSound() {
-    const me = this;
-
-    Here.Audio.stop("walk");
-  }
-
   _checkHole(velocityX) {
     const me = this;
 
@@ -477,29 +544,28 @@ export default class Game {
       me._isOnMarketZone
     ) {
       me._isBusy = true;
-      me._stopWalkSound();
+      me._stopMoveSound();
 
       const originX = me._gnome.x;
       me._gnome
         .setPosition(Config.Positions.Hole - 25, me._gnome.y - 50)
         .setFlipX(false)
-        .setAngle(90)
-        .play("gnome_walk");
+        .setAngle(90);
+
+      me._playMoveAnimation();
 
       Here._.time.delayedCall(
         Utils.isDebug(Config.Debug.Delays) ? 10 : 1000,
         () => {
           me._gnome
             .setPosition(Config.Positions.Hole + 200, me._gnome.y + 50)
-            .setAngle(0)
-            .play("gnome_idle");
+            .setAngle(0);
+          me._playIdleAnimation();
           me._scrollX += me._gnome.x - originX;
           me._isBusy = false;
           me._isOnMarketZone = false;
 
-          me._buttons[Enums.Transport.Skate].setEnable(me._act >= 2);
-          me._buttons[Enums.Transport.Car].setEnable(me._act >= 3);
-          me._buttons[Enums.Transport.Rocket].setEnable(me._act >= 4);
+          me._invalidateButtonEnable();
 
           if (me._act > 0)
             Here.Audio.playIfNotPlaying("main", { volume: 0.25, loop: true });
@@ -516,7 +582,7 @@ export default class Game {
       !me._isOnMarketZone
     ) {
       me._isBusy = true;
-      me._stopWalkSound();
+      me._stopMoveSound();
       const originX = me._gnome.x;
 
       me._trySelectTransport(Enums.Transport.Walk);
@@ -527,16 +593,17 @@ export default class Game {
       me._gnome
         .setPosition(Config.Positions.Hole + 50, me._gnome.y - 50)
         .setFlipX(true)
-        .setAngle(-90)
-        .play("gnome_walk");
+        .setAngle(-90);
+
+      me._playMoveAnimation();
 
       Here._.time.delayedCall(
         Utils.isDebug(Config.Debug.Delays) ? 10 : 1000,
         () => {
           me._gnome
             .setPosition(Config.Positions.Hole - 200, me._gnome.y + 50)
-            .setAngle(0)
-            .play("gnome_idle");
+            .setAngle(0);
+          me._playIdleAnimation();
           me._scrollX += me._gnome.x - originX;
           me._isBusy = false;
           me._isOnMarketZone = true;
@@ -614,6 +681,8 @@ export default class Game {
   _trySelectTransport(trasnportIndex) {
     const me = this;
     if (me._currentTransportIndex === trasnportIndex) return;
+    const currentTransport = me._transports[me._currentTransportIndex];
+    currentTransport._accelerationProgress = 0;
 
     me._currentTransportIndex = trasnportIndex;
     for (let i = 0; i < me._buttons.length; ++i)

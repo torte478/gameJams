@@ -5,7 +5,7 @@ export default class Config {
     ShowSceneLog: true,
     IgnoreSound: false,
     Random: false,
-    Delays: false,
+    Delays: true,
     StartAct: 2,
     WalkSpeed: 3,
   };

@@ -51,6 +51,7 @@ export default class GameScene extends HereScene {
     Utils.loadWav("coin");
 
     Utils.loadMp3("walk");
+    Utils.loadMp3("skate");
     Utils.loadMp3("main");
     Utils.loadMp3("epic");
 
