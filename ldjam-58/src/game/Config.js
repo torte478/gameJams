@@ -3,7 +3,7 @@ export default class Config {
     Global: true,
     Log: true,
     ShowSceneLog: true,
-    PlaySound: true,
+    IgnoreSound: true,
     Random: false,
     TitleScreen: true,
     Order: 2,

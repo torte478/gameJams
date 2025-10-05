@@ -639,7 +639,7 @@ export default class Game {
       me._isBusy = true;
 
       Here.Audio.stopAll();
-      Here.Audio.play("epic");
+      Here.Audio.play("epic", { volume: 0.8 });
       me._gnome.play("gnome_wonder");
 
       Here._.time.delayedCall(
