@@ -29,7 +29,7 @@ export default class Shelf {
         fontSize: 18,
         color: "#000000",
         fontStyle: "bold",
-        fontFamily: "Pixelify Sans",
+        fontFamily: "Archivo Black",
       })
       .setOrigin(0.5, 0.5);
     me._container = Here._.add.container(0, 0, [me._image, me._text]);

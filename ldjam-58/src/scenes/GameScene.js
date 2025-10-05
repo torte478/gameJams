@@ -48,9 +48,20 @@ export default class GameScene extends HereScene {
   create() {
     const me = this;
 
-    Animation.init();
+    if (me._isRestart) {
+      me._game = new Game();
+    } else {
+      Animation.init();
 
-    me._game = new Game();
+      WebFont.load({
+        google: {
+          families: ["Archivo Black"],
+        },
+        active: function () {
+          me._game = new Game();
+        },
+      });
+    }
   }
 
   // TODO: to framework
@@ -60,6 +71,6 @@ export default class GameScene extends HereScene {
 
     const me = this;
 
-    me._game.update(time, delta);
+    if (!!me._game) me._game.update(time, delta);
   }
 }

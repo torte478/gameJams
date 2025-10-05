@@ -54,6 +54,15 @@ export default class Game {
   /** @type {Phaser.Tweens.Tween} */
   _gobletTween;
 
+  /** @type {Phaser.GameObjects.Text} */
+  _mainText;
+
+  /** @type {String} */
+  _mainTextPattern = "of 8,031,810,176";
+
+  /** @type {Number} */
+  _completedOrderCount = 1; //8031810175;
+
   // color red: #C61831
 
   constructor() {
@@ -95,6 +104,17 @@ export default class Game {
       .setDepth(Consts.Depth.Table - 100);
 
     me._initGoblet();
+
+    me._mainText = Here._.add
+      .text(985, 50, "TEST", {
+        fontSize: 56,
+        color: "#344c72",
+        fontFamily: "Archivo Black",
+      })
+      .setOrigin(1, 0.5)
+      .setScrollFactor(0)
+      .setDepth(Consts.Depth.Button);
+    me._updateMainText();
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -145,16 +165,26 @@ export default class Game {
     me._tryTakeOrder();
   }
 
+  _updateMainText() {
+    const me = this;
+
+    me._mainText.setText(
+      `${me._completedOrderCount.toLocaleString("en-US")} ${
+        me._mainTextPattern
+      }`
+    );
+  }
+
   _initGoblet() {
     const me = this;
 
     const gobletImage = Here._.add.image(0, 0, "goblet");
     me._gobletText = Here._.add
       .text(33, 78, "TEST", {
-        fontSize: 28,
+        fontSize: 26,
         color: "#000000",
         fontStyle: "bold",
-        fontFamily: "Pixelify Sans",
+        fontFamily: "Archivo Black",
       })
       .setOrigin(0.5, 0.5)
       .setAngle(8);
@@ -230,9 +260,18 @@ export default class Game {
       me._gnome.play("gnome_idle", true);
     }
 
-    const isOrder =
-      me._order !== null &&
-      me._collection.isCurrentShelfCorrectForOrderIFE(me._scrollX, me._order);
+    me._checkGobletAnimation();
+  }
+
+  _checkGobletAnimation() {
+    const me = this;
+
+    if (me._order === null) return;
+
+    const isOrder = me._collection.isCurrentShelfCorrectForOrderIFE(
+      me._scrollX,
+      me._order
+    );
     if (isOrder && me._gobletTween.paused) {
       me._gobletTween.play();
     } else if (!isOrder && !me._gobletTween.paused) {
@@ -401,10 +440,14 @@ export default class Game {
     const me = this;
 
     const success = me._collection.tryCompleteOrder(me._scrollX, me._order);
-    if (success) {
-      me._order = null;
-      me._gobletContainer.setVisible(false);
-    }
+    if (!success) return;
+
+    me._order = null;
+    me._gobletContainer.setVisible(false);
+    me._pauseGobletTween();
+
+    me._completedOrderCount += 1;
+    me._updateMainText();
   }
 
   _trySelectTransport(trasnportIndex) {
