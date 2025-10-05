@@ -105,7 +105,7 @@ export default class Game {
   /** @type {Number} */
   _orderIterator = 0;
 
-  _lastOrderScroll = 0;
+  _checkpoint = 0;
 
   /** @type {Phaser.GameObjects.Sprite} */
   _car;
@@ -124,6 +124,9 @@ export default class Game {
 
   /** @type {Boolean} */
   _isOldMoving = false;
+
+  /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+  _rocketExplosionParticles;
 
   // color red: #C61831
 
@@ -154,6 +157,17 @@ export default class Game {
         scale: { start: 0.8, end: 0 },
         gravityY: 300,
         //blendMode: "ADD",
+        emitting: false,
+      })
+      .setDepth(Consts.Depth.Button);
+
+    me._rocketExplosionParticles = Here._.add
+      .particles(120, 400, "particles", {
+        frame: [0, 1, 2, 3],
+        speed: 200,
+        lifespan: 1500,
+        gravityX: -300,
+        blendMode: "ADD",
         emitting: false,
       })
       .setDepth(Consts.Depth.Button);
@@ -529,6 +543,13 @@ export default class Game {
 
     if (key === null) throw "null animation";
 
+    if (
+      me._currentTransportIndex === Enums.Transport.Rocket &&
+      !me._rocketExplosionParticles.emitting
+    ) {
+      me._rocketExplosionParticles.start();
+    }
+
     me._gnome.play(key, true);
   }
 
@@ -600,7 +621,11 @@ export default class Game {
     const me = this;
     if (me._act < 1) return;
 
-    if (me._order !== null || me._scrollX > Config.TakeOrderPosition + 10)
+    if (
+      me._order !== null ||
+      me._scrollX > Config.TakeOrderPosition + 10 ||
+      me._isBusy
+    )
       return;
 
     me._collectable.setVisible(false);
@@ -736,7 +761,7 @@ export default class Game {
     Here._.time.delayedCall(
       delay,
       () => {
-        me._scrollX = me._lastOrderScroll;
+        me._scrollX = me._checkpoint;
         me._playIdleAnimation();
         me._gnome.setPosition(500, originalPos.y);
         me._collection.updatePos(me._scrollX, me._act);
@@ -765,7 +790,7 @@ export default class Game {
       90,
       580,
       0,
-      () => me._trySelectTransport(Enums.Transport.Walk),
+      () => me._trySelectTransport(Enums.Transport.Walk, true),
       me
     ).setEnable(true);
 
@@ -773,7 +798,7 @@ export default class Game {
       210,
       580,
       2,
-      () => me._trySelectTransport(Enums.Transport.Skate),
+      () => me._trySelectTransport(Enums.Transport.Skate, true),
       me
     ).setEnable(false);
 
@@ -781,7 +806,7 @@ export default class Game {
       90,
       705,
       4,
-      () => me._trySelectTransport(Enums.Transport.Car),
+      () => me._trySelectTransport(Enums.Transport.Car, true),
       me
     ).setEnable(false);
 
@@ -789,7 +814,7 @@ export default class Game {
       210,
       705,
       6,
-      () => me._trySelectTransport(Enums.Transport.Rocket),
+      () => me._trySelectTransport(Enums.Transport.Rocket, true),
       me
     ).setEnable(false);
 
@@ -813,14 +838,14 @@ export default class Game {
 
     Here.Audio.play("order", { volume: 0.5 });
 
-    me._lastOrderScroll = Math.max(0, me._scrollX);
+    me._checkpoint = Math.max(0, me._scrollX);
 
     if (me._act > 0) me._spawnNpc();
 
     me._checkActActionOnCompleteOrder();
   }
 
-  _trySelectTransport(trasnportIndex) {
+  _trySelectTransport(trasnportIndex, withCheckpoint) {
     const me = this;
     if (me._currentTransportIndex === trasnportIndex) return;
     const currentTransport = me._transports[me._currentTransportIndex];
@@ -833,6 +858,8 @@ export default class Game {
     me._buttons[me._currentTransportIndex]._image.setFrame(
       me._currentTransportIndex * 2 + 1
     );
+
+    if (!!withCheckpoint) me._checkpoint = Math.max(0, me._scrollX);
 
     me._car.setVisible(trasnportIndex === Enums.Transport.Car);
     me._rocket.setVisible(trasnportIndex === Enums.Transport.Rocket);
@@ -1101,6 +1128,8 @@ export default class Game {
           .sprite(0, me._gnome.y, "old", 0)
           .play("old_walk")
           .setOrigin(0.9, 0.5);
+
+        me._rocketExplosionParticles.stop();
 
         Here._.tweens.add({
           targets: me._old,

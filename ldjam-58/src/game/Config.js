@@ -5,11 +5,11 @@ export default class Config {
     ShowSceneLog: true,
     IgnoreSound: false,
     Random: false,
-    Delays: false,
+    Delays: true,
     StartAct: 3,
     WalkSpeed: 1.5,
-    GameOverLimit: 0,
-    GameOver: false,
+    GameOverLimit: 1000,
+    GameOver: true,
   };
 
   static TakeOrderPosition = -1450;
