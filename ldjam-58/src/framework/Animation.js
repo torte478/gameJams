@@ -1,5 +1,6 @@
 import Here from "./Here.js";
 
+// TODO: to base
 export default class Animation {
   static init() {
     Animation._init("gnome", "idle", [0, 1], 1.5, -1);

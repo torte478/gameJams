@@ -12,6 +12,7 @@ export default class Consts {
 
   static Depth = {
     Background: -1000,
+    Table: -500,
     Normal: 0,
     Wall: 1000,
     UnderWall: 1500,

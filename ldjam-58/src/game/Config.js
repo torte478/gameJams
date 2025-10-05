@@ -7,10 +7,11 @@ export default class Config {
     Random: false,
   };
 
-  static TakeOrderPosition = -1200;
+  static TakeOrderPosition = -1450;
 
   static Positions = {
-    Start: 0, //-950, //0,
+    Start: -700, //0,
     Hole: -510,
+    NpcSpawn: -1400,
   };
 }

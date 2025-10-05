@@ -25,7 +25,7 @@ export default class Game {
   _scrollX = 0;
 
   /** @type {Number | Null} */
-  _order = 1;
+  _order = null;
 
   /** @type {Button[]} */
   _buttons = [];
@@ -41,6 +41,9 @@ export default class Game {
 
   /** @type {Boolean} */
   _isBusy = false;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _npc;
 
   // color red: #C61831
 
@@ -65,6 +68,8 @@ export default class Game {
       .setPosition(-1200, 100)
       .setDepth(Consts.Depth.Background);
 
+    Here._.add.image(-950, 400, "table").setDepth(Consts.Depth.Table);
+
     me._isOnMarketZone = Config.Positions.Start < Config.Positions.Hole;
     me._gnome = Here._.add
       .sprite(Config.Positions.Start, 400, "gnome")
@@ -74,6 +79,10 @@ export default class Game {
     me._camera.startFollow(me._gnome, true);
 
     me._initButtons();
+
+    me._npc = Here._.add
+      .image(Config.Positions.NpcSpawn, 360, "npc", 0)
+      .setDepth(Consts.Depth.Table - 100);
 
     //Here._.add.image(850, 600, "order");
 
@@ -122,16 +131,18 @@ export default class Game {
 
     if (me._isBusy) return;
 
-    // for (let i = 0; i < me._buttons.length; ++i) {
-    //   const button = me._buttons[i];
-    //   if (!!button && !!button._onPress) button.update();
-    // }
+    me._updateMovement(deltaTime);
+    me._tryTakeOrder();
+  }
+
+  _updateMovement(deltaTime) {
+    const me = this;
 
     const transport = me._transports[me._currentTransportIndex];
     let velocityX = transport.getVelocity(deltaTime);
 
     if (velocityX !== 0) {
-      me._scrollX += velocityX;
+      me._scrollX = Math.max(me._scrollX + velocityX, Config.TakeOrderPosition);
 
       me._gnome.setFlipX(velocityX < 0);
       me._gnome.play("gnome_walk", true);
@@ -146,17 +157,50 @@ export default class Game {
     } else {
       me._gnome.play("gnome_idle", true);
     }
+  }
 
-    // =================== new order
-    if (me._order === null && me._scrollX <= Config.TakeOrderPosition) {
-      me._order = Utils.getRandom(0, 3000);
-    }
+  _tryTakeOrder() {
+    const me = this;
+    if (me._order !== null || me._scrollX > Config.TakeOrderPosition + 10)
+      return;
+
+    me._isBusy = true;
+    me._gnome.setFlipX(true).play("gnome_idle");
+    me._npc.setFlipX(false);
+
+    Here._.tweens.add({
+      targets: me._npc,
+      x: -1120,
+      ease: "sine.out",
+      duration: 1000,
+      onComplete: () => {
+        Here._.tweens.add({
+          targets: me._npc,
+          x: Config.Positions.NpcSpawn,
+          ease: "sine.in",
+          duration: 1000,
+          delay: 500,
+          onStart: () => {
+            me._npc.setFlipX(true);
+
+            me._isBusy = false;
+            me._createNewOrder();
+          },
+        });
+      },
+    });
+  }
+
+  _createNewOrder() {
+    const me = this;
+
+    me._order = Utils.getRandom(0, 10);
   }
 
   _checkHole(velocityX) {
     const me = this;
 
-    // more right
+    // move right
 
     if (
       velocityX > 0 &&
@@ -186,7 +230,7 @@ export default class Game {
       );
     }
 
-    // more left
+    // move left
 
     if (
       velocityX < 0 &&
@@ -221,25 +265,6 @@ export default class Game {
     const me = this;
 
     me._buttons = Utils.buildArray(10, null); // TODO
-
-    // me._buttons[Enums.Button.WalkMoveLeft] = new Button(
-    //   400,
-    //   600,
-    //   0,
-    //   null,
-    //   null,
-    //   null,
-    //   me
-    // );
-    // me._buttons[Enums.Button.WalkMoveRight] = new Button(
-    //   500,
-    //   600,
-    //   1,
-    //   null,
-    //   null,
-    //   null,
-    //   me
-    // );
 
     me._buttons[Enums.Button.CompleteOrder] = new Button(
       700,

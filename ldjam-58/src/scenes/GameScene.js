@@ -31,10 +31,12 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("gnome", 200, 200);
     Utils.loadSpriteSheet("shelf", 200, 400);
     Utils.loadSpriteSheet("buttons", 100, 100);
+    Utils.loadSpriteSheet("npc", 200, 200);
 
     Utils.loadImage("order");
     Utils.loadImage("background");
     Utils.loadImage("wall");
+    Utils.loadImage("table");
 
     me.load.script(
       "webfont",
