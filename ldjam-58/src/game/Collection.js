@@ -27,7 +27,7 @@ export default class Collection {
     }
   }
 
-  updatePos(scroll) {
+  updatePos(scroll, act) {
     const me = this;
 
     const shelfOffset = -scroll % Consts.Shelf.Width;
@@ -40,7 +40,8 @@ export default class Collection {
       shelfObj.setPosition(shelfOffset + i * Consts.Shelf.Width, shelfObj.y);
       const nextIndex = startIndex + i;
       if (shelf.getIndex() !== nextIndex) {
-        shelf.init(nextIndex, me._collectedIndexes.has(nextIndex));
+        let isComplete = me._collectedIndexes.has(nextIndex);
+        shelf.init(nextIndex, me._isComplete(nextIndex, act));
       }
     }
   }
@@ -79,5 +80,24 @@ export default class Collection {
     );
 
     return currentShelfIndex === orderIndex;
+  }
+
+  _isComplete(shelfIndex, act) {
+    const me = this;
+
+    if (me._collectedIndexes.has(shelfIndex)) return true;
+
+    if (act >= 2 && shelfIndex % 11 === 0) {
+      return true;
+    }
+
+    if (
+      act >= 3 &&
+      (shelfIndex % 7 === 0 || shelfIndex % 4 === 0 || shelfIndex % 13 === 0)
+    ) {
+      return true;
+    }
+
+    return false;
   }
 }

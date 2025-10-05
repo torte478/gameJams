@@ -130,7 +130,7 @@ export default class Game {
 
     me._act1Title = me._createActTitle("act1");
     me._act2Title = me._createActTitle("act2");
-    // me._act3Title = me._createActTitle("act3");
+    me._act3Title = me._createActTitle("act3");
     // me._act4Title = me._createActTitle("act4");
 
     me._camera = Here._.cameras.main;
@@ -386,7 +386,7 @@ export default class Game {
 
       if (me._scrollX >= 0) {
         me._gnome.setPosition(500, me._gnome.y);
-        me._collection.updatePos(me._scrollX);
+        me._collection.updatePos(me._scrollX, me._act);
       } else {
         me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
         me._checkHole(velocityX);
@@ -639,7 +639,7 @@ export default class Game {
         me._scrollX = me._lastOrderScroll;
         me._playIdleAnimation();
         me._gnome.setPosition(500, originalPos.y);
-        me._collection.updatePos(me._scrollX);
+        me._collection.updatePos(me._scrollX, me._act);
 
         me._isBusy = false;
       },
@@ -790,12 +790,14 @@ export default class Game {
       return;
     }
 
-    if (me._act === 1) {
+    if (me._act === 1 || me._act === 2) {
       if (me._orderIterator < Config.Orders[me._act].length) return;
 
       me._isBusy = true;
-      me._act = 2;
-      me._initAct();
+      me._act += 1;
+
+      me._isBusy = true;
+      Here._.time.delayedCall(500, () => me._initAct(), me);
 
       return;
     }
@@ -810,7 +812,7 @@ export default class Game {
     me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
     me._isOnMarketZone = true;
 
-    me._collection.updatePos(0);
+    me._collection.updatePos(0, me._act);
     me._trySelectTransport(Enums.Transport.Walk);
 
     // order
@@ -882,6 +884,8 @@ export default class Game {
     // ==== 2 =====
     if (me._act === 2) {
       me._setSpeedometerVisible(false);
+      me._completedOrderCount += 22;
+      me._updateMainText();
 
       // show title screen
       me._act2Title.setVisible(true);
@@ -897,6 +901,27 @@ export default class Game {
       );
 
       return; // ==== 2 =====
+    }
+
+    // ==== 2 =====
+    if (me._act === 3) {
+      me._setSpeedometerVisible(false);
+      me._completedOrderCount += 10758;
+      me._updateMainText();
+      // show title screen
+      me._act3Title.setVisible(true);
+      const duration = Utils.isDebug(Config.Debug.Delays) ? 10 : 1000;
+      Here._.time.delayedCall(
+        duration,
+        () => {
+          // end title
+          me._act3Title.setVisible(false);
+          me._isBusy = false;
+        },
+        me
+      );
+
+      return; // ==== 3 =====
     }
 
     throw `unexpected act ${me._act}`;
