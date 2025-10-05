@@ -710,11 +710,13 @@ export default class Game {
       for (let i = 1; i < me._buttons.length; ++i)
         me._buttons[i].setVisible(true).setEnable(false);
 
+      // show title screen
       me._act1Title.setVisible(true);
-
+      const duration = Utils.isDebug(Config.Debug.TitleScreen) ? 10 : 3000;
       Here._.time.delayedCall(
-        3000,
+        duration,
         () => {
+          // end title
           Here.Audio.stopAll();
           me._act1Title.setVisible(false);
           me._isBusy = false;

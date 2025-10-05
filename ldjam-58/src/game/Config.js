@@ -5,8 +5,9 @@ export default class Config {
     ShowSceneLog: true,
     PlaySound: true,
     Random: false,
+    TitleScreen: true,
     Order: 2,
-    StartAct: 0,
+    StartAct: 1,
     WalkSpeed: 2,
   };
 
