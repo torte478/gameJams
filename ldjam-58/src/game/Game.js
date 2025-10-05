@@ -652,6 +652,7 @@ export default class Game {
         .setAngle(90);
 
       me._playMoveAnimation();
+      Here.Audio.play("hole", { volume: 0.3 });
 
       Here._.time.delayedCall(
         Utils.isDebug(Config.Debug.Delays) ? 10 : 1000,
@@ -701,6 +702,7 @@ export default class Game {
         .setAngle(-90);
 
       me._playMoveAnimation();
+      Here.Audio.play("hole", { volume: 0.3 });
 
       Here._.time.delayedCall(
         Utils.isDebug(Config.Debug.Delays) ? 10 : 1000,
@@ -723,6 +725,7 @@ export default class Game {
 
     me._isBusy = true;
     me._runWallExplode();
+    Here.Audio.play("death", { volume: 0.5 });
 
     me._stopMoveSound();
 
@@ -807,6 +810,8 @@ export default class Game {
 
     me._completedOrderCount += 1;
     me._updateMainText();
+
+    Here.Audio.play("order", { volume: 0.5 });
 
     me._lastOrderScroll = Math.max(0, me._scrollX);
 
@@ -901,7 +906,7 @@ export default class Game {
       me._act += 1;
 
       me._isBusy = true;
-      Here._.time.delayedCall(500, () => me._initAct(), me);
+      Here._.time.delayedCall(1000, () => me._initAct(), me);
 
       return;
     }
@@ -993,7 +998,8 @@ export default class Game {
 
       // show title screen
       me._act2Title.setVisible(true);
-      const duration = Utils.isDebug(Config.Debug.Delays) ? 10 : 1000;
+      Here.Audio.play("1day", { volume: 0.5 });
+      const duration = Utils.isDebug(Config.Debug.Delays) ? 10 : 3000;
       Here._.time.delayedCall(
         duration,
         () => {
@@ -1015,7 +1021,8 @@ export default class Game {
 
       // show title screen
       me._act3Title.setVisible(true);
-      const duration = Utils.isDebug(Config.Debug.Delays) ? 10 : 1000;
+      Here.Audio.play("1year", { volume: 0.5 });
+      const duration = Utils.isDebug(Config.Debug.Delays) ? 10 : 3000;
       Here._.time.delayedCall(
         duration,
         () => {
@@ -1036,7 +1043,8 @@ export default class Game {
 
       // show title screen
       me._act4Title.setVisible(true);
-      const duration = Utils.isDebug(Config.Debug.Delays) ? 10 : 1000;
+      Here.Audio.play("1eternity", { volume: 0.5 });
+      const duration = Utils.isDebug(Config.Debug.Delays) ? 10 : 3000;
       Here._.time.delayedCall(
         duration,
         () => {
@@ -1116,8 +1124,10 @@ export default class Game {
 
     me._isOldMoving = false;
     me._old.stop().setFrame(2);
+
     Here.Audio.stopAll();
-    // play death
+    Here.Audio.play("death", { volume: 0.5 });
+
     Here._.time.delayedCall(2000, () => {
       Here.Audio.play("final", { loop: true });
       me._mainText.setText("Thank you for playing!");

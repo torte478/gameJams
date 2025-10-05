@@ -6,7 +6,7 @@ export default class Config {
     IgnoreSound: false,
     Random: false,
     Delays: false,
-    StartAct: 4,
+    StartAct: 0,
     WalkSpeed: 3,
     GameOverLimit: 0,
     GameOver: false,
@@ -22,7 +22,7 @@ export default class Config {
 
   static Orders = [
     [5], // 0
-    [2, 1, 6], // 1
+    [1], //[2, 1, 6], // 1
     [1], //, 1, 1], // 2
     [1], // 3
     [8031810176 - 1], // 4

@@ -64,6 +64,13 @@ export default class GameScene extends HereScene {
     Utils.loadMp3("car");
     Utils.loadMp3("final");
 
+    Utils.loadMp3("hole");
+    Utils.loadMp3("death");
+    Utils.loadMp3("order");
+    Utils.loadMp3("1day");
+    Utils.loadMp3("1year");
+    Utils.loadMp3("1eternity");
+
     me.load.script(
       "webfont",
       "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"
