@@ -10,6 +10,7 @@ export default class Config {
   static TakeOrderPosition = -1200;
 
   static Positions = {
-    Start: -950, //0,
+    Start: 0, //-950, //0,
+    Hole: -510,
   };
 }

@@ -39,6 +39,9 @@ export default class Game {
   /** @type {Boolean} */
   _isOnMarketZone;
 
+  /** @type {Boolean} */
+  _isBusy = false;
+
   // color red: #C61831
 
   constructor() {
@@ -62,6 +65,7 @@ export default class Game {
       .setPosition(-1200, 100)
       .setDepth(Consts.Depth.Background);
 
+    me._isOnMarketZone = Config.Positions.Start < Config.Positions.Hole;
     me._gnome = Here._.add
       .sprite(Config.Positions.Start, 400, "gnome")
       .play("gnome_idle");
@@ -116,6 +120,8 @@ export default class Game {
   _gameLoop(deltaTime) {
     const me = this;
 
+    if (me._isBusy) return;
+
     // for (let i = 0; i < me._buttons.length; ++i) {
     //   const button = me._buttons[i];
     //   if (!!button && !!button._onPress) button.update();
@@ -135,6 +141,7 @@ export default class Game {
         me._collection.updatePos(me._scrollX);
       } else {
         me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
+        me._checkHole(velocityX);
       }
     } else {
       me._gnome.play("gnome_idle", true);
@@ -143,6 +150,70 @@ export default class Game {
     // =================== new order
     if (me._order === null && me._scrollX <= Config.TakeOrderPosition) {
       me._order = Utils.getRandom(0, 3000);
+    }
+  }
+
+  _checkHole(velocityX) {
+    const me = this;
+
+    // more right
+
+    if (
+      velocityX > 0 &&
+      me._gnome.x >= Config.Positions.Hole - 150 &&
+      me._isOnMarketZone
+    ) {
+      me._isBusy = true;
+      const originX = me._gnome.x;
+      me._gnome
+        .setPosition(Config.Positions.Hole - 25, me._gnome.y - 50)
+        .setFlipX(false)
+        .setAngle(90)
+        .play("gnome_walk");
+
+      Here._.time.delayedCall(
+        1000,
+        () => {
+          me._gnome
+            .setPosition(Config.Positions.Hole + 200, me._gnome.y + 50)
+            .setAngle(0)
+            .play("gnome_idle");
+          me._scrollX += me._gnome.x - originX;
+          me._isBusy = false;
+          me._isOnMarketZone = false;
+        },
+        me
+      );
+    }
+
+    // more left
+
+    if (
+      velocityX < 0 &&
+      me._gnome.x <= Config.Positions.Hole + 150 &&
+      !me._isOnMarketZone
+    ) {
+      me._isBusy = true;
+      const originX = me._gnome.x;
+      me._gnome
+        .setPosition(Config.Positions.Hole + 50, me._gnome.y - 50)
+        .setFlipX(true)
+        .setAngle(-90)
+        .play("gnome_walk");
+
+      Here._.time.delayedCall(
+        1000,
+        () => {
+          me._gnome
+            .setPosition(Config.Positions.Hole - 200, me._gnome.y + 50)
+            .setAngle(0)
+            .play("gnome_idle");
+          me._scrollX += me._gnome.x - originX;
+          me._isBusy = false;
+          me._isOnMarketZone = true;
+        },
+        me
+      );
     }
   }
 
