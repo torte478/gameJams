@@ -51,7 +51,7 @@ export default class Game {
     const me = this;
 
     me._camera = Here._.cameras.main;
-    me._camera.setBounds(-1200, 0, 4000, 800);
+    me._camera.setBounds(-1200, 0, 4000, 800).setBackgroundColor("#011427");
 
     Here._.add.image(-510, 300, "wall").setDepth(Consts.Depth.Wall);
 
@@ -264,22 +264,27 @@ export default class Game {
   _initButtons() {
     const me = this;
 
-    me._buttons = Utils.buildArray(10, null); // TODO
+    Here._.add
+      .image(500, 650, "panel")
+      .setScrollFactor(0)
+      .setDepth(Consts.Depth.Panel);
 
-    me._buttons[Enums.Button.CompleteOrder] = new Button(
-      700,
-      600,
-      2,
-      () => me._tryCompleteOrder(),
-      null,
-      null,
-      me
-    );
+    me._buttons = Utils.buildArray(4, null); // TODO
+
+    // me._buttons[Enums.Button.CompleteOrder] = new Button(
+    //   700,
+    //   600,
+    //   2,
+    //   () => me._tryCompleteOrder(),
+    //   null,
+    //   null,
+    //   me
+    // );
 
     me._buttons[Enums.Button.SelectTransportWalk] = new Button(
       150,
       550,
-      3,
+      0,
       () => me._trySelectTransport(Enums.Transport.Walk),
       null,
       null,
@@ -289,7 +294,7 @@ export default class Game {
     me._buttons[Enums.Button.SelectTransportScooter] = new Button(
       150,
       650,
-      4,
+      1,
       () => me._trySelectTransport(Enums.Transport.Scooter),
       null,
       null,
@@ -299,7 +304,7 @@ export default class Game {
     me._buttons[Enums.Button.SelectTransportScooter] = new Button(
       150,
       750,
-      5,
+      2,
       () => me._trySelectTransport(Enums.Transport.Car),
       null,
       null,

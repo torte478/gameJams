@@ -37,6 +37,7 @@ export default class GameScene extends HereScene {
     Utils.loadImage("background");
     Utils.loadImage("wall");
     Utils.loadImage("table");
+    Utils.loadImage("panel");
 
     me.load.script(
       "webfont",

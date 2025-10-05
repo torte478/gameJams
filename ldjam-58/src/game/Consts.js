@@ -16,6 +16,8 @@ export default class Consts {
     Normal: 0,
     Wall: 1000,
     UnderWall: 1500,
+    Panel: 10000,
+    Button: 11000,
     Max: 100000,
   };
 

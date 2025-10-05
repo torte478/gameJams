@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Consts from "./Consts.js";
 
 export default class Button {
   /** @type {Phaser.GameObjects.Image} */
@@ -31,7 +32,8 @@ export default class Button {
     me._image = Here._.add
       .image(x, y, "buttons", frame)
       .setInteractive()
-      .setScrollFactor(0, 0);
+      .setScrollFactor(0, 0)
+      .setDepth(Consts.Depth.Button);
 
     me._image.on(
       "pointerover",

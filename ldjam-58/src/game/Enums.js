@@ -13,10 +13,9 @@ export default class Enums {
   };
 
   static Button = {
-    WalkMoveLeft: 0,
-    WalkMoveRight: 1,
-    CompleteOrder: 2,
-    SelectTransportWalk: 3,
-    SelectTransportScooter: 4,
+    Walk: 0,
+    Scooter: 1,
+    Car: 2,
+    Rocket: 3,
   };
 }
