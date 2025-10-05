@@ -59,8 +59,9 @@ export default class Game {
 
     me._transports = Utils.buildArray(4, null);
     me._transports[Enums.Transport.Walk] = new Transport(1, 0.01, 0.01);
-    me._transports[Enums.Transport.Scooter] = new Transport(10, 1, 3);
+    me._transports[Enums.Transport.Skate] = new Transport(10, 1, 3);
     me._transports[Enums.Transport.Car] = new Transport(1000, 4, 5);
+    me._transports[Enums.Transport.Rocket] = new Transport(1000, 4, 5);
 
     const background = Here._.add
       .image(0, 0, "background")
@@ -271,44 +272,40 @@ export default class Game {
 
     me._buttons = Utils.buildArray(4, null); // TODO
 
-    // me._buttons[Enums.Button.CompleteOrder] = new Button(
-    //   700,
-    //   600,
-    //   2,
-    //   () => me._tryCompleteOrder(),
-    //   null,
-    //   null,
-    //   me
-    // );
-
-    me._buttons[Enums.Button.SelectTransportWalk] = new Button(
-      150,
-      550,
+    me._buttons[Enums.Transport.Walk] = new Button(
+      90,
+      580,
       0,
       () => me._trySelectTransport(Enums.Transport.Walk),
-      null,
-      null,
       me
     );
 
-    me._buttons[Enums.Button.SelectTransportScooter] = new Button(
-      150,
-      650,
-      1,
-      () => me._trySelectTransport(Enums.Transport.Scooter),
-      null,
-      null,
-      me
-    );
-
-    me._buttons[Enums.Button.SelectTransportScooter] = new Button(
-      150,
-      750,
+    me._buttons[Enums.Transport.Skate] = new Button(
+      210,
+      580,
       2,
-      () => me._trySelectTransport(Enums.Transport.Car),
-      null,
-      null,
+      () => me._trySelectTransport(Enums.Transport.Skate),
       me
+    );
+
+    me._buttons[Enums.Transport.Car] = new Button(
+      90,
+      705,
+      4,
+      () => me._trySelectTransport(Enums.Transport.Car),
+      me
+    );
+
+    me._buttons[Enums.Transport.Rocket] = new Button(
+      210,
+      705,
+      6,
+      () => me._trySelectTransport(Enums.Transport.Rocket),
+      me
+    );
+
+    me._buttons[me._currentTransportIndex]._image.setFrame(
+      me._currentTransportIndex * 2 + 1
     );
   }
 
@@ -323,6 +320,14 @@ export default class Game {
 
   _trySelectTransport(trasnportIndex) {
     const me = this;
+    if (me._currentTransportIndex === trasnportIndex) return;
+
     me._currentTransportIndex = trasnportIndex;
+    for (let i = 0; i < me._buttons.length; ++i)
+      me._buttons[i]._image.setFrame(i * 2);
+
+    me._buttons[me._currentTransportIndex]._image.setFrame(
+      me._currentTransportIndex * 2 + 1
+    );
   }
 }

@@ -5,15 +5,6 @@ export default class Button {
   /** @type {Phaser.GameObjects.Image} */
   _image;
 
-  /** @type {Boolean} */
-  _isPressed = false;
-
-  /** @type {Function} */
-  _onPress;
-
-  /** @type {Object} */
-  _context;
-
   /**
    * @param {Number} x
    * @param {Number} y
@@ -23,11 +14,8 @@ export default class Button {
    * @param {Function} onCancel
    * @param {Object} context
    */
-  constructor(x, y, frame, onClick, onPress, onCancel, context) {
+  constructor(x, y, frame, onClick, context) {
     const me = this;
-
-    me._onPress = onPress;
-    me._context = context;
 
     me._image = Here._.add
       .image(x, y, "buttons", frame)
@@ -47,10 +35,7 @@ export default class Button {
       "pointerout",
       (p) => {
         me._image.setScale(1);
-        me._isPressed = false;
         me._image.clearTint();
-
-        if (!!onCancel) onCancel.call(context);
       },
       me
     );
@@ -58,10 +43,8 @@ export default class Button {
     me._image.on(
       "pointerdown",
       (p) => {
-        me._isPressed = true;
-        me._image.setTint(0xff0000);
-
         if (!!onClick) onClick.call(context);
+        me._image.setTint(0xffff00);
       },
       me
     );
@@ -71,24 +54,8 @@ export default class Button {
       (p) => {
         me._isPressed = false;
         me._image.clearTint();
-
-        if (!!onCancel) onCancel.call(context);
       },
       me
     );
-  }
-
-  update() {
-    const me = this;
-
-    if (me._isPressed && !!me._onPress) {
-      me._onPress.call(me._context);
-    }
-  }
-
-  isPressed() {
-    const me = this;
-
-    return me._isPressed;
   }
 }

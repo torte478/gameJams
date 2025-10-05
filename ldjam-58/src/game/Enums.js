@@ -8,13 +8,7 @@ export default class Enums {
 
   static Transport = {
     Walk: 0,
-    Scooter: 1,
-    Car: 2,
-  };
-
-  static Button = {
-    Walk: 0,
-    Scooter: 1,
+    Skate: 1,
     Car: 2,
     Rocket: 3,
   };
