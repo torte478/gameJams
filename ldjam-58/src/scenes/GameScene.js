@@ -38,6 +38,7 @@ export default class GameScene extends HereScene {
     Utils.loadImage("wall");
     Utils.loadImage("table");
     Utils.loadImage("panel");
+    Utils.loadImage("speedometer");
 
     me.load.script(
       "webfont",
@@ -55,7 +56,7 @@ export default class GameScene extends HereScene {
 
       WebFont.load({
         google: {
-          families: ["Archivo Black"],
+          families: ["Archivo Black", "Pixelify Sans"],
         },
         active: function () {
           me._game = new Game();

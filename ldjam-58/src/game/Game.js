@@ -63,6 +63,12 @@ export default class Game {
   /** @type {Number} */
   _completedOrderCount = 1; //8031810175;
 
+  /** @type {Phaser.GameObjects.Image} */
+  _speedometer;
+
+  /** @type {Phaser.GameObjects.Text[]} */
+  _speedometerText = [];
+
   // color red: #C61831
 
   constructor() {
@@ -91,7 +97,7 @@ export default class Game {
 
     me._isOnMarketZone = Config.Positions.Start < Config.Positions.Hole;
     me._gnome = Here._.add
-      .sprite(Config.Positions.Start, 400, "gnome")
+      .sprite(Config.Positions.Start, 395, "gnome")
       .play("gnome_idle");
     me._scrollX = Config.Positions.Start - 500;
 
@@ -116,12 +122,34 @@ export default class Game {
       .setDepth(Consts.Depth.Button);
     me._updateMainText();
 
+    me._speedometer = Here._.add
+      .image(500, 650, "speedometer")
+      .setScrollFactor(0)
+      .setDepth(Consts.Depth.Panel + 10);
+
+    for (let i = 0; i < 7; ++i) me._createSpeedometerText(345 + 52 * i);
+
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
         .text(10, 10, "", { fontSize: 18, backgroundColor: "#000" })
         .setScrollFactor(0)
         .setDepth(Consts.Depth.Max);
     });
+  }
+
+  _createSpeedometerText(x) {
+    const me = this;
+
+    const text = Here._.add
+      .text(x, 732, "D", {
+        fontSize: 55,
+        color: "#011121",
+        fontFamily: "Pixelify Sans",
+      })
+      .setScrollFactor(0)
+      .setOrigin(0.5, 0.5)
+      .setDepth(Consts.Depth.Button);
+    me._speedometerText.push(text);
   }
 
   update(time, deltaTime) {
@@ -134,16 +162,17 @@ export default class Game {
       Here._.scene.restart({ isRestart: true });
 
     me._gameLoop(deltaTime);
+    const currentShelf = ((me._scrollX + 100) / 200 + 2) | 0;
+    const currentShelfStr = Utils.intToBase26(currentShelf);
+    for (let i = 0; i < currentShelfStr.length; ++i)
+      me._speedometerText[i].setText(currentShelfStr[i]);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
 
-      const todoCurrentIndex = ((me._scrollX + 100) / 200 + 2) | 0;
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `pos: ${Utils.intToBase26(todoCurrentIndex)} || ${
-          me._scrollX | 0
-        } || \n` +
+        `pos: ${currentShelfStr} || ${me._scrollX | 0} || \n` +
         `acc: ${
           (me._transports[me._currentTransportIndex]._accelerationProgress *
             100) |
