@@ -105,6 +105,8 @@ export default class Game {
   /** @type {Number} */
   _orderIterator = 0;
 
+  _lastOrderScroll = 0;
+
   // color red: #C61831
 
   constructor() {
@@ -586,6 +588,12 @@ export default class Game {
       const originX = me._gnome.x;
 
       me._trySelectTransport(Enums.Transport.Walk);
+
+      if (velocityX < -10) {
+        me._crushToWall();
+        return;
+      }
+
       me._buttons[Enums.Transport.Skate].setEnable(false);
       me._buttons[Enums.Transport.Car].setEnable(false);
       me._buttons[Enums.Transport.Rocket].setEnable(false);
@@ -611,6 +619,32 @@ export default class Game {
         me
       );
     }
+  }
+
+  _crushToWall() {
+    const me = this;
+
+    me._isBusy = true;
+    me._runWallExplode();
+
+    me._stopMoveSound();
+
+    const originalPos = Utils.toPoint(me._gnome);
+    me._gnome.setFlipX(false).setPosition(-350, 300).play("gnome_death_wall");
+
+    const delay = 1000; //me._getDelay(1000);
+    Here._.time.delayedCall(
+      delay,
+      () => {
+        me._scrollX = me._lastOrderScroll;
+        me._playIdleAnimation();
+        me._gnome.setPosition(500, originalPos.y);
+        me._collection.updatePos(me._scrollX);
+
+        me._isBusy = false;
+      },
+      me
+    );
   }
 
   _initButtons() {
@@ -672,6 +706,8 @@ export default class Game {
 
     me._completedOrderCount += 1;
     me._updateMainText();
+
+    me._lastOrderScroll = Math.max(0, me._scrollX);
 
     if (me._act > 0) me._spawnNpc();
 

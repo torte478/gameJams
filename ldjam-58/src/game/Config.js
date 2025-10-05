@@ -21,7 +21,7 @@ export default class Config {
   static Orders = [
     [5], // 0
     [2, 1, 6], // 1
-    [1, 1, 1], // 3
+    [10, 1, 1], // 3
     // 4
   ];
 }
