@@ -13,6 +13,8 @@ export default class Animation {
     Animation._internalInit("gnome", "nothing", [13], 1, 0);
 
     Animation._internalInit("car", "ride", [0, 1], 16, -1);
+
+    Animation._internalInit("old", "walk", [0, 1], 12, -1);
   }
 
   static _getFrames(texture, frames) {

@@ -119,6 +119,12 @@ export default class Game {
   /** @type {Boolean} */
   _isFadeInProcess = false;
 
+  /** @type {Phaser.GameObjects.Sprite} */
+  _old;
+
+  /** @type {Boolean} */
+  _isOldMoving = false;
+
   // color red: #C61831
 
   constructor() {
@@ -254,6 +260,27 @@ export default class Game {
       Here._.scene.restart({ isRestart: true });
     }
 
+    if (me._isOldMoving) {
+      if (Here.Controls.isPressing(Enums.Keyboard.RIGHT)) {
+        let speed =
+          me._old.x < 300
+            ? 100
+            : me._old.x < 500
+            ? 75
+            : me._old.x < 700
+            ? 50
+            : 25;
+        if (Utils.isDebug(Config.Debug.Delays)) speed = 200;
+
+        const shift = speed * (deltaTime / 1000);
+        me._old.setPosition(me._old.x + shift, me._old.y);
+
+        if (me._old.x >= 800) {
+          me._gameOverOverOver();
+        }
+      }
+    }
+
     me._gameLoop(deltaTime);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
@@ -282,7 +309,7 @@ export default class Game {
     if (me._isBusy) return;
 
     //7361643
-    const gameOverLimit = Utils.isDebug(Config.Debug.Global)
+    const gameOverLimit = Utils.isDebug(Config.Debug.GameOver)
       ? Config.Debug.GameOverLimit
       : 7361643;
 
@@ -538,6 +565,8 @@ export default class Game {
 
   _checkGobletAnimation() {
     const me = this;
+
+    if (me._act === 4) return;
 
     if (me._order === null) return;
 
@@ -1033,7 +1062,7 @@ export default class Game {
       targets: me._fade,
       alpha: { from: 0, to: 1 },
       ease: "sine.in",
-      duration: me._getDelay(3000),
+      duration: me._getDelay(5000),
       onComplete: () => {
         // ========
         me._isBusy = true;
@@ -1055,11 +1084,43 @@ export default class Game {
 
         me._gnome.setPosition(500, me._gnome.y).setVisible(false);
 
-        Here.Audio.play("epic", { volume: 0.7 });
+        Here.Audio.play("epic", { volume: 0.7, loop: true });
 
-        me._fade.setVisible(false); // TODO
+        me._old = Here._.add
+          .sprite(0, me._gnome.y, "old", 0)
+          .play("old_walk")
+          .setOrigin(0.9, 0.5);
+
+        Here._.tweens.add({
+          targets: me._old,
+          x: 100,
+          duration: me._getDelay(4500),
+          onComplete: () => {
+            me._isOldMoving = true;
+          },
+        });
+
+        Here._.tweens.add({
+          targets: me._fade,
+          alpha: { from: 1, to: 0 },
+          ease: "sine.in",
+          duration: me._getDelay(5000),
+        });
         // ==========
       },
+    });
+  }
+
+  _gameOverOverOver() {
+    const me = this;
+
+    me._isOldMoving = false;
+    me._old.stop().setFrame(2);
+    Here.Audio.stopAll();
+    // play death
+    Here._.time.delayedCall(2000, () => {
+      Here.Audio.play("final", { loop: true });
+      me._mainText.setText("Thank you for playing!");
     });
   }
 }
