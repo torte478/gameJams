@@ -55,6 +55,7 @@ export default class Collection {
     );
 
     const success = currentShelfIndex === orderIndex;
+
     if (success) {
       me._collectedIndexes.add(currentShelfIndex);
       /** @type {Shelf} */
@@ -66,5 +67,17 @@ export default class Collection {
     }
 
     return success;
+  }
+
+  isCurrentShelfCorrectForOrderIFE(scroll, orderIndex) {
+    const me = this;
+
+    if (orderIndex === null) throw "order index is null";
+
+    const currentShelfIndex = Math.floor(
+      (scroll + Consts.Viewport.Width / 2) / Consts.Shelf.Width
+    );
+
+    return currentShelfIndex === orderIndex;
   }
 }

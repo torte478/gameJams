@@ -5,12 +5,13 @@ export default class Config {
     ShowSceneLog: true,
     PlaySound: true,
     Random: false,
+    Order: 2,
   };
 
   static TakeOrderPosition = -1450;
 
   static Positions = {
-    Start: -700, //0,
+    Start: 0, //-700, //0,
     Hole: -510,
     NpcSpawn: -1400,
   };

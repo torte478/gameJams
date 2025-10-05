@@ -45,6 +45,15 @@ export default class Game {
   /** @type {Phaser.GameObjects.Image} */
   _npc;
 
+  /** @type {Phaser.GameObjects.Container} */
+  _gobletContainer;
+
+  /** @type {Phaser.GameObjects.Text} */
+  _gobletText;
+
+  /** @type {Phaser.Tweens.Tween} */
+  _gobletTween;
+
   // color red: #C61831
 
   constructor() {
@@ -58,7 +67,7 @@ export default class Game {
     me._collection = new Collection();
 
     me._transports = Utils.buildArray(4, null);
-    me._transports[Enums.Transport.Walk] = new Transport(1, 0.01, 0.01);
+    me._transports[Enums.Transport.Walk] = new Transport(2, 0.01, 0.01); // 1 ?
     me._transports[Enums.Transport.Skate] = new Transport(10, 1, 3);
     me._transports[Enums.Transport.Car] = new Transport(1000, 4, 5);
     me._transports[Enums.Transport.Rocket] = new Transport(1000, 4, 5);
@@ -85,7 +94,7 @@ export default class Game {
       .image(Config.Positions.NpcSpawn, 360, "npc", 0)
       .setDepth(Consts.Depth.Table - 100);
 
-    //Here._.add.image(850, 600, "order");
+    me._initGoblet();
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -136,6 +145,68 @@ export default class Game {
     me._tryTakeOrder();
   }
 
+  _initGoblet() {
+    const me = this;
+
+    const gobletImage = Here._.add.image(0, 0, "goblet");
+    me._gobletText = Here._.add
+      .text(33, 78, "TEST", {
+        fontSize: 28,
+        color: "#000000",
+        fontStyle: "bold",
+        fontFamily: "Pixelify Sans",
+      })
+      .setOrigin(0.5, 0.5)
+      .setAngle(8);
+
+    me._gobletContainer = Here._.add
+      .container(855, 645, [gobletImage, me._gobletText])
+      .setDepth(Consts.Depth.Button)
+      .setScrollFactor(0)
+      .setSize(300, 300)
+      .setInteractive();
+
+    me._gobletContainer.on(
+      "pointerover",
+      (p) => {
+        me._gobletContainer.setScale(1.1);
+      },
+      me
+    );
+
+    me._gobletContainer.on(
+      "pointerout",
+      (p) => {
+        me._gobletContainer.setScale(1);
+      },
+      me
+    );
+
+    me._gobletContainer.on("pointerdown", (p) => me._tryCompleteOrder(), me);
+
+    me._gobletContainer.setVisible(me._order !== null);
+    if (Utils.isDebug(Config.Debug.Global)) {
+      me._order = Config.Debug.Order;
+      me._setOrderToGoblet();
+    }
+
+    me._gobletTween = Here._.tweens.add({
+      targets: me._gobletContainer,
+      angle: { from: -10, to: 10 },
+      duration: 250,
+      yoyo: true,
+      repeat: -1,
+    });
+    me._pauseGobletTween();
+  }
+
+  _pauseGobletTween() {
+    const me = this;
+
+    me._gobletTween.pause();
+    me._gobletContainer.setAngle(0);
+  }
+
   _updateMovement(deltaTime) {
     const me = this;
 
@@ -157,6 +228,15 @@ export default class Game {
       }
     } else {
       me._gnome.play("gnome_idle", true);
+    }
+
+    const isOrder =
+      me._order !== null &&
+      me._collection.isCurrentShelfCorrectForOrderIFE(me._scrollX, me._order);
+    if (isOrder && me._gobletTween.paused) {
+      me._gobletTween.play();
+    } else if (!isOrder && !me._gobletTween.paused) {
+      me._pauseGobletTween();
     }
   }
 
@@ -185,17 +265,25 @@ export default class Game {
             me._npc.setFlipX(true);
 
             me._isBusy = false;
-            me._createNewOrder();
+            me._createNewRandomOrder();
           },
         });
       },
     });
   }
 
-  _createNewOrder() {
+  _createNewRandomOrder() {
     const me = this;
 
     me._order = Utils.getRandom(0, 10);
+    me._setOrderToGoblet();
+  }
+
+  _setOrderToGoblet() {
+    const me = this;
+
+    me._gobletText.setText(Utils.intToBase26(me._order));
+    me._gobletContainer.setVisible(true);
   }
 
   _checkHole(velocityX) {
@@ -315,6 +403,7 @@ export default class Game {
     const success = me._collection.tryCompleteOrder(me._scrollX, me._order);
     if (success) {
       me._order = null;
+      me._gobletContainer.setVisible(false);
     }
   }
 

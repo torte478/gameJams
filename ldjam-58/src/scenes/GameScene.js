@@ -33,7 +33,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("buttons", 100, 100);
     Utils.loadSpriteSheet("npc", 200, 200);
 
-    Utils.loadImage("order");
+    Utils.loadImage("goblet");
     Utils.loadImage("background");
     Utils.loadImage("wall");
     Utils.loadImage("table");
