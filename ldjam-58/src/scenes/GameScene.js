@@ -32,6 +32,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("shelf", 200, 400);
     Utils.loadSpriteSheet("buttons", 100, 100);
     Utils.loadSpriteSheet("npc", 200, 200);
+    Utils.loadSpriteSheet("particles", 25);
 
     Utils.loadImage("goblet");
     Utils.loadImage("background");
@@ -41,6 +42,14 @@ export default class GameScene extends HereScene {
     Utils.loadImage("speedometer");
     Utils.loadImage("arrow");
     Utils.loadImage("cover");
+    Utils.loadImage("collectable");
+
+    Utils.loadImage("act1");
+
+    Utils.loadWav("explosion");
+    Utils.loadWav("coin");
+
+    Utils.loadMp3("walk");
 
     me.load.script(
       "webfont",

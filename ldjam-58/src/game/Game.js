@@ -61,7 +61,7 @@ export default class Game {
   _mainTextPattern = "of 8,031,810,176";
 
   /** @type {Number} */
-  _completedOrderCount = 1; //8031810175;
+  _completedOrderCount = 0; //8031810175;
 
   /** @type {Phaser.GameObjects.Image} */
   _speedometer;
@@ -84,10 +84,50 @@ export default class Game {
   /** @type {Phaser.GameObjects.Image} */
   _cover;
 
+  /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+  _wallExplosionParticles;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _collectable;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _act1Title;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _act2Title;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _act3Title;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _act4Title;
+
   // color red: #C61831
 
   constructor() {
     const me = this;
+
+    me._wallExplosionParticles = Here._.add
+      .particles(0, 0, "particles", {
+        frame: [0, 1, 2, 3],
+        speed: { min: 300, max: 500 },
+        scale: { start: 0.8, end: 0 },
+        gravityY: 300,
+        //blendMode: "ADD",
+        emitting: false,
+      })
+      .setDepth(Consts.Depth.Button);
+
+    me._collectable = Here._.add
+      .image(300, 480, "collectable")
+      .setDepth(Consts.Depth.Button)
+      .setAngle(90)
+      .setVisible(false);
+
+    me._act1Title = me._createActTitle("act1");
+    // me._act2Title = me._createActTitle("act2");
+    // me._act3Title = me._createActTitle("act3");
+    // me._act4Title = me._createActTitle("act4");
 
     me._camera = Here._.cameras.main;
     me._camera.setBounds(-1200, 0, 4000, 800).setBackgroundColor("#011427");
@@ -97,7 +137,7 @@ export default class Game {
     me._collection = new Collection();
 
     me._transports = Utils.buildArray(4, null);
-    me._transports[Enums.Transport.Walk] = new Transport(2, 0.01, 0.01); // 1 ?
+    me._transports[Enums.Transport.Walk] = new Transport(1, 0.01, 0.01); // 1 ?
     me._transports[Enums.Transport.Skate] = new Transport(10, 1, 3);
     me._transports[Enums.Transport.Car] = new Transport(1000, 4, 5);
     me._transports[Enums.Transport.Rocket] = new Transport(1000, 4, 5);
@@ -207,6 +247,17 @@ export default class Game {
     me._updateMovement(deltaTime);
     me._updateSpeedometer();
     me._tryTakeOrder();
+    me._updateActThings();
+  }
+
+  _createActTitle(texture) {
+    const me = this;
+
+    return Here._.add
+      .image(500, 400, texture)
+      .setScrollFactor(0)
+      .setDepth(Consts.Depth.Max)
+      .setVisible(false);
   }
 
   _updateMainText() {
@@ -291,10 +342,6 @@ export default class Game {
     me._gobletContainer.on("pointerdown", (p) => me._tryCompleteOrder(), me);
 
     me._gobletContainer.setVisible(me._order !== null);
-    if (Utils.isDebug(Config.Debug.Global)) {
-      me._order = Config.Debug.Order;
-      me._setOrderToGoblet();
-    }
 
     me._gobletTween = Here._.tweens.add({
       targets: me._gobletContainer,
@@ -320,6 +367,7 @@ export default class Game {
     let velocityX = transport.getVelocity(deltaTime);
 
     if (velocityX !== 0) {
+      Here.Audio.playIfNotPlaying("walk", { loop: true });
       me._scrollX = Math.max(me._scrollX + velocityX, Config.TakeOrderPosition);
 
       me._gnome.setFlipX(velocityX < 0);
@@ -334,6 +382,7 @@ export default class Game {
       }
     } else {
       me._gnome.play("gnome_idle", true);
+      Here.Audio.stop("walk");
     }
 
     me._checkGobletAnimation();
@@ -401,6 +450,8 @@ export default class Game {
 
     me._gobletText.setText(Utils.intToBase26(me._order));
     me._gobletContainer.setVisible(true);
+
+    Here.Audio.play("coin");
   }
 
   _checkHole(velocityX) {
@@ -414,6 +465,7 @@ export default class Game {
       me._isOnMarketZone
     ) {
       me._isBusy = true;
+      Here.Audio.stop("walk");
       const originX = me._gnome.x;
       me._gnome
         .setPosition(Config.Positions.Hole - 25, me._gnome.y - 50)
@@ -526,6 +578,8 @@ export default class Game {
 
     me._completedOrderCount += 1;
     me._updateMainText();
+
+    me._checkActActionOnCompleteOrder();
   }
 
   _trySelectTransport(trasnportIndex) {
@@ -551,12 +605,55 @@ export default class Game {
       me._speedometerText[i].setVisible(false);
   }
 
+  _runWallExplode() {
+    const me = this;
+
+    me._wallExplosionParticles.explode(200, -510, 300);
+    Here._.cameras.main.shake(200);
+    Here.Audio.play("explosion");
+  }
+
+  _updateActThings() {
+    const me = this;
+
+    if (me._act === 0) {
+      if (me._collectable.visible && me._gnome.x >= me._collectable.x - 40) {
+        me._collectable.setVisible(false);
+
+        me._order = 5;
+        me._setOrderToGoblet();
+        me._mainText.setText("Find the right place");
+      }
+    }
+  }
+
+  _checkActActionOnCompleteOrder() {
+    const me = this;
+
+    if (me._isBusy) return;
+
+    if (me._act === 0) {
+      me._isBusy = true;
+      me._gnome.play("gnome_wonder");
+
+      Here._.time.delayedCall(
+        3000,
+        () => {
+          me._act = 1;
+          me._initAct();
+        },
+        me
+      );
+      return;
+    }
+  }
+
   _initAct() {
     const me = this;
 
     me._isBusy = true;
 
-    me._scrollX = -1450;
+    me._scrollX = -1300;
     me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
     me._isOnMarketZone = true;
 
@@ -578,6 +675,7 @@ export default class Game {
       me._cover.setVisible(true);
 
       me._gnome.play("gnome_sleep");
+      me._collectable.setVisible(true);
 
       Here._.input.on(
         "pointerdown",
@@ -587,11 +685,36 @@ export default class Game {
           me._cover.setVisible(false);
           me._isBusy = false;
           me._mainText.setText("Use A/D to move");
+
+          me._runWallExplode();
         },
         me
       );
 
-      return;
+      return; // ==== 0 =====
+    }
+
+    // ==== 1 =====
+    if (me._act === 1) {
+      me._setSpeedometerVisible(false);
+      me._panel.setVisible(true);
+      me._table.setVisible(true);
+
+      me._buttons[0].setVisible(true).setEnable(true);
+      for (let i = 1; i < me._buttons.length; ++i)
+        me._buttons[i].setVisible(true).setEnable(false);
+
+      me._act1Title.setVisible(true);
+      Here._.time.delayedCall(
+        3000,
+        () => {
+          me._act1Title.setVisible(false);
+          me._isBusy = false;
+        },
+        me
+      );
+
+      return; // ==== 1 =====
     }
 
     throw `unexpected act ${me._act}`;
