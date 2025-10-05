@@ -127,7 +127,7 @@ export default class Game {
       .setVisible(false);
 
     me._act1Title = me._createActTitle("act1");
-    // me._act2Title = me._createActTitle("act2");
+    me._act2Title = me._createActTitle("act2");
     // me._act3Title = me._createActTitle("act3");
     // me._act4Title = me._createActTitle("act4");
 
@@ -497,6 +497,10 @@ export default class Game {
           me._isBusy = false;
           me._isOnMarketZone = false;
 
+          me._buttons[Enums.Transport.Skate].setEnable(me._act >= 2);
+          me._buttons[Enums.Transport.Car].setEnable(me._act >= 3);
+          me._buttons[Enums.Transport.Rocket].setEnable(me._act >= 4);
+
           if (me._act > 0)
             Here.Audio.playIfNotPlaying("main", { volume: 0.25, loop: true });
         },
@@ -514,6 +518,11 @@ export default class Game {
       me._isBusy = true;
       me._stopWalkSound();
       const originX = me._gnome.x;
+
+      me._trySelectTransport(Enums.Transport.Walk);
+      me._buttons[Enums.Transport.Skate].setEnable(false);
+      me._buttons[Enums.Transport.Car].setEnable(false);
+      me._buttons[Enums.Transport.Rocket].setEnable(false);
 
       me._gnome
         .setPosition(Config.Positions.Hole + 50, me._gnome.y - 50)
@@ -553,7 +562,7 @@ export default class Game {
       0,
       () => me._trySelectTransport(Enums.Transport.Walk),
       me
-    );
+    ).setEnable(true);
 
     me._buttons[Enums.Transport.Skate] = new Button(
       210,
@@ -561,7 +570,7 @@ export default class Game {
       2,
       () => me._trySelectTransport(Enums.Transport.Skate),
       me
-    );
+    ).setEnable(false);
 
     me._buttons[Enums.Transport.Car] = new Button(
       90,
@@ -569,7 +578,7 @@ export default class Game {
       4,
       () => me._trySelectTransport(Enums.Transport.Car),
       me
-    );
+    ).setEnable(false);
 
     me._buttons[Enums.Transport.Rocket] = new Button(
       210,
@@ -577,7 +586,7 @@ export default class Game {
       6,
       () => me._trySelectTransport(Enums.Transport.Rocket),
       me
-    );
+    ).setEnable(false);
 
     me._buttons[me._currentTransportIndex]._image.setFrame(
       me._currentTransportIndex * 2 + 1
@@ -697,6 +706,7 @@ export default class Game {
     me._isOnMarketZone = true;
 
     me._collection.updatePos(0);
+    me._trySelectTransport(Enums.Transport.Walk);
 
     // order
     me._order = null;
@@ -762,6 +772,26 @@ export default class Game {
       );
 
       return; // ==== 1 =====
+    }
+
+    // ==== 2 =====
+    if (me._act === 2) {
+      me._setSpeedometerVisible(false);
+
+      // show title screen
+      me._act2Title.setVisible(true);
+      const duration = Utils.isDebug(Config.Debug.Delays) ? 10 : 1000;
+      Here._.time.delayedCall(
+        duration,
+        () => {
+          // end title
+          me._act2Title.setVisible(false);
+          me._isBusy = false;
+        },
+        me
+      );
+
+      return; // ==== 2 =====
     }
 
     throw `unexpected act ${me._act}`;

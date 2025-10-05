@@ -45,6 +45,7 @@ export default class GameScene extends HereScene {
     Utils.loadImage("collectable");
 
     Utils.loadImage("act1");
+    Utils.loadImage("act2");
 
     Utils.loadWav("explosion");
     Utils.loadWav("coin");

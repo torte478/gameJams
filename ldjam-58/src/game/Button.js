@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 import Consts from "./Consts.js";
 
 export default class Button {
@@ -29,6 +30,7 @@ export default class Button {
       "pointerover",
       (p) => {
         if (!me._isEnabled) return;
+        if (Number(me._image.frame.name) % 2 == 1) return;
 
         me._image.setScale(1.25);
       },
@@ -50,6 +52,7 @@ export default class Button {
       "pointerdown",
       (p) => {
         if (!me._isEnabled) return;
+        if (Number(me._image.frame.name) % 2 == 1) return;
 
         if (!!onClick) onClick.call(context);
         me._image.setTint(0xffff00);

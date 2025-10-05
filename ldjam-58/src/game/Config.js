@@ -5,9 +5,8 @@ export default class Config {
     ShowSceneLog: true,
     IgnoreSound: false,
     Random: false,
-    Delays: true,
-    Order: 1,
-    StartAct: 1,
+    Delays: false,
+    StartAct: 2,
     WalkSpeed: 3,
   };
 
@@ -22,6 +21,7 @@ export default class Config {
   static Orders = [
     [5], // 0
     [2, 1, 6], // 1
-    // 3
+    [1, 1, 1], // 3
+    // 4
   ];
 }
