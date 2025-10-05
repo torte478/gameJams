@@ -72,6 +72,18 @@ export default class Game {
   /** @type {Phaser.GameObjects.Image} */
   _speedometerArrow;
 
+  /** @type {Phaser.GameObjects.Image} */
+  _panel;
+
+  /** @type {Number} */
+  _act;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _table;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _cover;
+
   // color red: #C61831
 
   constructor() {
@@ -96,7 +108,9 @@ export default class Game {
       .setPosition(-1200, 100)
       .setDepth(Consts.Depth.Background);
 
-    Here._.add.image(-950, 400, "table").setDepth(Consts.Depth.Table);
+    me._table = Here._.add
+      .image(-950, 400, "table")
+      .setDepth(Consts.Depth.Table);
 
     me._isOnMarketZone = Config.Positions.Start < Config.Positions.Hole;
     me._gnome = Here._.add
@@ -137,7 +151,14 @@ export default class Game {
       .setScrollFactor(0)
       .setDepth(Consts.Depth.Button);
 
-    // me._speedometerArrow.setAngle(145);
+    me._cover = Here._.add
+      .image(-400, 300, "cover")
+      .setDepth(Consts.Depth.Panel)
+      .setVisible(false);
+
+    // ACT INITITALIZE
+    me._act = Utils.isDebug(Config.Debug.Global) ? Config.Debug.StartAct : 0;
+    me._initAct();
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -157,13 +178,11 @@ export default class Game {
       Here._.scene.restart({ isRestart: true });
 
     me._gameLoop(deltaTime);
-    const currentShelf = ((me._scrollX + 100) / 200 + 2) | 0;
-    const currentShelfStr = Utils.intToBase26(currentShelf);
-    for (let i = 0; i < currentShelfStr.length; ++i)
-      me._speedometerText[i].setText(currentShelfStr[i]);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
+      const currentShelf = ((me._scrollX + 100) / 200 + 2) | 0;
+      const currentShelfStr = Utils.intToBase26(currentShelf);
 
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
@@ -186,7 +205,7 @@ export default class Game {
     if (me._isBusy) return;
 
     me._updateMovement(deltaTime);
-    me._updateSpeedometerArrow();
+    me._updateSpeedometer();
     me._tryTakeOrder();
   }
 
@@ -200,7 +219,7 @@ export default class Game {
     );
   }
 
-  _updateSpeedometerArrow() {
+  _updateSpeedometer() {
     const me = this;
 
     const speedFactor =
@@ -210,6 +229,11 @@ export default class Game {
       speedFactor * (Consts.ArrowAngle.Max - Consts.ArrowAngle.Min);
 
     me._speedometerArrow.setAngle(nextAngle);
+
+    const currentShelf = ((me._scrollX + 100) / 200 + 2) | 0;
+    const currentShelfStr = Utils.intToBase26(currentShelf);
+    for (let i = 0; i < currentShelfStr.length; ++i)
+      me._speedometerText[i].setText(currentShelfStr[i]);
   }
 
   _createSpeedometerText(x) {
@@ -333,6 +357,8 @@ export default class Game {
 
   _tryTakeOrder() {
     const me = this;
+    if (me._act < 1) return;
+
     if (me._order !== null || me._scrollX > Config.TakeOrderPosition + 10)
       return;
 
@@ -444,7 +470,7 @@ export default class Game {
   _initButtons() {
     const me = this;
 
-    Here._.add
+    me._panel = Here._.add
       .image(500, 650, "panel")
       .setScrollFactor(0)
       .setDepth(Consts.Depth.Panel);
@@ -513,5 +539,61 @@ export default class Game {
     me._buttons[me._currentTransportIndex]._image.setFrame(
       me._currentTransportIndex * 2 + 1
     );
+  }
+
+  _setSpeedometerVisible(visible) {
+    const me = this;
+
+    me._speedometer.setVisible(visible);
+    me._speedometerArrow.setVisible(visible);
+
+    for (let i = 0; i < me._speedometerText.length; ++i)
+      me._speedometerText[i].setVisible(false);
+  }
+
+  _initAct() {
+    const me = this;
+
+    me._isBusy = true;
+
+    me._scrollX = -1450;
+    me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
+    me._isOnMarketZone = true;
+
+    // order
+    me._order = null;
+    me._gobletContainer.setVisible(false);
+    me._pauseGobletTween();
+
+    // ==== 0 =====
+    if (me._act === 0) {
+      for (let i = 0; i < me._buttons.length; ++i)
+        me._buttons[i].setVisible(false).setEnable(false);
+
+      me._setSpeedometerVisible(false);
+      me._panel.setVisible(false);
+      me._table.setVisible(false);
+
+      me._mainText.setText("Click to start");
+      me._cover.setVisible(true);
+
+      me._gnome.play("gnome_sleep");
+
+      Here._.input.on(
+        "pointerdown",
+        (p) => {
+          if (me._act !== 0 || !me._cover.visible) return;
+
+          me._cover.setVisible(false);
+          me._isBusy = false;
+          me._mainText.setText("Use A/D to move");
+        },
+        me
+      );
+
+      return;
+    }
+
+    throw `unexpected act ${me._act}`;
   }
 }

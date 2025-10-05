@@ -40,6 +40,7 @@ export default class GameScene extends HereScene {
     Utils.loadImage("panel");
     Utils.loadImage("speedometer");
     Utils.loadImage("arrow");
+    Utils.loadImage("cover");
 
     me.load.script(
       "webfont",

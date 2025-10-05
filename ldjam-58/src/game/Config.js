@@ -6,6 +6,7 @@ export default class Config {
     PlaySound: true,
     Random: false,
     Order: 2,
+    StartAct: 0,
   };
 
   static TakeOrderPosition = -1450;
