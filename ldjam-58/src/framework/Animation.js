@@ -2,22 +2,23 @@ import Here from "./Here.js";
 
 export default class Animation {
   static init() {
-    Here._.anims.create({
-      key: "gnome_idle",
-      frames: Animation.getFrames("gnome", [0, 1]),
-      frameRate: 1.5,
-      repeat: -1,
-    });
-
-    Here._.anims.create({
-      key: "gnome_walk",
-      frames: Animation.getFrames("gnome", [2, 3]),
-      frameRate: 3,
-      repeat: -1,
-    });
+    Animation._init("gnome", "idle", [0, 1], 1.5, -1);
+    Animation._init("gnome", "walk", [2, 3], 3, -1);
   }
 
-  static getFrames(texture, frames) {
+  static _getFrames(texture, frames) {
     return Here._.anims.generateFrameNames(texture, { frames: frames });
+  }
+
+  static _init(texture, key, frames, frameRate, repeate) {
+    const animationName = `${texture}_${key}`;
+    if (Here._.anims.exists(animationName)) return;
+
+    Here._.anims.create({
+      key: animationName,
+      frames: Animation._getFrames(texture, frames),
+      frameRate: frameRate,
+      repeat: repeate,
+    });
   }
 }
