@@ -25,4 +25,9 @@ export default class Consts {
     Width: 200,
     Height: 300,
   };
+
+  static ArrowAngle = {
+    Min: -145,
+    Max: 145,
+  };
 }

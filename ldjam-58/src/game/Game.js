@@ -69,6 +69,9 @@ export default class Game {
   /** @type {Phaser.GameObjects.Text[]} */
   _speedometerText = [];
 
+  /** @type {Phaser.GameObjects.Image} */
+  _speedometerArrow;
+
   // color red: #C61831
 
   constructor() {
@@ -129,27 +132,19 @@ export default class Game {
 
     for (let i = 0; i < 7; ++i) me._createSpeedometerText(345 + 52 * i);
 
+    me._speedometerArrow = Here._.add
+      .image(500, 600, "arrow")
+      .setScrollFactor(0)
+      .setDepth(Consts.Depth.Button);
+
+    // me._speedometerArrow.setAngle(145);
+
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
         .text(10, 10, "", { fontSize: 18, backgroundColor: "#000" })
         .setScrollFactor(0)
         .setDepth(Consts.Depth.Max);
     });
-  }
-
-  _createSpeedometerText(x) {
-    const me = this;
-
-    const text = Here._.add
-      .text(x, 732, "D", {
-        fontSize: 55,
-        color: "#011121",
-        fontFamily: "Pixelify Sans",
-      })
-      .setScrollFactor(0)
-      .setOrigin(0.5, 0.5)
-      .setDepth(Consts.Depth.Button);
-    me._speedometerText.push(text);
   }
 
   update(time, deltaTime) {
@@ -191,6 +186,7 @@ export default class Game {
     if (me._isBusy) return;
 
     me._updateMovement(deltaTime);
+    me._updateSpeedometerArrow();
     me._tryTakeOrder();
   }
 
@@ -202,6 +198,33 @@ export default class Game {
         me._mainTextPattern
       }`
     );
+  }
+
+  _updateSpeedometerArrow() {
+    const me = this;
+
+    const speedFactor =
+      me._transports[me._currentTransportIndex]._accelerationProgress;
+    const nextAngle =
+      Consts.ArrowAngle.Min +
+      speedFactor * (Consts.ArrowAngle.Max - Consts.ArrowAngle.Min);
+
+    me._speedometerArrow.setAngle(nextAngle);
+  }
+
+  _createSpeedometerText(x) {
+    const me = this;
+
+    const text = Here._.add
+      .text(x, 732, "D", {
+        fontSize: 55,
+        color: "#011121",
+        fontFamily: "Pixelify Sans",
+      })
+      .setScrollFactor(0)
+      .setOrigin(0.5, 0.5)
+      .setDepth(Consts.Depth.Button);
+    me._speedometerText.push(text);
   }
 
   _initGoblet() {
