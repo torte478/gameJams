@@ -25,7 +25,7 @@ export default class Game {
   _scrollX = 0;
 
   /** @type {Number | Null} */
-  _order = null;
+  _order = 1;
 
   /** @type {Button[]} */
   _buttons = [];
@@ -35,6 +35,9 @@ export default class Game {
 
   /** @type {Number} */
   _currentTransportIndex = Enums.Transport.Walk;
+
+  /** @type {Boolean} */
+  _isOnMarketZone;
 
   // color red: #C61831
 
@@ -113,22 +116,28 @@ export default class Game {
   _gameLoop(deltaTime) {
     const me = this;
 
-    for (let i = 0; i < me._buttons.length; ++i) {
-      const button = me._buttons[i];
-      if (!!button && !!button._onPress) button.update();
-    }
+    // for (let i = 0; i < me._buttons.length; ++i) {
+    //   const button = me._buttons[i];
+    //   if (!!button && !!button._onPress) button.update();
+    // }
 
     const transport = me._transports[me._currentTransportIndex];
-    let velocityX = transport.getVelocity(me._buttons, deltaTime);
+    let velocityX = transport.getVelocity(deltaTime);
 
     if (velocityX !== 0) {
       me._scrollX += velocityX;
+
+      me._gnome.setFlipX(velocityX < 0);
+      me._gnome.play("gnome_walk", true);
+
       if (me._scrollX >= 0) {
         me._gnome.setPosition(500, me._gnome.y);
         me._collection.updatePos(me._scrollX);
       } else {
         me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
       }
+    } else {
+      me._gnome.play("gnome_idle", true);
     }
 
     // =================== new order
@@ -142,24 +151,25 @@ export default class Game {
 
     me._buttons = Utils.buildArray(10, null); // TODO
 
-    me._buttons[Enums.Button.WalkMoveLeft] = new Button(
-      400,
-      600,
-      0,
-      null,
-      null,
-      null,
-      me
-    );
-    me._buttons[Enums.Button.WalkMoveRight] = new Button(
-      500,
-      600,
-      1,
-      null,
-      null,
-      null,
-      me
-    );
+    // me._buttons[Enums.Button.WalkMoveLeft] = new Button(
+    //   400,
+    //   600,
+    //   0,
+    //   null,
+    //   null,
+    //   null,
+    //   me
+    // );
+    // me._buttons[Enums.Button.WalkMoveRight] = new Button(
+    //   500,
+    //   600,
+    //   1,
+    //   null,
+    //   null,
+    //   null,
+    //   me
+    // );
+
     me._buttons[Enums.Button.CompleteOrder] = new Button(
       700,
       600,

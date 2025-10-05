@@ -24,17 +24,16 @@ export default class Transport {
   }
 
   /**
-   * @param {Button[]} buttons
    * @param {Number} deltaTime
    * @returns {Number}
    */
-  getVelocity(buttons, deltaTime) {
+  getVelocity(deltaTime) {
     const me = this;
 
     let pressedDirection = 0;
-    if (buttons[Enums.Button.WalkMoveRight].isPressed()) {
+    if (Here.Controls.isPressing(Enums.Keyboard.RIGHT)) {
       pressedDirection = 1;
-    } else if (buttons[Enums.Button.WalkMoveLeft].isPressed()) {
+    } else if (Here.Controls.isPressing(Enums.Keyboard.LEFT)) {
       pressedDirection = -1;
     }
 
