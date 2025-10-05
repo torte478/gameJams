@@ -5,8 +5,8 @@ export default class Config {
     ShowSceneLog: true,
     IgnoreSound: false,
     Random: false,
-    Delays: true,
-    StartAct: 3,
+    Delays: false,
+    StartAct: 4,
     WalkSpeed: 1.5,
     GameOverLimit: 1000,
     GameOver: true,
@@ -24,8 +24,8 @@ export default class Config {
     // [0], //--
     [5], // 0
     [2, 1, 6], // 1
-    [50, 35, 87], // 2
-    [4586, 731, 6998], // 3 car
+    [50, 3, 87], // 2
+    [4586, 6998], // 3 car
     [8031810176 - 1], // 4
   ];
 }

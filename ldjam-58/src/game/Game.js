@@ -322,10 +322,9 @@ export default class Game {
 
     if (me._isBusy) return;
 
-    //7361643
     const gameOverLimit = Utils.isDebug(Config.Debug.GameOver)
       ? Config.Debug.GameOverLimit
-      : 7361643;
+      : 4808264;
 
     if (me._act === 4 && me._scrollX >= gameOverLimit && !me._isFadeInProcess) {
       me._runGameOver();
@@ -572,7 +571,7 @@ export default class Game {
     if (me._currentTransportIndex === Enums.Transport.Rocket)
       Here.Audio.stop("main");
 
-    Here.Audio.playIfNotPlaying(key, { loop: true });
+    Here.Audio.playIfNotPlaying(key, { loop: true, volume: 0.5 });
   }
 
   _stopMoveSound() {
@@ -605,7 +604,7 @@ export default class Game {
   _spawnNpc() {
     const me = this;
 
-    me._npc.setFlipX(false);
+    me._npc.setFlipX(false).setFrame(Utils.getRandom(0, 3));
     Here._.tweens.add({
       targets: me._npc,
       x: -1120,
@@ -912,11 +911,11 @@ export default class Game {
       me._isBusy = true;
 
       Here.Audio.stopAll();
-      Here.Audio.play("epic", { volume: 0.7 });
+      Here.Audio.play("epic", { volume: 0.5 });
       me._gnome.play("gnome_wonder");
 
       Here._.time.delayedCall(
-        me._getDelay(5000),
+        me._getDelay(5500),
         () => {
           me._act = 1;
           me._initAct();
@@ -1122,7 +1121,7 @@ export default class Game {
 
         me._gnome.setPosition(500, me._gnome.y).setVisible(false);
 
-        Here.Audio.play("epic", { volume: 0.7, loop: true });
+        Here.Audio.play("epic", { volume: 0.4, loop: true });
 
         me._old = Here._.add
           .sprite(0, me._gnome.y, "old", 0)
@@ -1161,7 +1160,7 @@ export default class Game {
     Here.Audio.play("death", { volume: 0.5 });
 
     Here._.time.delayedCall(2000, () => {
-      Here.Audio.play("final", { loop: true });
+      Here.Audio.play("final", { loop: true, volume: 0.75 });
       me._mainText.setText("Thank you for playing!");
     });
   }
