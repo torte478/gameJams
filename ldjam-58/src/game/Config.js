@@ -3,12 +3,12 @@ export default class Config {
     Global: true,
     Log: true,
     ShowSceneLog: true,
-    IgnoreSound: true,
+    IgnoreSound: false,
     Random: false,
-    TitleScreen: true,
-    Order: 2,
+    Delays: true,
+    Order: 1,
     StartAct: 1,
-    WalkSpeed: 2,
+    WalkSpeed: 3,
   };
 
   static TakeOrderPosition = -1450;
@@ -18,4 +18,10 @@ export default class Config {
     Hole: -510,
     NpcSpawn: -1400,
   };
+
+  static Orders = [
+    [5], // 0
+    [2, 1, 6], // 1
+    // 3
+  ];
 }

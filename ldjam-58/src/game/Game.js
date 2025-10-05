@@ -102,6 +102,9 @@ export default class Game {
   /** @type {Phaser.GameObjects.Image} */
   _act4Title;
 
+  /** @type {Number} */
+  _orderIterator = 0;
+
   // color red: #C61831
 
   constructor() {
@@ -119,9 +122,8 @@ export default class Game {
       .setDepth(Consts.Depth.Button);
 
     me._collectable = Here._.add
-      .image(300, 480, "collectable")
+      .image(-1030, 345, "collectable")
       .setDepth(Consts.Depth.Button)
-      .setAngle(90)
       .setVisible(false);
 
     me._act1Title = me._createActTitle("act1");
@@ -138,7 +140,7 @@ export default class Game {
 
     const walkSpeed = Utils.isDebug(Config.Debug.Global)
       ? Config.Debug.WalkSpeed
-      : 1;
+      : 1.5;
     me._transports = Utils.buildArray(4, null);
     me._transports[Enums.Transport.Walk] = new Transport(walkSpeed, 0.01, 0.01); // 1 ?
     me._transports[Enums.Transport.Skate] = new Transport(10, 1, 3);
@@ -407,6 +409,21 @@ export default class Game {
     }
   }
 
+  _spawnNpc() {
+    const me = this;
+
+    me._npc.setFlipX(false);
+    Here._.tweens.add({
+      targets: me._npc,
+      x: -1120,
+      ease: "sine.out",
+      duration: 1000,
+      onComplete: () => {
+        me._collectable.setVisible(true);
+      },
+    });
+  }
+
   _tryTakeOrder() {
     const me = this;
     if (me._act < 1) return;
@@ -414,37 +431,23 @@ export default class Game {
     if (me._order !== null || me._scrollX > Config.TakeOrderPosition + 10)
       return;
 
-    me._isBusy = true;
-    me._gnome.setFlipX(true).play("gnome_idle");
-    me._npc.setFlipX(false);
+    me._collectable.setVisible(false);
+    me._createNextOrder();
+    me._npc.setFlipX(true);
 
     Here._.tweens.add({
       targets: me._npc,
-      x: -1120,
-      ease: "sine.out",
+      x: Config.Positions.NpcSpawn,
+      ease: "sine.in",
       duration: 1000,
-      onComplete: () => {
-        Here._.tweens.add({
-          targets: me._npc,
-          x: Config.Positions.NpcSpawn,
-          ease: "sine.in",
-          duration: 1000,
-          delay: 500,
-          onStart: () => {
-            me._npc.setFlipX(true);
-
-            me._isBusy = false;
-            me._createNewRandomOrder();
-          },
-        });
-      },
     });
   }
 
-  _createNewRandomOrder() {
+  _createNextOrder() {
     const me = this;
 
-    me._order = Utils.getRandom(0, 10);
+    me._order = Config.Orders[me._act][me._orderIterator];
+    me._orderIterator += 1;
     me._setOrderToGoblet();
   }
 
@@ -454,7 +457,13 @@ export default class Game {
     me._gobletText.setText(Utils.intToBase26(me._order));
     me._gobletContainer.setVisible(true);
 
-    Here.Audio.play("coin");
+    Here.Audio.play("coin", { volume: 0.7 });
+  }
+
+  _stopWalkSound() {
+    const me = this;
+
+    Here.Audio.stop("walk");
   }
 
   _checkHole(velocityX) {
@@ -468,7 +477,8 @@ export default class Game {
       me._isOnMarketZone
     ) {
       me._isBusy = true;
-      Here.Audio.stop("walk");
+      me._stopWalkSound();
+
       const originX = me._gnome.x;
       me._gnome
         .setPosition(Config.Positions.Hole - 25, me._gnome.y - 50)
@@ -477,7 +487,7 @@ export default class Game {
         .play("gnome_walk");
 
       Here._.time.delayedCall(
-        1000,
+        Utils.isDebug(Config.Debug.Delays) ? 10 : 1000,
         () => {
           me._gnome
             .setPosition(Config.Positions.Hole + 200, me._gnome.y + 50)
@@ -486,6 +496,9 @@ export default class Game {
           me._scrollX += me._gnome.x - originX;
           me._isBusy = false;
           me._isOnMarketZone = false;
+
+          if (me._act > 0)
+            Here.Audio.playIfNotPlaying("main", { volume: 0.25, loop: true });
         },
         me
       );
@@ -499,7 +512,9 @@ export default class Game {
       !me._isOnMarketZone
     ) {
       me._isBusy = true;
+      me._stopWalkSound();
       const originX = me._gnome.x;
+
       me._gnome
         .setPosition(Config.Positions.Hole + 50, me._gnome.y - 50)
         .setFlipX(true)
@@ -507,7 +522,7 @@ export default class Game {
         .play("gnome_walk");
 
       Here._.time.delayedCall(
-        1000,
+        Utils.isDebug(Config.Debug.Delays) ? 10 : 1000,
         () => {
           me._gnome
             .setPosition(Config.Positions.Hole - 200, me._gnome.y + 50)
@@ -582,6 +597,8 @@ export default class Game {
     me._completedOrderCount += 1;
     me._updateMainText();
 
+    if (me._act > 0) me._spawnNpc();
+
     me._checkActActionOnCompleteOrder();
   }
 
@@ -621,13 +638,19 @@ export default class Game {
 
     if (me._act === 0) {
       if (me._collectable.visible && me._gnome.x >= me._collectable.x - 40) {
-        me._collectable.setVisible(false);
+        me._collectable.setVisible(false).setAngle(0).setPosition(-1030, 345);
 
-        me._order = 5;
+        me._order = Config.Orders[0][0];
         me._setOrderToGoblet();
         me._mainText.setText("Find the right place");
       }
     }
+  }
+
+  _getDelay(value) {
+    const me = this;
+
+    return Utils.isDebug(Config.Debug.Delays) ? 10 : value;
   }
 
   _checkActActionOnCompleteOrder() {
@@ -639,17 +662,27 @@ export default class Game {
       me._isBusy = true;
 
       Here.Audio.stopAll();
-      Here.Audio.play("epic", { volume: 0.8 });
+      Here.Audio.play("epic", { volume: 0.7 });
       me._gnome.play("gnome_wonder");
 
       Here._.time.delayedCall(
-        5000,
+        me._getDelay(5000),
         () => {
           me._act = 1;
           me._initAct();
         },
         me
       );
+      return;
+    }
+
+    if (me._act === 1) {
+      if (me._orderIterator < Config.Orders[me._act].length) return;
+
+      me._isBusy = true;
+      me._act = 2;
+      me._initAct();
+
       return;
     }
   }
@@ -663,8 +696,11 @@ export default class Game {
     me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
     me._isOnMarketZone = true;
 
+    me._collection.updatePos(0);
+
     // order
     me._order = null;
+    me._orderIterator = 0;
     me._gobletContainer.setVisible(false);
     me._pauseGobletTween();
 
@@ -681,7 +717,7 @@ export default class Game {
       me._cover.setVisible(true);
 
       me._gnome.play("gnome_sleep");
-      me._collectable.setVisible(true);
+      me._collectable.setVisible(true).setPosition(300, 480).setAngle(90);
 
       Here._.input.on(
         "pointerdown",
@@ -712,7 +748,7 @@ export default class Game {
 
       // show title screen
       me._act1Title.setVisible(true);
-      const duration = Utils.isDebug(Config.Debug.TitleScreen) ? 10 : 3000;
+      const duration = Utils.isDebug(Config.Debug.Delays) ? 10 : 3000;
       Here._.time.delayedCall(
         duration,
         () => {
@@ -720,6 +756,7 @@ export default class Game {
           Here.Audio.stopAll();
           me._act1Title.setVisible(false);
           me._isBusy = false;
+          Here._.time.delayedCall(1000, () => me._spawnNpc(), me);
         },
         me
       );

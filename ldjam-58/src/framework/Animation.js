@@ -4,7 +4,7 @@ import Here from "./Here.js";
 export default class Animation {
   static init() {
     Animation._init("gnome", "idle", [0, 1], 1.5, -1);
-    Animation._init("gnome", "walk", [2, 3], 3, -1);
+    Animation._init("gnome", "walk", [2, 3], 3.5, -1);
     Animation._init("gnome", "sleep", [4, 5], 1, -1);
     Animation._init("gnome", "wonder", [6, 7], 8, -1);
   }
