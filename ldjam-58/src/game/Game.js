@@ -136,8 +136,11 @@ export default class Game {
 
     me._collection = new Collection();
 
+    const walkSpeed = Utils.isDebug(Config.Debug.Global)
+      ? Config.Debug.WalkSpeed
+      : 1;
     me._transports = Utils.buildArray(4, null);
-    me._transports[Enums.Transport.Walk] = new Transport(1, 0.01, 0.01); // 1 ?
+    me._transports[Enums.Transport.Walk] = new Transport(walkSpeed, 0.01, 0.01); // 1 ?
     me._transports[Enums.Transport.Skate] = new Transport(10, 1, 3);
     me._transports[Enums.Transport.Car] = new Transport(1000, 4, 5);
     me._transports[Enums.Transport.Rocket] = new Transport(1000, 4, 5);
@@ -634,10 +637,13 @@ export default class Game {
 
     if (me._act === 0) {
       me._isBusy = true;
+
+      Here.Audio.stopAll();
+      Here.Audio.play("epic");
       me._gnome.play("gnome_wonder");
 
       Here._.time.delayedCall(
-        3000,
+        5000,
         () => {
           me._act = 1;
           me._initAct();
@@ -705,9 +711,11 @@ export default class Game {
         me._buttons[i].setVisible(true).setEnable(false);
 
       me._act1Title.setVisible(true);
+
       Here._.time.delayedCall(
         3000,
         () => {
+          Here.Audio.stopAll();
           me._act1Title.setVisible(false);
           me._isBusy = false;
         },

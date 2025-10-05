@@ -7,6 +7,7 @@ export default class Config {
     Random: false,
     Order: 2,
     StartAct: 0,
+    WalkSpeed: 2,
   };
 
   static TakeOrderPosition = -1450;
