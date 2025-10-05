@@ -113,10 +113,23 @@ export default class Game {
   /** @type {Phaser.GameObjects.Image} */
   _rocket;
 
+  /** @type {Phaser.GameObjects.Image} */
+  _fade;
+
+  /** @type {Boolean} */
+  _isFadeInProcess = false;
+
   // color red: #C61831
 
   constructor() {
     const me = this;
+
+    me._fade = Here._.add
+      .image(0, 0, "fade")
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setDepth(Consts.Depth.Max)
+      .setAlpha(0);
 
     me._car = Here._.add
       .sprite(0, 400, "car")
@@ -160,10 +173,10 @@ export default class Game {
       ? Config.Debug.WalkSpeed
       : 1.5;
     me._transports = Utils.buildArray(4, null);
-    me._transports[Enums.Transport.Walk] = new Transport(walkSpeed, 0.01, 0.01); // 1 ?
+    me._transports[Enums.Transport.Walk] = new Transport(walkSpeed, 0.01, 0.01);
     me._transports[Enums.Transport.Skate] = new Transport(10, 1, 3);
     me._transports[Enums.Transport.Car] = new Transport(1000, 4, 5);
-    me._transports[Enums.Transport.Rocket] = new Transport(2000, 0.5, 60);
+    me._transports[Enums.Transport.Rocket] = new Transport(4000, 0.5, 120);
 
     const background = Here._.add
       .image(0, 0, "background")
@@ -250,7 +263,7 @@ export default class Game {
 
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `pos: ${currentShelfStr} || ${me._scrollX | 0} || \n` +
+        `pos: ${currentShelfStr} || ${me._scrollX | 0} || ${currentShelf} \n` +
         `acc: ${
           (me._transports[me._currentTransportIndex]._accelerationProgress *
             100) |
@@ -267,6 +280,15 @@ export default class Game {
     const me = this;
 
     if (me._isBusy) return;
+
+    //7361643
+    const gameOverLimit = Utils.isDebug(Config.Debug.Global)
+      ? Config.Debug.GameOverLimit
+      : 7361643;
+
+    if (me._act === 4 && me._scrollX >= gameOverLimit && !me._isFadeInProcess) {
+      me._runGameOver();
+    }
 
     me._updateMovement(deltaTime);
     me._updateSpeedometer();
@@ -498,6 +520,9 @@ export default class Game {
         : null;
 
     if (key === null) throw "null sound";
+
+    if (me._currentTransportIndex === Enums.Transport.Rocket)
+      Here.Audio.stop("main");
 
     Here.Audio.playIfNotPlaying(key, { loop: true });
   }
@@ -997,5 +1022,44 @@ export default class Game {
     }
 
     throw `unexpected act ${me._act}`;
+  }
+
+  _runGameOver() {
+    const me = this;
+
+    me._isFadeInProcess = true;
+
+    Here._.tweens.add({
+      targets: me._fade,
+      alpha: { from: 0, to: 1 },
+      ease: "sine.in",
+      duration: me._getDelay(3000),
+      onComplete: () => {
+        // ========
+        me._isBusy = true;
+        me._stopMoveSound();
+        me._trySelectTransport(Enums.Transport.Walk);
+
+        for (let i = 0; i < me._buttons.length; ++i)
+          me._buttons[i].setEnable(false).setVisible(false);
+        me._panel.setVisible(false);
+        me._setSpeedometerVisible(false);
+
+        for (let i = 0; i < me._collection._shelfs.length; ++i) {
+          const shelf = me._collection._shelfs[i];
+          shelf
+            .toGameObj()
+            .setPosition(0 + Consts.Shelf.Width * i, shelf.toGameObj().y);
+          shelf.init(8031810176 - 5 + i, i < 4);
+        }
+
+        me._gnome.setPosition(500, me._gnome.y).setVisible(false);
+
+        Here.Audio.play("epic", { volume: 0.7 });
+
+        me._fade.setVisible(false); // TODO
+        // ==========
+      },
+    });
   }
 }

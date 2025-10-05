@@ -45,6 +45,7 @@ export default class GameScene extends HereScene {
     Utils.loadImage("cover");
     Utils.loadImage("collectable");
     Utils.loadImage("rocket");
+    Utils.loadImage("fade");
 
     Utils.loadImage("act1");
     Utils.loadImage("act2");

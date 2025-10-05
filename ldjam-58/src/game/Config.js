@@ -8,6 +8,7 @@ export default class Config {
     Delays: true,
     StartAct: 4,
     WalkSpeed: 3,
+    GameOverLimit: 0,
   };
 
   static TakeOrderPosition = -1450;
