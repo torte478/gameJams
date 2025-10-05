@@ -83,7 +83,7 @@ export default class Button {
     const me = this;
 
     me._isEnabled = enable;
-    me._image.setAlpha(me._isEnabled ? 1 : 0.5);
+    me._image.setAlpha(me._isEnabled ? 1 : 0.25);
 
     return me;
   }

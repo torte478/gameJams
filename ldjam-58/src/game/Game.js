@@ -107,10 +107,18 @@ export default class Game {
 
   _lastOrderScroll = 0;
 
+  /** @type {Phaser.GameObjects.Sprite} */
+  _car;
+
   // color red: #C61831
 
   constructor() {
     const me = this;
+
+    me._car = Here._.add
+      .sprite(0, 400, "car")
+      .setVisible(false)
+      .setDepth(Consts.Depth.Panel);
 
     me._wallExplosionParticles = Here._.add
       .particles(0, 0, "particles", {
@@ -281,16 +289,22 @@ export default class Game {
   _updateSpeedometer() {
     const me = this;
 
-    const speedFactor =
-      me._transports[me._currentTransportIndex]._accelerationProgress;
-    const nextAngle =
-      Consts.ArrowAngle.Min +
-      speedFactor * (Consts.ArrowAngle.Max - Consts.ArrowAngle.Min);
+    if (me._currentTransportIndex != Enums.Transport.Walk) {
+      const speedFactor =
+        me._transports[me._currentTransportIndex]._accelerationProgress;
+      const nextAngle =
+        Consts.ArrowAngle.Min +
+        speedFactor * (Consts.ArrowAngle.Max - Consts.ArrowAngle.Min);
 
-    me._speedometerArrow.setAngle(nextAngle);
+      me._speedometerArrow.setAngle(nextAngle);
+    } else {
+      me._speedometerArrow.setAngle(Consts.ArrowAngle.Min);
+    }
 
     const currentShelf = ((me._scrollX + 100) / 200 + 2) | 0;
-    const currentShelfStr = Utils.intToBase26(currentShelf);
+    const currentShelfStr =
+      currentShelf >= 0 ? Utils.intToBase26(currentShelf) : "";
+
     for (let i = 0; i < currentShelfStr.length; ++i)
       me._speedometerText[i].setText(currentShelfStr[i]);
   }
@@ -299,7 +313,7 @@ export default class Game {
     const me = this;
 
     const text = Here._.add
-      .text(x, 732, "D", {
+      .text(x, 732, "A", {
         fontSize: 55,
         color: "#011121",
         fontFamily: "Pixelify Sans",
@@ -391,11 +405,17 @@ export default class Game {
         me._gnome.setPosition(500 + me._scrollX, me._gnome.y);
         me._checkHole(velocityX);
       }
+
+      me._car
+        .setPosition(me._gnome.x, me._car.y)
+        .setFlipX(me._gnome.flipX)
+        .play("car_ride", true);
     } else {
       me._playIdleAnimation();
       me._stopMoveSound();
 
       me._invalidateButtonEnable();
+      me._car.stop();
     }
 
     me._checkGobletAnimation();
@@ -424,6 +444,25 @@ export default class Game {
         ? "gnome_idle"
         : me._currentTransportIndex === Enums.Transport.Skate
         ? "gnome_skate_idle"
+        : me._currentTransportIndex === Enums.Transport.Car
+        ? "gnome_nothing"
+        : null;
+
+    if (key === null) throw "null animation";
+
+    me._gnome.play(key, true);
+  }
+
+  _playMoveAnimation() {
+    const me = this;
+
+    const key =
+      me._currentTransportIndex === Enums.Transport.Walk
+        ? "gnome_walk"
+        : me._currentTransportIndex === Enums.Transport.Skate
+        ? "gnome_skate_walk"
+        : me._currentTransportIndex === Enums.Transport.Car
+        ? "gnome_nothing"
         : null;
 
     if (key === null) throw "null animation";
@@ -439,6 +478,8 @@ export default class Game {
         ? "walk"
         : me._currentTransportIndex === Enums.Transport.Skate
         ? "skate"
+        : me._currentTransportIndex === Enums.Transport.Car
+        ? "car"
         : null;
 
     if (key === null) throw "null sound";
@@ -451,21 +492,7 @@ export default class Game {
 
     Here.Audio.stop("walk");
     Here.Audio.stop("skate");
-  }
-
-  _playMoveAnimation() {
-    const me = this;
-
-    const key =
-      me._currentTransportIndex === Enums.Transport.Walk
-        ? "gnome_walk"
-        : me._currentTransportIndex === Enums.Transport.Skate
-        ? "gnome_skate_walk"
-        : null;
-
-    if (key === null) throw "null animation";
-
-    me._gnome.play(key, true);
+    Here.Audio.stop("car");
   }
 
   _checkGobletAnimation() {
@@ -640,6 +667,10 @@ export default class Game {
         me._playIdleAnimation();
         me._gnome.setPosition(500, originalPos.y);
         me._collection.updatePos(me._scrollX, me._act);
+        me._car
+          .setPosition(me._gnome.x, me._car.y)
+          .setFlipX(me._gnome.flipX)
+          .stop();
 
         me._isBusy = false;
       },
@@ -727,6 +758,8 @@ export default class Game {
     me._buttons[me._currentTransportIndex]._image.setFrame(
       me._currentTransportIndex * 2 + 1
     );
+
+    me._car.setVisible(trasnportIndex === Enums.Transport.Car);
   }
 
   _setSpeedometerVisible(visible) {
@@ -736,7 +769,7 @@ export default class Game {
     me._speedometerArrow.setVisible(visible);
 
     for (let i = 0; i < me._speedometerText.length; ++i)
-      me._speedometerText[i].setVisible(false);
+      me._speedometerText[i].setVisible(visible);
   }
 
   _runWallExplode() {
@@ -903,11 +936,12 @@ export default class Game {
       return; // ==== 2 =====
     }
 
-    // ==== 2 =====
+    // ==== 3 =====
     if (me._act === 3) {
-      me._setSpeedometerVisible(false);
       me._completedOrderCount += 10758;
       me._updateMainText();
+      me._setSpeedometerVisible(true);
+
       // show title screen
       me._act3Title.setVisible(true);
       const duration = Utils.isDebug(Config.Debug.Delays) ? 10 : 1000;

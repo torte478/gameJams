@@ -33,6 +33,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("buttons", 100, 100);
     Utils.loadSpriteSheet("npc", 200, 200);
     Utils.loadSpriteSheet("particles", 25);
+    Utils.loadSpriteSheet("car", 500, 150);
 
     Utils.loadImage("goblet");
     Utils.loadImage("background");
@@ -55,6 +56,7 @@ export default class GameScene extends HereScene {
     Utils.loadMp3("skate");
     Utils.loadMp3("main");
     Utils.loadMp3("epic");
+    Utils.loadMp3("car");
 
     me.load.script(
       "webfont",
