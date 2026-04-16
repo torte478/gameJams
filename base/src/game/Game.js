@@ -22,7 +22,7 @@ export default class Game {
     });
   }
 
-  update() {
+  update(time, deltaTime) {
     const me = this;
 
     if (
@@ -34,7 +34,9 @@ export default class Game {
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
 
-      let text = `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n`;
+      let text =
+        `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
+        `${(time / 1000) | 0} + ${deltaTime | 1}`;
 
       me._log.setText(text);
     });

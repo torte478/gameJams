@@ -1,32 +1,31 @@
 export default class ButtonConfig {
+  /** @type {Number} */
+  x;
 
-    /** @type {Number} */
-    x;
+  /** @type {Number} */
+  y;
 
-    /** @type {Number} */
-    y;
+  /** @type {String} */
+  texture;
 
-    /** @type {String} */
-    texture;
+  /** @type {Number} */
+  frameIdle;
 
-    /** @type {Number} */
-    frameIdle;
+  /** @type {Number} */
+  frameSelected;
 
-    /** @type {Number} */
-    frameSelected;
+  /** @type {Function} */
+  callback;
 
-    /** @type {Function} */
-    callback;
+  /** @type {Object} */
+  callbackScope;
 
-    /** @type {Object} */
-    callbackScope;
+  /** @type {String} */
+  text;
 
-    /** @type {String} */
-    text;
+  /** @type {Phaser.GameObjects.TextStyle} */
+  textStyle;
 
-    /** @type {Phaser.GameObjects.TextStyle} */
-    textStyle;
-
-    /** @type {string} */
-    sound;
+  /** @type {string} */
+  sound;
 }
