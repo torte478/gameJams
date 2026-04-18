@@ -74,8 +74,6 @@ export default class Graph {
         me._onPointerUp(pointer);
       });
 
-    events.on(Enums.Events.MOUSE_ON_TOWER, me._onMouseOnTower, me);
-
     me._rebuildGraph();
   }
 
@@ -281,6 +279,32 @@ export default class Graph {
 
     if (me._isCutscene) return;
 
+    if (me._towerMenu.isOpen) {
+      me._processTowerMenuClick(pointer);
+    } else {
+      me._processRegularClick(pointer);
+    }
+  }
+
+  _processTowerMenuClick(pointer) {
+    const me = this;
+
+    const mousePos = new Phaser.Math.Vector2(pointer.x, pointer.y);
+    if (!me._towerMenu.containsPoint(mousePos)) {
+      me._towerMenu.close();
+      return;
+    }
+
+    if (pointer.rightButtonDown()) {
+      // me._tryRemoveEdge(pointer);
+    } else {
+      // me._processTowerClick(pointer);
+    }
+  }
+
+  _processRegularClick(pointer) {
+    const me = this;
+
     if (pointer.rightButtonDown()) {
       me._tryRemoveEdge(pointer);
     } else {
@@ -330,7 +354,7 @@ export default class Graph {
     const targetTower = me._getTowerOnMousePos(pointer);
     if (!!targetTower) {
       if (targetTower.id === me._selectedTower.id) {
-        targetTower.toggleMode();
+        me._openTowerMenu(targetTower);
       } else {
         me._tryAddEdge(me._selectedTower, targetTower);
       }
@@ -338,6 +362,22 @@ export default class Graph {
 
     me._selectedTower = null;
     me._lineDrawingGraphics.clear();
+  }
+
+  /**
+   * @param {Tower} tower
+   */
+  _openTowerMenu(tower) {
+    const me = this;
+
+    const towerPos = tower.getPos();
+
+    me._towerMenu
+      .toGameObj()
+      .setPosition(towerPos.x, towerPos.y)
+      .setVisible(true);
+
+    me._towerMenu.open(tower);
   }
 
   /**
@@ -494,19 +534,5 @@ export default class Graph {
     );
 
     return distance <= halfThickness;
-  }
-
-  /**
-   * @param {Tower} tower
-   */
-  _onMouseOnTower(tower) {
-    const me = this;
-
-    const towerPos = tower.getPos();
-
-    me._towerMenu
-      .toGameObj()
-      .setPosition(towerPos.x, towerPos.y - 100)
-      .setVisible(true);
   }
 }
