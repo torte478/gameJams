@@ -4,6 +4,7 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
+import Tower from "./Tower.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -12,7 +13,10 @@ export default class Game {
   constructor() {
     const me = this;
 
-    Utils.debugLog("PAST YOUR CODE HERE!");
+    for (let i = 0; i < Config.Start.Towers.length; ++i) {
+      const el = Config.Start.Towers[i];
+      new Tower(el.x, el.y, i + "");
+    }
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
