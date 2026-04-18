@@ -5,7 +5,7 @@ export default class Config {
     ShowSceneLog: true,
     PlaySound: true,
     Random: false,
-    CutsceneZoom: true,
+    CutsceneZoom: false,
   };
 
   static Start = {
@@ -21,7 +21,13 @@ export default class Config {
   };
 
   static Time = {
-    SpawnSignalPeriodMd: 1000,
+    SpawnSignalPeriodMs: 1000,
+    // Endgame sequence
+    P0_Zoom: 1000,
+    P1_WaitBeforeStartRestartAnimaion: 1000,
+    P2_1_BossAttackAndFade: 1000,
+    P2_2_AllRed: 2000,
+    P3_FadeOut: 1000,
   };
 
   static NewTowerCost = 1;

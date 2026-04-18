@@ -88,6 +88,12 @@ export default class UI {
     me._startFinalBossButton.toGameObj().setVisible(false);
   }
 
+  reset() {
+    const me = this;
+
+    me._startFinalBossButton.toGameObj().setVisible(true);
+  }
+
   _invalidateButtonsVisibility() {
     const me = this;
 

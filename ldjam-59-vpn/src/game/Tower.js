@@ -146,6 +146,19 @@ export default class Tower {
     me._sprite.play("tower_transform");
   }
 
+  reset() {
+    const me = this;
+
+    for (const signal of me._signalQueue) {
+      me._signalPool.release(signal);
+    }
+
+    me._signalQueue = [];
+    me._invalidateSignalQueueText();
+
+    me._sprite.setFrame(0);
+  }
+
   /**
    * @param {Signal} signal
    */

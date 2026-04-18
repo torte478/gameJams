@@ -11,6 +11,7 @@ export default class Consts {
   };
 
   static Depth = {
+    Fade: 10000,
     Max: 100000,
   };
 }

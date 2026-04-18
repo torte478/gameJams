@@ -84,6 +84,23 @@ export default class Graph {
     me._updateSignals(deltaTime);
   }
 
+  reset() {
+    const me = this;
+
+    me._isCutscene = false;
+
+    for (const edge of me._edges) {
+      edge.remove();
+    }
+
+    for (const tower of me._towers) {
+      tower.reset();
+    }
+
+    me._edges = [];
+    me._rebuildGraph();
+  }
+
   startFinalBossSequence() {
     const me = this;
 
@@ -288,8 +305,9 @@ export default class Graph {
     );
     me._edgeToRemove.remove();
     me._events.emit(Enums.Events.EDGE_REMOVED, me._edgeToRemove);
-    me._edgeToRemove = null;
     me._rebuildGraph();
+
+    me._edgeToRemove = null;
   }
 
   _onPointerUp(pointer) {

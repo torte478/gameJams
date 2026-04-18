@@ -30,14 +30,22 @@ export default class Game {
   /** @type {Boolean} */
   _isCutscene = false;
 
+  /** @type {Boolean} */
+  _isRestartCutscene = false;
+
   /** @type {VFX} */
   _vfx;
 
   /** @type {Boss} */
   _boss;
 
+  /** @type {Number} */
+  _currentTime;
+
   constructor() {
     const me = this;
+
+    console.log("start game init");
 
     Here._.input.mouse.disableContextMenu();
 
@@ -98,6 +106,8 @@ export default class Game {
   update(time, deltaTime) {
     const me = this;
 
+    me._currentTime = time;
+
     if (
       Here.Controls.isPressedOnce(Enums.Keyboard.RESTART) &&
       Utils.isDebug(Config.Debug.Global)
@@ -144,6 +154,8 @@ export default class Game {
   _cutsceneUpdate() {
     const me = this;
 
+    if (me._isRestartCutscene) return;
+
     const damage = me._vfx.tryShotBoss();
     me._boss.applyDamage(damage);
 
@@ -152,16 +164,50 @@ export default class Game {
     }
 
     if (me._ui._score <= 0) {
-      console.log("game over");
-      ТУТЬ;
+      me._isRestartCutscene = true;
+
+      Here._.time.delayedCall(
+        Config.Time.P1_WaitBeforeStartRestartAnimaion,
+        () => {
+          me._runGameRestartSequence();
+        },
+        me,
+      );
     }
+  }
+
+  _runGameRestartSequence() {
+    const me = this;
+
+    me._boss.runGameRestartSequence();
+
+    Here._.time.delayedCall(
+      Config.Time.P2_2_AllRed,
+      () => {
+        me._startNewGameSequence();
+      },
+      me,
+    );
+  }
+
+  _startNewGameSequence() {
+    const me = this;
+
+    me._boss.hideRedFadeWithReset();
+    me._graph.reset();
+    me._ui.reset();
+
+    Here._.cameras.main.setZoom(1);
+    me._nextSignalSpawnTime = me._currentTime + Config.Time.SpawnSignalPeriodMs;
+    me._isCutscene = false;
+    me._isRestartCutscene = false;
   }
 
   _spawnSignal() {
     const me = this;
 
     if (me._graph.trySpawnNewSignal()) {
-      me._nextSignalSpawnTime += Config.Time.SpawnSignalPeriodMd;
+      me._nextSignalSpawnTime += Config.Time.SpawnSignalPeriodMs;
     }
   }
 
@@ -173,10 +219,15 @@ export default class Game {
     me._ui.startFinalBossSequence();
     me._boss.startFinalBossSequence();
 
-    Here._.cameras.main.zoomTo(Config.CutsceneCameraZoom, 1000, "Sine", true);
+    Here._.cameras.main.zoomTo(
+      Config.CutsceneCameraZoom,
+      Config.Time.P0_Zoom,
+      "Sine",
+      true,
+    );
 
     Here._.time.delayedCall(
-      1000,
+      Config.Time.P0_Zoom,
       () => {
         me._vfx.startSpawn(me._graph._towers.map((t) => t.getPos()));
       },
