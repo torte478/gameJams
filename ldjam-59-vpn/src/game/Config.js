@@ -16,6 +16,6 @@ export default class Config {
   };
 
   static Speed = {
-    Signal: 100,
+    Signal: 400,
   };
 }

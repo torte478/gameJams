@@ -16,10 +16,14 @@ export default class SignalPool {
     return signal;
   }
 
+  /**
+   * @param {Signal} signal
+   */
   release(signal) {
     const me = this;
 
     me._pool.push(signal);
+    signal.toGameObj().setVisible(false);
   }
 
   _getOrCreateSignal() {

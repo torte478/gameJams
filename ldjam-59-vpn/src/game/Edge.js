@@ -17,17 +17,33 @@ export default class Edge {
   _isDirect = true;
 
   /** @type {Number} */
-  _lerpT = 0;
+  _distance;
 
+  /** @type {Number} */
+  _totalSignalDurationMs;
+
+  /** @type {Number} */
+  _currentSignalDurationMs;
+
+  /**
+   *
+   * @param {Tower} from
+   * @param {Tower} to
+   */
   constructor(from, to) {
     const me = this;
 
     me._from = from;
     me._to = to;
+
+    me._distance = Phaser.Math.Distance.BetweenPoints(
+      from.getPos(),
+      to.getPos(),
+    );
+    me._totalSignalDurationMs = me._distance / (Config.Speed.Signal / 1000);
   }
 
   /**
-   *
    * @param {Number} from
    * @param {Number} to
    * @returns
@@ -47,17 +63,17 @@ export default class Edge {
       return;
     }
 
-    me._lerpT += (deltaTime / 1000) * Config.Speed.Signal;
-    const signalPos = Phaser.Math.LinearXY(
-      me._getFromPos(),
-      me._getToPos(),
-      me._lerpT,
-    );
-    me._signal.toGameObj().setPosition(signalPos.x, signalPos.y);
+    const fromPos = me._getFromPos();
+    const toPos = me._getToPos();
 
-    if (me._lerpT >= 1.0) {
-      throw "Arrived!";
+    me._currentSignalDurationMs += deltaTime;
+    if (me._currentSignalDurationMs >= me._totalSignalDurationMs) {
+      return me._completeSignal();
     }
+
+    const progress = me._currentSignalDurationMs / me._totalSignalDurationMs;
+    const signalPos = Phaser.Math.LinearXY(fromPos, toPos, progress);
+    me._signal.toGameObj().setPosition(signalPos.x, signalPos.y);
   }
 
   isFree() {
@@ -82,20 +98,28 @@ export default class Edge {
 
     const fromPos = me._getFromPos();
     me._signal.toGameObj().setVisible(true).setPosition(fromPos.x, fromPos.y);
-    me._lerpT = 0;
+    me._currentSignalDurationMs = 0;
+  }
+
+  _completeSignal() {
+    const me = this;
+
+    const tower = me._isDirect ? me._to : me._from;
+    tower.addSignal(me._signal);
+    me._signal = null;
   }
 
   _getFromPos() {
     const me = this;
 
     const tower = me._isDirect ? me._from : me._to;
-    return Utils.toPoint(tower.toGameObj());
+    return tower.getPos();
   }
 
   _getToPos() {
     const me = this;
 
     const tower = !me._isDirect ? me._from : me._to;
-    return Utils.toPoint(tower.toGameObj());
+    return tower.getPos();
   }
 }

@@ -31,7 +31,7 @@ export default class Graph {
 
     for (let i = 0; i < Config.Start.Towers.length; ++i) {
       const el = Config.Start.Towers[i];
-      const tower = new Tower(i, el.x, el.y, i + "");
+      const tower = new Tower(i, el.x, el.y, i + "", me._signalPool);
       me._towers.push(tower);
     }
 

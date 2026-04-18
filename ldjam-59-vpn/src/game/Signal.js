@@ -21,7 +21,7 @@ export default class Signal {
   constructor() {
     const me = this;
 
-    me.uid == Signal._uid_counter++;
+    me.uid = Signal._uid_counter++;
 
     me._labelText = Here._.add
       .text(0, 0, "X", { fontSize: 30 })

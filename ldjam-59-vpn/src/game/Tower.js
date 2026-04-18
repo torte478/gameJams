@@ -2,6 +2,7 @@ import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Graph from "./Graph.js";
 import Signal from "./Signal.js";
+import SignalPool from "./SignalPool.js";
 
 export default class Tower {
   /** @type {Number} */
@@ -19,16 +20,20 @@ export default class Tower {
   /** @type {Phaser.GameObjects.Text} */
   _signalQueueText;
 
+  /** @type {SignalPool} */
+  _signalPool;
+
   /**
    * @param {Number} id
    * @param {Number} x
    * @param {Number} y
    * @param {String} labe
    */
-  constructor(id, x, y, label) {
+  constructor(id, x, y, label, signalPool) {
     const me = this;
 
     me.id = id;
+    me._signalPool = signalPool;
 
     me._sprite = Here._.add.sprite(0, 0, "tower", 0);
     const labelText = Here._.add.text(0, 26, label, { fontSize: 20 });
@@ -56,6 +61,12 @@ export default class Tower {
     return me._container;
   }
 
+  getPos() {
+    const me = this;
+
+    return Utils.toPoint(me._container);
+  }
+
   /**
    * @param {Phaser.Math.Vector2} pos
    * @returns {Boolean}
@@ -71,6 +82,15 @@ export default class Tower {
    */
   addSignal(signal) {
     const me = this;
+
+    if (signal.toTowerId === me.id) {
+      return me._processSignalArrived(signal);
+    }
+
+    signal
+      .toGameObj()
+      .setPosition(me._container.x, me._container.y)
+      .setVisible(false);
 
     me._signalQueue.push(signal);
     me._invalidateSignalQueueText();
@@ -102,6 +122,17 @@ export default class Tower {
       );
       me._invalidateSignalQueueText();
     }
+  }
+
+  /**
+   * @param {Signal} signal
+   */
+  _processSignalArrived(signal) {
+    const me = this;
+
+    me._signalPool.release(signal);
+
+    console.log(`${signal.toTowerId} arrived!`);
   }
 
   _invalidateSignalQueueText() {
