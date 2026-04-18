@@ -27,10 +27,11 @@ export default class GameScene extends HereScene {
 
     if (!me._isRestart) Utils.runLoadingBar();
 
-    Utils.loadImage("tower");
     Utils.loadImage("signal");
     Utils.loadImage("rkn");
+    Utils.loadImage("bullet");
 
+    Utils.loadSpriteSheet("tower", 50, 100);
     Utils.loadSpriteSheet("newTowerButton", 100);
   }
 

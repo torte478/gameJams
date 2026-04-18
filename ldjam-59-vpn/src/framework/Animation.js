@@ -2,12 +2,12 @@ import Here from "./Here.js";
 
 export default class Animation {
   static init() {
-    // scene.anims.create({
-    //     key: 'ANIM_NAME',
-    //     frames: Animation.getFrames('ASSET_NAME', [ 1, 2, 3 ]),
-    //     frameRate: 24,
-    //     repeat: -1
-    // });
+    Here._.anims.create({
+      key: "tower_transform",
+      frames: Animation.getFrames("tower", [0, 1, 2]),
+      frameRate: 1,
+      repeat: 0,
+    });
   }
 
   static getFrames(texture, frames) {

@@ -43,6 +43,7 @@ export default class Tower {
     me._events = events;
 
     me._sprite = Here._.add.sprite(0, 0, "tower", 0);
+
     const labelText = Here._.add.text(0, 26, label, { fontSize: 20 });
     me._signalQueueText = Here._.add.text(50, 0, "[]", { fontSize: 20 });
     me._container = Here._.add.container(x, y, [
@@ -137,6 +138,12 @@ export default class Tower {
     const me = this;
 
     return me._signalQueue.length < Config.MaxSignalPerTower;
+  }
+
+  startFinalBossSequence() {
+    const me = this;
+
+    me._sprite.play("tower_transform");
   }
 
   /**

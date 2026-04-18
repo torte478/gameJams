@@ -37,19 +37,29 @@ export default class Graph {
   /** @type {Edge | null} */
   _edgeToRemove = null;
 
+  /** @type {Boolean} */
+  _isCutscene = false;
+
   constructor(signalPool, events) {
     const me = this;
 
     me._signalPool = signalPool;
     me._events = events;
+    me._lineDrawingGraphics = Here._.add.graphics();
+    me._graphEdgesGraphics = Here._.add.graphics();
 
+    // =========
     for (let i = 0; i < Config.Start.TowersCount; ++i) {
       me.addNewTower();
     }
 
-    me._lineDrawingGraphics = Here._.add.graphics();
-
-    me._graphEdgesGraphics = Here._.add.graphics();
+    for (let i = 0; i < Config.Start.Edges.length; ++i) {
+      me._tryAddEdge(
+        me._towers[Config.Start.Edges[i].from],
+        me._towers[Config.Start.Edges[i].to],
+      );
+    }
+    // =======
 
     Here._.input
       .on("pointerdown", (pointer) => {
@@ -60,11 +70,6 @@ export default class Graph {
       });
 
     me._rebuildGraph();
-
-    // ==== DEBUG DEBUG
-    for (let i = 0; i < 3; ++i) {
-      me.trySpawnNewSignal();
-    }
   }
 
   update(deltaTime) {
@@ -77,6 +82,19 @@ export default class Graph {
     }
 
     me._updateSignals(deltaTime);
+  }
+
+  startFinalBossSequence() {
+    const me = this;
+
+    me._isCutscene = true;
+    for (const edge of me._edges) {
+      edge.startFinalBossSequence();
+    }
+
+    for (const tower of me._towers) {
+      tower.startFinalBossSequence();
+    }
   }
 
   trySpawnNewSignal() {
@@ -237,6 +255,8 @@ export default class Graph {
   _onPointerDown(pointer) {
     const me = this;
 
+    if (me._isCutscene) return;
+
     if (pointer.rightButtonDown()) {
       me._tryRemoveEdge(pointer);
     } else {
@@ -274,6 +294,8 @@ export default class Graph {
 
   _onPointerUp(pointer) {
     const me = this;
+
+    if (me._isCutscene) return;
 
     if (!me._selectedTower) {
       return;

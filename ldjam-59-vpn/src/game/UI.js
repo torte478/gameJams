@@ -1,6 +1,8 @@
 import Button from "../framework/Button.js";
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Graph from "./Graph.js";
 
@@ -14,11 +16,14 @@ export default class UI {
   /** @type {Phaser.Events.EventEmitter} */
   _events;
 
+  /** @type {Graph} */
+  _graph;
+
   /** @type {Button} */
   _newTowerButton;
 
-  /** @type {Graph} */
-  _graph;
+  /** @type {Button} */
+  _startFinalBossButton;
 
   constructor(events, graph) {
     const me = this;
@@ -26,9 +31,12 @@ export default class UI {
     me._events = events;
     me._graph = graph;
 
+    me._score = Utils.isDebug(Config.Debug.Global) ? Config.Start.Score : 0;
+
     me._scoreText = Here._.add
       .text(400, 50, "score: 0", { fontSize: 24 })
-      .setOrigin(0.5, 0.5);
+      .setOrigin(0.5, 0.5)
+      .setScrollFactor(0);
 
     me._newTowerButton = new Button({
       x: 100,
@@ -42,6 +50,19 @@ export default class UI {
       },
       callbackScope: me,
     });
+
+    me._startFinalBossButton = new Button({
+      x: 950,
+      y: 750,
+      texture: "newTowerButton",
+      frameIdle: 2,
+      frameSelected: 3,
+      callback: () => {
+        me._events.emit(Enums.Events.START_FINAL_BOSS_CLICK);
+      },
+      callbackScope: me,
+    });
+
     me._invalidateButtonsVisibility();
   }
 
@@ -52,6 +73,19 @@ export default class UI {
     me._scoreText.setText(`score: ${me._score}`);
 
     me._invalidateButtonsVisibility();
+  }
+
+  decrementScore() {
+    const me = this;
+
+    me._score -= 1;
+    me._scoreText.setText(`score: ${me._score}`);
+  }
+
+  startFinalBossSequence() {
+    const me = this;
+
+    me._startFinalBossButton.toGameObj().setVisible(false);
   }
 
   _invalidateButtonsVisibility() {

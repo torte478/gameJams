@@ -84,6 +84,12 @@ export default class Edge {
     return exists;
   }
 
+  startFinalBossSequence() {
+    const me = this;
+
+    me._removeSignalIfExists();
+  }
+
   updateSignals(deltaTime) {
     const me = this;
 
@@ -155,17 +161,13 @@ export default class Edge {
   signalEaten() {
     const me = this;
 
-    me._signalPool.release(me._signal);
-    me._signal = null;
+    me._removeSignalIfExists();
   }
 
   remove() {
     const me = this;
 
-    if (!!me._signal) {
-      me._signalPool.release(me._signal);
-      me._signal = null;
-    }
+    me._removeSignalIfExists();
   }
 
   /**
@@ -175,6 +177,15 @@ export default class Edge {
     const me = this;
 
     return me.thisIsIt(other._from.id, other._to.id);
+  }
+
+  _removeSignalIfExists() {
+    const me = this;
+
+    if (!me._signal) return;
+
+    me._signalPool.release(me._signal);
+    me._signal = null;
   }
 
   _completeSignal() {

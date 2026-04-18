@@ -10,6 +10,8 @@ export default class Config {
   static Start = {
     TowersCount: 2,
     EnemiesCount: 0,
+    Score: 0,
+    Edges: [{ from: 0, to: 1 }],
   };
 
   static Speed = {
@@ -22,6 +24,7 @@ export default class Config {
   };
 
   static NewTowerCost = 1;
+  static BossHP = 100;
 
   static EatSignalRadius = 5;
   static EdgeThickness = 1;

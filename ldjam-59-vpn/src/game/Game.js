@@ -3,12 +3,12 @@ import Utils from "../framework/Utils.js";
 
 import Config from "./Config.js";
 import Consts from "./Consts.js";
-import Edge from "./Edge.js";
 import Enums from "./Enums.js";
 import Graph from "./Graph.js";
 import RKNMotherBrain from "./RKNMotherBrain.js";
 import SignalPool from "./SignalPool.js";
 import UI from "./UI.js";
+import VFX from "./VFX.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -26,6 +26,15 @@ export default class Game {
   /** @type {Number} */
   _nextSignalSpawnTime = 0;
 
+  /** @type {Boolean} */
+  _isCutscene = false;
+
+  /** @type {VFX} */
+  _vfx;
+
+  /** @type {Number} */
+  _bossHp = 0;
+
   constructor() {
     const me = this;
 
@@ -39,6 +48,7 @@ export default class Game {
     me._enemies = new RKNMotherBrain(me._graph);
 
     me._ui = new UI(gameEvents, me._graph);
+    me._vfx = new VFX(me._ui);
 
     //==========
 
@@ -61,6 +71,11 @@ export default class Game {
       Enums.Events.NEW_TOWER_BUTTON_CLICK,
       me._graph.addNewTower,
       me._graph,
+    );
+    gameEvents.on(
+      Enums.Events.START_FINAL_BOSS_CLICK,
+      me._onStartFinalBossClick,
+      me,
     );
 
     //===============
@@ -98,14 +113,17 @@ export default class Game {
       const mouse = Here._.input.activePointer;
 
       let text =
-        `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `twr: ${!!me._graph._selectedTower}`;
+        `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` + `rkn: ${me._bossHp}`;
       me._log.setText(text);
     });
   }
 
   _gameLoop(time, deltaTime) {
     const me = this;
+
+    if (me._isCutscene) {
+      return me._cutsceneUpdate();
+    }
 
     me._graph.update(deltaTime);
     me._enemies.update();
@@ -115,11 +133,47 @@ export default class Game {
     }
   }
 
+  _cutsceneUpdate() {
+    const me = this;
+
+    const damage = me._vfx.tryShotBoss();
+    me._bossHp -= damage;
+
+    if (me._bossHp <= 0) {
+      throw "!!!!!!!! YOU WIN !!!!!!!!";
+    }
+
+    if (me._ui._score <= 0) {
+      console.log("game over");
+    }
+  }
+
   _spawnSignal() {
     const me = this;
 
     if (me._graph.trySpawnNewSignal()) {
       me._nextSignalSpawnTime += Config.Time.SpawnSignalPeriodMd;
     }
+  }
+
+  _onStartFinalBossClick() {
+    const me = this;
+
+    me._isCutscene = true;
+    me._graph.startFinalBossSequence();
+    me._ui.startFinalBossSequence();
+
+    me._bossHp = Config.BossHP;
+
+    Here._.cameras.main.zoomTo(0.6, 1000, "Sine", true);
+
+    Here._.time.delayedCall(
+      1000,
+      () => {
+        me._vfx.startSpawn(me._graph._towers.map((t) => t.getPos()));
+      },
+      null,
+      me,
+    );
   }
 }
