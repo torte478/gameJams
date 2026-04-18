@@ -55,10 +55,10 @@ export default class RKN {
   /**
    * @param {Edge} edge
    */
-  setTargetIfRequired(edge) {
+  setTarget(edge) {
     const me = this;
 
-    if (!!me._targetEdge) return;
+    if (!!me._targetEdge) throw "target already exists";
 
     me._targetEdge = edge;
 

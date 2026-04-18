@@ -116,6 +116,23 @@ export default class Graph {
     return edge;
   }
 
+  /**
+   * @param {Edge[]} takenEdges
+   * @returns {Edge}
+   */
+  getEdgesToTake(takenEdges) {
+    const me = this;
+
+    const result = [];
+    for (const edge of me._edges) {
+      if (Utils.any(takenEdges, (e) => e.equalTo(edge))) continue;
+
+      result.push(edge);
+    }
+
+    return result;
+  }
+
   _selectEdgeToRemove() {
     const me = this;
 

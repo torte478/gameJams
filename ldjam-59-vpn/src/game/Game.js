@@ -7,6 +7,7 @@ import Edge from "./Edge.js";
 import Enums from "./Enums.js";
 import Graph from "./Graph.js";
 import RKN from "./RKN.js";
+import RKNMotherBrain from "./RKNMotherBrain.js";
 import SignalPool from "./SignalPool.js";
 
 export default class Game {
@@ -16,8 +17,8 @@ export default class Game {
   /** @type {Graph} */
   _graph;
 
-  /** @type {RKN} */
-  _rkn;
+  /** @type {RKNMotherBrain} */
+  _enemies;
 
   constructor() {
     const me = this;
@@ -29,12 +30,20 @@ export default class Game {
     const signalPool = new SignalPool();
     me._graph = new Graph(signalPool, gameEvents);
 
-    me._rkn = new RKN(150, 150);
+    me._enemies = new RKNMotherBrain(me._graph);
 
     //==========
 
-    gameEvents.on(Enums.Events.EDGE_ADDED, me._onEdgeAdded, me);
-    gameEvents.on(Enums.Events.EDGE_REMOVED, me._onEdgeRemoved, me);
+    gameEvents.on(
+      Enums.Events.EDGE_ADDED,
+      me._enemies.onEdgeAdded,
+      me._enemies,
+    );
+    gameEvents.on(
+      Enums.Events.EDGE_REMOVED,
+      me._enemies.onEdgeRemoved,
+      me._enemies,
+    );
 
     //===============
 
@@ -81,24 +90,6 @@ export default class Game {
     const me = this;
 
     me._graph.update(deltaTime);
-    me._rkn.update();
-  }
-
-  /**
-   * @param {Edge} edge
-   */
-  _onEdgeAdded(edge) {
-    const me = this;
-
-    me._rkn.setTargetIfRequired(edge);
-  }
-
-  /**
-   * @param {Edge} edge
-   */
-  _onEdgeRemoved(edge) {
-    const me = this;
-
-    me._rkn.checkEdgeRemove(edge);
+    me._enemies.update();
   }
 }
