@@ -16,6 +16,9 @@ export default class TowerMenu {
   /** @type {Boolean} */
   isOpen = false;
 
+  /** @type {Tower | null} */
+  currentTower = null;
+
   constructor() {
     const me = this;
 
@@ -84,25 +87,26 @@ export default class TowerMenu {
     const me = this;
 
     me.isOpen = true;
-    me.invalidate(tower);
+    me.currentTower = tower;
+
+    me.invalidate();
   }
 
   /**
    *
    * @param {Tower} tower
    */
-  invalidate(tower) {
+  invalidate() {
     const me = this;
 
     if (!me.isOpen) return;
 
     for (let i = 0; i < me._items.length; ++i) {
-      const item = me._items[i];
-      if (tower._signalQueue.length > i) {
+      if (me.currentTower._signalQueue.length > i) {
         me._items[i].setVisible(true);
         me._itemTexts[i]
           .setVisible(true)
-          .setText(tower._signalQueue[i].toTowerId);
+          .setText(me.currentTower._signalQueue[i].toTowerId);
       } else {
         me._items[i].setVisible(false);
         me._itemTexts[i].setVisible(false);

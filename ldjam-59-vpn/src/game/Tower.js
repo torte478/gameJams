@@ -119,6 +119,7 @@ export default class Tower {
 
     me._signalQueue.push(signal);
     me._invalidateSignalQueueText();
+    me._events.emit(Enums.Events.TOWER_SIGNAL_CHANGE, me);
   }
 
   /**
@@ -146,6 +147,7 @@ export default class Tower {
         (s) => !Utils.contains(signalsToDelete, s.uid),
       );
       me._invalidateSignalQueueText();
+      me._events.emit(Enums.Events.TOWER_SIGNAL_CHANGE, me);
     }
   }
 

@@ -74,6 +74,12 @@ export default class Graph {
         me._onPointerUp(pointer);
       });
 
+    me._events.on(
+      Enums.Events.TOWER_SIGNAL_CHANGE,
+      me._onTowerSignalChange,
+      me,
+    );
+
     me._rebuildGraph();
   }
 
@@ -534,5 +540,16 @@ export default class Graph {
     );
 
     return distance <= halfThickness;
+  }
+
+  /**
+   * @param {Tower} tower
+   */
+  _onTowerSignalChange(tower) {
+    const me = this;
+
+    if (me._towerMenu.isOpen && me._towerMenu.currentTower.id === tower.id) {
+      me._towerMenu.invalidate();
+    }
   }
 }
