@@ -3,8 +3,10 @@ import Utils from "../framework/Utils.js";
 
 import Config from "./Config.js";
 import Consts from "./Consts.js";
+import Edge from "./Edge.js";
 import Enums from "./Enums.js";
 import Graph from "./Graph.js";
+import RKN from "./RKN.js";
 import SignalPool from "./SignalPool.js";
 
 export default class Game {
@@ -14,13 +16,26 @@ export default class Game {
   /** @type {Graph} */
   _graph;
 
+  /** @type {RKN} */
+  _rkn;
+
   constructor() {
     const me = this;
 
     Here._.input.mouse.disableContextMenu();
 
+    const gameEvents = new Phaser.Events.EventEmitter();
+
     const signalPool = new SignalPool();
-    me._graph = new Graph(signalPool);
+    me._graph = new Graph(signalPool, gameEvents);
+
+    me._rkn = new RKN(150, 150);
+
+    //==========
+
+    gameEvents.on(Enums.Events.EDGE_ADDED, me._onEdgeAdded, me);
+
+    //===============
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -65,5 +80,14 @@ export default class Game {
     const me = this;
 
     me._graph.update(deltaTime);
+  }
+
+  /**
+   * @param {Edge} edge
+   */
+  _onEdgeAdded(edge) {
+    const me = this;
+
+    me._rkn.setTarget(edge);
   }
 }

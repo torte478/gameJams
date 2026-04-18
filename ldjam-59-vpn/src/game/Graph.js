@@ -2,6 +2,7 @@ import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Edge from "./Edge.js";
+import Enums from "./Enums.js";
 import SignalPool from "./SignalPool.js";
 import Tower from "./Tower.js";
 
@@ -30,10 +31,14 @@ export default class Graph {
   /** @type {Number[][]} */
   _nextNodes;
 
-  constructor(signalPool) {
+  /** @type {Phaser.Events.EventEmitter} */
+  _events;
+
+  constructor(signalPool, events) {
     const me = this;
 
     me._signalPool = signalPool;
+    me._events = events;
 
     for (let i = 0; i < Config.Start.Towers.length; ++i) {
       const el = Config.Start.Towers[i];
@@ -198,6 +203,7 @@ export default class Graph {
     );
 
     me._rebuildDistances();
+    me._events.emit(Enums.Events.EDGE_ADDED, edge);
   }
 
   _rebuildDistances() {

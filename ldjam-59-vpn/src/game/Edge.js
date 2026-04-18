@@ -113,6 +113,15 @@ export default class Edge {
     me._currentSignalDurationMs = 0;
   }
 
+  getMiddle() {
+    const me = this;
+
+    const from = me._from.getPos();
+    const to = me._to.getPos();
+
+    return Utils.buildPoint((from.x + to.x) / 2, (from.y + to.y) / 2);
+  }
+
   _completeSignal() {
     const me = this;
 

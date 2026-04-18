@@ -10,4 +10,8 @@ export default class Enums {
 
     RESTART: 6,
   };
+
+  static Events = {
+    EDGE_ADDED: "EDGE_ADDED",
+  };
 }
