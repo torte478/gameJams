@@ -2,6 +2,7 @@ import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Edge from "./Edge.js";
+import SignalPool from "./SignalPool.js";
 import Tower from "./Tower.js";
 
 export default class Graph {
@@ -20,8 +21,13 @@ export default class Graph {
   /** @type {Edge[]} */
   _edges = [];
 
-  constructor() {
+  /** @type {SignalPool} */
+  _signalPool;
+
+  constructor(signalPool) {
     const me = this;
+
+    me._signalPool = signalPool;
 
     for (let i = 0; i < Config.Start.Towers.length; ++i) {
       const el = Config.Start.Towers[i];
@@ -42,9 +48,55 @@ export default class Graph {
       .on("pointerup", (pointer) => {
         me._onPointerUp(pointer);
       });
+
+    for (let i = 0; i < 3; ++i) {
+      me.createNewSignal();
+    }
   }
 
-  update() {
+  update(deltaTime) {
+    const me = this;
+
+    me._drawNewEdgeLine();
+    me._updateSignals(deltaTime);
+  }
+
+  createNewSignal() {
+    const me = this;
+
+    const path = Utils.getRandomElems(me._towers, 2);
+    const signal = me._signalPool.create(path[0].id, path[1].id);
+
+    me._towers[path[0].id].addSignal(signal);
+  }
+
+  /**
+   * @param {Number} fromTowerId
+   * @param {Number} toTowerId
+   * @returns {Edge}
+   */
+  getEdgeToSend(fromTowerId, toTowerId) {
+    const me = this;
+
+    return Utils.firstOrNull(
+      me._edges,
+      (e) => e.thisIsIt(fromTowerId, toTowerId) && e.isFree(),
+    );
+  }
+
+  _updateSignals(deltaTime) {
+    const me = this;
+
+    for (const edge of me._edges) {
+      edge.updateSignals(deltaTime);
+    }
+
+    for (const tower of me._towers) {
+      tower.updateSignals(me);
+    }
+  }
+
+  _drawNewEdgeLine() {
     const me = this;
 
     if (!me._selectedTower) {
@@ -111,7 +163,7 @@ export default class Graph {
     );
     if (alreadyExists) return;
 
-    const edge = new Edge(fromTower.id, toTower.id);
+    const edge = new Edge(fromTower, toTower);
     me._edges.push(edge);
 
     const fromPos = Utils.toPoint(fromTower.toGameObj());

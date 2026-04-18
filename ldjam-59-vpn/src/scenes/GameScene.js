@@ -28,6 +28,7 @@ export default class GameScene extends HereScene {
     if (!me._isRestart) Utils.runLoadingBar();
 
     Utils.loadImage("tower");
+    Utils.loadImage("signal");
   }
 
   create() {

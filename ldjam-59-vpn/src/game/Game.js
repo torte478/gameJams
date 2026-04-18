@@ -5,6 +5,7 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Graph from "./Graph.js";
+import SignalPool from "./SignalPool.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -18,7 +19,8 @@ export default class Game {
 
     Here._.input.mouse.disableContextMenu();
 
-    me._graph = new Graph();
+    const signalPool = new SignalPool();
+    me._graph = new Graph(signalPool);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -34,11 +36,19 @@ export default class Game {
     if (
       Here.Controls.isPressedOnce(Enums.Keyboard.RESTART) &&
       Utils.isDebug(Config.Debug.Global)
-    )
+    ) {
       Here._.scene.restart({ isRestart: true });
+    }
+
+    if (
+      Here.Controls.isPressedOnce(Enums.Keyboard.MAIN_ACTION) &&
+      Utils.isDebug(Config.Debug.Global)
+    ) {
+      me._graph.createNewSignal();
+    }
 
     //=================
-    me._gameLoop();
+    me._gameLoop(deltaTime);
     //=================
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
@@ -51,9 +61,9 @@ export default class Game {
     });
   }
 
-  _gameLoop() {
+  _gameLoop(deltaTime) {
     const me = this;
 
-    me._graph.update();
+    me._graph.update(deltaTime);
   }
 }
