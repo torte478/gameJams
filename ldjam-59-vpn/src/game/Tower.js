@@ -28,6 +28,9 @@ export default class Tower {
   /** @type {Phaser.Events.EventEmitter} */
   _events;
 
+  /** @type {Boolean} */
+  _isAutoMode = true;
+
   /**
    * @param {Number} id
    * @param {Number} x
@@ -75,6 +78,18 @@ export default class Tower {
     return Utils.toPoint(me._container);
   }
 
+  toggleMode() {
+    const me = this;
+
+    if (me._isAutoMode) {
+      me._isAutoMode = false;
+      me._sprite.setFrame(1);
+    } else {
+      me._isAutoMode = true;
+      me._sprite.setFrame(0);
+    }
+  }
+
   /**
    * @param {Phaser.Math.Vector2} pos
    * @returns {Boolean}
@@ -113,7 +128,7 @@ export default class Tower {
   updateSignals(graph) {
     const me = this;
 
-    if (me._signalQueue.length === 0) {
+    if (me._signalQueue.length === 0 || !me._isAutoMode) {
       return;
     }
 
@@ -156,6 +171,7 @@ export default class Tower {
     me._signalQueue = [];
     me._invalidateSignalQueueText();
 
+    me._isAutoMode = true;
     me._sprite.setFrame(0);
   }
 

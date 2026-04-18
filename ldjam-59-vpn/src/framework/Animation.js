@@ -4,7 +4,7 @@ export default class Animation {
   static init() {
     Here._.anims.create({
       key: "tower_transform",
-      frames: Animation.getFrames("tower", [0, 1, 2]),
+      frames: Animation.getFrames("tower", [1, 2, 3]),
       frameRate: 1,
       repeat: 0,
     });

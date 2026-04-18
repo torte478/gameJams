@@ -319,9 +319,14 @@ export default class Graph {
       return;
     }
 
+    /** @type {Tower} */
     const targetTower = me._getTowerOnMousePos(pointer);
     if (!!targetTower) {
-      me._tryAddEdge(me._selectedTower, targetTower);
+      if (targetTower.id === me._selectedTower.id) {
+        targetTower.toggleMode();
+      } else {
+        me._tryAddEdge(me._selectedTower, targetTower);
+      }
     }
 
     me._selectedTower = null;
