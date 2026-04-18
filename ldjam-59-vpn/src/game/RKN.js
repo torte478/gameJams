@@ -55,10 +55,10 @@ export default class RKN {
   /**
    * @param {Edge} edge
    */
-  setTarget(edge) {
+  setTargetIfRequired(edge) {
     const me = this;
 
-    if (!!me._targetEdge) throw "target edge already exists!";
+    if (!!me._targetEdge) return;
 
     me._targetEdge = edge;
 
@@ -77,5 +77,20 @@ export default class RKN {
         me._isEating = true;
       },
     });
+  }
+
+  /** @type {Edge} */
+  checkEdgeRemove(edge) {
+    const me = this;
+
+    if (!me._targetEdge || !me._targetEdge.equalTo(edge)) return;
+
+    if (!!me._movementTween) {
+      me._movementTween.stop();
+      me._movementTween = null;
+    }
+
+    me._targetEdge = null;
+    me._isEating = false;
   }
 }

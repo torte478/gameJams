@@ -31,7 +31,7 @@ export default class SignalPool {
 
     if (me._pool.length > 0) {
       const signal = me._pool[me._pool.length - 1];
-      me._pool = me._pool.splice(me._pool.length - 1, 1);
+      me._pool.splice(me._pool.length - 1, 1);
       return signal;
     }
 

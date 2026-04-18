@@ -11,8 +11,8 @@ export default class Config {
     Towers: [
       { x: 300, y: 400 },
       { x: 700, y: 500 },
-      // { x: 550, y: 200 },
-      // { x: 400, y: 700 },
+      { x: 550, y: 200 },
+      { x: 400, y: 700 },
     ],
   };
 
@@ -22,4 +22,8 @@ export default class Config {
   };
 
   static EatSignalRadius = 5;
+
+  static EdgeThickness = 1;
+
+  static RemoveEdgeOffset = 10;
 }

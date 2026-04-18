@@ -13,5 +13,6 @@ export default class Enums {
 
   static Events = {
     EDGE_ADDED: "EDGE_ADDED",
+    EDGE_REMOVED: "EDGE_REMOVED",
   };
 }

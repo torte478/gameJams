@@ -34,6 +34,9 @@ export default class Graph {
   /** @type {Phaser.Events.EventEmitter} */
   _events;
 
+  /** @type {Edge | null} */
+  _edgeToRemove = null;
+
   constructor(signalPool, events) {
     const me = this;
 
@@ -46,11 +49,9 @@ export default class Graph {
       me._towers.push(tower);
     }
 
-    me._lineDrawingGraphics = Here._.add
-      .graphics()
-      .lineStyle(10, 0xffff00, 1.0);
+    me._lineDrawingGraphics = Here._.add.graphics();
 
-    me._graphEdgesGraphics = Here._.add.graphics().lineStyle(10, 0xffff00, 1.0);
+    me._graphEdgesGraphics = Here._.add.graphics();
 
     Here._.input
       .on("pointerdown", (pointer) => {
@@ -60,7 +61,7 @@ export default class Graph {
         me._onPointerUp(pointer);
       });
 
-    me._rebuildDistances();
+    me._rebuildGraph();
 
     // ==== DEBUG DEBUG
     for (let i = 0; i < 3; ++i) {
@@ -71,7 +72,12 @@ export default class Graph {
   update(deltaTime) {
     const me = this;
 
-    me._drawNewEdgeLine();
+    if (!!me._selectedTower) {
+      me._drawNewEdgeLine();
+    } else {
+      me._selectEdgeToRemove();
+    }
+
     me._updateSignals(deltaTime);
   }
 
@@ -108,6 +114,37 @@ export default class Graph {
     if (!edge.isFree()) return null;
 
     return edge;
+  }
+
+  _selectEdgeToRemove() {
+    const me = this;
+
+    me._lineDrawingGraphics.clear();
+
+    const mouserPos = Utils.buildPoint(
+      Here._.input.mousePointer.worldX,
+      Here._.input.mousePointer.worldY,
+    );
+    /** @type {Edge} */
+    me._edgeToRemove = Utils.firstOrNull(me._edges, (e) => {
+      /** @type {Edge} */
+      const edge = e;
+      const onSegment = me._isPointOnSegment(
+        edge.getFromPos(),
+        edge.getToPos(),
+        Config.EdgeThickness,
+        mouserPos,
+        Config.RemoveEdgeOffset,
+      );
+      return onSegment;
+    });
+
+    if (!me._edgeToRemove) return;
+
+    me._lineDrawingGraphics.lineStyle(Config.EdgeThickness + 10, 0xff0000, 1.0);
+    const from = me._edgeToRemove.getFromPos();
+    const to = me._edgeToRemove.getToPos();
+    me._lineDrawingGraphics.lineBetween(from.x, from.y, to.x, to.y);
   }
 
   _updateSignals(deltaTime) {
@@ -148,7 +185,22 @@ export default class Graph {
     return Utils.firstOrNull(me._towers, (t) => t.containsPoint(pos));
   }
 
+  /**
+   *
+   * @param {Phaser.Input.Pointer} pointer
+   * @returns
+   */
   _onPointerDown(pointer) {
+    const me = this;
+
+    if (pointer.rightButtonDown()) {
+      me._tryRemoveEdge(pointer);
+    } else {
+      me._processTowerClick(pointer);
+    }
+  }
+
+  _processTowerClick(pointer) {
     const me = this;
 
     const clickedTower = me._getTowerOnMousePos(pointer);
@@ -159,6 +211,21 @@ export default class Graph {
     }
 
     me._selectedTower = clickedTower;
+  }
+
+  _tryRemoveEdge() {
+    const me = this;
+
+    if (!me._edgeToRemove) return;
+
+    me._edges = me._edges.filter(
+      (e) =>
+        !e.thisIsIt(me._edgeToRemove.getFromId(), me._edgeToRemove.getToId()),
+    );
+    me._edgeToRemove.remove();
+    me._events.emit(Enums.Events.EDGE_REMOVED, me._edgeToRemove);
+    me._edgeToRemove = null;
+    me._rebuildGraph();
   }
 
   _onPointerUp(pointer) {
@@ -192,18 +259,29 @@ export default class Graph {
     const edge = new Edge(fromTower, toTower, me._signalPool);
     me._edges.push(edge);
 
-    const fromPos = Utils.toPoint(fromTower.toGameObj());
-    const targetPos = Utils.toPoint(toTower.toGameObj());
+    me._rebuildGraph();
+    me._events.emit(Enums.Events.EDGE_ADDED, edge);
+  }
 
-    me._graphEdgesGraphics.lineBetween(
-      fromPos.x,
-      fromPos.y,
-      targetPos.x,
-      targetPos.y,
-    );
+  _rebuildGraph() {
+    const me = this;
+
+    me._graphEdgesGraphics
+      .clear()
+      .lineStyle(Config.EdgeThickness, 0xffff00, 1.0);
+    for (const edge of me._edges) {
+      const fromPos = edge.getFromPos();
+      const targetPos = edge.getToPos();
+
+      me._graphEdgesGraphics.lineBetween(
+        fromPos.x,
+        fromPos.y,
+        targetPos.x,
+        targetPos.y,
+      );
+    }
 
     me._rebuildDistances();
-    me._events.emit(Enums.Events.EDGE_ADDED, edge);
   }
 
   _rebuildDistances() {
@@ -281,5 +359,44 @@ export default class Graph {
     }
 
     return path;
+  }
+
+  _isPointOnSegment(fromPos, toPos, thickness, point, offset = 0) {
+    const effectiveThickness = thickness + offset;
+    const halfThickness = effectiveThickness / 2;
+
+    const segmentVec = {
+      x: toPos.x - fromPos.x,
+      y: toPos.y - fromPos.y,
+    };
+
+    const pointVec = {
+      x: point.x - fromPos.x,
+      y: point.y - fromPos.y,
+    };
+
+    const segmentLengthSq =
+      segmentVec.x * segmentVec.x + segmentVec.y * segmentVec.y;
+
+    if (segmentLengthSq === 0) {
+      return Math.hypot(pointVec.x, pointVec.y) <= halfThickness;
+    }
+
+    let t =
+      (pointVec.x * segmentVec.x + pointVec.y * segmentVec.y) / segmentLengthSq;
+
+    if (t < 0 || t > 1) return false;
+
+    const closestPoint = {
+      x: fromPos.x + t * segmentVec.x,
+      y: fromPos.y + t * segmentVec.y,
+    };
+
+    const distance = Math.hypot(
+      point.x - closestPoint.x,
+      point.y - closestPoint.y,
+    );
+
+    return distance <= halfThickness;
   }
 }

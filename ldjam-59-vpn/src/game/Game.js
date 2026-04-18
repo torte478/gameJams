@@ -34,6 +34,7 @@ export default class Game {
     //==========
 
     gameEvents.on(Enums.Events.EDGE_ADDED, me._onEdgeAdded, me);
+    gameEvents.on(Enums.Events.EDGE_REMOVED, me._onEdgeRemoved, me);
 
     //===============
 
@@ -89,6 +90,15 @@ export default class Game {
   _onEdgeAdded(edge) {
     const me = this;
 
-    me._rkn.setTarget(edge);
+    me._rkn.setTargetIfRequired(edge);
+  }
+
+  /**
+   * @param {Edge} edge
+   */
+  _onEdgeRemoved(edge) {
+    const me = this;
+
+    me._rkn.checkEdgeRemove(edge);
   }
 }

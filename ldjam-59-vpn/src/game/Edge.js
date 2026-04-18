@@ -53,10 +53,22 @@ export default class Edge {
     return me._from.id;
   }
 
+  getFromPos() {
+    const me = this;
+
+    return me._from.getPos();
+  }
+
   getToId() {
     const me = this;
 
     return me._to.id;
+  }
+
+  getToPos() {
+    const me = this;
+
+    return me._to.getPos();
   }
 
   /**
@@ -145,6 +157,24 @@ export default class Edge {
 
     me._signalPool.release(me._signal);
     me._signal = null;
+  }
+
+  remove() {
+    const me = this;
+
+    if (!!me._signal) {
+      me._signalPool.release(me._signal);
+      me._signal = null;
+    }
+  }
+
+  /**
+   * @param {Edge} other
+   */
+  equalTo(other) {
+    const me = this;
+
+    return me.thisIsIt(other._from.id, other._to.id);
   }
 
   _completeSignal() {
