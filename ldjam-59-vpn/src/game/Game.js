@@ -4,19 +4,21 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
-import Tower from "./Tower.js";
+import Graph from "./Graph.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
   _log;
 
+  /** @type {Graph} */
+  _graph;
+
   constructor() {
     const me = this;
 
-    for (let i = 0; i < Config.Start.Towers.length; ++i) {
-      const el = Config.Start.Towers[i];
-      new Tower(el.x, el.y, i + "");
-    }
+    Here._.input.mouse.disableContextMenu();
+
+    me._graph = new Graph();
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
@@ -35,14 +37,23 @@ export default class Game {
     )
       Here._.scene.restart({ isRestart: true });
 
+    //=================
+    me._gameLoop();
+    //=================
+
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
 
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `${(time / 1000) | 0} + ${deltaTime | 1}`;
-
+        `twr: ${!!me._graph._selectedTower}`;
       me._log.setText(text);
     });
+  }
+
+  _gameLoop() {
+    const me = this;
+
+    me._graph.update();
   }
 }

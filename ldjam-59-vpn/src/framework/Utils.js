@@ -214,22 +214,22 @@ export default class Utils {
   /**
    * @param {Number} x
    * @param {Number} y
-   * @returns {Phaser.Geom.Point}
+   * @returns {Phaser.Math.Vector2}
    */
   static buildPoint(x, y) {
-    return new Phaser.Geom.Point(x, y);
+    return new Phaser.Math.Vector2(x, y);
   }
 
   /**
    * @param {Object} obj
-   * @returns {Phaser.Geom.Point}
+   * @returns {Phaser.Math.Vector2}
    */
   static toPoint(obj) {
     if (obj.x == undefined) throw "obj is not contains property X";
 
     if (obj.y == undefined) throw "obj is not contains property Y";
 
-    return new Phaser.Geom.Point(obj.x, obj.y);
+    return new Phaser.Math.Vector2(obj.x, obj.y);
   }
 
   // --- Random ---
