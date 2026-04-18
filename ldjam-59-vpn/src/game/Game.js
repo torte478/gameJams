@@ -80,6 +80,7 @@ export default class Game {
     const me = this;
 
     me._graph.update(deltaTime);
+    me._rkn.update();
   }
 
   /**

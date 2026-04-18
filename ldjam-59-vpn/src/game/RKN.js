@@ -16,6 +16,9 @@ export default class RKN {
   /** @type {Phaser.Tweens.Tween | null} */
   _movementTween = null;
 
+  /** @type {Boolean} */
+  _isEating = false;
+
   constructor(x, y) {
     const me = this;
 
@@ -38,6 +41,17 @@ export default class RKN {
     return Utils.toPoint(me._container);
   }
 
+  update() {
+    const me = this;
+
+    if (!me._isEating) return;
+
+    if (me._targetEdge.hasSignalAtMiddle()) {
+      console.log("eat signal!!!");
+      me._targetEdge.signalEaten();
+    }
+  }
+
   /**
    * @param {Edge} edge
    */
@@ -58,6 +72,10 @@ export default class RKN {
         targetPos,
         Config.Speed.RknMovement,
       ),
+      onComplete: () => {
+        me._movementTween = null;
+        me._isEating = true;
+      },
     });
   }
 }

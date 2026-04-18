@@ -1,6 +1,7 @@
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Signal from "./Signal.js";
+import SignalPool from "./SignalPool.js";
 import Tower from "./Tower.js";
 
 export default class Edge {
@@ -25,16 +26,19 @@ export default class Edge {
   /** @type {Number} */
   _currentSignalDurationMs;
 
+  /** @type {SignalPool} */
+  _signalPool;
+
   /**
-   *
    * @param {Tower} from
    * @param {Tower} to
    */
-  constructor(from, to) {
+  constructor(from, to, signalPool) {
     const me = this;
 
     me._from = from;
     me._to = to;
+    me._signalPool = signalPool;
 
     me._distance = Phaser.Math.Distance.BetweenPoints(
       from.getPos(),
@@ -120,6 +124,27 @@ export default class Edge {
     const to = me._to.getPos();
 
     return Utils.buildPoint((from.x + to.x) / 2, (from.y + to.y) / 2);
+  }
+
+  hasSignalAtMiddle() {
+    const me = this;
+
+    if (!me._signal) return false;
+
+    const middlePos = me.getMiddle();
+    const signalPos = me._signal.getPos();
+
+    return (
+      Phaser.Math.Distance.BetweenPoints(signalPos, middlePos) <
+      Config.EatSignalRadius
+    );
+  }
+
+  signalEaten() {
+    const me = this;
+
+    me._signalPool.release(me._signal);
+    me._signal = null;
   }
 
   _completeSignal() {

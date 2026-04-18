@@ -20,4 +20,6 @@ export default class Config {
     Signal: 100,
     RknMovement: 300,
   };
+
+  static EatSignalRadius = 5;
 }

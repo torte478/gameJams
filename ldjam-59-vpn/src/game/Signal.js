@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 
 export default class Signal {
   /** @type {Phaser.GameObjects.Container} */
@@ -53,5 +54,11 @@ export default class Signal {
     const me = this;
 
     return me._container;
+  }
+
+  getPos() {
+    const me = this;
+
+    return Utils.toPoint(me._container);
   }
 }

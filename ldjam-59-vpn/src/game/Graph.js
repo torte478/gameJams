@@ -189,7 +189,7 @@ export default class Graph {
     );
     if (alreadyExists) return;
 
-    const edge = new Edge(fromTower, toTower);
+    const edge = new Edge(fromTower, toTower, me._signalPool);
     me._edges.push(edge);
 
     const fromPos = Utils.toPoint(fromTower.toGameObj());
