@@ -1,6 +1,4 @@
-import Phaser from "../../lib/phaser.js";
 import Here from "./Here.js";
-
 import ButtonConfig from "./ButtonConfig.js";
 
 export default class Button {
@@ -45,6 +43,13 @@ export default class Button {
     me._container.on("pointerdown", me._onButtonClick, me);
     me._container.on("pointerover", me._select, me);
     me._container.on("pointerout", me._unselect, me);
+  }
+
+  /** @type {Phaser.GameObjects.Container} */
+  toGameObj() {
+    const me = this;
+
+    return me._container;
   }
 
   _onButtonClick() {

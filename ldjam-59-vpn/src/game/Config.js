@@ -8,12 +8,8 @@ export default class Config {
   };
 
   static Start = {
-    Towers: [
-      { x: 300, y: 400 },
-      { x: 700, y: 500 },
-      { x: 550, y: 200 },
-      { x: 400, y: 700 },
-    ],
+    TowersCount: 2,
+    EnemiesCount: 0,
   };
 
   static Speed = {
@@ -25,8 +21,17 @@ export default class Config {
     SpawnSignalPeriodMd: 1000,
   };
 
+  static NewTowerCost = 1;
+
   static EatSignalRadius = 5;
   static EdgeThickness = 1;
   static RemoveEdgeOffset = 10;
   static MaxSignalPerTower = 8;
+
+  static TowerPositions = [
+    { x: 300, y: 400 },
+    { x: 700, y: 500 },
+    { x: 550, y: 200 },
+    { x: 400, y: 700 },
+  ];
 }

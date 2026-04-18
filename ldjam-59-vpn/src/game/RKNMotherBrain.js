@@ -1,3 +1,4 @@
+import Config from "./Config.js";
 import Graph from "./Graph.js";
 import RKN from "./RKN.js";
 
@@ -13,9 +14,9 @@ export default class RKNMotherBrain {
 
     me._graph = graph;
 
-    me._enemies.push(new RKN(150, 150));
-    me._enemies.push(new RKN(200, 200));
-    me._enemies.push(new RKN(250, 250));
+    for (let i = 0; i < Config.Start.EnemiesCount; ++i) {
+      me._enemies.push(new RKN(150, 150));
+    }
   }
 
   update() {

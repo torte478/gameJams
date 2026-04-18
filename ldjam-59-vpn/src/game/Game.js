@@ -33,12 +33,12 @@ export default class Game {
 
     const gameEvents = new Phaser.Events.EventEmitter();
 
-    me._ui = new UI();
-
     const signalPool = new SignalPool();
     me._graph = new Graph(signalPool, gameEvents);
 
     me._enemies = new RKNMotherBrain(me._graph);
+
+    me._ui = new UI(gameEvents, me._graph);
 
     //==========
 
@@ -56,6 +56,11 @@ export default class Game {
       Enums.Events.SCORE_INCREMENT,
       me._ui.onScoreIncrement,
       me._ui,
+    );
+    gameEvents.on(
+      Enums.Events.NEW_TOWER_BUTTON_CLICK,
+      me._graph.addNewTower,
+      me._graph,
     );
 
     //===============

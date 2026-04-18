@@ -43,17 +43,8 @@ export default class Graph {
     me._signalPool = signalPool;
     me._events = events;
 
-    for (let i = 0; i < Config.Start.Towers.length; ++i) {
-      const el = Config.Start.Towers[i];
-      const tower = new Tower(
-        i,
-        el.x,
-        el.y,
-        i + "",
-        me._signalPool,
-        me._events,
-      );
-      me._towers.push(tower);
+    for (let i = 0; i < Config.Start.TowersCount; ++i) {
+      me.addNewTower();
     }
 
     me._lineDrawingGraphics = Here._.add.graphics();
@@ -144,6 +135,29 @@ export default class Graph {
     }
 
     return result;
+  }
+
+  addNewTower() {
+    const me = this;
+
+    if (me._towers.length >= Config.TowerPositions.length) {
+      return; // TODO: error
+    }
+
+    const index = me._towers.length;
+
+    const el = Config.TowerPositions[me._towers.length];
+    const tower = new Tower(
+      index,
+      el.x,
+      el.y,
+      index + "",
+      me._signalPool,
+      me._events,
+    );
+    me._towers.push(tower);
+
+    me._rebuildDistances();
   }
 
   _selectEdgeToRemove() {
