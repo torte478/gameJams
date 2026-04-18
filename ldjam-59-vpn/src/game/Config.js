@@ -5,6 +5,7 @@ export default class Config {
     ShowSceneLog: true,
     PlaySound: true,
     Random: false,
+    CutsceneZoom: true,
   };
 
   static Start = {
@@ -30,6 +31,8 @@ export default class Config {
   static EdgeThickness = 1;
   static RemoveEdgeOffset = 10;
   static MaxSignalPerTower = 8;
+  static CutsceneCameraZoom = 0.75;
+  static BossJiggleOffset = 25;
 
   static TowerPositions = [
     { x: 300, y: 400 },
