@@ -24,6 +24,12 @@ export default class Graph {
   /** @type {SignalPool} */
   _signalPool;
 
+  /** @type {Number[][]} */
+  _shortestPaths;
+
+  /** @type {Number[][]} */
+  _nextNodes;
+
   constructor(signalPool) {
     const me = this;
 
@@ -49,6 +55,9 @@ export default class Graph {
         me._onPointerUp(pointer);
       });
 
+    me._rebuildDistances();
+
+    // ==== DEBUG DEBUG
     for (let i = 0; i < 3; ++i) {
       me.createNewSignal();
     }
@@ -64,10 +73,11 @@ export default class Graph {
   createNewSignal() {
     const me = this;
 
-    const path = Utils.getRandomElems(me._towers, 2);
-    const signal = me._signalPool.create(path[0].id, path[1].id);
+    const pair = Utils.getRandomElems(me._towers, 2);
+    console.log(pair[0].id, pair[1].id);
+    const signal = me._signalPool.create(pair[0].id, pair[1].id);
 
-    me._towers[path[0].id].addSignal(signal);
+    me._towers[pair[0].id].addSignal(signal);
   }
 
   /**
@@ -78,10 +88,21 @@ export default class Graph {
   getEdgeToSend(fromTowerId, toTowerId) {
     const me = this;
 
-    return Utils.firstOrNull(
-      me._edges,
-      (e) => e.thisIsIt(fromTowerId, toTowerId) && e.isFree(),
+    const path = me._getPath(fromTowerId, toTowerId);
+    if (!path) return null;
+
+    if (path.length === 0) throw "same vertex!";
+
+    const nextVertexId = path[0];
+    /** @type {Edge} */
+    const edge = Utils.firstOrNull(me._edges, (e) =>
+      e.thisIsIt(fromTowerId, nextVertexId),
     );
+    if (!edge) throw `can't find edge ${fromTowerId} ${nextVertexId}`;
+
+    if (!edge.isFree()) return null;
+
+    return edge;
   }
 
   _updateSignals(deltaTime) {
@@ -176,6 +197,83 @@ export default class Graph {
       targetPos.y,
     );
 
-    console.log("new edge!!!");
+    me._rebuildDistances();
+  }
+
+  _rebuildDistances() {
+    const me = this;
+
+    const n = this._towers.length;
+
+    const dist = Array(n)
+      .fill()
+      .map(() => Array(n).fill(Infinity));
+    const next = Array(n)
+      .fill()
+      .map(() => Array(n).fill(null));
+
+    for (let i = 0; i < n; i++) {
+      dist[i][i] = 0;
+    }
+
+    for (const edge of this._edges) {
+      const fromId = edge.getFromId();
+      const toId = edge.getToId();
+
+      if (fromId < n && toId < n) {
+        dist[fromId][toId] = 1;
+        dist[toId][fromId] = 1;
+        next[fromId][toId] = toId;
+        next[toId][fromId] = fromId;
+      }
+    }
+
+    for (let k = 0; k < n; k++) {
+      for (let i = 0; i < n; i++) {
+        if (dist[i][k] === Infinity) continue;
+        for (let j = 0; j < n; j++) {
+          if (dist[k][j] === Infinity) continue;
+
+          const newDist = dist[i][k] + dist[k][j];
+          if (newDist < dist[i][j]) {
+            dist[i][j] = newDist;
+            next[i][j] = next[i][k];
+          }
+        }
+      }
+    }
+
+    this._shortestPaths = dist;
+    this._nextNodes = next;
+  }
+
+  _getPath(fromId, toId) {
+    const me = this;
+    if (
+      fromId < 0 ||
+      fromId >= this._towers.length ||
+      toId < 0 ||
+      toId >= this._towers.length
+    ) {
+      return null;
+    }
+
+    if (this._shortestPaths[fromId][toId] === Infinity) {
+      return null;
+    }
+
+    // Восстановление пути
+    const path = [];
+    let current = fromId;
+
+    while (current !== toId) {
+      current = this._nextNodes[current][toId];
+      if (current === null) {
+        return null;
+      }
+      path.push(current);
+    }
+
+    return path;
   }
 }

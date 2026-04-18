@@ -43,6 +43,18 @@ export default class Edge {
     me._totalSignalDurationMs = me._distance / (Config.Speed.Signal / 1000);
   }
 
+  getFromId() {
+    const me = this;
+
+    return me._from.id;
+  }
+
+  getToId() {
+    const me = this;
+
+    return me._to.id;
+  }
+
   /**
    * @param {Number} from
    * @param {Number} to
