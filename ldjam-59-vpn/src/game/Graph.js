@@ -5,6 +5,7 @@ import Edge from "./Edge.js";
 import Enums from "./Enums.js";
 import SignalPool from "./SignalPool.js";
 import Tower from "./Tower.js";
+import TowerMenu from "./TowerMenu.js";
 
 export default class Graph {
   /** @type {Tower[]} */
@@ -40,6 +41,9 @@ export default class Graph {
   /** @type {Boolean} */
   _isCutscene = false;
 
+  /** @type {TowerMenu} */
+  _towerMenu;
+
   constructor(signalPool, events) {
     const me = this;
 
@@ -47,6 +51,7 @@ export default class Graph {
     me._events = events;
     me._lineDrawingGraphics = Here._.add.graphics();
     me._graphEdgesGraphics = Here._.add.graphics();
+    me._towerMenu = new TowerMenu();
 
     // =========
     for (let i = 0; i < Config.Start.TowersCount; ++i) {
@@ -68,6 +73,8 @@ export default class Graph {
       .on("pointerup", (pointer) => {
         me._onPointerUp(pointer);
       });
+
+    events.on(Enums.Events.MOUSE_ON_TOWER, me._onMouseOnTower, me);
 
     me._rebuildGraph();
   }
@@ -487,5 +494,19 @@ export default class Graph {
     );
 
     return distance <= halfThickness;
+  }
+
+  /**
+   * @param {Tower} tower
+   */
+  _onMouseOnTower(tower) {
+    const me = this;
+
+    const towerPos = tower.getPos();
+
+    me._towerMenu
+      .toGameObj()
+      .setPosition(towerPos.x, towerPos.y - 100)
+      .setVisible(true);
   }
 }

@@ -60,6 +60,7 @@ export default class Tower {
       .setInteractive()
       .on("pointerover", () => {
         me._sprite.setTint(0x44ff44);
+        events.emit(Enums.Events.MOUSE_ON_TOWER, me);
       })
       .on("pointerout", () => {
         me._sprite.clearTint();

@@ -36,7 +36,7 @@ export default class Config {
   static EatSignalRadius = 5;
   static EdgeThickness = 1;
   static RemoveEdgeOffset = 10;
-  static MaxSignalPerTower = 8;
+  static MaxSignalPerTower = 9;
   static CutsceneCameraZoom = 0.75;
   static BossJiggleOffset = 25;
 

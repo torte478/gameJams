@@ -32,6 +32,8 @@ export default class GameScene extends HereScene {
     Utils.loadImage("bullet");
     Utils.loadImage("boss");
     Utils.loadImage("redFade");
+    Utils.loadImage("towerMenu");
+    Utils.loadImage("towerMenuItem");
 
     Utils.loadSpriteSheet("tower", 50, 100);
     Utils.loadSpriteSheet("newTowerButton", 100);

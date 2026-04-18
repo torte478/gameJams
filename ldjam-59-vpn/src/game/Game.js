@@ -45,8 +45,6 @@ export default class Game {
   constructor() {
     const me = this;
 
-    console.log("start game init");
-
     Here._.input.mouse.disableContextMenu();
 
     const gameEvents = new Phaser.Events.EventEmitter();
