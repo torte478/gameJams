@@ -1,5 +1,7 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
+import Config from "./Config.js";
+import Enums from "./Enums.js";
 import Graph from "./Graph.js";
 import Signal from "./Signal.js";
 import SignalPool from "./SignalPool.js";
@@ -23,17 +25,22 @@ export default class Tower {
   /** @type {SignalPool} */
   _signalPool;
 
+  /** @type {Phaser.Events.EventEmitter} */
+  _events;
+
   /**
    * @param {Number} id
    * @param {Number} x
    * @param {Number} y
-   * @param {String} labe
+   * @param {String} label
+   * @param {Phaser.Events.EventEmitter} events
    */
-  constructor(id, x, y, label, signalPool) {
+  constructor(id, x, y, label, signalPool, events) {
     const me = this;
 
     me.id = id;
     me._signalPool = signalPool;
+    me._events = events;
 
     me._sprite = Here._.add.sprite(0, 0, "tower", 0);
     const labelText = Here._.add.text(0, 26, label, { fontSize: 20 });
@@ -83,6 +90,8 @@ export default class Tower {
   addSignal(signal) {
     const me = this;
 
+    if (!me.hasRoom) throw `tower ${me.id} is full!`;
+
     if (signal.toTowerId === me.id) {
       return me._processSignalArrived(signal);
     }
@@ -124,6 +133,12 @@ export default class Tower {
     }
   }
 
+  hasRoom() {
+    const me = this;
+
+    return me._signalQueue.length < Config.MaxSignalPerTower;
+  }
+
   /**
    * @param {Signal} signal
    */
@@ -132,7 +147,7 @@ export default class Tower {
 
     me._signalPool.release(signal);
 
-    console.log(`${signal.toTowerId} arrived!`);
+    me._events.emit(Enums.Events.SCORE_INCREMENT);
   }
 
   _invalidateSignalQueueText() {

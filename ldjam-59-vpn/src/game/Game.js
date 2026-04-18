@@ -6,9 +6,9 @@ import Consts from "./Consts.js";
 import Edge from "./Edge.js";
 import Enums from "./Enums.js";
 import Graph from "./Graph.js";
-import RKN from "./RKN.js";
 import RKNMotherBrain from "./RKNMotherBrain.js";
 import SignalPool from "./SignalPool.js";
+import UI from "./UI.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -20,12 +20,20 @@ export default class Game {
   /** @type {RKNMotherBrain} */
   _enemies;
 
+  /** @type {UI} */
+  _ui;
+
+  /** @type {Number} */
+  _nextSignalSpawnTime = 0;
+
   constructor() {
     const me = this;
 
     Here._.input.mouse.disableContextMenu();
 
     const gameEvents = new Phaser.Events.EventEmitter();
+
+    me._ui = new UI();
 
     const signalPool = new SignalPool();
     me._graph = new Graph(signalPool, gameEvents);
@@ -43,6 +51,11 @@ export default class Game {
       Enums.Events.EDGE_REMOVED,
       me._enemies.onEdgeRemoved,
       me._enemies,
+    );
+    gameEvents.on(
+      Enums.Events.SCORE_INCREMENT,
+      me._ui.onScoreIncrement,
+      me._ui,
     );
 
     //===============
@@ -69,11 +82,11 @@ export default class Game {
       Here.Controls.isPressedOnce(Enums.Keyboard.MAIN_ACTION) &&
       Utils.isDebug(Config.Debug.Global)
     ) {
-      me._graph.createNewSignal();
+      me._graph.trySpawnNewSignal();
     }
 
     //=================
-    me._gameLoop(deltaTime);
+    me._gameLoop(time, deltaTime);
     //=================
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
@@ -86,10 +99,22 @@ export default class Game {
     });
   }
 
-  _gameLoop(deltaTime) {
+  _gameLoop(time, deltaTime) {
     const me = this;
 
     me._graph.update(deltaTime);
     me._enemies.update();
+
+    if (time > me._nextSignalSpawnTime) {
+      me._spawnSignal();
+    }
+  }
+
+  _spawnSignal() {
+    const me = this;
+
+    if (me._graph.trySpawnNewSignal()) {
+      me._nextSignalSpawnTime += Config.Time.SpawnSignalPeriodMd;
+    }
   }
 }

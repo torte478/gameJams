@@ -45,7 +45,14 @@ export default class Graph {
 
     for (let i = 0; i < Config.Start.Towers.length; ++i) {
       const el = Config.Start.Towers[i];
-      const tower = new Tower(i, el.x, el.y, i + "", me._signalPool);
+      const tower = new Tower(
+        i,
+        el.x,
+        el.y,
+        i + "",
+        me._signalPool,
+        me._events,
+      );
       me._towers.push(tower);
     }
 
@@ -65,7 +72,7 @@ export default class Graph {
 
     // ==== DEBUG DEBUG
     for (let i = 0; i < 3; ++i) {
-      me.createNewSignal();
+      me.trySpawnNewSignal();
     }
   }
 
@@ -81,14 +88,17 @@ export default class Graph {
     me._updateSignals(deltaTime);
   }
 
-  createNewSignal() {
+  trySpawnNewSignal() {
     const me = this;
 
-    const pair = Utils.getRandomElems(me._towers, 2);
-    console.log(pair[0].id, pair[1].id);
+    const towersWithRoom = me._towers.filter((t) => t.hasRoom());
+    if (towersWithRoom.length < 2) return false;
+
+    const pair = Utils.getRandomElems(towersWithRoom, 2);
     const signal = me._signalPool.create(pair[0].id, pair[1].id);
 
     me._towers[pair[0].id].addSignal(signal);
+    return true;
   }
 
   /**
@@ -112,6 +122,9 @@ export default class Graph {
     if (!edge) throw `can't find edge ${fromTowerId} ${nextVertexId}`;
 
     if (!edge.isFree()) return null;
+
+    const nextTower = me._towers[nextVertexId];
+    if (!nextTower.hasRoom()) return null; // TODO: multiple paths
 
     return edge;
   }

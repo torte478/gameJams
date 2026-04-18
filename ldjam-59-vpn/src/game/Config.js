@@ -17,13 +17,16 @@ export default class Config {
   };
 
   static Speed = {
-    Signal: 100,
+    Signal: 300,
     RknMovement: 300,
   };
 
+  static Time = {
+    SpawnSignalPeriodMd: 1000,
+  };
+
   static EatSignalRadius = 5;
-
   static EdgeThickness = 1;
-
   static RemoveEdgeOffset = 10;
+  static MaxSignalPerTower = 8;
 }
