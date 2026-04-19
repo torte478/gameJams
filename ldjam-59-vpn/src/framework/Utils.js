@@ -429,4 +429,12 @@ export default class Utils {
   }
 
   // --- New ---
+
+  static colorNumberToString(hexNumber) {
+    return "#" + hexNumber.toString(16).padStart(6, "0");
+  }
+
+  static indexToLetter(index) {
+    return String.fromCharCode(65 + index);
+  }
 }

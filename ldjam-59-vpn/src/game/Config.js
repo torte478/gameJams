@@ -6,26 +6,26 @@ export default class Config {
     PlaySound: true,
     Random: false,
     CutsceneZoom: false,
-    AutoMode: false,
+    AutoMode: true,
     SignalQueueView: false,
   };
 
   static Start = {
-    TowersCount: 4,
+    TowersCount: 2,
     RKN: 0,
     Score: 0,
     Edges: [
-      // { from: 0, to: 1 },
+      { from: 0, to: 1 },
       // { from: 0, to: 2 },
       // { from: 0, to: 3 },
     ],
   };
 
   static Color = {
-    Dark: "#140B23",
-    Light: "#f7ebff",
-    Red: "$d4745c",
-    Green: "#00c8a0",
+    Dark: 0x140b23,
+    Light: 0xf7ebff,
+    Red: 0xd4745c,
+    Green: 0x00c8a0,
     TowerLight: {
       Green: 0x00ff00,
       Yellow: 0xffff00,
@@ -54,7 +54,7 @@ export default class Config {
 
   static FontFamily = "Arial";
   static EatSignalRadius = 5;
-  static EdgeThickness = 1;
+  static EdgeThickness = 2;
   static RemoveEdgeOffset = 10;
   static MaxSignalPerTower = 9;
   static CutsceneCameraZoom = 0.75;

@@ -216,7 +216,7 @@ export default class Graph {
       index,
       el.x,
       el.y,
-      index + "",
+      Utils.indexToLetter(index),
       me._signalPool,
       me._events,
     );
@@ -515,7 +515,7 @@ export default class Graph {
 
     me._graphEdgesGraphics
       .clear()
-      .lineStyle(Config.EdgeThickness, 0xffff00, 1.0);
+      .lineStyle(Config.EdgeThickness, Config.Color.Light);
     for (const edge of me._edges) {
       const fromPos = edge.getFromPos();
       const targetPos = edge.getToPos();

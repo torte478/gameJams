@@ -1,5 +1,6 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
+import Config from "./Config.js";
 
 export default class Signal {
   /** @type {Phaser.GameObjects.Container} */
@@ -25,7 +26,11 @@ export default class Signal {
     me.uid = Signal._uid_counter++;
 
     me._labelText = Here._.add
-      .text(0, 0, "X", { fontSize: 30 })
+      .text(0, 0, "X", {
+        fontSize: 24,
+        fontFamily: Config.FontFamily,
+        color: Utils.colorNumberToString(Config.Color.Dark),
+      })
       .setOrigin(0.5, 0.5);
     const image = Here._.add.image(0, 0, "signal");
 
@@ -44,7 +49,7 @@ export default class Signal {
     me.fromTowerId = fromTowerId;
     me.toTowerId = toTowerId;
 
-    me._labelText.setText(me.toTowerId);
+    me._labelText.setText(Utils.indexToLetter(me.toTowerId));
   }
 
   /**

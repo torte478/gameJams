@@ -69,7 +69,7 @@ export default class Tower {
       .text(2, 33, label, {
         fontSize: 18,
         fontFamily: Config.FontFamily,
-        color: Config.Color.Light,
+        color: Utils.colorNumberToString(Config.Color.Light),
       })
       .setOrigin(0.5, 0.5);
     me._signalQueueText = Here._.add
@@ -108,7 +108,7 @@ export default class Tower {
   getPos() {
     const me = this;
 
-    return Utils.toPoint(me._container);
+    return Utils.buildPoint(me._container.x, me._container.y + 30);
   }
 
   toggleMode() {
