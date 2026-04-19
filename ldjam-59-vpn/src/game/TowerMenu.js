@@ -1,4 +1,5 @@
 import Here from "../framework/Here.js";
+import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Tower from "./Tower.js";
@@ -128,14 +129,20 @@ export default class TowerMenu {
     return me._container;
   }
 
-  getSignalIndexAtMouse() {
+  getSignalAtMouse() {
     const me = this;
 
     if (!me._selectedItem) {
       return null;
     }
 
-    return me._selectedItem.signalIndex;
+    return {
+      index: me._selectedItem.signalIndex,
+      pos: Utils.buildPoint(
+        me._container.x + me._selectedItem.x,
+        me._container.y + me._selectedItem.y,
+      ),
+    };
   }
 
   _onPointerOverItem(index) {

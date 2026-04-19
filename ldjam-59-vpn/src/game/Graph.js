@@ -1,6 +1,7 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Consts from "./Consts.js";
 import Edge from "./Edge.js";
 import Enums from "./Enums.js";
 import SignalPool from "./SignalPool.js";
@@ -43,6 +44,12 @@ export default class Graph {
 
   /** @type {TowerMenu} */
   _towerMenu;
+
+  /** @type {Number | null} */
+  _selectedSignalForManualSendSignalIndex = null;
+
+  /** @type {Phaser.Math.Vector2 | null} */
+  _selectedSignalForManualSendPos = null;
 
   constructor(signalPool, events) {
     const me = this;
@@ -88,6 +95,8 @@ export default class Graph {
 
     if (!!me._selectedTower) {
       me._drawNewEdgeLine();
+    } else if (!!me._selectedSignalForManualSendPos) {
+      me._drawManualSignalSendLine();
     } else {
       me._selectEdgeToRemove();
     }
@@ -158,10 +167,7 @@ export default class Graph {
     );
     if (!edge) throw `can't find edge ${fromTowerId} ${nextVertexId}`;
 
-    if (!edge.isFree()) return null;
-
-    const nextTower = me._towers[nextVertexId];
-    if (!nextTower.hasRoom()) return null; // TODO: multiple paths
+    if (!me._canSendSignalThrowEdge(edge, toTowerId)) return null;
 
     return edge;
   }
@@ -249,6 +255,20 @@ export default class Graph {
     }
   }
 
+  _drawManualSignalSendLine() {
+    const me = this;
+
+    me._lineDrawingGraphics
+      .clear()
+      .setDepth(Consts.Depth.SignalLineDrawing)
+      .lineBetween(
+        me._selectedSignalForManualSendPos.x,
+        me._selectedSignalForManualSendPos.y,
+        Here._.input.mousePointer.worldX,
+        Here._.input.mousePointer.worldY,
+      );
+  }
+
   _drawNewEdgeLine() {
     const me = this;
 
@@ -260,6 +280,7 @@ export default class Graph {
 
     me._lineDrawingGraphics
       .clear()
+      .setDepth(Consts.Depth.EdgeDrawing)
       .lineBetween(
         fromPos.x,
         fromPos.y,
@@ -298,24 +319,44 @@ export default class Graph {
     const mousePos = new Phaser.Math.Vector2(pointer.x, pointer.y);
     if (!me._towerMenu.containsPoint(mousePos)) {
       me._towerMenu.close();
+      me._removeManualSignalSelection();
       return;
     }
 
     if (pointer.rightButtonDown()) {
       me._tryRemoveSignal(mousePos);
     } else {
-      // me._processTowerClick(pointer);
+      me._trySelectSignalForManualSend(mousePos);
     }
+  }
+
+  _removeManualSignalSelection() {
+    const me = this;
+
+    me._selectedSignalForManualSendPos = null;
+    me._selectedSignalForManualSendSignalIndex = null;
+  }
+
+  _trySelectSignalForManualSend(mousePos) {
+    const me = this;
+
+    const signal = me._towerMenu.getSignalAtMouse(mousePos);
+    if (signal == null) return;
+
+    me._selectedSignalForManualSendPos = signal.pos;
+    me._selectedSignalForManualSendSignalIndex = signal.index;
   }
 
   _tryRemoveSignal(pos) {
     const me = this;
 
-    const index = me._towerMenu.getSignalIndexAtMouse(pos);
-    if (index == null) return;
+    me._removeManualSignalSelection();
+
+    const signal = me._towerMenu.getSignalAtMouse(pos);
+    if (signal == null) return;
 
     const tower = me._towerMenu.currentTower;
-    tower.removeSignalOfIndex(index);
+    tower.removeSignalByIndex(signal.index);
     me._towerMenu.invalidate();
   }
 
@@ -363,9 +404,49 @@ export default class Graph {
 
     if (me._isCutscene) return;
 
-    if (!me._selectedTower) {
-      return;
+    if (!!me._selectedTower) {
+      me._processTowerPointerUp(pointer);
+    } else if (!!me._selectedSignalForManualSendPos) {
+      me._processManualSignalPointerUp(pointer);
     }
+  }
+
+  _processManualSignalPointerUp(pointer) {
+    const me = this;
+
+    const targetTower = me._getTowerOnMousePos(pointer);
+    if (!!targetTower) {
+      me._trySendSignalToTower(targetTower);
+    }
+
+    me._removeManualSignalSelection();
+    me._lineDrawingGraphics.clear();
+  }
+
+  _trySendSignalToTower(tower) {
+    const me = this;
+
+    const fromTower = me._towerMenu.currentTower;
+    if (fromTower.id === tower.id) return;
+
+    /** @type {Edge} */
+    const edge = Utils.firstOrNull(me._edges, (e) =>
+      e.thisIsIt(fromTower.id, tower.id),
+    );
+    if (!edge) return;
+
+    if (!me._canSendSignalThrowEdge(edge, tower.id)) return;
+
+    edge.sendSignal(
+      fromTower.id,
+      fromTower.getSignalByIndexAndRemove(
+        me._selectedSignalForManualSendSignalIndex,
+      ),
+    );
+  }
+
+  _processTowerPointerUp(pointer) {
+    const me = this;
 
     /** @type {Tower} */
     const targetTower = me._getTowerOnMousePos(pointer);
@@ -499,7 +580,6 @@ export default class Graph {
       return null;
     }
 
-    // Восстановление пути
     const path = [];
     let current = fromId;
 
@@ -562,5 +642,16 @@ export default class Graph {
     if (me._towerMenu.isOpen && me._towerMenu.currentTower.id === tower.id) {
       me._towerMenu.invalidate();
     }
+  }
+
+  _canSendSignalThrowEdge(edge, toTowerId) {
+    const me = this;
+
+    if (!edge.isFree()) return false;
+
+    const nextTower = me._towers[toTowerId];
+    if (!nextTower.hasRoom()) return false; // TODO: multiple paths
+
+    return true;
   }
 }

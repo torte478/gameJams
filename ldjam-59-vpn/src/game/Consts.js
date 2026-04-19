@@ -11,7 +11,9 @@ export default class Consts {
   };
 
   static Depth = {
+    EdgeDrawing: 500,
     TowerMenu: 1000,
+    SignalLineDrawing: 5000,
     Fade: 10000,
     Max: 100000,
   };

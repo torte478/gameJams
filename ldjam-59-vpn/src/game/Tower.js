@@ -155,6 +155,16 @@ export default class Tower {
     }
   }
 
+  getSignalByIndexAndRemove(index) {
+    const me = this;
+
+    if (index >= me._signalQueue.length) throw "wrong signal index at queue";
+
+    const signal = me._signalQueue[index];
+    me.removeSignalByIndex(index);
+    return signal;
+  }
+
   hasRoom() {
     const me = this;
 
@@ -181,7 +191,7 @@ export default class Tower {
     me._sprite.setFrame(0);
   }
 
-  removeSignalOfIndex(index) {
+  removeSignalByIndex(index) {
     const me = this;
 
     if (me._signalQueue.length < index) throw "wrong signal index";
