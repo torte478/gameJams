@@ -4,6 +4,7 @@ import Boss from "./Boss.js";
 
 import Config from "./Config.js";
 import Consts from "./Consts.js";
+import Edge from "./Edge.js";
 import Enums from "./Enums.js";
 import Graph from "./Graph.js";
 import RKNMotherBrain from "./RKNMotherBrain.js";
@@ -40,7 +41,10 @@ export default class Game {
   _boss;
 
   /** @type {Number} */
-  _currentTime;
+  _currentTime = 0;
+
+  /** @type {Number} */
+  _nextSignalRateRecalculationTime = 0;
 
   constructor() {
     const me = this;
@@ -87,6 +91,9 @@ export default class Game {
       me,
     );
 
+    me._nextSignalRateRecalculationTime =
+      Config.Time.SignalRateRecalculationPeriod;
+
     //===============
 
     Utils.ifDebug(Config.Debug.CutsceneZoom, () => {
@@ -129,7 +136,8 @@ export default class Game {
 
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `rkn: ${me._boss.hp}`;
+        `tme: ${(me._currentTime / 1000) | 0}\n` +
+        `nxt: ${me._nextSignalRateRecalculationTime / 1000}`;
       me._log.setText(text);
     });
   }
@@ -147,6 +155,31 @@ export default class Game {
     if (time > me._nextSignalSpawnTime) {
       me._spawnSignal();
     }
+
+    if (time > me._nextSignalRateRecalculationTime) {
+      me._recalculateEdgeRates();
+    }
+  }
+
+  _recalculateEdgeRates() {
+    const me = this;
+
+    /** @type {Edge[]} */
+    const edges = me._graph.recalculateEdgeRates();
+
+    if (Utils.isDebug(Config.Debug.Global)) {
+      let edgeRatingText = "rating: ";
+      for (const edge of edges) {
+        edgeRatingText += `(${edge.getFromId()}, ${edge.getToId()}), `;
+      }
+
+      Utils.debugLog(edgeRatingText);
+    }
+
+    me._enemies.processNextEdgeRating(edges);
+
+    me._nextSignalRateRecalculationTime =
+      me._currentTime + Config.Time.SignalRateRecalculationPeriod;
   }
 
   _cutsceneUpdate() {

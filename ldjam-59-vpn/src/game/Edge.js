@@ -29,6 +29,9 @@ export default class Edge {
   /** @type {SignalPool} */
   _signalPool;
 
+  /** @type {Number} */
+  _signalCounter = 0;
+
   /**
    * @param {Tower} from
    * @param {Tower} to
@@ -116,6 +119,12 @@ export default class Edge {
     return !me._signal;
   }
 
+  resetRate() {
+    const me = this;
+
+    me._signalCounter = 0;
+  }
+
   /**
    * @param {Number} fromTowerId
    * @param {Signal} signal
@@ -128,6 +137,7 @@ export default class Edge {
     }
 
     me._signal = signal;
+    me._signalCounter++;
     me._isDirect = fromTowerId === me._from.id;
 
     const fromPos = me._getFromPos();

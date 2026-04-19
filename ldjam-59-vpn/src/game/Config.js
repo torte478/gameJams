@@ -11,7 +11,7 @@ export default class Config {
 
   static Start = {
     TowersCount: 4,
-    EnemiesCount: 1,
+    EnemiesCount: 3,
     Score: 0,
     Edges: [
       // { from: 0, to: 1 },
@@ -27,6 +27,7 @@ export default class Config {
 
   static Time = {
     SpawnSignalPeriodMs: 5000,
+    SignalRateRecalculationPeriod: 5000,
     // Endgame sequence
     P0_Zoom: 1000,
     P1_WaitBeforeStartRestartAnimaion: 1000,

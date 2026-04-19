@@ -1,3 +1,4 @@
+import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Graph from "./Graph.js";
 import RKN from "./RKN.js";
@@ -37,6 +38,28 @@ export default class RKNMotherBrain {
 
     if (enimeiesWithoutTargets.length > 0) {
       enimeiesWithoutTargets[0].setTarget(edge);
+    }
+  }
+
+  /**
+   * @param {Edge[]} sortedEdges
+   */
+  processNextEdgeRating(sortedEdges) {
+    const me = this;
+
+    let enemyIndex = me._enemies.length - 1;
+    for (let i = 0; i < me._enemies.length; ++i) {
+      if (i >= sortedEdges.length || enemyIndex < 0) return;
+
+      const edge = sortedEdges[i];
+      const edgeTaken = Utils.any(
+        me._enemies,
+        (e) => !!e._targetEdge && e._targetEdge.equalTo(edge),
+      );
+      if (!edgeTaken) {
+        me._enemies[enemyIndex].setTarget(edge);
+        enemyIndex -= 1;
+      }
     }
   }
 

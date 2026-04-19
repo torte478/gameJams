@@ -47,7 +47,7 @@ export default class RKN {
     if (!me._isEating) return;
 
     if (me._targetEdge.hasSignalAtMiddle()) {
-      console.log("eat signal!!!");
+      console.log("eat signal!!!"); // TODODODODODODODODODODODODDO
       me._targetEdge.signalEaten();
     }
   }
@@ -58,9 +58,11 @@ export default class RKN {
   setTarget(edge) {
     const me = this;
 
-    if (!!me._targetEdge) throw "target already exists";
+    me.checkEdgeRemove(me._targetEdge);
 
     me._targetEdge = edge;
+
+    Utils.debugLog(`new edge target: ${edge.getFromId()} - ${edge.getToId()}`);
 
     const targetPos = edge.getMiddle();
     me._movementTween = Here._.add.tween({

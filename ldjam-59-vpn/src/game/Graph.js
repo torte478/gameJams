@@ -134,6 +134,19 @@ export default class Graph {
     }
   }
 
+  recalculateEdgeRates() {
+    const me = this;
+
+    const sortedEdges = me._edges.sort(
+      (a, b) => -(a._signalCounter - b._signalCounter),
+    );
+    for (const edge of me._edges) {
+      edge.resetRate();
+    }
+
+    return sortedEdges;
+  }
+
   trySpawnNewSignal() {
     const me = this;
 
