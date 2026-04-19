@@ -367,6 +367,14 @@ export default class Game {
       me._setPhase(Enums.Phase.P4_ENEMY_ARRIVING);
       return;
     }
+
+    if (
+      Game.phaseId === Enums.Phase.P4_ENEMY_ARRIVING &&
+      me._graph._towers.length === 6
+    ) {
+      me._setPhase(Enums.Phase.P5_THE_GAME);
+      return;
+    }
   }
 
   _setPhase(phaseId, doQuickly) {
@@ -437,6 +445,12 @@ export default class Game {
         me._graph._tryAddEdge(me._graph._towers[2], me._graph._towers[1]);
         me._graph._tryAddEdge(me._graph._towers[3], me._graph._towers[1]);
       }
+      return;
+    }
+
+    if (phaseId === Enums.Phase.P5_THE_GAME) {
+      // TODO
+
       return;
     }
 

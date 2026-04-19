@@ -14,7 +14,7 @@ export default class Config {
   };
 
   static Start = {
-    PhaseId: Enums.Phase.P0_START, //P4_ENEMY_ARRIVING,
+    PhaseId: Enums.Phase.P0_START,
     TowersCount: 2,
     RKN: 0,
     Score: 0,
@@ -61,6 +61,7 @@ export default class Config {
       2000, // 2
       1750, // 3
       1500, // 4
+      1000, // 5
     ],
     SignalRateRecalculationPeriod: 15000,
     // Endgame sequence

@@ -17,6 +17,7 @@ export default class Enums {
     P2_FIRST_TOWER_BUY: 2,
     P3_REMOVE_EDGE: 3,
     P4_ENEMY_ARRIVING: 4,
+    P5_THE_GAME: 5,
     TODO: 9999999,
   };
 
