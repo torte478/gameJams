@@ -199,8 +199,17 @@ export default class Game {
     if (time < me._nextSignalSpawnTime) return;
 
     if (me._graph.trySpawnNewSignal()) {
-      me._nextSignalSpawnTime += Config.Time.SpawnSignalPeriodMs;
+      me._nextSignalSpawnTime += me._getSpawnSignalPeriod();
     }
+  }
+
+  _getSpawnSignalPeriod() {
+    const me = this;
+
+    if (Config.Time.SpawnSignal.length <= Game.phaseId)
+      throw "missing spawn signal time";
+
+    return Config.Time.SpawnSignal[Game.phaseId];
   }
 
   _recalculateEdgeRates() {
@@ -271,7 +280,7 @@ export default class Game {
     me._ui.reset();
 
     Here._.cameras.main.setZoom(1);
-    me._nextSignalSpawnTime = me._currentTime + Config.Time.SpawnSignalPeriodMs;
+    me._nextSignalSpawnTime = me._currentTime + me._getSpawnSignalPeriod();
     me._isCutscene = false;
     me._isRestartCutscene = false;
   }
@@ -381,8 +390,7 @@ export default class Game {
     if (phaseId === Enums.Phase.P2_FIRST_TOWER_BUY) {
       Here.Audio.play("musicRadio", { loop: true });
 
-      me._nextSignalSpawnTime =
-        me._currentTime + Config.Time.SpawnSignalPeriodMs;
+      me._nextSignalSpawnTime = me._currentTime + me._getSpawnSignalPeriod();
       me._nextSignalRateRecalculationTime =
         me._currentTime + Config.Time.SignalRateRecalculationPeriod;
 
@@ -420,6 +428,7 @@ export default class Game {
     }
 
     if (phaseId === Enums.Phase.P4_ENEMY_ARRIVING) {
+      me._vfx.tenctacleRightClickHint(doQuickly);
       me._enemies.spawnFirstEnemy();
 
       if (!!doQuickly) {

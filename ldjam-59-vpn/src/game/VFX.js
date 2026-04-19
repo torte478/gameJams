@@ -187,6 +187,22 @@ export default class VFX {
     );
   }
 
+  tenctacleRightClickHint(doQuickly) {
+    const me = this;
+
+    const fromPos = Utils.buildPoint(-250, 200);
+    const toPos = Utils.buildPoint(150, 200);
+
+    me._tentacleAction(
+      fromPos,
+      toPos,
+      0,
+      me._hintDeleteChannel,
+      doQuickly,
+      () => {},
+    );
+  }
+
   tenctacleConnectHint(doQuickly) {
     const me = this;
 
@@ -196,7 +212,9 @@ export default class VFX {
       -90,
       me._hintConnectTowers,
       doQuickly,
-      () => me._showRightClickHint(),
+      () => {
+        if (!doQuickly) me._showRightClickHint();
+      },
     );
   }
 

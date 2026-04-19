@@ -14,7 +14,7 @@ export default class Config {
   };
 
   static Start = {
-    PhaseId: Enums.Phase.P0_START, //P3_REMOVE_EDGE, //P4_ENEMY_ARRIVING,
+    PhaseId: Enums.Phase.P4_ENEMY_ARRIVING,
     TowersCount: 2,
     RKN: 0,
     Score: 100,
@@ -55,7 +55,13 @@ export default class Config {
   };
 
   static Time = {
-    SpawnSignalPeriodMs: 2500,
+    SpawnSignal: [
+      2500, // 0
+      2500, // 1
+      2500, // 2
+      2000, // 3
+      1500, // 4
+    ],
     SignalRateRecalculationPeriod: 15000,
     // Endgame sequence
     P0_Zoom: 1000,
@@ -70,6 +76,7 @@ export default class Config {
 
   static RknStartScale = 0.5;
   static RknScaleChange = 0.1;
+  static RknMaxScale = 1;
 
   static EdgeThickness = 2;
   static SelectedEdgeThickness = 12;

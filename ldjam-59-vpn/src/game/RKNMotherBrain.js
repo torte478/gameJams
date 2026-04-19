@@ -1,5 +1,6 @@
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Game from "./Game.js";
 import Graph from "./Graph.js";
 import RKN from "./RKN.js";
 import VFX from "./VFX.js";
@@ -96,8 +97,13 @@ export default class RKNMotherBrain {
   spawnFirstEnemy() {
     const me = this;
 
-    //-50 200
-    const enemy = new RKN(-50, 200, me._vfx);
+    const enemy = new RKN(650, 850, me._vfx);
     me._enemies.push(enemy);
+
+    const edges = Game.instance._graph._edges;
+    if (edges.length === 0) return;
+
+    const target = Utils.getRandomEl(edges);
+    enemy.setTarget(target);
   }
 }

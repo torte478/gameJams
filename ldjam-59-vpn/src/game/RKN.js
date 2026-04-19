@@ -56,12 +56,18 @@ export default class RKN {
 
     if (!me._isEating) return;
 
-    if (me._targetEdge.hasSignalAtMiddle()) {
-      me._sprite.play("rkn_eat");
-      me._targetEdge.signalEaten();
-      Here.Audio.playEat();
-      me._vfx.minusOneParticles(me.getPos());
-    }
+    if (!me._targetEdge.hasSignalAtMiddle()) return;
+
+    me._sprite.play("rkn_eat");
+    me._targetEdge.signalEaten();
+    Here.Audio.playEat();
+    me._vfx.minusOneParticles(me.getPos());
+
+    const scale = Math.min(
+      Config.RknMaxScale,
+      me._container.scale + Config.RknScaleChange,
+    );
+    me._container.setScale(scale);
   }
 
   /**
