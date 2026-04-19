@@ -31,6 +31,9 @@ export default class Tower {
   /** @type {Boolean} */
   _isAutoMode = true;
 
+  /** @type {Phaser.GameObjects.PointLight} */
+  _light;
+
   /**
    * @param {Number} id
    * @param {Number} x
@@ -50,12 +53,36 @@ export default class Tower {
     }
 
     me._sprite = Here._.add.sprite(0, 0, "tower", 0);
+    if (me._isAutoMode) {
+      me._sprite.play("tower_idle");
+    }
 
-    const labelText = Here._.add.text(0, 26, label, { fontSize: 20 });
-    me._signalQueueText = Here._.add.text(50, 0, "[]", { fontSize: 20 });
+    me._light = Here._.add.pointlight(
+      -1,
+      -25,
+      Config.Color.TowerLight.Green,
+      30,
+      0.1,
+    );
+
+    const labelText = Here._.add
+      .text(2, 33, label, {
+        fontSize: 18,
+        fontFamily: Config.FontFamily,
+        color: Config.Color.Light,
+      })
+      .setOrigin(0.5, 0.5);
+    me._signalQueueText = Here._.add
+      .text(50, 0, "[]", { fontSize: 20 })
+      .setVisible(false);
+    if (Utils.isDebug(Config.Debug.SignalQueueView)) {
+      me._signalQueueText.setVisible(true);
+    }
+
     me._container = Here._.add.container(x, y, [
       me._sprite,
       labelText,
+      me._light,
       me._signalQueueText,
     ]);
 
@@ -68,6 +95,8 @@ export default class Tower {
       .on("pointerout", () => {
         me._sprite.clearTint();
       });
+
+    me._invalidateSignalQueueVisual();
   }
 
   toGameObj() {
@@ -122,7 +151,7 @@ export default class Tower {
       .setVisible(false);
 
     me._signalQueue.push(signal);
-    me._invalidateSignalQueueText();
+    me._invalidateSignalQueueVisual();
     me._events.emit(Enums.Events.TOWER_SIGNAL_CHANGE, me);
   }
 
@@ -150,7 +179,7 @@ export default class Tower {
       me._signalQueue = me._signalQueue.filter(
         (s) => !Utils.contains(signalsToDelete, s.uid),
       );
-      me._invalidateSignalQueueText();
+      me._invalidateSignalQueueVisual();
       me._events.emit(Enums.Events.TOWER_SIGNAL_CHANGE, me);
     }
   }
@@ -185,7 +214,7 @@ export default class Tower {
     }
 
     me._signalQueue = [];
-    me._invalidateSignalQueueText();
+    me._invalidateSignalQueueVisual();
 
     me._isAutoMode = true;
     me._sprite.setFrame(0);
@@ -197,7 +226,7 @@ export default class Tower {
     if (me._signalQueue.length < index) throw "wrong signal index";
 
     me._signalQueue.splice(index, 1);
-    me._invalidateSignalQueueText();
+    me._invalidateSignalQueueVisual();
     me._events.emit(Enums.Events.TOWER_SIGNAL_CHANGE, me);
   }
 
@@ -212,11 +241,14 @@ export default class Tower {
     me._events.emit(Enums.Events.SCORE_INCREMENT);
   }
 
-  _invalidateSignalQueueText() {
+  _invalidateSignalQueueVisual() {
     const me = this;
 
-    if (me._signalQueue.length === 0) {
+    const signalCount = me._signalQueue.length;
+
+    if (signalCount === 0) {
       me._signalQueueText.setText("[]");
+      me._light.setVisible(false);
       return;
     }
 
@@ -225,5 +257,26 @@ export default class Tower {
       text += signal._labelText.text + ",";
     }
     me._signalQueueText.setText(text);
+
+    me._light.setVisible(true);
+    let lightColor = -1;
+    if (signalCount >= 1 && signalCount <= 3)
+      lightColor = Config.Color.TowerLight.Green;
+    else if (signalCount >= 4 && signalCount <= 6)
+      lightColor = Config.Color.TowerLight.Yellow;
+    else if (signalCount >= 7) lightColor = Config.Color.TowerLight.Red;
+
+    if (lightColor === -1) throw "light color error";
+
+    const rgb = me._hexToRgb(lightColor);
+    me._light.color.setTo(rgb.r, rgb.g, rgb.b);
+  }
+
+  _hexToRgb(hexColor) {
+    const r = (hexColor >> 16) & 0xff;
+    const g = (hexColor >> 8) & 0xff;
+    const b = hexColor & 0xff;
+
+    return { r, g, b };
   }
 }

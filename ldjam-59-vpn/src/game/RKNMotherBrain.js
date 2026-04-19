@@ -15,7 +15,7 @@ export default class RKNMotherBrain {
 
     me._graph = graph;
 
-    for (let i = 0; i < Config.Start.EnemiesCount; ++i) {
+    for (let i = 0; i < Config.Start.RKN; ++i) {
       me._enemies.push(new RKN(150, 150));
     }
   }

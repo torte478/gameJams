@@ -7,11 +7,12 @@ export default class Config {
     Random: false,
     CutsceneZoom: false,
     AutoMode: false,
+    SignalQueueView: false,
   };
 
   static Start = {
     TowersCount: 4,
-    EnemiesCount: 3,
+    RKN: 0,
     Score: 0,
     Edges: [
       // { from: 0, to: 1 },
@@ -20,13 +21,25 @@ export default class Config {
     ],
   };
 
+  static Color = {
+    Dark: "#140B23",
+    Light: "#f7ebff",
+    Red: "$d4745c",
+    Green: "#00c8a0",
+    TowerLight: {
+      Green: 0x00ff00,
+      Yellow: 0xffff00,
+      Red: 0xff0000,
+    },
+  };
+
   static Speed = {
     Signal: 300,
     RknMovement: 300,
   };
 
   static Time = {
-    SpawnSignalPeriodMs: 5000,
+    SpawnSignalPeriodMs: 3000,
     SignalRateRecalculationPeriod: 5000,
     // Endgame sequence
     P0_Zoom: 1000,
@@ -39,6 +52,7 @@ export default class Config {
   static NewTowerCost = 1;
   static BossHP = 100;
 
+  static FontFamily = "Arial";
   static EatSignalRadius = 5;
   static EdgeThickness = 1;
   static RemoveEdgeOffset = 10;

@@ -50,6 +50,7 @@ export default class Game {
     const me = this;
 
     Here._.input.mouse.disableContextMenu();
+    Here._.cameras.main.setBackgroundColor(Config.Color.Dark);
 
     const gameEvents = new Phaser.Events.EventEmitter();
 
