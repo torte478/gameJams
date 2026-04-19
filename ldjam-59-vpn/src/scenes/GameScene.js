@@ -48,6 +48,7 @@ export default class GameScene extends HereScene {
     Utils.loadWav("damage");
     Utils.loadWav("pointerDown");
     Utils.loadWav("pointerUp");
+    Utils.loadWav("enemySpawn");
 
     Utils.loadMp3("musicRadio");
     Utils.loadMp3("eat");

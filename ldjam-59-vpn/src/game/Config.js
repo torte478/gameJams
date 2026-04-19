@@ -14,10 +14,10 @@ export default class Config {
   };
 
   static Start = {
-    PhaseId: Enums.Phase.P4_ENEMY_ARRIVING,
+    PhaseId: Enums.Phase.P0_START, //P4_ENEMY_ARRIVING,
     TowersCount: 2,
     RKN: 0,
-    Score: 100,
+    Score: 0,
     Edges: [
       // { from: 0, to: 1 },
       // { from: 0, to: 2 },
@@ -57,9 +57,9 @@ export default class Config {
   static Time = {
     SpawnSignal: [
       2500, // 0
-      2500, // 1
-      2500, // 2
-      2000, // 3
+      2000, // 1
+      2000, // 2
+      1750, // 3
       1500, // 4
     ],
     SignalRateRecalculationPeriod: 15000,

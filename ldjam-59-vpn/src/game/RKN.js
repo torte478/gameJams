@@ -3,6 +3,8 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Edge from "./Edge.js";
+import Enums from "./Enums.js";
+import Game from "./Game.js";
 import VFX from "./VFX.js";
 
 export default class RKN {
@@ -58,16 +60,46 @@ export default class RKN {
 
     if (!me._targetEdge.hasSignalAtMiddle()) return;
 
-    me._sprite.play("rkn_eat");
     me._targetEdge.signalEaten();
-    Here.Audio.playEat();
     me._vfx.minusOneParticles(me.getPos());
+
+    if (me.isBigBoy() && me._trySpawnAnother()) {
+      return;
+    }
+
+    me._eatSignal();
+  }
+
+  resetScale() {
+    const me = this;
+
+    me._container.setScale(Config.RknStartScale);
+  }
+
+  _trySpawnAnother() {
+    const me = this;
+
+    const parent = Game.instance._enemies;
+    return parent.trySpawnAnother(me);
+  }
+
+  _eatSignal() {
+    const me = this;
+
+    me._sprite.play("rkn_eat");
+    Here.Audio.playEat();
 
     const scale = Math.min(
       Config.RknMaxScale,
       me._container.scale + Config.RknScaleChange,
     );
     me._container.setScale(scale);
+  }
+
+  isBigBoy() {
+    const me = this;
+
+    return Math.abs(me._container.scale - Config.RknMaxScale) < 0.01;
   }
 
   /**

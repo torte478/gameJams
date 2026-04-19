@@ -1,5 +1,8 @@
+import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Edge from "./Edge.js";
+import Enums from "./Enums.js";
 import Game from "./Game.js";
 import Graph from "./Graph.js";
 import RKN from "./RKN.js";
@@ -20,10 +23,6 @@ export default class RKNMotherBrain {
 
     me._graph = graph;
     me._vfx = vfx;
-
-    // for (let i = 0; i < Config.Start.RKN; ++i) {
-    //   me._enemies.push(new RKN(150, 150));
-    // }
   }
 
   update() {
@@ -79,6 +78,12 @@ export default class RKNMotherBrain {
       enemy.checkEdgeRemove(edge);
     }
 
+    me._takeEdges();
+  }
+
+  _takeEdges() {
+    const me = this;
+
     const enimeiesWithoutTargets = me._enemies.filter((e) => !e._targetEdge);
     if (enimeiesWithoutTargets.length === 0) return;
 
@@ -97,13 +102,48 @@ export default class RKNMotherBrain {
   spawnFirstEnemy() {
     const me = this;
 
-    const enemy = new RKN(650, 850, me._vfx);
+    const enemy = new RKN(650, 850, me._vfx, me._events);
     me._enemies.push(enemy);
 
-    const edges = Game.instance._graph._edges;
-    if (edges.length === 0) return;
+    me._takeEdges();
+  }
 
-    const target = Utils.getRandomEl(edges);
-    enemy.setTarget(target);
+  /**
+   * @param {RKN} origin
+   */
+  trySpawnAnother(origin) {
+    const me = this;
+
+    const edgeCount = Game.instance._graph._edges.length;
+    const enemyCount = me._enemies.length;
+
+    if (enemyCount >= edgeCount / 2) return false;
+
+    const originPos = origin.getPos();
+    const other = new RKN(originPos.x, originPos.y, me._vfx);
+    origin.resetScale();
+
+    me._enemies.push(other);
+
+    me._takeEdges();
+
+    Here.Audio.play("enemySpawn");
+
+    return true;
+  }
+
+  _findTarget() {
+    const me = this;
+
+    const edges = Game.instance._graph._edges.filter((e) =>
+      Utils.all(me._enemies, (enemy) => {
+        /** @type {RKN} */
+        const ee = enemy;
+        return !ee._targetEdge || !ee._targetEdge.equalTo(e);
+      }),
+    );
+    if (edges.length === 0) return null;
+
+    return Utils.getRandomEl(edges);
   }
 }
