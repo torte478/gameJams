@@ -1,5 +1,7 @@
 import Here from "./Here.js";
 import ButtonConfig from "./ButtonConfig.js";
+import Config from "../game/Config.js";
+import Utils from "./Utils.js";
 
 export default class Button {
   /** @type {ButtonConfig} */
@@ -28,8 +30,12 @@ export default class Button {
 
     if (!!config.text) {
       const text = Here._.add
-        .text(0, 0, config.text, config.textStyle)
-        .setOrigin(0.5, 0.5);
+        .text(-10, 0, config.text, {
+          fontSize: 32,
+          fontFamily: Config.FontFamily,
+          color: Utils.colorNumberToString(Config.Color.Light),
+        })
+        .setOrigin(0, 0.5);
 
       children.push(text);
     }
@@ -76,14 +82,12 @@ export default class Button {
   _select() {
     const me = this;
 
-    if (me._config.frameSelected !== null)
-      me._sprite.setFrame(me._config.frameSelected);
+    me._container.setScale(1.25);
   }
 
   _unselect() {
     const me = this;
 
-    if (me._config.frameIdle !== null)
-      me._sprite.setFrame(me._config.frameIdle);
+    me._container.setScale(1);
   }
 }

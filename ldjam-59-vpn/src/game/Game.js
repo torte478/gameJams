@@ -371,6 +371,10 @@ export default class Game {
         me,
       );
 
+      if (me._graph._edges.length == 0) {
+        me._graph._tryAddEdge(me._graph._towers[0], me._graph._towers[1]);
+      }
+
       return;
     }
 

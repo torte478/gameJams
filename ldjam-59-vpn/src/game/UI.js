@@ -40,10 +40,11 @@ export default class UI {
 
     me._newTowerButton = new Button({
       x: 100,
-      y: 700,
-      texture: "newTowerButton",
+      y: 725,
+      texture: "buttons",
       frameIdle: 0,
-      frameSelected: 1,
+      frameSelected: 0,
+      text: "10",
       callback: () => {
         me._events.emit(Enums.Events.NEW_TOWER_BUTTON_CLICK);
       },
