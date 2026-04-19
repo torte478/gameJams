@@ -23,16 +23,19 @@ export default class TowerMenu {
   /** @type {Phaser.GameObjects.Image | null} */
   _selectedItem = null;
 
+  /** @type {Phaser.GameObjects.Image} */
+  _background;
+
   constructor() {
     const me = this;
 
-    const background = Here._.add.image(0, 0, "towerMenu");
+    me._background = Here._.add.image(0, 10, "towerMenu", 0);
 
     const rowLength = 3; // yes
-    const tileSize = 30; // yes yes
+    const tileSize = 20; // yes yes
 
-    const startX = -30;
-    const startY = -30;
+    const startX = -27;
+    const startY = -5;
     const offset = 5;
     for (let i = 0; i < Config.MaxSignalPerTower; ++i) {
       const row = Math.floor(i / rowLength);
@@ -55,7 +58,7 @@ export default class TowerMenu {
       me._itemTexts.push(text);
     }
 
-    const children = [background];
+    const children = [me._background];
     for (const item of me._items) children.push(item);
     for (const text of me._itemTexts) children.push(text);
 
@@ -112,12 +115,16 @@ export default class TowerMenu {
         me._items[i].setVisible(true);
         me._itemTexts[i]
           .setVisible(true)
-          .setText(me.currentTower._signalQueue[i].toTowerId);
+          .setText(
+            Utils.indexToLetter(me.currentTower._signalQueue[i].toTowerId),
+          );
       } else {
         me._items[i].setVisible(false);
         me._itemTexts[i].setVisible(false);
       }
     }
+
+    me._background.setFrame(me.currentTower._isAutoMode ? 0 : 1);
   }
 
   /**
@@ -127,6 +134,15 @@ export default class TowerMenu {
     const me = this;
 
     return me._container;
+  }
+
+  isToggleClick(mousePos) {
+    const me = this;
+
+    const diffX = me._container.x - mousePos.x;
+    const diffY = me._container.y - mousePos.y;
+    // return diffX >= -17 && diffX <= 34 && diffY >= -44 && diffY <= -30; // AAaaAaaaAAaaa
+    return diffX >= -34 && diffX <= 43 && diffY >= 30 && diffY <= 44; // AAaaAaaaAAaaa
   }
 
   getSignalAtMouse() {
@@ -149,7 +165,7 @@ export default class TowerMenu {
     const me = this;
 
     const sprite = me._items[index];
-    sprite.setTint(0x44ff44);
+    sprite.setTint(Config.Color.Green);
 
     me._selectedItem = sprite;
   }

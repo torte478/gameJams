@@ -149,7 +149,7 @@ export default class Game {
       Here.Controls.isPressedOnce(Enums.Keyboard.MAIN_ACTION) &&
       Utils.isDebug(Config.Debug.Global)
     ) {
-      me._graph.trySpawnNewSignal();
+      for (let i = 0; i < 5; ++i) me._graph.trySpawnNewSignal();
     }
 
     //=================

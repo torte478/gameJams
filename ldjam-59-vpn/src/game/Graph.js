@@ -166,7 +166,7 @@ export default class Graph {
    * @param {Number} toTowerId
    * @returns {Edge}
    */
-  getEdgeToSend(fromTowerId, toTowerId) {
+  getEdgeToSend(fromTowerId, toTowerId, signalTargetId) {
     const me = this;
 
     const path = me._getPath(fromTowerId, toTowerId);
@@ -181,7 +181,8 @@ export default class Graph {
     );
     if (!edge) throw `can't find edge ${fromTowerId} ${nextVertexId}`;
 
-    if (!me._canSendSignalThrowEdge(edge, toTowerId)) return null;
+    if (!me._canSendSignalThrowEdge(edge, toTowerId, signalTargetId))
+      return null;
 
     return edge;
   }
@@ -237,6 +238,9 @@ export default class Graph {
       Here._.input.mousePointer.worldX,
       Here._.input.mousePointer.worldY,
     );
+
+    if (me._towerMenu.isOpen && me._towerMenu.containsPoint(mouserPos)) return;
+
     /** @type {Edge} */
     me._edgeToRemove = Utils.firstOrNull(me._edges, (e) => {
       /** @type {Edge} */
@@ -282,6 +286,7 @@ export default class Graph {
     me._lineDrawingGraphics
       .clear()
       .setDepth(Consts.Depth.SignalLineDrawing)
+      .lineStyle(Config.ManualLineThickness, Config.Color.Green)
       .lineBetween(
         me._selectedSignalForManualSendPos.x,
         me._selectedSignalForManualSendPos.y,
@@ -378,7 +383,7 @@ export default class Graph {
     if (pointer.rightButtonDown()) {
       me._tryRemoveSignal(mousePos);
     } else {
-      me._trySelectSignalForManualSend(mousePos);
+      me._trySelectSignalForManualSendOrToggleMode(mousePos);
     }
   }
 
@@ -389,8 +394,14 @@ export default class Graph {
     me._selectedSignalForManualSendSignalIndex = null;
   }
 
-  _trySelectSignalForManualSend(mousePos) {
+  _trySelectSignalForManualSendOrToggleMode(mousePos) {
     const me = this;
+
+    if (me._towerMenu.isToggleClick(mousePos)) {
+      me._towerMenu.currentTower.toggleMode();
+      me._towerMenu.invalidate();
+      return;
+    }
 
     const signal = me._towerMenu.getSignalAtMouse(mousePos);
     if (signal == null) return;
@@ -482,6 +493,9 @@ export default class Graph {
     me._lineDrawingGraphics.clear();
   }
 
+  /**
+   * @param {Tower} tower
+   */
   _trySendSignalToTower(tower) {
     const me = this;
 
@@ -494,7 +508,12 @@ export default class Graph {
     );
     if (!edge) return;
 
-    if (!me._canSendSignalThrowEdge(edge, tower.id)) return;
+    const signal = fromTower.getSignalByIndex(
+      me._selectedSignalForManualSendSignalIndex,
+    );
+    if (!me._canSendSignalThrowEdge(edge, tower.id, signal.toTowerId)) return;
+
+    Here.Audio.play("pointerUp");
 
     edge.sendSignal(
       fromTower.id,
@@ -721,13 +740,13 @@ export default class Graph {
     }
   }
 
-  _canSendSignalThrowEdge(edge, toTowerId) {
+  _canSendSignalThrowEdge(edge, toTowerId, signalTargetId) {
     const me = this;
 
     if (!edge.isFree()) return false;
 
     const nextTower = me._towers[toTowerId];
-    if (!nextTower.hasRoom()) return false; // TODO: multiple paths
+    if (!nextTower.hasRoom() && nextTower.id != signalTargetId) return false; // TODO: multiple paths
 
     return true;
   }

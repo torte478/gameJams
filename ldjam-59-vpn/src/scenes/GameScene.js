@@ -31,7 +31,6 @@ export default class GameScene extends HereScene {
     Utils.loadImage("bullet");
     Utils.loadImage("boss");
     Utils.loadImage("redFade");
-    Utils.loadImage("towerMenu");
     Utils.loadImage("towerMenuItem");
 
     Utils.loadImage("title");
@@ -45,6 +44,7 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("tape", 1200, 200);
     Utils.loadSpriteSheet("digits", 100);
     Utils.loadSpriteSheet("rkn", 100);
+    Utils.loadSpriteSheet("towerMenu", 100, 125);
 
     Utils.loadWav("damage");
     Utils.loadWav("pointerDown");

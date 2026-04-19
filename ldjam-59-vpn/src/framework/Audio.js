@@ -1,6 +1,8 @@
 import Utils from "./Utils.js";
 import Here from "./Here.js";
 import Config from "../game/Config.js";
+import Game from "../game/Game.js";
+import Enums from "../game/Enums.js";
 
 export default class Audio {
   /** @type {Set} */
@@ -42,6 +44,8 @@ export default class Audio {
 
   playEat() {
     const me = this;
+
+    if (Game.phaseId >= Enums.Phase.P5_THE_GAME) return;
 
     const now = new Date().getTime();
     if (now - me._lastEatPlaying < 1000) return;

@@ -14,7 +14,7 @@ export default class Config {
   };
 
   static Start = {
-    PhaseId: Enums.Phase.P4_ENEMY_ARRIVING, //P5_THE_GAME,
+    PhaseId: Enums.Phase.P5_THE_GAME,
     TowersCount: 2,
     RKN: 0,
     Score: 100,
@@ -80,6 +80,7 @@ export default class Config {
   static RknMaxScale = 1;
 
   static EdgeThickness = 2;
+  static ManualLineThickness = 4;
   static SelectedEdgeThickness = 12;
 
   static FontFamily = "Arial";

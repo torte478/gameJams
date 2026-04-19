@@ -173,7 +173,11 @@ export default class Tower {
 
     const signalsToDelete = [];
     for (const signal of me._signalQueue) {
-      const edgeToSend = graph.getEdgeToSend(me.id, signal.toTowerId);
+      const edgeToSend = graph.getEdgeToSend(
+        me.id,
+        signal.toTowerId,
+        signal.toTowerId,
+      );
       if (!edgeToSend) continue;
 
       signalsToDelete.push(signal.uid);
@@ -187,6 +191,21 @@ export default class Tower {
       me._invalidateSignalQueueVisual();
       me._events.emit(Enums.Events.TOWER_SIGNAL_CHANGE, me);
     }
+  }
+
+  /**
+   *
+   * @param {Number} index
+   * @returns {Signal}
+   */
+  getSignalByIndex(index) {
+    const me = this;
+
+    if (index >= me._signalQueue.length) throw "wrong signal index at queue";
+
+    const signal = me._signalQueue[index];
+    // me.removeSignalByIndex(index);
+    return signal;
   }
 
   getSignalByIndexAndRemove(index) {
