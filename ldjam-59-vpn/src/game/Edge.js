@@ -47,7 +47,9 @@ export default class Edge {
       from.getPos(),
       to.getPos(),
     );
-    me._totalSignalDurationMs = me._distance / (Config.Speed.Signal / 1000);
+
+    const signalSpeed = Utils.getSpeedMaybeQuick(Config.Speed.Signal);
+    me._totalSignalDurationMs = me._distance / (signalSpeed / 1000);
   }
 
   getFromId() {

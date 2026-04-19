@@ -243,7 +243,7 @@ export default class Tower {
 
     me._signalPool.release(signal);
 
-    me._events.emit(Enums.Events.SCORE_INCREMENT);
+    me._events.emit(Enums.Events.SCORE_INCREMENT, me);
   }
 
   _invalidateSignalQueueVisual() {

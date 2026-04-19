@@ -9,6 +9,7 @@ import Enums from "./Enums.js";
 import Graph from "./Graph.js";
 import RKNMotherBrain from "./RKNMotherBrain.js";
 import SignalPool from "./SignalPool.js";
+import Tower from "./Tower.js";
 import UI from "./UI.js";
 import VFX from "./VFX.js";
 
@@ -77,18 +78,18 @@ export default class Game {
 
     //==========
 
-    gameEvents.on(Enums.Events.EDGE_ADDED, me._onEdgeAdded, me);
+    gameEvents.on(
+      Enums.Events.EDGE_ADDED,
+      me._enemies.onEdgeAdded,
+      me._enemies,
+    );
 
     gameEvents.on(
       Enums.Events.EDGE_REMOVED,
       me._enemies.onEdgeRemoved,
       me._enemies,
     );
-    gameEvents.on(
-      Enums.Events.SCORE_INCREMENT,
-      me._ui.onScoreIncrement,
-      me._ui,
-    );
+    gameEvents.on(Enums.Events.SCORE_INCREMENT, me._onScoreIncrement, me);
     gameEvents.on(
       Enums.Events.NEW_TOWER_BUTTON_CLICK,
       me._graph.addNewTower,
@@ -125,7 +126,8 @@ export default class Game {
     // ============================
 
     Game.instance = me;
-    me._setPhase(startPhase);
+    for (let phase = Enums.Phase.P0_START; phase <= startPhase; ++phase)
+      me._setPhase(phase);
   }
 
   update(time, deltaTime) {
@@ -137,6 +139,7 @@ export default class Game {
       Here.Controls.isPressedOnce(Enums.Keyboard.RESTART) &&
       Utils.isDebug(Config.Debug.Global)
     ) {
+      Here.Audio.stopAll();
       Here._.scene.restart({ isRestart: true });
     }
 
@@ -158,7 +161,8 @@ export default class Game {
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `phs: ${Game.phaseId}\n` +
         `tme: ${(me._currentTime / 1000) | 0}\n` +
-        `nxt: ${me._nextSignalRateRecalculationTime / 1000}`;
+        `rate: ${(me._nextSignalRateRecalculationTime / 1000) | 0}\n` +
+        `spwn: ${(me._nextSignalSpawnTime / 1000) | 0}`;
       me._log.setText(text);
     });
   }
@@ -174,15 +178,17 @@ export default class Game {
 
     me._graph.update(deltaTime);
 
-    if (Game.phaseId < Enums.Phase.TODO) return;
-
-    me._enemies.update();
+    if (Game.phaseId < Enums.Phase.P2_FIRST_TOWER_BUY) return;
 
     me._checkSignalSpawn(time);
 
     if (time > me._nextSignalRateRecalculationTime) {
       me._recalculateEdgeRates();
     }
+
+    if (Game.phaseId < Enums.Phase.TODO) return;
+
+    me._enemies.update();
   }
 
   _checkSignalSpawn(time) {
@@ -316,14 +322,18 @@ export default class Game {
     }
   }
 
-  _onEdgeAdded(edge) {
+  /**
+   * @param {Tower} tower
+   */
+  _onScoreIncrement(tower) {
     const me = this;
 
-    me._enemies.onEdgeAdded(edge);
+    me._ui.onScoreIncrement();
+    me._vfx.plusOneParticles(tower.getPos());
 
-    if (Game.phaseId === Enums.Phase.P1_FIRST_CONNECT) {
-      //throw "new phase";
-    }
+    if (Game.phaseId !== Enums.Phase.P1_FIRST_CONNECT) return;
+
+    me._setPhase(Enums.Phase.P2_FIRST_TOWER_BUY);
   }
 
   _setPhase(phaseId) {
@@ -343,8 +353,27 @@ export default class Game {
       towerA.toggleMode();
 
       return;
-    } else {
-      throw `unknown phase ${phaseId}`;
     }
+
+    if (phaseId === Enums.Phase.P2_FIRST_TOWER_BUY) {
+      Here.Audio.play("musicRadio", { loop: true });
+      me._graph._towers[1].toggleMode();
+
+      me._nextSignalSpawnTime =
+        me._currentTime + Config.Time.SpawnSignalPeriodMs;
+      me._nextSignalRateRecalculationTime =
+        me._currentTime + Config.Time.SignalRateRecalculationPeriod;
+
+      Here._.time.delayedCall(
+        Utils.getDurationMaybeQuick(3000),
+        () => me._vfx.tenctacleVpnTitle(),
+        null,
+        me,
+      );
+
+      return;
+    }
+
+    throw `unknown phase ${phaseId}`;
   }
 }

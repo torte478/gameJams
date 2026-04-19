@@ -530,7 +530,7 @@ export default class Graph {
     const alreadyExists = Utils.any(me._edges, (e) =>
       e.thisIsIt(fromTower.id, toTower.id),
     );
-    if (alreadyExists) return;
+    if (alreadyExists || fromTower.id === toTower.id) return;
 
     const edge = new Edge(fromTower, toTower, me._signalPool);
     me._edges.push(edge);

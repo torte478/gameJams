@@ -10,10 +10,11 @@ export default class Config {
     CutsceneZoom: false,
     AutoMode: false,
     SignalQueueView: false,
+    QuickDelays: true,
   };
 
   static Start = {
-    PhaseId: Enums.Phase.P0_START, //P1_FIRST_CONNECT,
+    PhaseId: Enums.Phase.P2_FIRST_TOWER_BUY,
     TowersCount: 2,
     RKN: 0,
     Score: 0,
@@ -47,10 +48,11 @@ export default class Config {
     Signal: 100,
     RknMovement: 300,
     TapeFall: 800,
+    Tentacle: 100,
   };
 
   static Time = {
-    SpawnSignalPeriodMs: 1000,
+    SpawnSignalPeriodMs: 3000,
     SignalRateRecalculationPeriod: 5000,
     // Endgame sequence
     P0_Zoom: 1000,

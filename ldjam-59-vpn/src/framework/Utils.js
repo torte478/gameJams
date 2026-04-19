@@ -437,4 +437,12 @@ export default class Utils {
   static indexToLetter(index) {
     return String.fromCharCode(65 + index);
   }
+
+  static getDurationMaybeQuick(duration) {
+    return Utils.isDebug(Config.Debug.QuickDelays) ? duration / 10 : duration;
+  }
+
+  static getSpeedMaybeQuick(speed) {
+    return Utils.isDebug(Config.Debug.QuickDelays) ? speed * 10 : duration;
+  }
 }

@@ -37,14 +37,18 @@ export default class GameScene extends HereScene {
 
     Utils.loadImage("title");
     Utils.loadImage("hintConnectTowers");
+    Utils.loadImage("tentacle");
 
     Utils.loadSpriteSheet("tower", 50, 100);
     Utils.loadSpriteSheet("newTowerButton", 100);
     Utils.loadSpriteSheet("tape", 1200, 200);
+    Utils.loadSpriteSheet("digits", 100);
 
     Utils.loadWav("damage");
     Utils.loadWav("pointerDown");
     Utils.loadWav("pointerUp");
+
+    Utils.loadMp3("musicRadio");
   }
 
   create() {

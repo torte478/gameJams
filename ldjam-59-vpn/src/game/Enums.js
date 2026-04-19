@@ -14,6 +14,7 @@ export default class Enums {
   static Phase = {
     P0_START: 0,
     P1_FIRST_CONNECT: 1,
+    P2_FIRST_TOWER_BUY: 2,
     TODO: 9999999,
   };
 

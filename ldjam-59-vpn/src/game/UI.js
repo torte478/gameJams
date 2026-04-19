@@ -46,10 +46,10 @@ export default class UI {
       frameSelected: 1,
       callback: () => {
         me._events.emit(Enums.Events.NEW_TOWER_BUTTON_CLICK);
-        me._invalidateButtonsVisibility();
       },
       callbackScope: me,
     });
+    me._newTowerButton.toGameObj().setVisible(false);
 
     me._startFinalBossButton = new Button({
       x: 950,
@@ -63,8 +63,6 @@ export default class UI {
       callbackScope: me,
     });
 
-    me._invalidateButtonsVisibility();
-
     if (Game.phaseId < Enums.Phase.TODO) {
       me._scoreText.setVisible(false);
       me._startFinalBossButton.toGameObj().setVisible(false);
@@ -76,8 +74,6 @@ export default class UI {
 
     me._score += 1;
     me._scoreText.setText(`score: ${me._score}`);
-
-    me._invalidateButtonsVisibility();
   }
 
   decrementScore() {
@@ -99,14 +95,9 @@ export default class UI {
     me._startFinalBossButton.toGameObj().setVisible(true);
   }
 
-  _invalidateButtonsVisibility() {
+  showNewTowerButton() {
     const me = this;
 
-    const isButtonVisible =
-      me._score >= Config.NewTowerCost &&
-      me._graph._towers.length < Config.TowerPositions.length &&
-      Game.phaseId >= Enums.Phase.TODO;
-
-    me._newTowerButton.toGameObj().setVisible(isButtonVisible);
+    me._newTowerButton.toGameObj().setVisible(true);
   }
 }
