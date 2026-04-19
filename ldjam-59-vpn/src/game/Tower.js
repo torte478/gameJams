@@ -227,8 +227,15 @@ export default class Tower {
   startFinalBossSequence() {
     const me = this;
 
-    me._sprite.play("tower_transform");
     me._light.setVisible(false);
+    Here._.time.delayedCall(
+      Utils.getRandom(0, 1000),
+      () => {
+        me._sprite.play("tower_transform");
+      },
+      null,
+      me,
+    );
   }
 
   reset() {

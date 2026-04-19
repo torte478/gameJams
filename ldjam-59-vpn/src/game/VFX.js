@@ -213,8 +213,8 @@ export default class VFX {
   tenctacleVpnTitle(doQuickly) {
     const me = this;
 
-    const fromPos = Utils.buildPoint(500, -200);
-    const toPos = Utils.buildPoint(500, 100);
+    const fromPos = Utils.buildPoint(450, -200);
+    const toPos = Utils.buildPoint(550, 100);
 
     me._tentacleAction(fromPos, toPos, 90, me._title, doQuickly, () =>
       me._ui.showNewTowerButtonAndScore(),

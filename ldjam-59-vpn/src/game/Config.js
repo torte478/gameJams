@@ -30,11 +30,11 @@ export default class Config {
     { x: 700, y: 400, cost: 0 }, // B
     { x: 550, y: 200, cost: 5 }, // C
     { x: 250, y: 700, cost: 10 }, // D
-    { x: 850, y: 250, cost: 16 }, // E
+    { x: 850, y: 250, cost: 15 }, // E
     { x: 60, y: 250, cost: 25 }, // F
-    { x: 250, y: 100, cost: 50 }, // G
+    { x: 250, y: 100, cost: 40 }, // G
     { x: 920, y: 530, cost: 60 }, // H
-    { x: 620, y: 730, cost: 80 }, // I
+    { x: 620, y: 730, cost: 75 }, // I
   ];
 
   static Color = {
@@ -52,9 +52,9 @@ export default class Config {
 
   static Speed = {
     Signal: 150,
-    RknMovement: 100,
+    RknMovement: 75,
     TapeFall: 800,
-    Tentacle: 100,
+    Tentacle: 150,
   };
 
   static Time = {
