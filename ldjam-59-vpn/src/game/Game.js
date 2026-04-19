@@ -341,7 +341,7 @@ export default class Game {
       () => {
         const gameOverText =
           "Thank you for playing!\n" +
-          "(I know it was hard)\n" +
+          "(I know that was hard)\n" +
           "\n" +
           `time: ${me._formatMilliseconds(me._currentTime)}\n` +
           `signals: ${me.signalCount}`;

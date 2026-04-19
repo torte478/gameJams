@@ -2,7 +2,7 @@ import Enums from "./Enums.js";
 
 export default class Config {
   static Debug = {
-    Global: true,
+    Global: false,
     Log: true,
     ShowSceneLog: true,
     PlaySound: true,
@@ -14,10 +14,10 @@ export default class Config {
   };
 
   static Start = {
-    PhaseId: Enums.Phase.P4_ENEMY_ARRIVING,
+    PhaseId: Enums.Phase.P5_THE_GAME, //P4_ENEMY_ARRIVING,
     TowersCount: 2,
     RKN: 0,
-    Score: 100,
+    Score: 1000,
     Edges: [
       // { from: 0, to: 1 },
       // { from: 0, to: 2 },
@@ -32,6 +32,9 @@ export default class Config {
     { x: 250, y: 700, cost: 10 }, // D
     { x: 850, y: 250, cost: 16 }, // E
     { x: 60, y: 250, cost: 25 }, // F
+    { x: 250, y: 100, cost: 50 }, // G
+    { x: 920, y: 530, cost: 60 }, // H
+    { x: 620, y: 730, cost: 80 }, // I
   ];
 
   static Color = {
@@ -48,7 +51,7 @@ export default class Config {
   };
 
   static Speed = {
-    Signal: 100,
+    Signal: 150,
     RknMovement: 100,
     TapeFall: 800,
     Tentacle: 100,
@@ -56,12 +59,12 @@ export default class Config {
 
   static Time = {
     SpawnSignal: [
-      2500, // 0
-      2000, // 1
-      2000, // 2
-      1750, // 3
-      1500, // 4
-      1000, // 5
+      2000, // 0
+      1500, // 1
+      1750, // 2
+      1500, // 3
+      1000, // 4
+      250, // 5
     ],
     SignalRateRecalculationPeriod: 15000,
     // Endgame sequence
@@ -75,7 +78,7 @@ export default class Config {
   static NewTowerCost = 1;
   static BossHP = 100; //deprecated
 
-  static BossCost = 200; //1000;
+  static BossCost = 100; //1000;
   static VibeCost = 20;
   static BossFirePeriod = 250;
 

@@ -746,7 +746,11 @@ export default class Graph {
     if (!edge.isFree()) return false;
 
     const nextTower = me._towers[toTowerId];
-    if (!nextTower.hasRoom() && nextTower.id != signalTargetId) return false; // TODO: multiple paths
+    if (
+      !nextTower._isAutoMode ||
+      (!nextTower.hasRoom() && nextTower.id != signalTargetId)
+    )
+      return false; // TODO: multiple paths
 
     return true;
   }

@@ -102,11 +102,41 @@ export default class RKN {
     return Math.abs(me._container.scale - Config.RknMaxScale) < 0.01;
   }
 
+  goToNafig() {
+    const me = this;
+
+    if (!!me._movementTween) {
+      me._movementTween.stop();
+      me._movementTween = null;
+    }
+
+    const fromPos = Utils.toPoint(me._container);
+    const toPos = Utils.buildPoint(500, 900); // ENEMY NAFIG POINT
+
+    me._sprite.play("rkn_walk");
+
+    me._movementTween = Here._.add.tween({
+      targets: me._container,
+      x: toPos.x,
+      y: toPos.y,
+      duration: Utils.getTweenDuration(
+        fromPos,
+        toPos,
+        Config.Speed.RknMovement,
+      ),
+    });
+  }
+
   /**
    * @param {Edge} edge
    */
   setTarget(edge) {
     const me = this;
+
+    if (!!me._movementTween) {
+      me._movementTween.stop();
+      me._movementTween = null;
+    }
 
     me.checkEdgeRemove(me._targetEdge);
 

@@ -97,6 +97,11 @@ export default class RKNMotherBrain {
 
       enimeiesWithoutTargets[i].setTarget(edgesToTake[i]);
     }
+
+    const voobsheBezTargets = me._enemies.filter((e) => !e._targetEdge);
+    for (const enemy of voobsheBezTargets) {
+      enemy.goToNafig();
+    }
   }
 
   spawnFirstEnemy() {
