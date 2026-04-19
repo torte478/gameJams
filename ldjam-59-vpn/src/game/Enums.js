@@ -11,6 +11,10 @@ export default class Enums {
     RESTART: 6,
   };
 
+  static Phase = {
+    P0_START: 0,
+  };
+
   static Events = {
     EDGE_ADDED: "EDGE_ADDED",
     EDGE_REMOVED: "EDGE_REMOVED",

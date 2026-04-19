@@ -1,3 +1,5 @@
+import Enums from "./Enums.js";
+
 export default class Config {
   static Debug = {
     Global: true,
@@ -6,20 +8,28 @@ export default class Config {
     PlaySound: true,
     Random: false,
     CutsceneZoom: false,
-    AutoMode: true,
+    AutoMode: false,
     SignalQueueView: false,
   };
 
   static Start = {
+    PhaseId: Enums.Phase.P0_START,
     TowersCount: 2,
     RKN: 0,
     Score: 0,
     Edges: [
-      { from: 0, to: 1 },
+      // { from: 0, to: 1 },
       // { from: 0, to: 2 },
       // { from: 0, to: 3 },
     ],
   };
+
+  static TowerPositions = [
+    { x: 300, y: 400 }, // A
+    { x: 700, y: 400 }, // B
+    { x: 550, y: 200 }, // C
+    { x: 400, y: 700 }, // D
+  ];
 
   static Color = {
     Dark: 0x140b23,
@@ -34,12 +44,13 @@ export default class Config {
   };
 
   static Speed = {
-    Signal: 300,
+    Signal: 100,
     RknMovement: 300,
+    TapeFall: 800,
   };
 
   static Time = {
-    SpawnSignalPeriodMs: 3000,
+    SpawnSignalPeriodMs: 1000,
     SignalRateRecalculationPeriod: 5000,
     // Endgame sequence
     P0_Zoom: 1000,
@@ -59,11 +70,4 @@ export default class Config {
   static MaxSignalPerTower = 9;
   static CutsceneCameraZoom = 0.75;
   static BossJiggleOffset = 25;
-
-  static TowerPositions = [
-    { x: 300, y: 400 },
-    { x: 700, y: 500 },
-    { x: 550, y: 200 },
-    { x: 400, y: 700 },
-  ];
 }

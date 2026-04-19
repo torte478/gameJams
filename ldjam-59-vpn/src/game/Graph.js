@@ -4,6 +4,7 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Edge from "./Edge.js";
 import Enums from "./Enums.js";
+import Game from "./Game.js";
 import SignalPool from "./SignalPool.js";
 import Tower from "./Tower.js";
 import TowerMenu from "./TowerMenu.js";
@@ -92,6 +93,8 @@ export default class Graph {
 
   update(deltaTime) {
     const me = this;
+
+    if (Game.phaseId === Enums.Phase.P0_START) return;
 
     if (!!me._selectedTower) {
       me._drawNewEdgeLine();
@@ -317,6 +320,8 @@ export default class Graph {
   _onPointerDown(pointer) {
     const me = this;
 
+    if (Game.phaseId === Enums.Phase.P0_START) return;
+
     if (me._isCutscene) return;
 
     if (me._towerMenu.isOpen) {
@@ -414,6 +419,8 @@ export default class Graph {
 
   _onPointerUp(pointer) {
     const me = this;
+
+    if (Game.phaseId === Enums.Phase.P0_START) return;
 
     if (me._isCutscene) return;
 

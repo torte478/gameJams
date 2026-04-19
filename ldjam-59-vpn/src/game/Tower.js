@@ -2,6 +2,7 @@ import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Enums from "./Enums.js";
+import Game from "./Game.js";
 import Graph from "./Graph.js";
 import Signal from "./Signal.js";
 import SignalPool from "./SignalPool.js";
@@ -66,7 +67,7 @@ export default class Tower {
     );
 
     const labelText = Here._.add
-      .text(2, 33, label, {
+      .text(1, 33, label, {
         fontSize: 18,
         fontFamily: Config.FontFamily,
         color: Utils.colorNumberToString(Config.Color.Light),
@@ -90,6 +91,7 @@ export default class Tower {
       .setSize(me._sprite.width, me._sprite.height)
       .setInteractive()
       .on("pointerover", () => {
+        if (Game.phaseId === Enums.Phase.P0_START) return;
         me._sprite.setTint(0x44ff44);
       })
       .on("pointerout", () => {

@@ -46,8 +46,13 @@ export default class Game {
   /** @type {Number} */
   _nextSignalRateRecalculationTime = 0;
 
+  /** @type {Number} */
+  static phaseId;
+
   constructor() {
     const me = this;
+
+    Game.phaseId = Config.Start.PhaseId;
 
     Here._.input.mouse.disableContextMenu();
     Here._.cameras.main.setBackgroundColor(Config.Color.Dark);
@@ -94,6 +99,10 @@ export default class Game {
 
     me._nextSignalRateRecalculationTime =
       Config.Time.SignalRateRecalculationPeriod;
+
+    Here._.input.on("pointerdown", (pointer) => {
+      me._onPointerDown(pointer);
+    });
 
     //===============
 
@@ -153,12 +162,22 @@ export default class Game {
     me._graph.update(deltaTime);
     me._enemies.update();
 
-    if (time > me._nextSignalSpawnTime) {
-      me._spawnSignal();
-    }
+    me._checkSignalSpawn(time);
 
     if (time > me._nextSignalRateRecalculationTime) {
       me._recalculateEdgeRates();
+    }
+  }
+
+  _checkSignalSpawn(time) {
+    const me = this;
+
+    if (Game.phaseId == Enums.Phase.P0_START) return;
+
+    if (time < me._nextSignalSpawnTime) return;
+
+    if (me._graph.trySpawnNewSignal()) {
+      me._nextSignalSpawnTime += Config.Time.SpawnSignalPeriodMs;
     }
   }
 
@@ -237,10 +256,6 @@ export default class Game {
 
   _spawnSignal() {
     const me = this;
-
-    if (me._graph.trySpawnNewSignal()) {
-      me._nextSignalSpawnTime += Config.Time.SpawnSignalPeriodMs;
-    }
   }
 
   _onStartFinalBossClick() {
@@ -266,5 +281,22 @@ export default class Game {
       null,
       me,
     );
+  }
+
+  _onPointerDown(pointer) {
+    const me = this;
+
+    if (Game.phaseId !== Enums.Phase.P0_START) return;
+
+    if (
+      pointer.x < 0 ||
+      pointer.x > Consts.Viewport.Width ||
+      pointer.y < 0 ||
+      pointer.y > Consts.Viewport.Height
+    )
+      return;
+
+    const isNextPhase = me._vfx.processPhase0Click();
+    if (!!isNextPhase) throw "todo";
   }
 }

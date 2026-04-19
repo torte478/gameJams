@@ -2,8 +2,8 @@ import Button from "../framework/Button.js";
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
-import Consts from "./Consts.js";
 import Enums from "./Enums.js";
+import Game from "./Game.js";
 import Graph from "./Graph.js";
 
 export default class UI {
@@ -64,6 +64,11 @@ export default class UI {
     });
 
     me._invalidateButtonsVisibility();
+
+    if (Game.phaseId == Enums.Phase.P0_START) {
+      me._scoreText.setVisible(false);
+      me._startFinalBossButton.toGameObj().setVisible(false);
+    }
   }
 
   onScoreIncrement() {
