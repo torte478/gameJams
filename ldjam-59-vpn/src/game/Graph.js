@@ -94,7 +94,7 @@ export default class Graph {
   update(deltaTime) {
     const me = this;
 
-    if (Game.phaseId === Enums.Phase.P0_START) return;
+    me._updateSignals(deltaTime);
 
     if (!!me._selectedTower) {
       me._drawNewEdgeLine();
@@ -103,8 +103,6 @@ export default class Graph {
     } else {
       me._selectEdgeToRemove();
     }
-
-    me._updateSignals(deltaTime);
   }
 
   reset() {
@@ -231,6 +229,8 @@ export default class Graph {
   _selectEdgeToRemove() {
     const me = this;
 
+    if (Game.phaseId < Enums.Phase.TODO) return;
+
     me._lineDrawingGraphics.clear();
 
     const mouserPos = Utils.buildPoint(
@@ -274,6 +274,8 @@ export default class Graph {
   _drawManualSignalSendLine() {
     const me = this;
 
+    if (Game.phaseId < Enums.Phase.TODO) return;
+
     me._lineDrawingGraphics
       .clear()
       .setDepth(Consts.Depth.SignalLineDrawing)
@@ -292,11 +294,12 @@ export default class Graph {
       return;
     }
 
-    const fromPos = Utils.toPoint(me._selectedTower.toGameObj());
+    const fromPos = Utils.toPoint(me._selectedTower.getPos());
 
     me._lineDrawingGraphics
       .clear()
       .setDepth(Consts.Depth.EdgeDrawing)
+      .lineStyle(Config.SelectedEdgeThickness, Config.Color.Green)
       .lineBetween(
         fromPos.x,
         fromPos.y,
@@ -320,19 +323,21 @@ export default class Graph {
   _onPointerDown(pointer) {
     const me = this;
 
-    if (Game.phaseId === Enums.Phase.P0_START) return;
+    if (Game.phaseId < Enums.Phase.P1_FIRST_CONNECT) return;
 
     if (me._isCutscene) return;
 
     if (me._towerMenu.isOpen) {
-      me._processTowerMenuClick(pointer);
+      me._processMenuClick(pointer);
     } else {
-      me._processRegularClick(pointer);
+      me._processTowerClick(pointer);
     }
   }
 
-  _processTowerMenuClick(pointer) {
+  _processMenuClick(pointer) {
     const me = this;
+
+    if (Game.phaseId < Enums.Phase.TODO) return;
 
     const mousePos = new Phaser.Math.Vector2(pointer.x, pointer.y);
     if (!me._towerMenu.containsPoint(mousePos)) {
@@ -378,7 +383,7 @@ export default class Graph {
     me._towerMenu.invalidate();
   }
 
-  _processRegularClick(pointer) {
+  _processTowerClick(pointer) {
     const me = this;
 
     if (pointer.rightButtonDown()) {
@@ -399,10 +404,13 @@ export default class Graph {
     }
 
     me._selectedTower = clickedTower;
+    Here.Audio.play("pointerDown");
   }
 
   _tryRemoveEdge() {
     const me = this;
+
+    if (Game.phaseId < Enums.Phase.TODO) return;
 
     if (!me._edgeToRemove) return;
 
@@ -420,7 +428,7 @@ export default class Graph {
   _onPointerUp(pointer) {
     const me = this;
 
-    if (Game.phaseId === Enums.Phase.P0_START) return;
+    if (Game.phaseId < Enums.Phase.P1_FIRST_CONNECT) return;
 
     if (me._isCutscene) return;
 
@@ -433,6 +441,8 @@ export default class Graph {
 
   _processManualSignalPointerUp(pointer) {
     const me = this;
+
+    if (Game.phaseId < Enums.Phase.TODO) return;
 
     const targetTower = me._getTowerOnMousePos(pointer);
     if (!!targetTower) {
@@ -470,13 +480,25 @@ export default class Graph {
 
     /** @type {Tower} */
     const targetTower = me._getTowerOnMousePos(pointer);
-    if (!!targetTower) {
-      if (targetTower.id === me._selectedTower.id) {
-        me._openTowerMenu(targetTower);
-      } else {
-        me._tryAddEdge(me._selectedTower, targetTower);
-      }
+    if (!targetTower) {
+      me._clearEdgeDrawingSelectionAndGraphics();
+      return;
     }
+
+    if (
+      targetTower.id === me._selectedTower.id &&
+      Game.phaseId >= Enums.Phase.TODO
+    ) {
+      me._openTowerMenu(targetTower);
+    } else {
+      me._tryAddEdge(me._selectedTower, targetTower);
+    }
+
+    me._clearEdgeDrawingSelectionAndGraphics();
+  }
+
+  _clearEdgeDrawingSelectionAndGraphics() {
+    const me = this;
 
     me._selectedTower = null;
     me._lineDrawingGraphics.clear();
@@ -515,6 +537,8 @@ export default class Graph {
 
     me._rebuildGraph();
     me._events.emit(Enums.Events.EDGE_ADDED, edge);
+
+    Here.Audio.play("pointerUp");
   }
 
   _rebuildGraph() {

@@ -49,10 +49,16 @@ export default class Game {
   /** @type {Number} */
   static phaseId;
 
+  /** @type {Game} */
+  static instance;
+
   constructor() {
     const me = this;
 
-    Game.phaseId = Config.Start.PhaseId;
+    const startPhase = Utils.isDebug(Config.Debug.Global)
+      ? Config.Start.PhaseId
+      : Enums.Phase.P0_START;
+    Game.phaseId = startPhase;
 
     Here._.input.mouse.disableContextMenu();
     Here._.cameras.main.setBackgroundColor(Config.Color.Dark);
@@ -71,11 +77,8 @@ export default class Game {
 
     //==========
 
-    gameEvents.on(
-      Enums.Events.EDGE_ADDED,
-      me._enemies.onEdgeAdded,
-      me._enemies,
-    );
+    gameEvents.on(Enums.Events.EDGE_ADDED, me._onEdgeAdded, me);
+
     gameEvents.on(
       Enums.Events.EDGE_REMOVED,
       me._enemies.onEdgeRemoved,
@@ -116,6 +119,13 @@ export default class Game {
         .setScrollFactor(0)
         .setDepth(Consts.Depth.Max);
     });
+
+    // ============================
+    // ============================
+    // ============================
+
+    Game.instance = me;
+    me._setPhase(startPhase);
   }
 
   update(time, deltaTime) {
@@ -146,6 +156,7 @@ export default class Game {
 
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
+        `phs: ${Game.phaseId}\n` +
         `tme: ${(me._currentTime / 1000) | 0}\n` +
         `nxt: ${me._nextSignalRateRecalculationTime / 1000}`;
       me._log.setText(text);
@@ -155,11 +166,16 @@ export default class Game {
   _gameLoop(time, deltaTime) {
     const me = this;
 
+    if (Game.phaseId < Enums.Phase.P1_FIRST_CONNECT) return;
+
     if (me._isCutscene) {
       return me._cutsceneUpdate();
     }
 
     me._graph.update(deltaTime);
+
+    if (Game.phaseId < Enums.Phase.TODO) return;
+
     me._enemies.update();
 
     me._checkSignalSpawn(time);
@@ -171,8 +187,6 @@ export default class Game {
 
   _checkSignalSpawn(time) {
     const me = this;
-
-    if (Game.phaseId == Enums.Phase.P0_START) return;
 
     if (time < me._nextSignalSpawnTime) return;
 
@@ -297,6 +311,40 @@ export default class Game {
       return;
 
     const isNextPhase = me._vfx.processPhase0Click();
-    if (!!isNextPhase) throw "todo";
+    if (!!isNextPhase) {
+      me._setPhase(Enums.Phase.P1_FIRST_CONNECT);
+    }
+  }
+
+  _onEdgeAdded(edge) {
+    const me = this;
+
+    me._enemies.onEdgeAdded(edge);
+
+    if (Game.phaseId === Enums.Phase.P1_FIRST_CONNECT) {
+      //throw "new phase";
+    }
+  }
+
+  _setPhase(phaseId) {
+    const me = this;
+
+    Game.phaseId = phaseId;
+    Utils.debugLog(`!!! Next phase: ${phaseId} !!!`);
+
+    if (phaseId === Enums.Phase.P0_START) {
+      // do nothing
+      return;
+    }
+
+    if (phaseId === Enums.Phase.P1_FIRST_CONNECT) {
+      const towerA = me._graph._towers[0];
+      towerA.addSignal(me._graph._signalPool.create(0, 1));
+      towerA.toggleMode();
+
+      return;
+    } else {
+      throw `unknown phase ${phaseId}`;
+    }
   }
 }

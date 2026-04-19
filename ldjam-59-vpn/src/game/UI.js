@@ -65,7 +65,7 @@ export default class UI {
 
     me._invalidateButtonsVisibility();
 
-    if (Game.phaseId == Enums.Phase.P0_START) {
+    if (Game.phaseId < Enums.Phase.TODO) {
       me._scoreText.setVisible(false);
       me._startFinalBossButton.toGameObj().setVisible(false);
     }
@@ -104,7 +104,8 @@ export default class UI {
 
     const isButtonVisible =
       me._score >= Config.NewTowerCost &&
-      me._graph._towers.length < Config.TowerPositions.length;
+      me._graph._towers.length < Config.TowerPositions.length &&
+      Game.phaseId >= Enums.Phase.TODO;
 
     me._newTowerButton.toGameObj().setVisible(isButtonVisible);
   }

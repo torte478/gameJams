@@ -13,6 +13,8 @@ export default class Enums {
 
   static Phase = {
     P0_START: 0,
+    P1_FIRST_CONNECT: 1,
+    TODO: 9999999,
   };
 
   static Events = {

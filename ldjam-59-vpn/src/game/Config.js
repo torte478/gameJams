@@ -13,7 +13,7 @@ export default class Config {
   };
 
   static Start = {
-    PhaseId: Enums.Phase.P0_START,
+    PhaseId: Enums.Phase.P0_START, //P1_FIRST_CONNECT,
     TowersCount: 2,
     RKN: 0,
     Score: 0,
@@ -63,9 +63,11 @@ export default class Config {
   static NewTowerCost = 1;
   static BossHP = 100;
 
+  static EdgeThickness = 2;
+  static SelectedEdgeThickness = 12;
+
   static FontFamily = "Arial";
   static EatSignalRadius = 5;
-  static EdgeThickness = 2;
   static RemoveEdgeOffset = 10;
   static MaxSignalPerTower = 9;
   static CutsceneCameraZoom = 0.75;

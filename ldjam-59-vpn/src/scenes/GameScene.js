@@ -43,6 +43,8 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("tape", 1200, 200);
 
     Utils.loadWav("damage");
+    Utils.loadWav("pointerDown");
+    Utils.loadWav("pointerUp");
   }
 
   create() {

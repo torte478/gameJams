@@ -1,6 +1,7 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Game from "./Game.js";
 import UI from "./UI.js";
@@ -32,12 +33,20 @@ export default class VFX {
 
     me._ui = ui;
 
-    if (Game.phaseId == Enums.Phase.P0_START) {
+    me._emitter = Here._.add.particles(0, 0, "bullet", {
+      lifespan: 2000,
+      speed: 400, //{ min: 400, max: 400 },
+      emitting: false,
+    });
+
+    if (Game.phaseId < Enums.Phase.TODO) {
       me._title = Here._.add.image(500, 100, "title"); //1
       me._hintConnectTowers = Here._.add
         .image(720, 710, "hintConnectTowers")
         .setAngle(-15);
+    }
 
+    if (Game.phaseId === Enums.Phase.P0_START) {
       me._tapes.push(
         Here._.add.image(520, 800, "tape", 0).setAngle(-15).setFlipY(true),
       );
@@ -55,13 +64,11 @@ export default class VFX {
       me._tapes.push(
         Here._.add.image(400, 320, "tape", 0).setAngle(-45).setScale(1.5, 1),
       );
-    }
 
-    me._emitter = Here._.add.particles(0, 0, "bullet", {
-      lifespan: 2000,
-      speed: 400, //{ min: 400, max: 400 },
-      emitting: false,
-    });
+      for (let i = 0; i < me._tapes.length; ++i) {
+        me._tapes[i].setDepth(Consts.Depth.Fade + i);
+      }
+    }
   }
 
   tryShotBoss() {

@@ -1,6 +1,7 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Game from "./Game.js";
 import Graph from "./Graph.js";
@@ -88,11 +89,13 @@ export default class Tower {
     ]);
 
     me._container
+      .setDepth(Consts.Depth.Tower)
       .setSize(me._sprite.width, me._sprite.height)
       .setInteractive()
       .on("pointerover", () => {
         if (Game.phaseId === Enums.Phase.P0_START) return;
-        me._sprite.setTint(0x44ff44);
+
+        me._sprite.setTint(Config.Color.Green);
       })
       .on("pointerout", () => {
         me._sprite.clearTint();
@@ -118,10 +121,10 @@ export default class Tower {
 
     if (me._isAutoMode) {
       me._isAutoMode = false;
-      me._sprite.setFrame(1);
+      me._sprite.stop().setFrame(0);
     } else {
       me._isAutoMode = true;
-      me._sprite.setFrame(0);
+      me._sprite.play("tower_idle");
     }
   }
 
