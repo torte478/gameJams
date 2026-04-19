@@ -2,6 +2,7 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Graph from "./Graph.js";
 import RKN from "./RKN.js";
+import VFX from "./VFX.js";
 
 export default class RKNMotherBrain {
   /** @type {RKN[]} */
@@ -10,14 +11,18 @@ export default class RKNMotherBrain {
   /** @type {Graph} */
   _graph;
 
-  constructor(graph) {
+  /** @type {VFX} */
+  _vfx;
+
+  constructor(graph, vfx) {
     const me = this;
 
     me._graph = graph;
+    me._vfx = vfx;
 
-    for (let i = 0; i < Config.Start.RKN; ++i) {
-      me._enemies.push(new RKN(150, 150));
-    }
+    // for (let i = 0; i < Config.Start.RKN; ++i) {
+    //   me._enemies.push(new RKN(150, 150));
+    // }
   }
 
   update() {
@@ -86,5 +91,13 @@ export default class RKNMotherBrain {
 
       enimeiesWithoutTargets[i].setTarget(edgesToTake[i]);
     }
+  }
+
+  spawnFirstEnemy() {
+    const me = this;
+
+    //-50 200
+    const enemy = new RKN(-50, 200, me._vfx);
+    me._enemies.push(enemy);
   }
 }

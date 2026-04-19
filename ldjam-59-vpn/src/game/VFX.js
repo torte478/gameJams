@@ -34,6 +34,9 @@ export default class VFX {
   /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
   _plusOneEmmiter;
 
+  /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+  _minuxOneEmmiter;
+
   /** @type {Phaser.GameObjects.Image} */
   _tentacle;
 
@@ -64,6 +67,17 @@ export default class VFX {
       })
       .setDepth(Consts.Depth.TowerEffects);
 
+    me._minusOneEmmiter = Here._.add
+      .particles(0, 0, "digits", {
+        lifespan: 1000,
+        speed: 100, //{ min: 400, max: 400 },
+        frame: 1,
+        alpha: { from: 1, to: 0 },
+        scale: 0.5,
+        emitting: false,
+      })
+      .setDepth(Consts.Depth.TowerEffects);
+
     if (Game.phaseId < Enums.Phase.TODO) {
       me._title = Here._.add.image(500, 100, "title"); //1
       me._hintConnectTowers = Here._.add
@@ -71,7 +85,7 @@ export default class VFX {
         .setAngle(-15);
 
       me._hintDeleteChannel = Here._.add
-        .image(150, 220, "hintDeleteChannel")
+        .image(-150, 220, "hintDeleteChannel") // required 150
         .setAngle(10);
     }
 
@@ -119,6 +133,12 @@ export default class VFX {
     const me = this;
 
     me._plusOneEmmiter.emitParticleAt(pos.x, pos.y, 1);
+  }
+
+  minusOneParticles(pos) {
+    const me = this;
+
+    me._minusOneEmmiter.emitParticleAt(pos.x, pos.y, 1);
   }
 
   startSpawn(towerPositions, bulletCount) {
@@ -176,8 +196,25 @@ export default class VFX {
       -90,
       me._hintConnectTowers,
       doQuickly,
-      () => {},
+      () => me._showRightClickHint(),
     );
+  }
+
+  _showRightClickHint() {
+    const me = this;
+
+    const speed = Utils.getDurationMaybeQuick(Config.Speed.Tentacle);
+
+    const fromPos = Utils.toPoint(me._hintDeleteChannel);
+    const toPos = Utils.buildPoint(150, fromPos.y);
+
+    Here._.add.tween({
+      targets: me._hintDeleteChannel,
+      x: toPos.x,
+      y: toPos.y,
+      ease: "sine.out",
+      duration: Utils.getTweenDuration(fromPos, toPos, speed),
+    });
   }
 
   /**

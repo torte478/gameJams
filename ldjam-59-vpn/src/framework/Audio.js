@@ -6,6 +6,9 @@ export default class Audio {
   /** @type {Set} */
   _playing;
 
+  /** @type {Number} */
+  _lastEatPlaying = 0;
+
   constructor() {
     const me = this;
 
@@ -35,6 +38,16 @@ export default class Audio {
 
     me._playing.add(sound);
     me.play(sound, config);
+  }
+
+  playEat() {
+    const me = this;
+
+    const now = new Date().getTime();
+    if (now - me._lastEatPlaying < 1000) return;
+
+    me.play("eat");
+    me._lastEatPlaying = now;
   }
 
   /**

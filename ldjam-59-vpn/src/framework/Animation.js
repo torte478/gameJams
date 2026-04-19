@@ -15,6 +15,23 @@ export default class Animation {
       frameRate: 1,
       repeat: 0,
     });
+
+    Here._.anims.create({
+      key: "rkn_movement",
+      frames: Animation.getFrames("rkn", [1, 2]),
+      frameRate: 4,
+      repeat: -1,
+    });
+
+    Here._.anims.create({
+      key: "rkn_eat",
+      frames: Animation.getFrames(
+        "rkn",
+        [3, 4, 5, 3, 4, 5, 3, 4, 5, 3, 4, 5, 0],
+      ),
+      frameRate: 6,
+      repeat: 0,
+    });
   }
 
   static getFrames(texture, frames) {

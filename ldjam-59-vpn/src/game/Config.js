@@ -14,7 +14,7 @@ export default class Config {
   };
 
   static Start = {
-    PhaseId: Enums.Phase.P3_REMOVE_EDGE,
+    PhaseId: Enums.Phase.P4_ENEMY_ARRIVING,
     TowersCount: 2,
     RKN: 0,
     Score: 100,
@@ -30,7 +30,8 @@ export default class Config {
     { x: 700, y: 400, cost: 0 }, // B
     { x: 550, y: 200, cost: 5 }, // C
     { x: 250, y: 700, cost: 10 }, // D
-    { x: 850, y: 250, cost: 20 }, // E
+    { x: 850, y: 250, cost: 16 }, // E
+    { x: 60, y: 250, cost: 30 }, // F
   ];
 
   static Color = {
@@ -48,7 +49,7 @@ export default class Config {
 
   static Speed = {
     Signal: 100,
-    RknMovement: 300,
+    RknMovement: 100,
     TapeFall: 800,
     Tentacle: 100,
   };
@@ -66,6 +67,9 @@ export default class Config {
 
   static NewTowerCost = 1;
   static BossHP = 100;
+
+  static RknStartScale = 0.5;
+  static RknScaleChange = 0.1;
 
   static EdgeThickness = 2;
   static SelectedEdgeThickness = 12;

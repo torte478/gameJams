@@ -28,7 +28,6 @@ export default class GameScene extends HereScene {
     if (!me._isRestart) Utils.runLoadingBar();
 
     Utils.loadImage("signal");
-    Utils.loadImage("rkn");
     Utils.loadImage("bullet");
     Utils.loadImage("boss");
     Utils.loadImage("redFade");
@@ -44,12 +43,14 @@ export default class GameScene extends HereScene {
     Utils.loadSpriteSheet("buttons", 150, 75);
     Utils.loadSpriteSheet("tape", 1200, 200);
     Utils.loadSpriteSheet("digits", 100);
+    Utils.loadSpriteSheet("rkn", 100);
 
     Utils.loadWav("damage");
     Utils.loadWav("pointerDown");
     Utils.loadWav("pointerUp");
 
     Utils.loadMp3("musicRadio");
+    Utils.loadMp3("eat");
   }
 
   create() {

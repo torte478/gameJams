@@ -11,8 +11,10 @@ export default class Consts {
   };
 
   static Depth = {
+    Signal: 100,
     EdgeDrawing: 250,
     Tower: 500,
+    RKN: 650,
     TowerEffects: 750,
     TowerMenu: 1000,
     SignalLineDrawing: 5000,

@@ -1,6 +1,7 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Consts from "./Consts.js";
 
 export default class Signal {
   /** @type {Phaser.GameObjects.Container} */
@@ -36,7 +37,8 @@ export default class Signal {
 
     me._container = Here._.add
       .container(0, 0, [image, me._labelText])
-      .setVisible(false);
+      .setVisible(false)
+      .setDepth(Consts.Depth.Signal);
   }
 
   init(fromTowerId, toTowerId) {

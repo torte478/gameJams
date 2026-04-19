@@ -69,10 +69,10 @@ export default class Game {
     const signalPool = new SignalPool();
     me._graph = new Graph(signalPool, gameEvents);
 
-    me._enemies = new RKNMotherBrain(me._graph);
-
     me._ui = new UI(gameEvents, me._graph);
     me._vfx = new VFX(me._ui);
+
+    me._enemies = new RKNMotherBrain(me._graph, me._vfx);
 
     me._boss = new Boss();
 
@@ -188,7 +188,7 @@ export default class Game {
       me._recalculateEdgeRates();
     }
 
-    if (Game.phaseId < Enums.Phase.TODO) return;
+    if (Game.phaseId < Enums.Phase.P4_ENEMY_ARRIVING) return;
 
     me._enemies.update();
   }
@@ -209,14 +209,14 @@ export default class Game {
     /** @type {Edge[]} */
     const edges = me._graph.recalculateEdgeRates();
 
-    if (Utils.isDebug(Config.Debug.Global)) {
-      let edgeRatingText = "rating: ";
-      for (const edge of edges) {
-        edgeRatingText += `(${edge.getFromId()}, ${edge.getToId()}), `;
-      }
+    // if (Utils.isDebug(Config.Debug.Global)) {
+    //   let edgeRatingText = "rating: ";
+    //   for (const edge of edges) {
+    //     edgeRatingText += `(${edge.getFromId()}, ${edge.getToId()}), `;
+    //   }
 
-      Utils.debugLog(edgeRatingText);
-    }
+    //   Utils.debugLog(edgeRatingText);
+    // }
 
     me._enemies.processNextEdgeRating(edges);
 
@@ -343,10 +343,20 @@ export default class Game {
 
     me._graph.addNewTower();
 
-    if (Game.phaseId != Enums.Phase.P2_FIRST_TOWER_BUY) return;
-
-    if (me._graph._towers.length === 4) {
+    if (
+      Game.phaseId === Enums.Phase.P2_FIRST_TOWER_BUY &&
+      me._graph._towers.length === 4
+    ) {
       me._setPhase(Enums.Phase.P3_REMOVE_EDGE);
+      return;
+    }
+
+    if (
+      Game.phaseId === Enums.Phase.P3_REMOVE_EDGE &&
+      me._graph._towers.length === 5
+    ) {
+      me._setPhase(Enums.Phase.P4_ENEMY_ARRIVING);
+      return;
     }
   }
 
@@ -364,7 +374,7 @@ export default class Game {
     if (phaseId === Enums.Phase.P1_FIRST_CONNECT) {
       const towerA = me._graph._towers[0];
       towerA.addSignal(me._graph._signalPool.create(0, 1));
-
+      me._ui._invalidateUI();
       return;
     }
 
@@ -406,6 +416,18 @@ export default class Game {
         me._graph.addNewTower();
       }
 
+      return;
+    }
+
+    if (phaseId === Enums.Phase.P4_ENEMY_ARRIVING) {
+      me._enemies.spawnFirstEnemy();
+
+      if (!!doQuickly) {
+        me._graph._tryAddEdge(me._graph._towers[0], me._graph._towers[2]);
+        me._graph._tryAddEdge(me._graph._towers[0], me._graph._towers[3]);
+        me._graph._tryAddEdge(me._graph._towers[2], me._graph._towers[1]);
+        me._graph._tryAddEdge(me._graph._towers[3], me._graph._towers[1]);
+      }
       return;
     }
 

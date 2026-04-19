@@ -1,7 +1,9 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Consts from "./Consts.js";
 import Edge from "./Edge.js";
+import VFX from "./VFX.js";
 
 export default class RKN {
   /** @type {Phaser.GameObjects.Sprite} */
@@ -19,11 +21,19 @@ export default class RKN {
   /** @type {Boolean} */
   _isEating = false;
 
-  constructor(x, y) {
+  /** @type {VFX} */
+  _vfx;
+
+  constructor(x, y, vfx) {
     const me = this;
+
+    me._vfx = vfx;
 
     me._sprite = Here._.add.sprite(0, 0, "rkn", 0);
     me._container = Here._.add.container(x, y, [me._sprite]);
+
+    me._container.setScale(Config.RknStartScale).setDepth(Consts.Depth.RKN);
+    me._sprite.play("rkn_movement");
   }
 
   /**
@@ -47,8 +57,10 @@ export default class RKN {
     if (!me._isEating) return;
 
     if (me._targetEdge.hasSignalAtMiddle()) {
-      console.log("eat signal!!!"); // TODODODODODODODODODODODODDO
+      me._sprite.play("rkn_eat");
       me._targetEdge.signalEaten();
+      Here.Audio.playEat();
+      me._vfx.minusOneParticles(me.getPos());
     }
   }
 
@@ -62,7 +74,9 @@ export default class RKN {
 
     me._targetEdge = edge;
 
-    Utils.debugLog(`new edge target: ${edge.getFromId()} - ${edge.getToId()}`);
+    // Utils.debugLog(`new edge target: ${edge.getFromId()} - ${edge.getToId()}`);
+
+    me._sprite.play("rkn_walk");
 
     const targetPos = edge.getMiddle();
     me._movementTween = Here._.add.tween({
@@ -75,6 +89,7 @@ export default class RKN {
         Config.Speed.RknMovement,
       ),
       onComplete: () => {
+        me._sprite.stop().setFrame(0);
         me._movementTween = null;
         me._isEating = true;
       },
