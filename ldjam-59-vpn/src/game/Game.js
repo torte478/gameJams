@@ -192,6 +192,7 @@ export default class Game {
     if (Game.phaseId < Enums.Phase.P4_ENEMY_ARRIVING) return;
 
     me._enemies.update();
+    me._ui.update();
   }
 
   _checkSignalSpawn(time) {

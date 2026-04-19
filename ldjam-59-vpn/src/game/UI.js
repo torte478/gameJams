@@ -2,6 +2,7 @@ import Button from "../framework/Button.js";
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
+import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import Game from "./Game.js";
 import Graph from "./Graph.js";
@@ -27,6 +28,9 @@ export default class UI {
 
   /** @type {Phaser.Cameras.Scene2D.Camera} */
   _scoreCamera;
+
+  /** @type {Button} */
+  _vibeButton;
 
   constructor(events, graph) {
     const me = this;
@@ -81,16 +85,133 @@ export default class UI {
       callbackScope: me,
     });
 
+    me._vibeButton = new Button({
+      x: 100,
+      y: 625,
+      texture: "buttons",
+      frameIdle: 1,
+      frameSelected: 1,
+      text: Config.VibeCost + "",
+      callback: () => {
+        me._vibeButtonClick();
+      },
+      callbackScope: me,
+    });
+
     if (Game.phaseId < Enums.Phase.TODO) {
       me._scoreCamera.setVisible(false);
-      // me._startFinalBossButton.toGameObj().setVisible(false);
+      me._vibeButton.toGameObj().setVisible(false);
     }
   }
 
-  showBossButton() {
+  /** @type {Phaser.GameObjects.PointLight[]} */
+  _vibeLights = [];
+
+  _vibeButtonClick() {
+    const me = this;
+
+    me._vibeButton.toGameObj().setVisible(false);
+    Here.Audio.playVibe();
+
+    // first
+
+    const firstLight = Here._.add
+      .pointlight(180, 220, 0xff0000, 200, 0.05)
+      .setAlpha(0.5)
+      .setDepth(Consts.Depth.Fade);
+
+    const firstLightFollower = { t: 0, vec: new Phaser.Math.Vector2() };
+    const firstLightPath = new Phaser.Curves.Path();
+    firstLightPath.add(new Phaser.Curves.Ellipse(500, 400, 400));
+
+    Here._.add.tween({
+      targets: firstLightFollower,
+      t: 1,
+      ease: "Sine.easeInOut",
+      duration: 14000,
+      yoyo: true,
+      repeat: -1,
+    });
+
+    firstLight.path = firstLightPath;
+    firstLight.follower = firstLightFollower;
+
+    me._vibeLights.push(firstLight);
+
+    // second
+
+    const secondLight = Here._.add
+      .pointlight(180, 220, 0xf9f871, 400, 0.05)
+      .setAlpha(0.5)
+      .setDepth(Consts.Depth.Fade);
+
+    const secondLightFollower = { t: 0, vec: new Phaser.Math.Vector2() };
+    const secondLightPath = new Phaser.Curves.Path(100, 100);
+    secondLightPath.lineTo(700, 300);
+    secondLightPath.lineTo(100, 500);
+    secondLightPath.lineTo(700, 700);
+
+    Here._.add.tween({
+      targets: secondLightFollower,
+      t: 1,
+      ease: "Sine.easeInOut",
+      duration: 10000,
+      yoyo: true,
+      repeat: -1,
+    });
+
+    secondLight.path = secondLightPath;
+    secondLight.follower = secondLightFollower;
+
+    me._vibeLights.push(secondLight);
+
+    // third
+
+    const thirdLight = Here._.add
+      .pointlight(180, 220, 0x00ff00, 350, 0.05)
+      .setAlpha(0.5)
+      .setDepth(Consts.Depth.Fade);
+
+    const thirdLightFollower = { t: 0, vec: new Phaser.Math.Vector2() };
+    const thirdLightPath = new Phaser.Curves.Path(50, 500);
+    thirdLightPath.splineTo([164, 446, 274, 542, 412, 457, 522, 541, 664, 464]);
+    thirdLightPath.lineTo(700, 300);
+    thirdLightPath.lineTo(600, 350);
+    thirdLightPath.ellipseTo(200, 100, 100, 250, false, 0);
+    thirdLightPath.cubicBezierTo(222, 119, 308, 107, 208, 368);
+    thirdLightPath.ellipseTo(60, 60, 0, 360, true);
+
+    Here._.add.tween({
+      targets: thirdLightFollower,
+      t: 1,
+      ease: "Sine.easeInOut",
+      duration: 20000,
+      yoyo: true,
+      repeat: -1,
+    });
+
+    thirdLight.path = thirdLightPath;
+    thirdLight.follower = thirdLightFollower;
+
+    me._vibeLights.push(thirdLight);
+  }
+
+  update() {
+    const me = this;
+
+    for (const light of me._vibeLights) {
+      /** @type {Phaser.Curves.Path} */
+      const path = light.path;
+      path.getPoint(light.follower.t, light.follower.vec);
+      light.setPosition(light.follower.vec.x, light.follower.vec.y);
+    }
+  }
+
+  showEndgameButtons() {
     const me = this;
 
     me._startFinalBossButton.toGameObj().setVisible(true);
+    me._vibeButton.toGameObj().setVisible(true);
   }
 
   onScoreIncrement() {
@@ -112,6 +233,7 @@ export default class UI {
 
     me._startFinalBossButton.toGameObj().setVisible(false);
     me._newTowerButton.toGameObj().setVisible(false);
+    me._vibeButton.toGameObj().setVisible(false);
     me._scoreCamera.setVisible(false);
   }
 
@@ -141,6 +263,7 @@ export default class UI {
     me._newTowerButton.setActive(isNewTowerButtonActive);
 
     me._startFinalBossButton.setActive(me._score >= Config.BossCost);
+    me._vibeButton.setActive(me._score >= Config.VibeCost);
   }
 
   _newTowerButtonClick() {

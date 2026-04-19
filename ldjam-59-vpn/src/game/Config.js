@@ -76,6 +76,7 @@ export default class Config {
   static BossHP = 100; //deprecated
 
   static BossCost = 0; //1000;
+  static VibeCost = 0;
   static BossFirePeriod = 250;
 
   static RknStartScale = 0.5;

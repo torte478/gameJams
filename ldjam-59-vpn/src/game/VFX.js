@@ -253,7 +253,7 @@ export default class VFX {
     const me = this;
 
     if (!!doQuickly) {
-      me._ui.showBossButton();
+      me._ui.showEndgameButtons();
       return;
     }
 
@@ -278,7 +278,7 @@ export default class VFX {
               -90,
               me._hintLast,
               false,
-              () => me._ui.showBossButton(),
+              () => me._ui.showEndgameButtons(),
             );
           },
           me,
