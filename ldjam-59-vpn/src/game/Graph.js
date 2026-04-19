@@ -277,7 +277,7 @@ export default class Graph {
   _drawManualSignalSendLine() {
     const me = this;
 
-    if (Game.phaseId < Enums.Phase.TODO) return;
+    if (Game.phaseId < Enums.Phase.P5_THE_GAME) return;
 
     me._lineDrawingGraphics
       .clear()
@@ -366,7 +366,7 @@ export default class Graph {
   _processMenuClick(pointer) {
     const me = this;
 
-    if (Game.phaseId < Enums.Phase.TODO) return;
+    if (Game.phaseId < Enums.Phase.P5_THE_GAME) return;
 
     const mousePos = new Phaser.Math.Vector2(pointer.x, pointer.y);
     if (!me._towerMenu.containsPoint(mousePos)) {
@@ -471,7 +471,7 @@ export default class Graph {
   _processManualSignalPointerUp(pointer) {
     const me = this;
 
-    if (Game.phaseId < Enums.Phase.TODO) return;
+    if (Game.phaseId < Enums.Phase.P5_THE_GAME) return;
 
     const targetTower = me._getTowerOnMousePos(pointer);
     if (!!targetTower) {
@@ -516,7 +516,7 @@ export default class Graph {
 
     if (
       targetTower.id === me._selectedTower.id &&
-      Game.phaseId >= Enums.Phase.TODO
+      Game.phaseId >= Enums.Phase.P5_THE_GAME
     ) {
       me._openTowerMenu(targetTower);
     } else {

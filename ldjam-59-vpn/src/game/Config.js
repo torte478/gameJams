@@ -14,10 +14,10 @@ export default class Config {
   };
 
   static Start = {
-    PhaseId: Enums.Phase.P0_START,
+    PhaseId: Enums.Phase.P4_ENEMY_ARRIVING, //P5_THE_GAME,
     TowersCount: 2,
     RKN: 0,
-    Score: 0,
+    Score: 100,
     Edges: [
       // { from: 0, to: 1 },
       // { from: 0, to: 2 },
@@ -31,7 +31,7 @@ export default class Config {
     { x: 550, y: 200, cost: 5 }, // C
     { x: 250, y: 700, cost: 10 }, // D
     { x: 850, y: 250, cost: 16 }, // E
-    { x: 60, y: 250, cost: 30 }, // F
+    { x: 60, y: 250, cost: 25 }, // F
   ];
 
   static Color = {

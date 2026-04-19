@@ -28,6 +28,9 @@ export default class VFX {
   /** @type {Phaser.GameObjects.Image} */
   _hintDeleteChannel;
 
+  /** @type {Phaser.GameObjects.Image} */
+  _hintLast;
+
   /** @type {Phaser.GameObjects.Image[]} */
   _tapes = [];
 
@@ -83,6 +86,8 @@ export default class VFX {
       me._hintConnectTowers = Here._.add
         .image(720, 710, "hintConnectTowers")
         .setAngle(-15);
+
+      me._hintLast = Here._.add.image(720, 900, "hintLast").setAngle(5); //700
 
       me._hintDeleteChannel = Here._.add
         .image(-150, 220, "hintDeleteChannel") // required 150
@@ -232,6 +237,39 @@ export default class VFX {
       y: toPos.y,
       ease: "sine.out",
       duration: Utils.getTweenDuration(fromPos, toPos, speed),
+    });
+  }
+
+  showLastHint() {
+    const me = this;
+
+    const speed = Utils.getDurationMaybeQuick(Config.Speed.Tentacle);
+
+    const fromPos = Utils.toPoint(me._hintLast);
+    const toPos = Utils.buildPoint(720, 700);
+
+    Here._.add.tween({
+      targets: me._hintLast,
+      x: toPos.x,
+      y: toPos.y,
+      ease: "sine.out",
+      duration: Utils.getTweenDuration(fromPos, toPos, speed),
+      onComplete: () => {
+        Here._.time.delayedCall(
+          5000,
+          () => {
+            me._tentacleAction(
+              Utils.buildPoint(800, 1000),
+              Utils.buildPoint(800, 750),
+              -90,
+              me._hintLast,
+              false,
+              () => {},
+            );
+          },
+          me,
+        );
+      },
     });
   }
 

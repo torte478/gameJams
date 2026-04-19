@@ -449,7 +449,7 @@ export default class Game {
     }
 
     if (phaseId === Enums.Phase.P5_THE_GAME) {
-      // TODO
+      me._vfx.showLastHint();
 
       return;
     }
