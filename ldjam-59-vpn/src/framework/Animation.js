@@ -17,7 +17,7 @@ export default class Animation {
     });
 
     Here._.anims.create({
-      key: "rkn_movement",
+      key: "rkn_walk",
       frames: Animation.getFrames("rkn", [1, 2]),
       frameRate: 4,
       repeat: -1,

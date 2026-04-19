@@ -33,7 +33,7 @@ export default class RKN {
     me._container = Here._.add.container(x, y, [me._sprite]);
 
     me._container.setScale(Config.RknStartScale).setDepth(Consts.Depth.RKN);
-    me._sprite.play("rkn_movement");
+    me._sprite.play("rkn_walk");
   }
 
   /**
