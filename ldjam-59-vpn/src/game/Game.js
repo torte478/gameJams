@@ -456,7 +456,7 @@ export default class Game {
     }
 
     if (phaseId === Enums.Phase.P2_FIRST_TOWER_BUY) {
-      Here.Audio.play("musicRadio", { loop: true });
+      Here.Audio.playRadio();
 
       me._nextSignalSpawnTime = me._currentTime + me._getSpawnSignalPeriod();
       me._nextSignalRateRecalculationTime =

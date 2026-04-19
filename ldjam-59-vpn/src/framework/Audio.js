@@ -42,6 +42,25 @@ export default class Audio {
     me.play(sound, config);
   }
 
+  playVibe() {
+    const me = this;
+
+    const radioSeek = me._radio.seek;
+    me._radio.stop();
+    me._vibe = Here._.sound.add("musicVibe");
+    me._vibe.play({ loop: true });
+    me._vibe.setSeek(radioSeek);
+  }
+
+  playRadio() {
+    const me = this;
+
+    me._radio = Here._.sound.add("musicRadio");
+    me._radio.play(null, { loop: true });
+
+    // me.play("musicRadio", { loop: true });
+  }
+
   playEat() {
     const me = this;
 
