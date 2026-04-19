@@ -73,7 +73,10 @@ export default class Config {
   };
 
   static NewTowerCost = 1;
-  static BossHP = 100;
+  static BossHP = 100; //deprecated
+
+  static BossCost = 0; //1000;
+  static BossFirePeriod = 250;
 
   static RknStartScale = 0.5;
   static RknScaleChange = 0.1;

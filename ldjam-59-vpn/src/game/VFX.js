@@ -17,7 +17,7 @@ export default class VFX {
   _ui;
 
   /** @type {Boolean} */
-  _isSpawing = false;
+  _isSpawning = false;
 
   /** @type  {Phaser.GameObjects.Image} */
   _title;
@@ -119,19 +119,28 @@ export default class VFX {
     }
   }
 
+  _nextSpawningTime = 0;
+
   tryShotBoss() {
     const me = this;
 
-    if (!me._isSpawing || me._ui._score <= 0) return 0;
+    if (!me._isSpawning) return;
 
-    const pos = me._towerPositions[me._index];
-    me._index = (me._index + 1) % me._towerPositions.length;
+    const now = new Date().getTime();
+    if (now < me._nextSpawningTime) return;
 
-    me._emitter.emitParticleAt(pos.x, pos.y, 1);
+    const pos = Utils.getRandomEl(me._towerPositions);
+    me._emitter.emitParticleAt(pos.x, pos.y, 50);
+    me._nextSpawningTime = now + Config.BossFirePeriod;
 
-    me._ui.decrementScore();
+    // const pos = me._towerPositions[me._index];
+    // me._index = (me._index + 1) % me._towerPositions.length;
 
-    return 1;
+    // me._emitter.emitParticleAt(pos.x, pos.y, 1);
+
+    // me._ui.decrementScore();
+
+    // return 1;
   }
 
   plusOneParticles(pos) {
@@ -151,7 +160,7 @@ export default class VFX {
 
     me._towerPositions = towerPositions;
     me._index = 0;
-    me._isSpawing = true;
+    me._isSpawning = true;
   }
 
   processPhase0Click() {
@@ -240,8 +249,13 @@ export default class VFX {
     });
   }
 
-  showLastHint() {
+  showLastHint(doQuickly) {
     const me = this;
+
+    if (!!doQuickly) {
+      me._ui.showBossButton();
+      return;
+    }
 
     const speed = Utils.getDurationMaybeQuick(Config.Speed.Tentacle);
 
@@ -264,7 +278,7 @@ export default class VFX {
               -90,
               me._hintLast,
               false,
-              () => {},
+              () => me._ui.showBossButton(),
             );
           },
           me,

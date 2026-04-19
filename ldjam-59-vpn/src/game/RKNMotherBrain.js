@@ -132,6 +132,14 @@ export default class RKNMotherBrain {
     return true;
   }
 
+  startFinalBossSequence() {
+    const me = this;
+
+    for (const enemy of me._enemies) {
+      enemy.totalStop();
+    }
+  }
+
   _findTarget() {
     const me = this;
 

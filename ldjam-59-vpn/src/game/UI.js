@@ -69,11 +69,12 @@ export default class UI {
     me._newTowerButton.toGameObj().setVisible(false);
 
     me._startFinalBossButton = new Button({
-      x: 950,
-      y: 750,
-      texture: "newTowerButton",
+      x: 900,
+      y: 725,
+      texture: "buttons",
       frameIdle: 2,
-      frameSelected: 3,
+      frameSelected: 2,
+      text: Config.BossCost + "",
       callback: () => {
         me._events.emit(Enums.Events.START_FINAL_BOSS_CLICK);
       },
@@ -82,8 +83,14 @@ export default class UI {
 
     if (Game.phaseId < Enums.Phase.TODO) {
       me._scoreCamera.setVisible(false);
-      me._startFinalBossButton.toGameObj().setVisible(false);
+      // me._startFinalBossButton.toGameObj().setVisible(false);
     }
+  }
+
+  showBossButton() {
+    const me = this;
+
+    me._startFinalBossButton.toGameObj().setVisible(true);
   }
 
   onScoreIncrement() {
@@ -104,6 +111,8 @@ export default class UI {
     const me = this;
 
     me._startFinalBossButton.toGameObj().setVisible(false);
+    me._newTowerButton.toGameObj().setVisible(false);
+    me._scoreCamera.setVisible(false);
   }
 
   reset() {
@@ -130,6 +139,8 @@ export default class UI {
       towersCount < Config.TowerInfo.length &&
       me._score >= Config.TowerInfo[towersCount].cost;
     me._newTowerButton.setActive(isNewTowerButtonActive);
+
+    me._startFinalBossButton.setActive(me._score >= Config.BossCost);
   }
 
   _newTowerButtonClick() {

@@ -55,6 +55,7 @@ export default class Game {
 
   constructor() {
     const me = this;
+    me.signalCount = 0;
 
     const startPhase = Utils.isDebug(Config.Debug.Global)
       ? Config.Start.PhaseId
@@ -238,24 +239,29 @@ export default class Game {
 
     if (me._isRestartCutscene) return;
 
-    const damage = me._vfx.tryShotBoss();
-    me._boss.applyDamage(damage);
+    me._vfx.tryShotBoss();
 
-    if (me._boss.hp <= 0) {
-      throw "!!!!!!!! YOU WIN !!!!!!!!";
-    }
+    // GAME OVER
+    return;
 
-    if (me._ui._score <= 0) {
-      me._isRestartCutscene = true;
+    // const damage = me._vfx.tryShotBoss();
+    // me._boss.applyDamage(damage);
 
-      Here._.time.delayedCall(
-        Config.Time.P1_WaitBeforeStartRestartAnimaion,
-        () => {
-          me._runGameRestartSequence();
-        },
-        me,
-      );
-    }
+    // if (me._boss.hp <= 0) {
+    //   throw "!!!!!!!! YOU WIN !!!!!!!!";
+    // }
+
+    // if (me._ui._score <= 0) {
+    //   me._isRestartCutscene = true;
+
+    //   Here._.time.delayedCall(
+    //     Config.Time.P1_WaitBeforeStartRestartAnimaion,
+    //     () => {
+    //       me._runGameRestartSequence();
+    //     },
+    //     me,
+    //   );
+    // }
   }
 
   _runGameRestartSequence() {
@@ -292,26 +298,79 @@ export default class Game {
   _onStartFinalBossClick() {
     const me = this;
 
+    Here.Audio.stopAll();
+
     me._isCutscene = true;
     me._graph.startFinalBossSequence();
     me._ui.startFinalBossSequence();
-    me._boss.startFinalBossSequence();
+    me._enemies.startFinalBossSequence();
+    // me._boss.startFinalBossSequence();
 
-    Here._.cameras.main.zoomTo(
-      Config.CutsceneCameraZoom,
-      Config.Time.P0_Zoom,
-      "Sine",
-      true,
-    );
+    // Here._.cameras.main.zoomTo(
+    //   Config.CutsceneCameraZoom,
+    //   Config.Time.P0_Zoom,
+    //   "Sine",
+    //   true,
+    // );
+
+    Here.Audio.play("musicFinal", { volume: 0.75 });
 
     Here._.time.delayedCall(
-      Config.Time.P0_Zoom,
+      5000,
       () => {
         me._vfx.startSpawn(me._graph._towers.map((t) => t.getPos()));
       },
       null,
       me,
     );
+
+    Here._.time.delayedCall(
+      6000,
+      () => {
+        for (const enemy of me._enemies._enemies) {
+          enemy._sprite.setFrame(6);
+        }
+      },
+      null,
+      me,
+    );
+
+    Here._.time.delayedCall(
+      10000,
+      () => {
+        const gameOverText =
+          "Thank you for playing!\n" +
+          "(I know it was hard)\n" +
+          "\n" +
+          `time: ${me._formatMilliseconds(me._currentTime)}\n` +
+          `signals: ${me.signalCount}`;
+
+        Here._.add
+          .text(500, 400, gameOverText, {
+            fontFamily: Config.FontFamily,
+            color: Utils.colorNumberToString(Config.Color.Light),
+            fontSize: 48,
+            backgroundColor: Utils.colorNumberToString(Config.Color.NotSoDark),
+            align: "center",
+          })
+          .setDepth(Consts.Depth.Max)
+          .setOrigin(0.5, 0.5);
+      },
+      null,
+      me,
+    );
+  }
+
+  signalCount = 0;
+
+  _formatMilliseconds(ms) {
+    if (ms < 0) return "0m 0s";
+
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${minutes}m ${seconds}s`;
   }
 
   _onPointerDown(pointer) {
@@ -449,7 +508,7 @@ export default class Game {
     }
 
     if (phaseId === Enums.Phase.P5_THE_GAME) {
-      me._vfx.showLastHint();
+      me._vfx.showLastHint(doQuickly);
 
       return;
     }

@@ -53,6 +53,7 @@ export default class GameScene extends HereScene {
 
     Utils.loadMp3("musicRadio");
     Utils.loadMp3("eat");
+    Utils.loadMp3("musicFinal");
   }
 
   create() {

@@ -148,4 +148,15 @@ export default class RKN {
     me._targetEdge = null;
     me._isEating = false;
   }
+
+  totalStop() {
+    const me = this;
+
+    if (!!me._movementTween) {
+      me._movementTween.stop();
+      me._movementTween = null;
+    }
+
+    me._sprite.stop().setFrame(0);
+  }
 }

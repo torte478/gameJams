@@ -228,6 +228,7 @@ export default class Tower {
     const me = this;
 
     me._sprite.play("tower_transform");
+    me._light.setVisible(false);
   }
 
   reset() {
@@ -263,6 +264,7 @@ export default class Tower {
     me._signalPool.release(signal);
 
     me._events.emit(Enums.Events.SCORE_INCREMENT, me);
+    Game.instance.signalCount += 1;
   }
 
   _invalidateSignalQueueVisual() {
