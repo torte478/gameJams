@@ -119,6 +119,8 @@ export default class Game {
         .text(10, 10, "", { fontSize: 18, backgroundColor: "#000" })
         .setScrollFactor(0)
         .setDepth(Consts.Depth.Max);
+
+      me._ui._scoreCamera.ignore(me._log);
     });
 
     // ============================

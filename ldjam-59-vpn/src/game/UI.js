@@ -25,18 +25,34 @@ export default class UI {
   /** @type {Button} */
   _startFinalBossButton;
 
+  /** @type {Phaser.Cameras.Scene2D.Camera} */
+  _scoreCamera;
+
   constructor(events, graph) {
     const me = this;
 
     me._events = events;
     me._graph = graph;
 
+    me._scoreCamera = Here._.cameras
+      .add(425, 5, 150, 100)
+      .setBackgroundColor(Config.Color.Dark)
+      .setScroll(-1000, -1000);
+
     me._score = Utils.isDebug(Config.Debug.Global) ? Config.Start.Score : 0;
 
     me._scoreText = Here._.add
-      .text(400, 50, "score: 0", { fontSize: 24 })
-      .setOrigin(0.5, 0.5)
-      .setScrollFactor(0);
+      .text(
+        me._scoreCamera.scrollX + me._scoreCamera.width / 2,
+        me._scoreCamera.scrollY + me._scoreCamera.height / 2,
+        me._score,
+        {
+          fontFamily: Config.FontFamily,
+          color: Utils.colorNumberToString(Config.Color.Light),
+          fontSize: 48,
+        },
+      )
+      .setOrigin(0.5, 0.5);
 
     me._newTowerButton = new Button({
       x: 100,
@@ -65,7 +81,6 @@ export default class UI {
     });
 
     if (Game.phaseId < Enums.Phase.TODO) {
-      me._scoreText.setVisible(false);
       me._startFinalBossButton.toGameObj().setVisible(false);
     }
   }
@@ -74,14 +89,14 @@ export default class UI {
     const me = this;
 
     me._score += 1;
-    me._scoreText.setText(`score: ${me._score}`);
+    me._scoreText.setText(me._score);
   }
 
   decrementScore() {
     const me = this;
 
     me._score -= 1;
-    me._scoreText.setText(`score: ${me._score}`);
+    me._scoreText.setText(me._score);
   }
 
   startFinalBossSequence() {

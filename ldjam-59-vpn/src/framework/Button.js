@@ -30,12 +30,12 @@ export default class Button {
 
     if (!!config.text) {
       const text = Here._.add
-        .text(-10, 0, config.text, {
+        .text(25, 0, config.text, {
           fontSize: 32,
           fontFamily: Config.FontFamily,
           color: Utils.colorNumberToString(Config.Color.Light),
         })
-        .setOrigin(0, 0.5);
+        .setOrigin(0.5, 0.5);
 
       children.push(text);
     }

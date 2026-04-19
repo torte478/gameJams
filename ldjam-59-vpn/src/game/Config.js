@@ -34,6 +34,7 @@ export default class Config {
 
   static Color = {
     Dark: 0x140b23,
+    NotSoDark: 0x1f304c,
     Light: 0xf7ebff,
     Red: 0xd4745c,
     Green: 0x00c8a0,
