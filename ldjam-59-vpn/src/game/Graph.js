@@ -206,13 +206,13 @@ export default class Graph {
   addNewTower() {
     const me = this;
 
-    if (me._towers.length >= Config.TowerPositions.length) {
+    if (me._towers.length >= Config.TowerInfo.length) {
       return; // TODO: error
     }
 
     const index = me._towers.length;
 
-    const el = Config.TowerPositions[me._towers.length];
+    const el = Config.TowerInfo[me._towers.length];
     const tower = new Tower(
       index,
       el.x,
@@ -229,7 +229,7 @@ export default class Graph {
   _selectEdgeToRemove() {
     const me = this;
 
-    if (Game.phaseId < Enums.Phase.TODO) return;
+    if (Game.phaseId < Enums.Phase.P3_REMOVE_EDGE) return;
 
     me._lineDrawingGraphics.clear();
 
@@ -253,7 +253,10 @@ export default class Graph {
 
     if (!me._edgeToRemove) return;
 
-    me._lineDrawingGraphics.lineStyle(Config.EdgeThickness + 10, 0xff0000, 1.0);
+    me._lineDrawingGraphics.lineStyle(
+      Config.SelectedEdgeThickness,
+      Config.Color.Red,
+    );
     const from = me._edgeToRemove.getFromPos();
     const to = me._edgeToRemove.getToPos();
     me._lineDrawingGraphics.lineBetween(from.x, from.y, to.x, to.y);
@@ -295,17 +298,37 @@ export default class Graph {
     }
 
     const fromPos = Utils.toPoint(me._selectedTower.getPos());
+    const toPos = Utils.buildPoint(
+      Here._.input.mousePointer.worldX,
+      Here._.input.mousePointer.worldY,
+    );
+
+    const intersects = Utils.any(me._edges, (e) => {
+      /** @type {Edge} */
+      const other = e;
+      const otherFrom = other.getFromPos();
+      const otherTo = other.getToPos();
+
+      return Utils.segmentsIntersect(
+        fromPos.x,
+        fromPos.y,
+        toPos.x,
+        toPos.y,
+        otherFrom.x,
+        otherFrom.y,
+        otherTo.x,
+        otherTo.y,
+      );
+    });
 
     me._lineDrawingGraphics
       .clear()
       .setDepth(Consts.Depth.EdgeDrawing)
-      .lineStyle(Config.SelectedEdgeThickness, Config.Color.Green)
-      .lineBetween(
-        fromPos.x,
-        fromPos.y,
-        Here._.input.mousePointer.worldX,
-        Here._.input.mousePointer.worldY,
-      );
+      .lineStyle(
+        Config.SelectedEdgeThickness,
+        intersects ? Config.Color.Red : Config.Color.Green,
+      )
+      .lineBetween(fromPos.x, fromPos.y, toPos.x, toPos.y);
   }
 
   _getTowerOnMousePos(pointer) {
@@ -330,7 +353,7 @@ export default class Graph {
     if (me._towerMenu.isOpen) {
       me._processMenuClick(pointer);
     } else {
-      me._processTowerClick(pointer);
+      me._processTowerOrEdgeClick(pointer);
     }
   }
 
@@ -383,7 +406,7 @@ export default class Graph {
     me._towerMenu.invalidate();
   }
 
-  _processTowerClick(pointer) {
+  _processTowerOrEdgeClick(pointer) {
     const me = this;
 
     if (pointer.rightButtonDown()) {
@@ -410,7 +433,7 @@ export default class Graph {
   _tryRemoveEdge() {
     const me = this;
 
-    if (Game.phaseId < Enums.Phase.TODO) return;
+    if (Game.phaseId < Enums.Phase.P3_REMOVE_EDGE) return;
 
     if (!me._edgeToRemove) return;
 

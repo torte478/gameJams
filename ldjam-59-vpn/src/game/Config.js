@@ -8,16 +8,16 @@ export default class Config {
     PlaySound: true,
     Random: false,
     CutsceneZoom: false,
-    AutoMode: false,
+    AutoMode: true,
     SignalQueueView: false,
-    QuickDelays: true,
+    QuickDelays: false,
   };
 
   static Start = {
-    PhaseId: Enums.Phase.P2_FIRST_TOWER_BUY,
+    PhaseId: Enums.Phase.P3_REMOVE_EDGE,
     TowersCount: 2,
     RKN: 0,
-    Score: 0,
+    Score: 100,
     Edges: [
       // { from: 0, to: 1 },
       // { from: 0, to: 2 },
@@ -25,11 +25,12 @@ export default class Config {
     ],
   };
 
-  static TowerPositions = [
-    { x: 300, y: 400 }, // A
-    { x: 700, y: 400 }, // B
-    { x: 550, y: 200 }, // C
-    { x: 400, y: 700 }, // D
+  static TowerInfo = [
+    { x: 300, y: 400, cost: 0 }, // A
+    { x: 700, y: 400, cost: 0 }, // B
+    { x: 550, y: 200, cost: 5 }, // C
+    { x: 250, y: 700, cost: 10 }, // D
+    { x: 850, y: 250, cost: 20 }, // E
   ];
 
   static Color = {
@@ -53,7 +54,7 @@ export default class Config {
   };
 
   static Time = {
-    SpawnSignalPeriodMs: 3000,
+    SpawnSignalPeriodMs: 2500,
     SignalRateRecalculationPeriod: 5000,
     // Endgame sequence
     P0_Zoom: 1000,

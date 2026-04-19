@@ -16,6 +16,12 @@ export default class Button {
   /** @type {Boolean} */
   _isClicked;
 
+  /** @type {Phaser.GameObjects.Text} */
+  _text;
+
+  /** @type {Boolean} */
+  _isActive = true;
+
   /**
    * @param {ButtonConfig} config
    */
@@ -29,7 +35,7 @@ export default class Button {
     const children = [me._sprite];
 
     if (!!config.text) {
-      const text = Here._.add
+      me._text = Here._.add
         .text(25, 0, config.text, {
           fontSize: 32,
           fontFamily: Config.FontFamily,
@@ -37,7 +43,7 @@ export default class Button {
         })
         .setOrigin(0.5, 0.5);
 
-      children.push(text);
+      children.push(me._text);
     }
 
     var bounds = me._sprite.getBounds();
@@ -61,6 +67,8 @@ export default class Button {
   _onButtonClick() {
     const me = this;
 
+    if (!me._isActive) return;
+
     if (me._isClicked) return;
 
     me._container.setScale(0.75);
@@ -79,14 +87,25 @@ export default class Button {
     Here._.time.delayedCall(200, me._config.callback, me._config.callbackScope);
   }
 
+  setActive(isActive) {
+    const me = this;
+
+    me._isActive = isActive;
+    me._container.setAlpha(isActive ? 1 : 0.25);
+  }
+
   _select() {
     const me = this;
+
+    if (!me._isActive) return;
 
     me._container.setScale(1.25);
   }
 
   _unselect() {
     const me = this;
+
+    if (!me._isActive) return;
 
     me._container.setScale(1);
   }

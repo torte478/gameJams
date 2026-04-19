@@ -37,6 +37,7 @@ export default class GameScene extends HereScene {
 
     Utils.loadImage("title");
     Utils.loadImage("hintConnectTowers");
+    Utils.loadImage("hintDeleteChannel");
     Utils.loadImage("tentacle");
 
     Utils.loadSpriteSheet("tower", 50, 100);

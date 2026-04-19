@@ -92,8 +92,8 @@ export default class Game {
     gameEvents.on(Enums.Events.SCORE_INCREMENT, me._onScoreIncrement, me);
     gameEvents.on(
       Enums.Events.NEW_TOWER_BUTTON_CLICK,
-      me._graph.addNewTower,
-      me._graph,
+      me._onNewTowerButtonClick,
+      me,
     );
     gameEvents.on(
       Enums.Events.START_FINAL_BOSS_CLICK,
@@ -129,7 +129,7 @@ export default class Game {
 
     Game.instance = me;
     for (let phase = Enums.Phase.P0_START; phase <= startPhase; ++phase)
-      me._setPhase(phase);
+      me._setPhase(phase, true);
   }
 
   update(time, deltaTime) {
@@ -338,7 +338,19 @@ export default class Game {
     me._setPhase(Enums.Phase.P2_FIRST_TOWER_BUY);
   }
 
-  _setPhase(phaseId) {
+  _onNewTowerButtonClick() {
+    const me = this;
+
+    me._graph.addNewTower();
+
+    if (Game.phaseId != Enums.Phase.P2_FIRST_TOWER_BUY) return;
+
+    if (me._graph._towers.length === 4) {
+      me._setPhase(Enums.Phase.P3_REMOVE_EDGE);
+    }
+  }
+
+  _setPhase(phaseId, doQuickly) {
     const me = this;
 
     Game.phaseId = phaseId;
@@ -352,29 +364,46 @@ export default class Game {
     if (phaseId === Enums.Phase.P1_FIRST_CONNECT) {
       const towerA = me._graph._towers[0];
       towerA.addSignal(me._graph._signalPool.create(0, 1));
-      towerA.toggleMode();
 
       return;
     }
 
     if (phaseId === Enums.Phase.P2_FIRST_TOWER_BUY) {
       Here.Audio.play("musicRadio", { loop: true });
-      me._graph._towers[1].toggleMode();
 
       me._nextSignalSpawnTime =
         me._currentTime + Config.Time.SpawnSignalPeriodMs;
       me._nextSignalRateRecalculationTime =
         me._currentTime + Config.Time.SignalRateRecalculationPeriod;
 
+      let beforeTentacleDuration = 3000;
+      if (!!doQuickly) beforeTentacleDuration /= 10;
       Here._.time.delayedCall(
-        Utils.getDurationMaybeQuick(3000),
-        () => me._vfx.tenctacleVpnTitle(),
+        Utils.getDurationMaybeQuick(beforeTentacleDuration),
+        () => me._vfx.tenctacleVpnTitle(doQuickly),
         null,
         me,
       );
 
       if (me._graph._edges.length == 0) {
         me._graph._tryAddEdge(me._graph._towers[0], me._graph._towers[1]);
+      }
+
+      return;
+    }
+
+    if (phaseId === Enums.Phase.P3_REMOVE_EDGE) {
+      let beforeTentacleDuration = 1000;
+      if (!!doQuickly) beforeTentacleDuration /= 10;
+      Here._.time.delayedCall(
+        Utils.getDurationMaybeQuick(beforeTentacleDuration),
+        () => me._vfx.tenctacleConnectHint(doQuickly),
+        null,
+        me,
+      );
+
+      while (me._graph._towers.length < 4) {
+        me._graph.addNewTower();
       }
 
       return;

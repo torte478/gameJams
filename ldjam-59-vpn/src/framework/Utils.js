@@ -443,6 +443,135 @@ export default class Utils {
   }
 
   static getSpeedMaybeQuick(speed) {
-    return Utils.isDebug(Config.Debug.QuickDelays) ? speed * 10 : duration;
+    return Utils.isDebug(Config.Debug.QuickDelays) ? speed * 10 : speed;
+  }
+
+  static EPS = 1e-12;
+
+  static isEqualWithEps(a, b) {
+    return Math.abs(a - b) < Utils.EPS;
+  }
+
+  static isPointOnSegment(px, py, x1, y1, x2, y2) {
+    const cross = (px - x1) * (y2 - y1) - (py - y1) * (x2 - x1);
+    if (Math.abs(cross) > Utils.EPS) return false;
+
+    const dot = (px - x1) * (x2 - x1) + (py - y1) * (y2 - y1);
+    if (dot < -Utils.EPS) return false;
+
+    const squaredLen = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+    if (dot - squaredLen > Utils.EPS) return false;
+
+    return true;
+  }
+
+  static segmentsIntersect(x1, y1, x2, y2, x3, y3, x4, y4) {
+    const len1 = Math.hypot(x2 - x1, y2 - y1);
+    const len2 = Math.hypot(x4 - x3, y4 - y3);
+
+    if (len1 < Utils.EPS || len2 < Utils.EPS) return false;
+
+    const cross1 = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
+    const cross2 = (x2 - x1) * (y4 - y1) - (y2 - y1) * (x4 - x1);
+    const cross3 = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3);
+    const cross4 = (x4 - x3) * (y2 - y3) - (y4 - y3) * (x2 - x3);
+
+    const strictIntersection =
+      cross1 * cross2 < -Utils.EPS && cross3 * cross4 < -Utils.EPS;
+
+    if (strictIntersection) return true;
+
+    const endpointOnSegment1 =
+      Utils.isPointOnSegment(x1, y1, x3, y3, x4, y4) ||
+      Utils.isPointOnSegment(x2, y2, x3, y3, x4, y4);
+
+    const endpointOnSegment2 =
+      Utils.isPointOnSegment(x3, y3, x1, y1, x2, y2) ||
+      Utils.isPointOnSegment(x4, y4, x1, y1, x2, y2);
+
+    if (endpointOnSegment1 || endpointOnSegment2) {
+      const commonPoints = [
+        [x1, y1],
+        [x2, y2],
+        [x3, y3],
+        [x4, y4],
+      ];
+
+      const shared = [];
+      for (let i = 0; i < commonPoints.length; i++) {
+        const [px, py] = commonPoints[i];
+        if (
+          Utils.isPointOnSegment(px, py, x1, y1, x2, y2) &&
+          Utils.isPointOnSegment(px, py, x3, y3, x4, y4)
+        ) {
+          shared.push([px, py]);
+        }
+      }
+
+      const uniqueShared = [];
+      for (const p of shared) {
+        let duplicate = false;
+        for (const q of uniqueShared) {
+          if (
+            Utils.isEqualWithEps(p[0], q[0]) &&
+            Utils.isEqualWithEps(p[1], q[1])
+          ) {
+            duplicate = true;
+            break;
+          }
+        }
+        if (!duplicate) uniqueShared.push(p);
+      }
+
+      if (uniqueShared.length > 1) return true;
+
+      if (uniqueShared.length === 1) {
+        const [cx, cy] = uniqueShared[0];
+
+        let dir1x = 0,
+          dir1y = 0;
+        if (Utils.isEqualWithEps(x1, cx) && Utils.isEqualWithEps(y1, cy)) {
+          dir1x = x2 - x1;
+          dir1y = y2 - y1;
+        } else if (
+          Utils.isEqualWithEps(x2, cx) &&
+          Utils.isEqualWithEps(y2, cy)
+        ) {
+          dir1x = x1 - x2;
+          dir1y = y1 - y2;
+        }
+
+        let dir2x = 0,
+          dir2y = 0;
+        if (Utils.isEqualWithEps(x3, cx) && Utils.isEqualWithEps(y3, cy)) {
+          dir2x = x4 - x3;
+          dir2y = y4 - y3;
+        } else if (
+          Utils.isEqualWithEps(x4, cx) &&
+          Utils.isEqualWithEps(y4, cy)
+        ) {
+          dir2x = x3 - x4;
+          dir2y = y3 - y4;
+        }
+
+        const len1 = Math.hypot(dir1x, dir1y);
+        const len2 = Math.hypot(dir2x, dir2y);
+
+        if (len1 > Utils.EPS && len2 > Utils.EPS) {
+          dir1x /= len1;
+          dir1y /= len1;
+          dir2x /= len2;
+          dir2y /= len2;
+
+          const dot = dir1x * dir2x + dir1y * dir2y;
+
+          if (dot < -Utils.EPS) return false;
+        }
+
+        return true;
+      }
+    }
+
+    return false;
   }
 }

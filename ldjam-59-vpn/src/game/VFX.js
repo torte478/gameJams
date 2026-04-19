@@ -25,6 +25,9 @@ export default class VFX {
   /** @type {Phaser.GameObjects.Image} */
   _hintConnectTowers;
 
+  /** @type {Phaser.GameObjects.Image} */
+  _hintDeleteChannel;
+
   /** @type {Phaser.GameObjects.Image[]} */
   _tapes = [];
 
@@ -66,6 +69,10 @@ export default class VFX {
       me._hintConnectTowers = Here._.add
         .image(720, 710, "hintConnectTowers")
         .setAngle(-15);
+
+      me._hintDeleteChannel = Here._.add
+        .image(150, 220, "hintDeleteChannel")
+        .setAngle(10);
     }
 
     if (Game.phaseId === Enums.Phase.P0_START) {
@@ -149,32 +156,66 @@ export default class VFX {
     return me._tapes.length === 0;
   }
 
-  tenctacleVpnTitle() {
+  tenctacleVpnTitle(doQuickly) {
     const me = this;
 
     const fromPos = Utils.buildPoint(500, -200);
     const toPos = Utils.buildPoint(500, 100);
 
+    me._tentacleAction(fromPos, toPos, 90, me._title, doQuickly, () =>
+      me._ui.showNewTowerButtonAndScore(),
+    );
+  }
+
+  tenctacleConnectHint(doQuickly) {
+    const me = this;
+
+    me._tentacleAction(
+      Utils.buildPoint(800, 1000),
+      Utils.buildPoint(800, 750),
+      -90,
+      me._hintConnectTowers,
+      doQuickly,
+      () => {},
+    );
+  }
+
+  /**
+   *
+   * @param {Phaser.Math.Vector2} fromPos
+   * @param {Phaser.Math.Vector2} toPos
+   * @param {Number} angle
+   * @param {Phaser.GameObjects.GameObject} other
+   * @param {Boolean | null} doQuickly
+   * @param {Function} handler
+   */
+  _tentacleAction(fromPos, toPos, angle, other, doQuickly, handler) {
+    const me = this;
+
     me._tentacle
       .setPosition(fromPos.x, fromPos.y)
       .setVisible(true)
-      .setAngle(90);
+      .setAngle(angle);
 
-    const tentacleSpeed = Utils.getSpeedMaybeQuick(Config.Speed.Tentacle);
+    let tentacleSpeed = Utils.getSpeedMaybeQuick(Config.Speed.Tentacle);
+    if (!!doQuickly) tentacleSpeed *= 10;
 
     Here._.tweens.add({
       targets: me._tentacle,
+      x: toPos.x,
       y: toPos.y,
       duration: Utils.getTweenDuration(fromPos, toPos, tentacleSpeed),
       ease: "sine.out",
       onComplete: () => {
         Here._.tweens.add({
-          targets: [me._tentacle, me._title],
+          targets: [me._tentacle, other],
+          x: fromPos.x,
           y: fromPos.y,
           duration: Utils.getTweenDuration(toPos, fromPos, tentacleSpeed),
           ease: "sine.in",
           onComplete: () => {
-            me._ui.showNewTowerButton();
+            handler.apply(me);
+            me._tentacle.setVisible(false);
           },
         });
       },

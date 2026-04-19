@@ -62,7 +62,7 @@ export default class UI {
       frameSelected: 0,
       text: "10",
       callback: () => {
-        me._events.emit(Enums.Events.NEW_TOWER_BUTTON_CLICK);
+        me._newTowerButtonClick();
       },
       callbackScope: me,
     });
@@ -81,6 +81,7 @@ export default class UI {
     });
 
     if (Game.phaseId < Enums.Phase.TODO) {
+      me._scoreCamera.setVisible(false);
       me._startFinalBossButton.toGameObj().setVisible(false);
     }
   }
@@ -89,14 +90,14 @@ export default class UI {
     const me = this;
 
     me._score += 1;
-    me._scoreText.setText(me._score);
+    me._invalidateUI();
   }
 
   decrementScore() {
     const me = this;
 
     me._score -= 1;
-    me._scoreText.setText(me._score);
+    me._invalidateUI();
   }
 
   startFinalBossSequence() {
@@ -111,9 +112,42 @@ export default class UI {
     me._startFinalBossButton.toGameObj().setVisible(true);
   }
 
-  showNewTowerButton() {
+  showNewTowerButtonAndScore() {
     const me = this;
 
     me._newTowerButton.toGameObj().setVisible(true);
+    me._scoreCamera.setVisible(true);
+    me._newTowerButton._text.setText(Config.TowerInfo[2].cost);
+  }
+
+  _invalidateUI() {
+    const me = this;
+
+    me._scoreText.setText(me._score);
+
+    const towersCount = Game.instance._graph._towers.length;
+    const isNewTowerButtonActive =
+      towersCount < Config.TowerInfo.length &&
+      me._score >= Config.TowerInfo[towersCount].cost;
+    me._newTowerButton.setActive(isNewTowerButtonActive);
+  }
+
+  _newTowerButtonClick() {
+    const me = this;
+
+    let towersCount = Game.instance._graph._towers.length;
+    me._score -= Config.TowerInfo[towersCount].cost;
+
+    me._events.emit(Enums.Events.NEW_TOWER_BUTTON_CLICK);
+
+    towersCount += 1;
+    const hasFutureTowers = towersCount < Config.TowerInfo.length;
+    me._newTowerButton._text.setText(
+      hasFutureTowers ? Config.TowerInfo[towersCount].cost : "MAX",
+    );
+
+    me._invalidateUI();
+
+    Here.Audio.play("pointerUp");
   }
 }
