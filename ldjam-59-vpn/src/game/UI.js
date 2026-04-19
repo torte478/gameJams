@@ -98,10 +98,9 @@ export default class UI {
       callbackScope: me,
     });
 
-    if (Game.phaseId < Enums.Phase.TODO) {
-      me._scoreCamera.setVisible(false);
-      me._vibeButton.toGameObj().setVisible(false);
-    }
+    me._scoreCamera.setVisible(false);
+    me._vibeButton.toGameObj().setVisible(false);
+    me._startFinalBossButton.toGameObj().setVisible(false);
   }
 
   /** @type {Phaser.GameObjects.PointLight[]} */
@@ -212,6 +211,9 @@ export default class UI {
 
     me._startFinalBossButton.toGameObj().setVisible(true);
     me._vibeButton.toGameObj().setVisible(true);
+
+    me._runNewButtonParticles(me._startFinalBossButton);
+    me._runNewButtonParticles(me._vibeButton);
   }
 
   onScoreIncrement() {
@@ -249,6 +251,15 @@ export default class UI {
     me._newTowerButton.toGameObj().setVisible(true);
     me._scoreCamera.setVisible(true);
     me._newTowerButton._text.setText(Config.TowerInfo[2].cost);
+
+    me._runNewButtonParticles(me._newTowerButton);
+  }
+
+  _runNewButtonParticles(button) {
+    const me = this;
+
+    const buttonPos = Utils.toPoint(button.toGameObj());
+    Game.instance._vfx.newButtonParticles(buttonPos);
   }
 
   _invalidateUI() {

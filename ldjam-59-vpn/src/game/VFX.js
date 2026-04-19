@@ -43,6 +43,9 @@ export default class VFX {
   /** @type {Phaser.GameObjects.Image} */
   _tentacle;
 
+  /** @type {Phaser.GameObjects.Particles.ParticleEmitter} */
+  _newButtonEmmiter;
+
   constructor(ui) {
     const me = this;
 
@@ -66,6 +69,17 @@ export default class VFX {
         frame: 0,
         alpha: { from: 1, to: 0 },
         scale: 0.5,
+        emitting: false,
+      })
+      .setDepth(Consts.Depth.TowerEffects);
+
+    me._newButtonEmmiter = Here._.add
+      .particles(0, 0, "newButtonParticle", {
+        lifespan: 3500,
+        speed: { min: 200, max: 400 },
+        frame: 0,
+        alpha: { from: 1, to: 0 },
+        scale: { from: 0.5, to: 2 },
         emitting: false,
       })
       .setDepth(Consts.Depth.TowerEffects);
@@ -147,6 +161,12 @@ export default class VFX {
     const me = this;
 
     me._plusOneEmmiter.emitParticleAt(pos.x, pos.y, 1);
+  }
+
+  newButtonParticles(pos) {
+    const me = this;
+
+    me._newButtonEmmiter.emitParticleAt(pos.x, pos.y, 50);
   }
 
   minusOneParticles(pos) {

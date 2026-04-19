@@ -14,7 +14,7 @@ export default class Config {
   };
 
   static Start = {
-    PhaseId: Enums.Phase.P5_THE_GAME,
+    PhaseId: Enums.Phase.P4_ENEMY_ARRIVING,
     TowersCount: 2,
     RKN: 0,
     Score: 100,
@@ -75,8 +75,8 @@ export default class Config {
   static NewTowerCost = 1;
   static BossHP = 100; //deprecated
 
-  static BossCost = 0; //1000;
-  static VibeCost = 0;
+  static BossCost = 200; //1000;
+  static VibeCost = 20;
   static BossFirePeriod = 250;
 
   static RknStartScale = 0.5;

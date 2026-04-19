@@ -38,6 +38,7 @@ export default class GameScene extends HereScene {
     Utils.loadImage("hintDeleteChannel");
     Utils.loadImage("tentacle");
     Utils.loadImage("hintLast");
+    Utils.loadImage("newButtonParticle");
 
     Utils.loadSpriteSheet("tower", 50, 100);
     Utils.loadSpriteSheet("buttons", 150, 75);
