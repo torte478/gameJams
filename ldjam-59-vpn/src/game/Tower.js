@@ -45,6 +45,10 @@ export default class Tower {
     me._signalPool = signalPool;
     me._events = events;
 
+    if (Utils.isDebug(Config.Debug.Global)) {
+      me._isAutoMode = Config.Debug.AutoMode;
+    }
+
     me._sprite = Here._.add.sprite(0, 0, "tower", 0);
 
     const labelText = Here._.add.text(0, 26, label, { fontSize: 20 });
@@ -175,6 +179,16 @@ export default class Tower {
 
     me._isAutoMode = true;
     me._sprite.setFrame(0);
+  }
+
+  removeSignalOfIndex(index) {
+    const me = this;
+
+    if (me._signalQueue.length < index) throw "wrong signal index";
+
+    me._signalQueue.splice(index, 1);
+    me._invalidateSignalQueueText();
+    me._events.emit(Enums.Events.TOWER_SIGNAL_CHANGE, me);
   }
 
   /**

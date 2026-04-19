@@ -302,10 +302,21 @@ export default class Graph {
     }
 
     if (pointer.rightButtonDown()) {
-      // me._tryRemoveEdge(pointer);
+      me._tryRemoveSignal(mousePos);
     } else {
       // me._processTowerClick(pointer);
     }
+  }
+
+  _tryRemoveSignal(pos) {
+    const me = this;
+
+    const index = me._towerMenu.getSignalIndexAtMouse(pos);
+    if (index == null) return;
+
+    const tower = me._towerMenu.currentTower;
+    tower.removeSignalOfIndex(index);
+    me._towerMenu.invalidate();
   }
 
   _processRegularClick(pointer) {

@@ -19,6 +19,9 @@ export default class TowerMenu {
   /** @type {Tower | null} */
   currentTower = null;
 
+  /** @type {Phaser.GameObjects.Image | null} */
+  _selectedItem = null;
+
   constructor() {
     const me = this;
 
@@ -42,6 +45,8 @@ export default class TowerMenu {
         .setInteractive()
         .on("pointerover", () => me._onPointerOverItem(i), me)
         .on("pointerout", () => me._onPointerOutItem(i), me);
+
+      item.signalIndex = i;
 
       const text = Here._.add.text(item.x, item.y, "X").setOrigin(0.5, 0.5);
 
@@ -123,11 +128,23 @@ export default class TowerMenu {
     return me._container;
   }
 
+  getSignalIndexAtMouse() {
+    const me = this;
+
+    if (!me._selectedItem) {
+      return null;
+    }
+
+    return me._selectedItem.signalIndex;
+  }
+
   _onPointerOverItem(index) {
     const me = this;
 
     const sprite = me._items[index];
     sprite.setTint(0x44ff44);
+
+    me._selectedItem = sprite;
   }
 
   _onPointerOutItem(index) {
@@ -135,5 +152,7 @@ export default class TowerMenu {
 
     const sprite = me._items[index];
     sprite.clearTint();
+
+    me._selectedItem = null;
   }
 }

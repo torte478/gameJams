@@ -6,13 +6,18 @@ export default class Config {
     PlaySound: true,
     Random: false,
     CutsceneZoom: false,
+    AutoMode: false,
   };
 
   static Start = {
-    TowersCount: 2,
+    TowersCount: 4,
     EnemiesCount: 0,
     Score: 0,
-    Edges: [{ from: 0, to: 1 }],
+    Edges: [
+      { from: 0, to: 1 },
+      { from: 0, to: 2 },
+      { from: 0, to: 3 },
+    ],
   };
 
   static Speed = {
