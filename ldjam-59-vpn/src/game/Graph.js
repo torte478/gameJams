@@ -303,7 +303,22 @@ export default class Graph {
       Here._.input.mousePointer.worldY,
     );
 
-    const intersects = Utils.any(me._edges, (e) => {
+    const intersects = me._isIntersectsWithAnyExistingEdge(fromPos, toPos);
+
+    me._lineDrawingGraphics
+      .clear()
+      .setDepth(Consts.Depth.EdgeDrawing)
+      .lineStyle(
+        Config.SelectedEdgeThickness,
+        intersects ? Config.Color.Red : Config.Color.Green,
+      )
+      .lineBetween(fromPos.x, fromPos.y, toPos.x, toPos.y);
+  }
+
+  _isIntersectsWithAnyExistingEdge(fromPos, toPos) {
+    const me = this;
+
+    return Utils.any(me._edges, (e) => {
       /** @type {Edge} */
       const other = e;
       const otherFrom = other.getFromPos();
@@ -320,15 +335,6 @@ export default class Graph {
         otherTo.y,
       );
     });
-
-    me._lineDrawingGraphics
-      .clear()
-      .setDepth(Consts.Depth.EdgeDrawing)
-      .lineStyle(
-        Config.SelectedEdgeThickness,
-        intersects ? Config.Color.Red : Config.Color.Green,
-      )
-      .lineBetween(fromPos.x, fromPos.y, toPos.x, toPos.y);
   }
 
   _getTowerOnMousePos(pointer) {
@@ -554,6 +560,10 @@ export default class Graph {
       e.thisIsIt(fromTower.id, toTower.id),
     );
     if (alreadyExists || fromTower.id === toTower.id) return;
+
+    const fromPos = fromTower.getPos();
+    const toPos = toTower.getPos();
+    if (me._isIntersectsWithAnyExistingEdge(fromPos, toPos)) return;
 
     const edge = new Edge(fromTower, toTower, me._signalPool);
     me._edges.push(edge);

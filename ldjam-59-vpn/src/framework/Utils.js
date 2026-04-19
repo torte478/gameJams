@@ -446,7 +446,7 @@ export default class Utils {
     return Utils.isDebug(Config.Debug.QuickDelays) ? speed * 10 : speed;
   }
 
-  static EPS = 1e-12;
+  static EPS = 1e-9;
 
   static isEqualWithEps(a, b) {
     return Math.abs(a - b) < Utils.EPS;
@@ -465,7 +465,19 @@ export default class Utils {
     return true;
   }
 
-  static segmentsIntersect(x1, y1, x2, y2, x3, y3, x4, y4) {
+  static isPointAtDistanceFromEnds(px, py, x1, y1, x2, y2, dist) {
+    const distToStart = Math.hypot(px - x1, py - y1);
+    const distToEnd = Math.hypot(px - x2, py - y2);
+    const segmentLength = Math.hypot(x2 - x1, y2 - y1);
+
+    if (distToStart < dist + Utils.EPS || distToEnd < dist + Utils.EPS) {
+      return false;
+    }
+
+    return Utils.isPointOnSegment(px, py, x1, y1, x2, y2);
+  }
+
+  static segmentsIntersect(x1, y1, x2, y2, x3, y3, x4, y4, Dist = 5) {
     const len1 = Math.hypot(x2 - x1, y2 - y1);
     const len2 = Math.hypot(x4 - x3, y4 - y3);
 
@@ -479,15 +491,53 @@ export default class Utils {
     const strictIntersection =
       cross1 * cross2 < -Utils.EPS && cross3 * cross4 < -Utils.EPS;
 
-    if (strictIntersection) return true;
+    if (strictIntersection) {
+      const intersectionPoint = Utils.getIntersectionPoint(
+        x1,
+        y1,
+        x2,
+        y2,
+        x3,
+        y3,
+        x4,
+        y4,
+      );
+      if (intersectionPoint) {
+        const [ix, iy] = intersectionPoint;
+        const distToEnds1 = Math.min(
+          Math.hypot(ix - x1, iy - y1),
+          Math.hypot(ix - x2, iy - y2),
+        );
+        const distToEnds2 = Math.min(
+          Math.hypot(ix - x3, iy - y3),
+          Math.hypot(ix - x4, iy - y4),
+        );
+
+        if (
+          distToEnds1 >= Dist - Utils.EPS &&
+          distToEnds2 >= Dist - Utils.EPS
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
 
     const endpointOnSegment1 =
-      Utils.isPointOnSegment(x1, y1, x3, y3, x4, y4) ||
-      Utils.isPointOnSegment(x2, y2, x3, y3, x4, y4);
+      (Dist <= 0 && Utils.isPointOnSegment(x1, y1, x3, y3, x4, y4)) ||
+      (Dist > 0 &&
+        Utils.isPointAtDistanceFromEnds(x1, y1, x3, y3, x4, y4, Dist)) ||
+      (Dist <= 0 && Utils.isPointOnSegment(x2, y2, x3, y3, x4, y4)) ||
+      (Dist > 0 &&
+        Utils.isPointAtDistanceFromEnds(x2, y2, x3, y3, x4, y4, Dist));
 
     const endpointOnSegment2 =
-      Utils.isPointOnSegment(x3, y3, x1, y1, x2, y2) ||
-      Utils.isPointOnSegment(x4, y4, x1, y1, x2, y2);
+      (Dist <= 0 && Utils.isPointOnSegment(x3, y3, x1, y1, x2, y2)) ||
+      (Dist > 0 &&
+        Utils.isPointAtDistanceFromEnds(x3, y3, x1, y1, x2, y2, Dist)) ||
+      (Dist <= 0 && Utils.isPointOnSegment(x4, y4, x1, y1, x2, y2)) ||
+      (Dist > 0 &&
+        Utils.isPointAtDistanceFromEnds(x4, y4, x1, y1, x2, y2, Dist));
 
     if (endpointOnSegment1 || endpointOnSegment2) {
       const commonPoints = [
@@ -527,6 +577,19 @@ export default class Utils {
 
       if (uniqueShared.length === 1) {
         const [cx, cy] = uniqueShared[0];
+
+        const distToEnds1 = Math.min(
+          Math.hypot(cx - x1, cy - y1),
+          Math.hypot(cx - x2, cy - y2),
+        );
+        const distToEnds2 = Math.min(
+          Math.hypot(cx - x3, cy - y3),
+          Math.hypot(cx - x4, cy - y4),
+        );
+
+        if (distToEnds1 < Dist - Utils.EPS || distToEnds2 < Dist - Utils.EPS) {
+          return false;
+        }
 
         let dir1x = 0,
           dir1y = 0;
@@ -573,5 +636,21 @@ export default class Utils {
     }
 
     return false;
+  }
+
+  static getIntersectionPoint(x1, y1, x2, y2, x3, y3, x4, y4) {
+    const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    if (Math.abs(denom) < Utils.EPS) return null;
+
+    const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
+    const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
+
+    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+      const ix = x1 + t * (x2 - x1);
+      const iy = y1 + t * (y2 - y1);
+      return [ix, iy];
+    }
+
+    return null;
   }
 }
