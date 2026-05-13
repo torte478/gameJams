@@ -1,0 +1,33 @@
+export default class Enums {
+  static Keyboard = {
+    LEFT: 0,
+    RIGHT: 1,
+    UP: 2,
+    DOWN: 3,
+
+    MAIN_ACTION: 4,
+    SECOND_ACTION: 5,
+
+    RESTART: 6,
+  };
+
+  static Phase = {
+    P0_START: 0,
+    P1_FIRST_CONNECT: 1,
+    P2_FIRST_TOWER_BUY: 2,
+    P3_REMOVE_EDGE: 3,
+    P4_ENEMY_ARRIVING: 4,
+    P5_THE_GAME: 5,
+    TODO: 9999999,
+  };
+
+  static Events = {
+    EDGE_ADDED: "EDGE_ADDED",
+    EDGE_REMOVED: "EDGE_REMOVED",
+    SCORE_INCREMENT: "SCORE_INCREMENT",
+    NEW_TOWER_BUTTON_CLICK: "NEW_TOWER_BUTTON_CLICK",
+    START_FINAL_BOSS_CLICK: "START_FINAL_BOSS_CLICK",
+    TOWER_SIGNAL_CHANGE: "TOWER_SIGNAL_CHANGE",
+    CAN_SPAWN_ENEMY: "CAN_SPAWN_ENEMY",
+  };
+}
