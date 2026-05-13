@@ -1,5 +1,19 @@
 # gameJams
 
+## V.P.N.
+Game: https://torte478.itch.io/vpn
+
+Submission for https://ldjam.com/events/ludum-dare/59
+
+18.04.2026 - 19.04.2026
+
+## 1 of 8,031,810,176
+Game: https://torte478.itch.io/1-of-many
+
+Submission for https://ldjam.com/events/ludum-dare/58
+
+04.10.2025 - 05.10.2025
+
 ## Drum Knight
 Game: https://torte478.itch.io/drum-knight
 
