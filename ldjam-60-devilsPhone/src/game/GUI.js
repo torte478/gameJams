@@ -1,5 +1,6 @@
 import Here from "../framework/Here.js";
 import LevelInfo from "./LevelInfo.js";
+import Status from "./Status.js";
 
 export default class GUI {
   /** @type {Phaser.GameObjects.Text} */
@@ -11,20 +12,38 @@ export default class GUI {
   /** @type {Phaser.GameObjects.Text} */
   _leftText;
 
-  constructor() {
+  /** @type {Phaser.GameObjects.Image} */
+  _backButton;
+
+  /** @type {Function} */
+  _backButtonCallback;
+
+  /** @type {Object} */
+  _thisObj;
+
+  /**
+   * @param {Function} backButtonCallback
+   * @param {Object} thisObj
+   */
+  constructor(backButtonCallback, thisObj) {
     const me = this;
+
+    me._backButtonCallback = backButtonCallback;
+    me._thisObj = thisObj;
 
     me._mainText = Here._.add
       .text(500, 100, "MAIN TEXT", { fontSize: 64 })
       .setOrigin(0.5, 0.5);
 
     me._topText = Here._.add
-      .text(500, 50, "", { fontSize: 48 })
+      .text(500, 50, "SELECT LEVEL", { fontSize: 48 })
       .setOrigin(0.5, 0.5);
 
     me._leftText = Here._.add
-      .text(30, 550, "SELECT LEVEL", { fontSize: 24 })
+      .text(30, 550, "MAIN MENU", { fontSize: 24 })
       .setOrigin(0, 0);
+
+    me._buildBackButton();
 
     me.resetMainText();
   }
@@ -47,15 +66,14 @@ export default class GUI {
   }
 
   /**
-   * @param {Number} levelIndex
-   * @param {LevelInfo} levelInfo
+   * @param {Status} status
    */
-  changeLevel(levelIndex, levelInfo) {
+  changeLevel(status) {
     const me = this;
 
     me.resetMainText();
-    me._topText.setText(`GOAL: ${levelInfo.goal}`);
-    me._leftText.setText(`Level: ${levelIndex}`);
+    me._topText.setText(`GOAL: ${status.levelInfo.goal}`);
+    me._leftText.setText(`Level: ${status.levelIndex}`);
   }
 
   getMainText() {
@@ -68,5 +86,25 @@ export default class GUI {
     const me = this;
 
     me._mainText.setText(">");
+  }
+
+  _buildBackButton() {
+    const me = this;
+
+    me._backButton = Here._.add.image(900, 700, "tiles", 14);
+
+    me._backButton.setInteractive();
+
+    me._backButton.on("pointerover", () => {
+      me._backButton.setTint(0x7878ff);
+    });
+
+    me._backButton.on("pointerout", () => {
+      me._backButton.clearTint();
+    });
+
+    me._backButton.on("pointerdown", () => {
+      me._backButtonCallback.call(me._thisObj);
+    });
   }
 }

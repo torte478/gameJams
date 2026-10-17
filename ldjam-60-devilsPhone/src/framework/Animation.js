@@ -2,12 +2,19 @@ import Here from "./Here.js";
 
 export default class Animation {
   static init() {
-    // scene.anims.create({
-    //     key: 'ANIM_NAME',
-    //     frames: Animation.getFrames('ASSET_NAME', [ 1, 2, 3 ]),
-    //     frameRate: 24,
-    //     repeat: -1
-    // });
+    Here._.anims.create({
+      key: "digitGateClose",
+      frames: Animation.getFrames("tiles", [13, 12, 11, 10]),
+      frameRate: 4,
+      repeat: 0,
+    });
+
+    Here._.anims.create({
+      key: "digitGateOpen",
+      frames: Animation.getFrames("tiles", [10, 11, 12, 13]),
+      frameRate: 4,
+      repeat: 0,
+    });
   }
 
   static getFrames(texture, frames) {

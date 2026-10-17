@@ -8,7 +8,7 @@ export default class Config {
     ShowSceneLog: true,
     PlaySound: true,
     Random: false,
-    Level: false,
+    Level: true,
   };
 
   static Start = {
@@ -24,7 +24,10 @@ export default class Config {
   /** @type {LevelInfo[]} */
   static Levels = [
     // 0
-    null,
+    {
+      // TODO: most hard level
+      goal: "99999999999999999",
+    },
     // 1
     {
       goal: "4",
@@ -32,6 +35,10 @@ export default class Config {
     // 2
     {
       goal: "52",
+    },
+    // 3
+    {
+      goal: "123",
     },
   ];
 }

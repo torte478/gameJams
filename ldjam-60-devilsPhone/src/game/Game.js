@@ -7,6 +7,7 @@ import Enums from "./Enums.js";
 import GUI from "./GUI.js";
 import LevelInfo from "./LevelInfo.js";
 import Phone from "./Phone.js";
+import Status from "./Status.js";
 
 export default class Game {
   /** @type {Phaser.GameObjects.Text} */
@@ -18,23 +19,18 @@ export default class Game {
   /** @type {GUI} */
   _gui;
 
-  /** @type {Number} */
-  _state;
-
-  /** @type {LevelInfo | null} */
-  _levelInfo = null;
-
-  /** @type {Number} */
-  _levelIndex = null;
+  /** @type {Status} */
+  _status;
 
   constructor() {
     const me = this;
 
     // init
-    me._gui = new GUI();
+    me._status = new Status();
+    me._gui = new GUI(me._onBackButtonClick, me);
     me._phone = new Phone(me._onDigitResolved, me._onTubeClick, me);
 
-    me._state = Config.Start.State;
+    me._status.state = Config.Start.State;
 
     // control
     Here._.input.on("pointerup", (pointer) => {
@@ -54,6 +50,8 @@ export default class Game {
     // afterInit
     if (Utils.isDebug(Config.Debug.Level)) {
       me._goToLevel(Config.Start.DebugLevel);
+    } else {
+      me._closeStartLevels();
     }
   }
 
@@ -74,7 +72,7 @@ export default class Game {
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `tme: ${(time / 1000) | 0} + ${deltaTime | 0}\n` +
-        `stt: ${me._state}\n`;
+        `stt: ${me._status.state}\n`;
 
       me._log.setText(text);
     });
@@ -101,6 +99,12 @@ export default class Game {
     }
 
     me._gui.appendText(digit);
+
+    if (me._status.solvedLevels.length < 9) {
+      for (let i = 0; i < 10; ++i) {
+        me._phone.closeGate(i);
+      }
+    }
   }
 
   _goToLevel(levelIndex) {
@@ -110,16 +114,17 @@ export default class Game {
       throw `wrong level index ${levelIndex}`;
     }
 
-    me._levelIndex = levelIndex;
-    me._levelInfo = Config.Levels[levelIndex];
-    me._gui.changeLevel(levelIndex, me._levelInfo);
-    me._state = Enums.GameState.LEVEL;
+    me._status.levelIndex = levelIndex;
+    me._status.levelInfo = Config.Levels[levelIndex];
+    me._gui.changeLevel(me._status);
+    me._phone.initLevel(me._status.levelInfo);
+    me._status.state = Enums.GameState.LEVEL;
   }
 
   _onTubeClick() {
     const me = this;
 
-    if (me._state === Enums.GameState.MAIN_MENU) {
+    if (me._status.state === Enums.GameState.MAIN_MENU) {
       const selectedLevel = me._gui.textToNumber();
       if (selectedLevel === -1) return;
 
@@ -127,7 +132,7 @@ export default class Game {
       return;
     }
 
-    if (me._state === Enums.GameState.LEVEL) {
+    if (me._status.state === Enums.GameState.LEVEL) {
       return me._processLevelTubeClick();
     }
   }
@@ -137,11 +142,27 @@ export default class Game {
 
     const currentStr = me._gui.getMainText();
 
-    if (currentStr === me._levelInfo.goal) {
+    if (currentStr === me._status.levelInfo.goal) {
       me._goToLevel(me._levelIndex + 1);
       return;
     } else {
       me._gui.resetMainText();
     }
+  }
+
+  _closeStartLevels() {
+    const me = this;
+
+    for (let i = 0; i < 10; ++i) {
+      if (i != 1) {
+        me._phone.closeGate(i);
+      }
+    }
+  }
+
+  _onBackButtonClick() {
+    const me = this;
+
+    Utils.debugLog("BACK BUTTON");
   }
 }

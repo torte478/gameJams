@@ -9,6 +9,7 @@ export default class Phone {
   /** @type {Phaser.Math.Vector2} */
   _centerPos = new Phaser.Math.Vector2(500, 550);
 
+  /** @type {Phaser.Math.Vector2} */
   _inputDigitPos;
 
   /** @type {Number | null} */
@@ -40,6 +41,12 @@ export default class Phone {
 
   /** @type {Function} */
   _tubeClickCallback;
+
+  /** @type {Phaser.GameObjects.Image[]} */
+  _digits;
+
+  /** @type {Phaser.GameObjects.Sprite[]} */
+  _digitGates;
 
   constructor(digitResolvedCallback, tubeClickCallback, thisObj) {
     const me = this;
@@ -97,6 +104,32 @@ export default class Phone {
     }
   }
 
+  closeGate(index) {
+    const me = this;
+
+    const i = me._getDigitArrayIndex(index);
+
+    if (me._digitGates[i].isClosed) {
+      return;
+    }
+
+    me._digitGates[i].play("digitGateClose");
+    me._digitGates[i].isClosed = true;
+  }
+
+  openGate(index) {
+    const me = this;
+
+    const i = me._getDigitArrayIndex(index);
+
+    if (!me._digitGates[i].isClosed) {
+      return;
+    }
+
+    me._digitGates[i].play("digitGateOpen");
+    me._digitGates[i].isClosed = false;
+  }
+
   onPointerUp() {
     const me = this;
 
@@ -121,10 +154,21 @@ export default class Phone {
     }
   }
 
+  initLevel(levelInfo) {
+    const me = this;
+
+    for (let i = 0; i < 10; ++i) {
+      me.openGate(i);
+    }
+  }
+
   _onDigitPointerDown(index) {
     const me = this;
 
     if (me._state === Enums.PhoneState.IDLE) {
+      if (me._digitGates[index].isClosed) {
+        return;
+      }
       me._selectedIndex = index;
       me._startAngle = me._calcDeltaDeg();
       me._currentAngle = me._startAngle;
@@ -162,6 +206,7 @@ export default class Phone {
     me._inputDigitPos = digitPositions[2];
 
     me._digits = [];
+    me._digitGates = [];
     for (let i = 0; i < 10; ++i) {
       const index = i == 0 ? 0 : 12 - i;
       const digitPos = digitPositions[index];
@@ -193,6 +238,14 @@ export default class Phone {
       });
 
       me._digits.push(digit);
+
+      const digitGate = Here._.add
+        .sprite(digitPos.x, digitPos.y, "tiles", 13)
+        .setDepth(Consts.Depth.PhoneDigits + 10);
+
+      digitGate.isClosed = false;
+
+      me._digitGates.push(digitGate);
     }
   }
 
@@ -223,5 +276,12 @@ export default class Phone {
     const me = this;
 
     me._tubeClickCallback.call(me._thisObj);
+  }
+
+  _getDigitArrayIndex(index) {
+    const me = this;
+
+    const result = index - 1;
+    return result < 0 ? 9 : result;
   }
 }
