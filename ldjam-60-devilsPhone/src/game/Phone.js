@@ -29,16 +29,23 @@ export default class Phone {
   /** @type {Phaser.GameObjects.Image} */
   _frontSprite;
 
-  /** @type {Function} */
-  _onDigitResolvedCallback;
-
   /** @type {Object} */
   _thisObj;
 
-  constructor(onDigitResolvedCallback, thisObj) {
+  /** @type {Phaser.GameObjects.Image} */
+  _phoneTubeSprite;
+
+  /** @type {Function} */
+  _digitResolvedCallback;
+
+  /** @type {Function} */
+  _tubeClickCallback;
+
+  constructor(digitResolvedCallback, tubeClickCallback, thisObj) {
     const me = this;
 
-    me._onDigitResolvedCallback = onDigitResolvedCallback;
+    me._digitResolvedCallback = digitResolvedCallback;
+    me._tubeClickCallback = tubeClickCallback;
     me._thisObj = thisObj;
 
     me._pointer = Here._.input.activePointer;
@@ -57,48 +64,8 @@ export default class Phone {
       .setDepth(Consts.Depth.PhoneLimiter)
       .setOrigin(0, 0);
 
-    const circle = new Phaser.Geom.Circle(
-      me._centerPos.x,
-      me._centerPos.y,
-      160,
-    );
-    const digitPositions = circle.getPoints(12);
-    me._inputDigitPos = digitPositions[2];
-    Utils.debugLog(me._inputDigitPos);
-
-    me._digits = [];
-    for (let i = 0; i < 10; ++i) {
-      const index = i == 0 ? 0 : 12 - i;
-      const digitPos = digitPositions[index];
-
-      const digitValue = i == 9 ? 0 : i + 1;
-      const digit = Here._.add
-        .image(digitPos.x, digitPos.y, "tiles", digitValue)
-        .setDepth(Consts.Depth.PhoneDigits)
-        .setInteractive(
-          new Phaser.Geom.Circle(
-            Consts.Unit.Small,
-            Consts.Unit.Small,
-            Consts.Unit.Small,
-          ),
-          Phaser.Geom.Circle.Contains,
-        );
-
-      // TODO: delete
-      digit.on("pointerover", () => {
-        digit.setTint(0x7878ff);
-      });
-
-      digit.on("pointerout", () => {
-        digit.clearTint();
-      });
-
-      digit.on("pointerdown", () => {
-        me._onDigitPointerDown(i);
-      });
-
-      me._digits.push(digit);
-    }
+    me._buildPhoneTube();
+    me._buildButtons(me);
   }
 
   update(deltaTime) {
@@ -144,7 +111,7 @@ export default class Phone {
         ) + 1;
 
       const normalizedDigit = digit == 10 ? 0 : digit;
-      me._onDigitResolvedCallback.call(me._thisObj, normalizedDigit);
+      me._digitResolvedCallback.call(me._thisObj, normalizedDigit);
 
       me._startAngle = NaN;
       me._currentAngle = NaN;
@@ -181,5 +148,81 @@ export default class Phone {
     const normalizedDelta =
       ((delta % Phaser.Math.PI2) + Phaser.Math.PI2) % Phaser.Math.PI2;
     return (normalizedDelta * 180) / Math.PI;
+  }
+
+  _buildButtons() {
+    const me = this;
+
+    const circle = new Phaser.Geom.Circle(
+      me._centerPos.x,
+      me._centerPos.y,
+      160,
+    );
+    const digitPositions = circle.getPoints(12);
+    me._inputDigitPos = digitPositions[2];
+    Utils.debugLog(me._inputDigitPos);
+
+    me._digits = [];
+    for (let i = 0; i < 10; ++i) {
+      const index = i == 0 ? 0 : 12 - i;
+      const digitPos = digitPositions[index];
+
+      const digitValue = i == 9 ? 0 : i + 1;
+      const digit = Here._.add
+        .image(digitPos.x, digitPos.y, "tiles", digitValue)
+        .setDepth(Consts.Depth.PhoneDigits)
+        .setInteractive(
+          new Phaser.Geom.Circle(
+            Consts.Unit.Small,
+            Consts.Unit.Small,
+            Consts.Unit.Small,
+          ),
+          Phaser.Geom.Circle.Contains,
+        );
+
+      // TODO: delete
+      digit.on("pointerover", () => {
+        digit.setTint(0x7878ff);
+      });
+
+      digit.on("pointerout", () => {
+        digit.clearTint();
+      });
+
+      digit.on("pointerdown", () => {
+        me._onDigitPointerDown(i);
+      });
+
+      me._digits.push(digit);
+    }
+  }
+
+  _buildPhoneTube() {
+    const me = this;
+
+    me._phoneTubeSprite = Here._.add.image(
+      me._centerPos.x,
+      me._centerPos.y - 300,
+      "phoneTube",
+    );
+
+    me._phoneTubeSprite.setInteractive();
+    me._phoneTubeSprite.on("pointerover", () => {
+      me._phoneTubeSprite.setTint(0x7878ff);
+    });
+
+    me._phoneTubeSprite.on("pointerout", () => {
+      me._phoneTubeSprite.clearTint();
+    });
+
+    me._phoneTubeSprite.on("pointerdown", () => {
+      me._onTubeClick();
+    });
+  }
+
+  _onTubeClick() {
+    const me = this;
+
+    me._tubeClickCallback.call(me._thisObj);
   }
 }

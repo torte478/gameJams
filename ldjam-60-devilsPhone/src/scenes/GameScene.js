@@ -33,6 +33,7 @@ export default class GameScene extends HereScene {
     Utils.loadImage("phoneBack");
     Utils.loadImage("phoneFront");
     Utils.loadImage("phoneLimiter");
+    Utils.loadImage("phoneTube");
 
     Utils.loadWav("button_click");
   }

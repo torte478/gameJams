@@ -17,12 +17,17 @@ export default class Game {
   /** @type {GUI} */
   _gui;
 
+  /** @type {Number} */
+  _state;
+
   constructor() {
     const me = this;
 
     // init
     me._gui = new GUI();
-    me._phone = new Phone(me._onDigitResolved, me);
+    me._phone = new Phone(me._onDigitResolved, me._onTubeClick, me);
+
+    me._state = Config.Start.State;
 
     // control
     Here._.input.on("pointerup", (pointer) => {
@@ -57,7 +62,7 @@ export default class Game {
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `tme: ${(time / 1000) | 0} + ${deltaTime | 0}\n` +
-        `stt: ${me._phone._state}\n`;
+        `stt: ${me._state}\n`;
 
       me._log.setText(text);
     });
@@ -84,5 +89,25 @@ export default class Game {
     }
 
     me._gui.appendText(digit);
+
+    if (me._state === Enums.GameState.MAIN_MENU) {
+      const selectedLevel = me._gui.textToNumber();
+      if (selectedLevel === -1) return;
+
+      //me._goToLevel(selectedLevel);
+      return;
+    }
+  }
+
+  _goToLevel(levelIndex) {
+    const me = this;
+
+    Utils.debugLog("NEW LEVEL: " + levelIndex);
+  }
+
+  _onTubeClick() {
+    const me = this;
+
+    Utils.debugLog("Tube click!");
   }
 }
