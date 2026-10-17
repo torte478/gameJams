@@ -12,4 +12,7 @@ export default class Status {
 
   /** @type {Set<string>} */
   solvedLevels = new Set();
+
+  /** @type {Number} */
+  timeRemain;
 }

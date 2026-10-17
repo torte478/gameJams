@@ -14,7 +14,7 @@ export default class Config {
 
   static Start = {
     State: Enums.GameState.MAIN_MENU,
-    DebugLevel: 1,
+    DebugLevel: 4,
   };
 
   static Duration = {
@@ -45,6 +45,11 @@ export default class Config {
     // 3
     {
       goal: "123",
+    },
+    // 4
+    {
+      goal: "111",
+      timerSec: 10,
     },
   ];
 }

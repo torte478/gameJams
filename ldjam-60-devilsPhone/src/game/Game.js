@@ -63,7 +63,7 @@ export default class Game {
     )
       Here._.scene.restart({ isRestart: true });
 
-    me._gameLoop(time, deltaTime / 1000);
+    me._gameLoop(time, deltaTime);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
@@ -72,16 +72,24 @@ export default class Game {
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `tme: ${(time / 1000) | 0} + ${deltaTime | 0}\n` +
         `stt: ${me._status.state}\n` +
-        `slv: ${me._status.solvedLevels.size}`;
+        `slv: ${me._status.solvedLevels.size}\n` +
+        `tmr: ${me._status.timeRemain | 0}`;
 
       me._log.setText(text);
     });
   }
 
-  _gameLoop(time, deltaTime) {
+  _gameLoop(time, deltaTimeMs) {
     const me = this;
 
-    me._phone.update(deltaTime);
+    me._phone.update(deltaTimeMs);
+    if (
+      me._status.state == Enums.GameState.LEVEL &&
+      me._status.levelInfo != null &&
+      me._status.levelInfo.timerSec != null
+    ) {
+      me._reduceTimer(deltaTimeMs);
+    }
   }
 
   _onLeftMouseButtonReleased() {
@@ -131,6 +139,7 @@ export default class Game {
 
     me._status.levelIndex = levelIndex;
     me._status.levelInfo = Config.Levels[levelIndex];
+    me._status.timeRemain = 0;
 
     me._gui.startLevelEnter(Config.Duration.LevelEnter, false);
     me._phone.startLevelEnter(Config.Duration.LevelEnter);
@@ -139,13 +148,26 @@ export default class Game {
     Here._.time.delayedCall(
       Utils.getDelay(Config.Duration.LevelEnter),
       () => {
-        me._gui.finishLevelEnter(me._status);
-        me._phone.finishLevelEnter(me._status.levelInfo);
-        me._status.state = Enums.GameState.LEVEL;
+        me._finishLevelEnter();
       },
       null,
       me,
     );
+  }
+
+  _finishLevelEnter() {
+    const me = this;
+
+    const levelInfo = me._status.levelInfo;
+
+    me._gui.finishLevelEnter(me._status);
+    me._phone.finishLevelEnter(levelInfo);
+
+    if (levelInfo.timerSec != null) {
+      me._status.timeRemain = levelInfo.timerSec * 1000;
+    }
+
+    me._status.state = Enums.GameState.LEVEL;
   }
 
   _startMenuEnter() {
@@ -215,5 +237,17 @@ export default class Game {
     const me = this;
 
     me._startMenuEnter();
+  }
+
+  _reduceTimer(deltaTimeMs) {
+    const me = this;
+
+    me._status.timeRemain -= deltaTimeMs;
+    me._gui.updateTimer(me._status.timeRemain, me._status.levelInfo.timerSec);
+
+    if (me._status.timeRemain < 0) {
+      Utils.debugLog("LOSE!!!!!!!");
+      me._startMenuEnter();
+    }
   }
 }

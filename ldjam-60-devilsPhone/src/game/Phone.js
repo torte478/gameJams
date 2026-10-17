@@ -92,7 +92,7 @@ export default class Phone {
       .setDepth(0);
   }
 
-  update(deltaTime) {
+  update(deltaTimeMs) {
     const me = this;
 
     if (me._state === Enums.PhoneState.DIGIT_SELECTED) {
@@ -110,7 +110,8 @@ export default class Phone {
         me._frontSprite.angle >= 0
           ? me._frontSprite.angle
           : me._frontSprite.angle + 360;
-      const nextAngle = currentAngle - Config.Phone.RollbackSpeed * deltaTime;
+      const nextAngle =
+        currentAngle - Config.Phone.RollbackSpeed * (deltaTimeMs / 1000);
       me._frontSprite.setAngle(nextAngle);
 
       if (nextAngle < 0) {

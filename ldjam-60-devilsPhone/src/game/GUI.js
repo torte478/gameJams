@@ -26,6 +26,9 @@ export default class GUI {
   /** @type {Object} */
   _thisObj;
 
+  /** @type {Phaser.GameObjects.Graphics} */
+  _timerGraphics;
+
   /**
    * @param {Function} backButtonCallback
    * @param {Object} thisObj
@@ -51,6 +54,10 @@ export default class GUI {
     me._dungeon = new Dungeon();
 
     me._buildBackButton();
+
+    me._timerGraphics = Here._.add.graphics();
+
+    // init
 
     me.resetMainText();
   }
@@ -81,6 +88,8 @@ export default class GUI {
     me._backButton.setVisible(false);
 
     me._dungeon.moveToNextRoom(duration, toMenu);
+
+    me._timerGraphics.clear();
   }
 
   finishLevelEnter(status) {
@@ -111,6 +120,21 @@ export default class GUI {
     me._leftText.setText("Main menu");
     me._topText.setText("SELECT LEVEL");
     me._backButton.setVisible(false);
+  }
+
+  updateTimer(remain, totalSec) {
+    const me = this;
+
+    me._timerGraphics.clear();
+
+    if (remain < 0) {
+      return;
+    }
+
+    const width = (remain * Consts.Viewport.Width) / (totalSec * 1000);
+
+    me._timerGraphics.fillStyle(0x00ff00, 0.9);
+    me._timerGraphics.fillRect(0, 0, width, 25);
   }
 
   _buildBackButton() {
