@@ -5,7 +5,6 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import GUI from "./GUI.js";
-import LevelInfo from "./LevelInfo.js";
 import Phone from "./Phone.js";
 import Status from "./Status.js";
 
@@ -49,9 +48,9 @@ export default class Game {
 
     // afterInit
     if (Utils.isDebug(Config.Debug.Level)) {
-      me._goToLevel(Config.Start.DebugLevel);
+      me._startLevelEnter(Config.Start.DebugLevel);
     } else {
-      me._closeStartLevels();
+      me._finishMenuEnter();
     }
   }
 
@@ -107,7 +106,7 @@ export default class Game {
     }
   }
 
-  _goToLevel(levelIndex) {
+  _startLevelEnter(levelIndex) {
     const me = this;
 
     if (levelIndex < 0 || levelIndex >= Config.Levels.length) {
@@ -116,9 +115,39 @@ export default class Game {
 
     me._status.levelIndex = levelIndex;
     me._status.levelInfo = Config.Levels[levelIndex];
-    me._gui.changeLevel(me._status);
-    me._phone.initLevel(me._status.levelInfo);
-    me._status.state = Enums.GameState.LEVEL;
+
+    me._gui.startLevelEnter(Config.Duration.LevelEnter, false);
+    me._status.state = Enums.GameState.BUSY;
+
+    Here._.time.delayedCall(
+      Utils.getDelay(Config.Duration.LevelEnter),
+      () => {
+        me._gui.finishLevelEnter(me._status);
+        me._phone.finishLevelEnter(me._status.levelInfo);
+        me._status.state = Enums.GameState.LEVEL;
+      },
+      null,
+      me,
+    );
+  }
+
+  _startMenuEnter() {
+    const me = this;
+
+    me._status.levelIndex = null;
+    me._status.levelInfo = null;
+
+    me._gui.startLevelEnter(Config.Duration.LevelEnter, true);
+    me._status.state = Enums.GameState.BUSY;
+
+    Here._.time.delayedCall(
+      Utils.getDelay(Config.Duration.LevelEnter),
+      () => {
+        me._finishMenuEnter();
+      },
+      null,
+      me,
+    );
   }
 
   _onTubeClick() {
@@ -128,7 +157,7 @@ export default class Game {
       const selectedLevel = me._gui.textToNumber();
       if (selectedLevel === -1) return;
 
-      me._goToLevel(selectedLevel);
+      me._startLevelEnter(selectedLevel);
       return;
     }
 
@@ -143,14 +172,14 @@ export default class Game {
     const currentStr = me._gui.getMainText();
 
     if (currentStr === me._status.levelInfo.goal) {
-      me._goToLevel(me._levelIndex + 1);
+      me._startLevelEnter(me._levelIndex + 1);
       return;
     } else {
       me._gui.resetMainText();
     }
   }
 
-  _closeStartLevels() {
+  _finishMenuEnter() {
     const me = this;
 
     for (let i = 0; i < 10; ++i) {
@@ -158,11 +187,14 @@ export default class Game {
         me._phone.closeGate(i);
       }
     }
+
+    me._gui.finishMenuEnter();
+    me._status.state = Enums.GameState.MAIN_MENU;
   }
 
   _onBackButtonClick() {
     const me = this;
 
-    Utils.debugLog("BACK BUTTON");
+    me._startMenuEnter();
   }
 }

@@ -14,11 +14,13 @@ export default class Enums {
   static GameState = {
     MAIN_MENU: 0,
     LEVEL: 1,
+    BUSY: 2,
   };
 
   static PhoneState = {
     IDLE: 0,
     DIGIT_SELECTED: 1,
     ROLLBACK: 2,
+    BUSY: 3,
   };
 }

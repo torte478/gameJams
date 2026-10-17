@@ -11,10 +11,12 @@ export default class Consts {
   };
 
   static Depth = {
-    Max: 100000,
+    Background: -1000,
     PhoneBack: 0,
     PhoneDigits: 100,
-    PhoneFront: 1000,
-    PhoneLimiter: 10000,
+    PhoneFront: 500,
+    PhoneLimiter: 1000,
+    UI: 1000000,
+    Max: 9999999,
   };
 }

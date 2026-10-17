@@ -154,7 +154,7 @@ export default class Phone {
     }
   }
 
-  initLevel(levelInfo) {
+  finishLevelEnter(levelInfo) {
     const me = this;
 
     for (let i = 0; i < 10; ++i) {
@@ -256,15 +256,16 @@ export default class Phone {
       me._centerPos.x,
       me._centerPos.y - 300,
       "phoneTube",
+      0,
     );
 
     me._phoneTubeSprite.setInteractive();
     me._phoneTubeSprite.on("pointerover", () => {
-      me._phoneTubeSprite.setTint(0x7878ff);
+      me._phoneTubeSprite.setFrame(1);
     });
 
     me._phoneTubeSprite.on("pointerout", () => {
-      me._phoneTubeSprite.clearTint();
+      me._phoneTubeSprite.setFrame(0);
     });
 
     me._phoneTubeSprite.on("pointerdown", () => {

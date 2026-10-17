@@ -8,12 +8,17 @@ export default class Config {
     ShowSceneLog: true,
     PlaySound: true,
     Random: false,
-    Level: true,
+    Level: false,
+    Duration: false,
   };
 
   static Start = {
     State: Enums.GameState.MAIN_MENU,
     DebugLevel: 1,
+  };
+
+  static Duration = {
+    LevelEnter: 2000,
   };
 
   static Phone = {

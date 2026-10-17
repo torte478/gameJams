@@ -29,11 +29,12 @@ export default class GameScene extends HereScene {
     if (!me._isRestart) Utils.runLoadingBar();
 
     Utils.loadSpriteSheet("tiles", Consts.Unit.Normal);
+    Utils.loadSpriteSheet("phoneTube", 600, 250);
 
     Utils.loadImage("phoneBack");
     Utils.loadImage("phoneFront");
     Utils.loadImage("phoneLimiter");
-    Utils.loadImage("phoneTube");
+    Utils.loadImage("dungeon");
 
     Utils.loadWav("button_click");
   }
