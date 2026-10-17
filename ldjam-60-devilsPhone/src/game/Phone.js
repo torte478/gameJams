@@ -71,8 +71,9 @@ export default class Phone {
       const index = i == 0 ? 0 : 12 - i;
       const digitPos = digitPositions[index];
 
+      const digitValue = i == 9 ? 0 : i + 1;
       const digit = Here._.add
-        .image(digitPos.x, digitPos.y, "tiles", i)
+        .image(digitPos.x, digitPos.y, "tiles", digitValue)
         .setDepth(Consts.Depth.PhoneDigits)
         .setInteractive(
           new Phaser.Geom.Circle(
@@ -136,11 +137,14 @@ export default class Phone {
       const sectorSize = 360 / 12;
       const digitResolvedOffset = 2 * sectorSize;
 
-      const digit = Math.round(
-        (me._startAngle - me._currentAngle - digitResolvedOffset) / sectorSize,
-      );
+      const digit =
+        Math.round(
+          (me._startAngle - me._currentAngle - digitResolvedOffset) /
+            sectorSize,
+        ) + 1;
 
-      me._onDigitResolvedCallback.call(me._thisObj, digit);
+      const normalizedDigit = digit == 10 ? 0 : digit;
+      me._onDigitResolvedCallback.call(me._thisObj, normalizedDigit);
 
       me._startAngle = NaN;
       me._currentAngle = NaN;
