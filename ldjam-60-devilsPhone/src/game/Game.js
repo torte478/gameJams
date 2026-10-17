@@ -71,7 +71,8 @@ export default class Game {
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `tme: ${(time / 1000) | 0} + ${deltaTime | 0}\n` +
-        `stt: ${me._status.state}\n`;
+        `stt: ${me._status.state}\n` +
+        `slv: ${me._status.solvedLevels.size}`;
 
       me._log.setText(text);
     });
@@ -99,8 +100,23 @@ export default class Game {
 
     me._gui.appendText(digit);
 
-    if (me._status.solvedLevels.length < 9) {
-      for (let i = 0; i < 10; ++i) {
+    if (me._status.state === Enums.GameState.MAIN_MENU) {
+      me._tryCloseDigitGates();
+    }
+  }
+
+  _tryCloseDigitGates() {
+    const me = this;
+
+    const solvedCount = me._status.solvedLevels.size;
+    if (solvedCount >= 10) {
+      return;
+    }
+
+    const currentInput = me._gui.getMainText();
+
+    for (let i = 0; i < 10; ++i) {
+      if (currentInput.length > 0 || i == 0 || i > solvedCount + 1) {
         me._phone.closeGate(i);
       }
     }
@@ -172,22 +188,23 @@ export default class Game {
     const currentStr = me._gui.getMainText();
 
     if (currentStr === me._status.levelInfo.goal) {
-      me._startLevelEnter(me._levelIndex + 1);
-      return;
+      me._processLevelComplete();
     } else {
       me._gui.resetMainText();
     }
   }
 
+  _processLevelComplete() {
+    const me = this;
+
+    me._status.solvedLevels.add(me._status.levelIndex);
+    me._startLevelEnter(me._status.levelIndex + 1);
+  }
+
   _finishMenuEnter() {
     const me = this;
 
-    for (let i = 0; i < 10; ++i) {
-      if (i != 1) {
-        me._phone.closeGate(i);
-      }
-    }
-
+    me._tryCloseDigitGates();
     me._gui.finishMenuEnter();
     me._status.state = Enums.GameState.MAIN_MENU;
   }

@@ -10,6 +10,6 @@ export default class Status {
   /** @type {LevelInfo | null} */
   levelInfo = null;
 
-  /** @type {Number[]} */
-  solvedLevels = [];
+  /** @type {Set<string>} */
+  solvedLevels = new Set();
 }
