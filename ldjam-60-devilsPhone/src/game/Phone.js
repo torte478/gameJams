@@ -200,7 +200,7 @@ export default class Phone {
     const circle = new Phaser.Geom.Circle(
       me._centerPos.x,
       me._centerPos.y,
-      160,
+      120,
     );
     const digitPositions = circle.getPoints(12);
     me._inputDigitPos = digitPositions[2];
@@ -254,7 +254,7 @@ export default class Phone {
 
     me._phoneTubeSprite = Here._.add.image(
       me._centerPos.x,
-      me._centerPos.y - 300,
+      me._centerPos.y - 200,
       "phoneTube",
       0,
     );

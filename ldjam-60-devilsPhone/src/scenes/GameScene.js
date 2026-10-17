@@ -28,8 +28,8 @@ export default class GameScene extends HereScene {
 
     if (!me._isRestart) Utils.runLoadingBar();
 
-    Utils.loadSpriteSheet("tiles", Consts.Unit.Normal);
-    Utils.loadSpriteSheet("phoneTube", 600, 250);
+    Utils.loadSpriteSheet("tiles", 40);
+    Utils.loadSpriteSheet("phoneTube", 500, 200);
 
     Utils.loadImage("phoneBack");
     Utils.loadImage("phoneFront");
