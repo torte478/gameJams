@@ -52,7 +52,8 @@ export default class Game {
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `tme: ${(time / 1000) | 0} + ${deltaTime | 1}\n` +
-        `stt: ${me._phone._state}`;
+        `stt: ${me._phone._state}\n` +
+        `deg: ${me._phone._deltaDeg | 0}`;
 
       me._log.setText(text);
     });
@@ -60,6 +61,8 @@ export default class Game {
 
   _gameLoop(time, deltaTime) {
     const me = this;
+
+    me._phone.update();
   }
 
   _onLeftMouseButtonReleased() {

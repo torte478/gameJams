@@ -6,4 +6,8 @@ export default class Config {
     PlaySound: true,
     Random: false,
   };
+
+  static Phone = {
+    MaxAnglePerFrame: 30,
+  };
 }

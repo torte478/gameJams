@@ -1,28 +1,49 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
+import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 
 export default class Phone {
+  /** @type {Phaser.Math.Vector2} */
+  _inputDigitPos = new Phaser.Math.Vector2(600, 670);
+
+  /** @type {Phaser.Math.Vector2} */
+  _centerPos = new Phaser.Math.Vector2(500, 550);
+
   /** @type {Number | null} */
   _selectedIndex = null;
 
   /** @type {Number} */
   _state = Enums.PhoneState.IDLE;
 
+  /** @type {Phaser.Input.Pointer} */
+  _pointer;
+
+  /** @type {Number} */
+  _startAngle = NaN;
+
+  /** @type {Number} */
+  _currentAngle = NaN;
+
+  /** @type {Phaser.GameObjects.Image} */
+  _frontSprite;
+
   constructor() {
     const me = this;
 
-    const center = new Phaser.Math.Vector2(500, 550);
+    me._pointer = Here._.input.activePointer;
+
+    me._centerPos = new Phaser.Math.Vector2(500, 550);
 
     me._background = Here._.add
-      .image(center.x, center.y, "phoneBack")
+      .image(me._centerPos.x, me._centerPos.y, "phoneBack")
       .setDepth(Consts.Depth.PhoneBack);
-    me._front = Here._.add
-      .image(center.x, center.y, "phoneFront")
+    me._frontSprite = Here._.add
+      .image(me._centerPos.x, me._centerPos.y, "phoneFront")
       .setDepth(Consts.Depth.PhoneFront);
     me._limiter = Here._.add
-      .image(center.x + 100, center.y + 150, "phoneLimiter")
+      .image(me._centerPos.x + 100, me._centerPos.y + 150, "phoneLimiter")
       .setDepth(Consts.Depth.PhoneLimiter);
 
     const digitsPos = Utils.buildArray(10, null);
@@ -41,7 +62,12 @@ export default class Phone {
     for (let i = 0; i < digitsPos.length; ++i) {
       if (digitsPos[i] === null) continue;
       const digit = Here._.add
-        .image(center.x + digitsPos[i].x, center.y + digitsPos[i].y, "tiles", i)
+        .image(
+          me._centerPos.x + digitsPos[i].x,
+          me._centerPos.y + digitsPos[i].y,
+          "tiles",
+          i,
+        )
         .setDepth(Consts.Depth.PhoneDigits)
         .setInteractive(
           new Phaser.Geom.Circle(
@@ -69,12 +95,32 @@ export default class Phone {
     }
   }
 
+  update() {
+    const me = this;
+
+    if (me._state !== Enums.PhoneState.DIGIT_SELECTED) {
+      return;
+    }
+
+    const nextAngle = me._calcDeltaDeg();
+    const delta = me._currentAngle - nextAngle;
+    if (delta > 0 && delta < Config.Phone.MaxAnglePerFrame) {
+      me._frontSprite.setAngle(me._startAngle - nextAngle);
+      me._currentAngle = nextAngle;
+    }
+  }
+
   onPointerUp() {
     const me = this;
 
     if (me._state === Enums.PhoneState.DIGIT_SELECTED) {
       Utils.debugLog("Pointer down: " + me._selectedIndex);
       me._selectedIndex = null;
+
+      me._startAngle = NaN;
+      me._currentAngle = NaN;
+      me._frontSprite.setAngle(0);
+
       me._state = Enums.PhoneState.IDLE;
       return;
     }
@@ -85,9 +131,28 @@ export default class Phone {
 
     if (me._state === Enums.PhoneState.IDLE) {
       Utils.debugLog("Click!: " + index);
-      me._state = Enums.PhoneState.DIGIT_SELECTED;
       me._selectedIndex = index;
+      me._startAngle = me._calcDeltaDeg();
+      me._currentAngle = me._startAngle;
+      me._state = Enums.PhoneState.DIGIT_SELECTED;
       return;
     }
+  }
+
+  _calcDeltaDeg() {
+    const me = this;
+
+    const polarA = Math.atan2(
+      me._inputDigitPos.y - me._centerPos.y,
+      me._inputDigitPos.x - me._centerPos.y,
+    );
+    const polarB = Math.atan2(
+      me._pointer.worldY - me._centerPos.y,
+      me._pointer.worldX - me._centerPos.y,
+    );
+    const delta = polarA - polarB;
+    const normalizedDelta =
+      ((delta % Phaser.Math.PI2) + Phaser.Math.PI2) % Phaser.Math.PI2;
+    return (normalizedDelta * 180) / Math.PI;
   }
 }
