@@ -5,6 +5,7 @@ import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
 import GUI from "./GUI.js";
+import LevelInfo from "./LevelInfo.js";
 import Phone from "./Phone.js";
 
 export default class Game {
@@ -19,6 +20,12 @@ export default class Game {
 
   /** @type {Number} */
   _state;
+
+  /** @type {LevelInfo | null} */
+  _levelInfo = null;
+
+  /** @type {Number} */
+  _levelIndex = null;
 
   constructor() {
     const me = this;
@@ -43,6 +50,11 @@ export default class Game {
         .setScrollFactor(0)
         .setDepth(Consts.Depth.Max);
     });
+
+    // afterInit
+    if (Utils.isDebug(Config.Debug.Level)) {
+      me._goToLevel(Config.Start.DebugLevel);
+    }
   }
 
   update(time, deltaTime) {
@@ -89,25 +101,47 @@ export default class Game {
     }
 
     me._gui.appendText(digit);
-
-    if (me._state === Enums.GameState.MAIN_MENU) {
-      const selectedLevel = me._gui.textToNumber();
-      if (selectedLevel === -1) return;
-
-      //me._goToLevel(selectedLevel);
-      return;
-    }
   }
 
   _goToLevel(levelIndex) {
     const me = this;
 
-    Utils.debugLog("NEW LEVEL: " + levelIndex);
+    if (levelIndex < 0 || levelIndex >= Config.Levels.length) {
+      throw `wrong level index ${levelIndex}`;
+    }
+
+    me._levelIndex = levelIndex;
+    me._levelInfo = Config.Levels[levelIndex];
+    me._gui.changeLevel(levelIndex, me._levelInfo);
+    me._state = Enums.GameState.LEVEL;
   }
 
   _onTubeClick() {
     const me = this;
 
-    Utils.debugLog("Tube click!");
+    if (me._state === Enums.GameState.MAIN_MENU) {
+      const selectedLevel = me._gui.textToNumber();
+      if (selectedLevel === -1) return;
+
+      me._goToLevel(selectedLevel);
+      return;
+    }
+
+    if (me._state === Enums.GameState.LEVEL) {
+      return me._processLevelTubeClick();
+    }
+  }
+
+  _processLevelTubeClick() {
+    const me = this;
+
+    const currentStr = me._gui.getMainText();
+
+    if (currentStr === me._levelInfo.goal) {
+      me._goToLevel(me._levelIndex + 1);
+      return;
+    } else {
+      me._gui.resetMainText();
+    }
   }
 }

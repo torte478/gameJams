@@ -160,7 +160,6 @@ export default class Phone {
     );
     const digitPositions = circle.getPoints(12);
     me._inputDigitPos = digitPositions[2];
-    Utils.debugLog(me._inputDigitPos);
 
     me._digits = [];
     for (let i = 0; i < 10; ++i) {
