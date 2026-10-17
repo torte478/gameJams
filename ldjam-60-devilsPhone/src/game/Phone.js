@@ -70,8 +70,7 @@ export default class Phone {
     me._pointer = Here._.input.activePointer;
 
     me._background = Here._.add
-      .image(0, 0, "phoneBack")
-      .setScale(1.2)
+      .image(10, -43, "phoneBack")
       .setDepth(Consts.Depth.PhoneBack);
 
     me._frontSprite = Here._.add
