@@ -36,7 +36,9 @@ export default class GameScene extends HereScene {
     Utils.loadImage("phoneLimiter");
     Utils.loadImage("dungeon");
 
-    Utils.loadWav("button_click");
+    Utils.loadWav("circleIncrease");
+
+    Utils.loadMp3("circleDecrease");
   }
 
   create() {

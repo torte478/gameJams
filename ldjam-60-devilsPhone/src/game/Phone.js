@@ -51,6 +51,15 @@ export default class Phone {
   /** @type {Phaser.GameObjects.Container} */
   _container;
 
+  /** @type {Number | null} */
+  _actualDigit = null;
+
+  /** @type {Number} */
+  _rollbackTotalTicks = 0;
+
+  /** @type {Number} */
+  _rollbackFromLastTickValue = 0;
+
   constructor(digitResolvedCallback, tubeClickCallback, thisObj) {
     const me = this;
 
@@ -101,6 +110,12 @@ export default class Phone {
       if (delta > 0 && delta < Config.Phone.MaxAnglePerFrame) {
         me._frontSprite.setAngle(me._startAngle - nextAngle);
         me._currentAngle = nextAngle;
+
+        const digit = me._getCurrentDigit();
+        if (me._actualDigit != digit) {
+          me._actualDigit = digit;
+          Here.Audio.play("circleDecrease");
+        }
       }
       return;
     }
@@ -113,6 +128,21 @@ export default class Phone {
       const nextAngle =
         currentAngle - Config.Phone.RollbackSpeed * (deltaTimeMs / 1000);
       me._frontSprite.setAngle(nextAngle);
+
+      me._rollbackFromLastTickValue += currentAngle - nextAngle;
+      const offsetFromExtraSound = 60;
+      const sectorSize = 30;
+      if (
+        me._rollbackFromLastTickValue >= offsetFromExtraSound &&
+        me._rollbackTotalTicks <= 10
+      ) {
+        while (me._rollbackFromLastTickValue >= offsetFromExtraSound) {
+          me._rollbackFromLastTickValue -= sectorSize;
+          me._rollbackTotalTicks += 1;
+        }
+
+        Here.Audio.play("circleDecrease");
+      }
 
       if (nextAngle < 0) {
         me._frontSprite.setAngle(0);
@@ -152,22 +182,20 @@ export default class Phone {
     const me = this;
 
     if (me._state === Enums.PhoneState.DIGIT_SELECTED) {
-      const sectorSize = 360 / 12;
-      const digitResolvedOffset = 2 * sectorSize;
-
-      const digit =
-        Math.round(
-          (me._startAngle - me._currentAngle - digitResolvedOffset) /
-            sectorSize,
-        ) + 1;
-
-      const normalizedDigit = digit == 10 ? 0 : digit;
-      me._digitResolvedCallback.call(me._thisObj, normalizedDigit);
+      const digit = me._getCurrentDigit();
+      if (digit == null) return;
+      me._digitResolvedCallback.call(me._thisObj, digit);
 
       me._startAngle = NaN;
       me._currentAngle = NaN;
       me._selectedIndex = NaN;
+      me._actualDigit = null;
+
+      me._rollbackTotalTicks = 0;
+      me._rollbackFromLastTickValue = 0;
+
       me._state = Enums.PhoneState.ROLLBACK;
+
       return;
     }
   }
@@ -217,6 +245,7 @@ export default class Phone {
       me._selectedIndex = index;
       me._startAngle = me._calcDeltaDeg();
       me._currentAngle = me._startAngle;
+      me._actualDigit = null;
       me._state = Enums.PhoneState.DIGIT_SELECTED;
       return;
     }
@@ -319,5 +348,21 @@ export default class Phone {
 
     const result = index - 1;
     return result < 0 ? 9 : result;
+  }
+
+  _getCurrentDigit() {
+    const me = this;
+
+    const sectorSize = 360 / 12;
+    const digitResolvedOffset = 2 * sectorSize;
+
+    const digit =
+      Math.round(
+        (me._startAngle - me._currentAngle - digitResolvedOffset) / sectorSize,
+      ) + 1;
+
+    const normalizedDigit = digit == 10 ? 0 : digit;
+    if (me._actualDigit == null && digit < 1) return null;
+    return normalizedDigit;
   }
 }

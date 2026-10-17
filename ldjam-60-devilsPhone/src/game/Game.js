@@ -141,12 +141,14 @@ export default class Game {
     me._status.levelInfo = Config.Levels[levelIndex];
     me._status.timeRemain = 0;
 
-    me._gui.startLevelEnter(Config.Duration.LevelEnter, false);
-    me._phone.startLevelEnter(Config.Duration.LevelEnter);
+    const duration = Utils.getDelay(Config.Duration.LevelEnter);
+
+    me._gui.startLevelEnter(duration, false);
+    me._phone.startLevelEnter(duration);
     me._status.state = Enums.GameState.BUSY;
 
     Here._.time.delayedCall(
-      Utils.getDelay(Config.Duration.LevelEnter),
+      duration,
       () => {
         me._finishLevelEnter();
       },
@@ -176,12 +178,14 @@ export default class Game {
     me._status.levelIndex = null;
     me._status.levelInfo = null;
 
-    me._gui.startLevelEnter(Config.Duration.LevelEnter, true);
-    me._phone.startLevelEnter(Config.Duration.LevelEnter);
+    const duration = Utils.getDelay(Config.Duration.LevelEnter);
+
+    me._gui.startLevelEnter(duration, true);
+    me._phone.startLevelEnter(duration);
     me._status.state = Enums.GameState.BUSY;
 
     Here._.time.delayedCall(
-      Utils.getDelay(Config.Duration.LevelEnter),
+      duration,
       () => {
         me._finishMenuEnter();
       },
