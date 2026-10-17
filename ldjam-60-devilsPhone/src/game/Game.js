@@ -22,7 +22,7 @@ export default class Game {
 
     // init
     me._gui = new GUI();
-    me._phone = new Phone(me._gui);
+    me._phone = new Phone(me._onDigitResolved, me);
 
     // control
     Here._.input.on("pointerup", (pointer) => {
@@ -58,7 +58,7 @@ export default class Game {
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
         `tme: ${(time / 1000) | 0} + ${deltaTime | 1}\n` +
         `stt: ${me._phone._state}\n` +
-        `deg: ${me._phone._deltaDeg | 0}`;
+        `deg: ${me._phone._currentAngle | 0}`;
 
       me._log.setText(text);
     });
@@ -74,5 +74,16 @@ export default class Game {
     const me = this;
 
     me._phone.onPointerUp();
+  }
+
+  _onDigitResolved(digit) {
+    const me = this;
+
+    if (digit < 0 || digit >= 10) {
+      Utils.debugLog("missclick");
+      return;
+    }
+
+    me._gui.appendText(digit);
   }
 }

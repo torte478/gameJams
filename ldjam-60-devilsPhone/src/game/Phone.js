@@ -7,11 +7,9 @@ import GUI from "./GUI.js";
 
 export default class Phone {
   /** @type {Phaser.Math.Vector2} */
-  _inputDigitPos = new Phaser.Math.Vector2(500 + 175, 550 + 150);
-  TODO;
-
-  /** @type {Phaser.Math.Vector2} */
   _centerPos = new Phaser.Math.Vector2(500, 550);
+
+  _inputDigitPos;
 
   /** @type {Number | null} */
   _selectedIndex = null;
@@ -31,55 +29,52 @@ export default class Phone {
   /** @type {Phaser.GameObjects.Image} */
   _frontSprite;
 
-  /** @type {GUI} */
-  _gui;
+  /** @type {Function} */
+  _onDigitResolvedCallback;
 
-  /**
-   *
-   * @param {GUI} gui
-   */
-  constructor(gui) {
+  /** @type {Object} */
+  _thisObj;
+
+  constructor(onDigitResolvedCallback, thisObj) {
     const me = this;
 
-    me._gui = gui;
+    me._onDigitResolvedCallback = onDigitResolvedCallback;
+    me._thisObj = thisObj;
 
     me._pointer = Here._.input.activePointer;
 
-    me._centerPos = new Phaser.Math.Vector2(500, 550);
-
     me._background = Here._.add
       .image(me._centerPos.x, me._centerPos.y, "phoneBack")
-      .setScale(1.1)
+      .setScale(1)
       .setDepth(Consts.Depth.PhoneBack);
+
     me._frontSprite = Here._.add
       .image(me._centerPos.x, me._centerPos.y, "phoneFront")
       .setDepth(Consts.Depth.PhoneFront);
+
     me._limiter = Here._.add
       .image(me._centerPos.x + 130, me._centerPos.y + 200, "phoneLimiter")
-      .setDepth(Consts.Depth.PhoneLimiter);
+      .setDepth(Consts.Depth.PhoneLimiter)
+      .setVisible(false);
 
-    const digitsPos = Utils.buildArray(10, null);
-    digitsPos[0] = { x: +175, y: 0 };
-    digitsPos[1] = { x: +150, y: -75 };
-    digitsPos[2] = { x: +80, y: -150 };
-    digitsPos[3] = { x: 0, y: -175 };
-    digitsPos[4] = { x: -80, y: -150 };
-    digitsPos[5] = { x: -160, y: -75 };
-    digitsPos[6] = { x: -175, y: 0 };
-    digitsPos[7] = { x: -160, y: +75 };
-    digitsPos[8] = { x: -80, y: +150 };
-    digitsPos[9] = { x: 0, y: +175 };
+    const digitsPos = Utils.buildArray(12, null);
+
+    const circle = new Phaser.Geom.Circle(
+      me._centerPos.x,
+      me._centerPos.y,
+      160,
+    );
+    const digitPositions = circle.getPoints(12);
+    me._inputDigitPos = digitPositions[2];
+    Utils.debugLog(me._inputDigitPos);
 
     me._digits = [];
-    for (let i = 0; i < digitsPos.length; ++i) {
-      if (digitsPos[i] === null) continue;
+    for (let i = 0; i < 10; ++i) {
+      const index = i == 0 ? 0 : 12 - i;
+      const digitPos = digitPositions[index];
+
       const digit = Here._.add
-        .image(
-          me._centerPos.x + digitsPos[i].x,
-          me._centerPos.y + digitsPos[i].y,
-          "tiles",
-          i,
-        )
+        .image(digitPos.x, digitPos.y, "tiles", i)
         .setDepth(Consts.Depth.PhoneDigits)
         .setInteractive(
           new Phaser.Geom.Circle(
@@ -126,8 +121,14 @@ export default class Phone {
     const me = this;
 
     if (me._state === Enums.PhoneState.DIGIT_SELECTED) {
-      const delta = Math.round((me._startAngle - me._currentAngle - 60) / 30); // 360 / 12 * 2
-      Utils.debugLog("RES: " + delta);
+      const sectorSize = 360 / 12;
+      const digitResolvedOffset = 2 * sectorSize;
+
+      const digit = Math.round(
+        (me._startAngle - me._currentAngle - digitResolvedOffset) / sectorSize,
+      );
+
+      me._onDigitResolvedCallback.call(me._thisObj, digit);
 
       me._selectedIndex = null;
       me._startAngle = NaN;
@@ -156,11 +157,11 @@ export default class Phone {
 
     const polarA = Math.atan2(
       me._inputDigitPos.y - me._centerPos.y,
-      me._inputDigitPos.x - me._centerPos.y,
+      me._inputDigitPos.x - me._centerPos.x,
     );
     const polarB = Math.atan2(
       me._pointer.worldY - me._centerPos.y,
-      me._pointer.worldX - me._centerPos.y,
+      me._pointer.worldX - me._centerPos.x,
     );
     const delta = polarA - polarB;
     const normalizedDelta =

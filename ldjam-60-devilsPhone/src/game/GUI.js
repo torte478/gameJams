@@ -8,11 +8,11 @@ export default class GUI {
     const me = this;
 
     me._mainText = Here._.add
-      .text(500, 150, "?", { fontSize: 32 })
+      .text(500, 150, ">", { fontSize: 64 })
       .setOrigin(0.5, 0.5);
   }
 
-  setText(text) {
+  appendText(text) {
     const me = this;
 
     me._mainText.setText(me._mainText.text + text);
