@@ -16,8 +16,17 @@ export default class Game {
   constructor() {
     const me = this;
 
+    // init
     me._phone = new Phone();
 
+    // control
+    Here._.input.on("pointerup", (pointer) => {
+      if (pointer.leftButtonReleased()) {
+        me._onLeftMouseButtonReleased();
+      }
+    });
+
+    // debug log
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       me._log = Here._.add
         .text(10, 10, "", { fontSize: 18, backgroundColor: "#000" })
@@ -35,14 +44,27 @@ export default class Game {
     )
       Here._.scene.restart({ isRestart: true });
 
+    me._gameLoop(time, deltaTime);
+
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
 
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `${(time / 1000) | 0} + ${deltaTime | 1}`;
+        `tme: ${(time / 1000) | 0} + ${deltaTime | 1}\n` +
+        `stt: ${me._phone._state}`;
 
       me._log.setText(text);
     });
+  }
+
+  _gameLoop(time, deltaTime) {
+    const me = this;
+  }
+
+  _onLeftMouseButtonReleased() {
+    const me = this;
+
+    me._phone.onPointerUp();
   }
 }

@@ -10,4 +10,9 @@ export default class Enums {
 
     RESTART: 6,
   };
+
+  static PhoneState = {
+    IDLE: 0,
+    DIGIT_SELECTED: 1,
+  };
 }

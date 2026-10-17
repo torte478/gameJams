@@ -1,8 +1,15 @@
 import Here from "../framework/Here.js";
 import Utils from "../framework/Utils.js";
 import Consts from "./Consts.js";
+import Enums from "./Enums.js";
 
 export default class Phone {
+  /** @type {Number | null} */
+  _selectedIndex = null;
+
+  /** @type {Number} */
+  _state = Enums.PhoneState.IDLE;
+
   constructor() {
     const me = this;
 
@@ -54,7 +61,33 @@ export default class Phone {
         digit.clearTint();
       });
 
+      digit.on("pointerdown", () => {
+        me._onDigitPointerDown(i);
+      });
+
       me._digits.push(digit);
+    }
+  }
+
+  onPointerUp() {
+    const me = this;
+
+    if (me._state === Enums.PhoneState.DIGIT_SELECTED) {
+      Utils.debugLog("Pointer down: " + me._selectedIndex);
+      me._selectedIndex = null;
+      me._state = Enums.PhoneState.IDLE;
+      return;
+    }
+  }
+
+  _onDigitPointerDown(index) {
+    const me = this;
+
+    if (me._state === Enums.PhoneState.IDLE) {
+      Utils.debugLog("Click!: " + index);
+      me._state = Enums.PhoneState.DIGIT_SELECTED;
+      me._selectedIndex = index;
+      return;
     }
   }
 }
