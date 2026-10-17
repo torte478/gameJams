@@ -19,6 +19,8 @@ export default class Dungeon {
   moveToNextRoom(duration, toMenu) {
     const me = this;
 
+    Here.Audio.play("walk");
+
     let scaleValues = [4, 0.33];
     let alphaValues = [1, 0];
     if (toMenu) {

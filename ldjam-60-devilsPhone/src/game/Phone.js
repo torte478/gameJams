@@ -117,6 +117,10 @@ export default class Phone {
           Here.Audio.play("circleDecrease");
         }
       }
+
+      if (!me._pointer.leftButtonDown()) {
+        me.onPointerUp();
+      }
       return;
     }
 
@@ -214,6 +218,8 @@ export default class Phone {
 
   startLevelEnter(duration) {
     const me = this;
+
+    me._phoneTubeSprite.setFrame(0);
 
     const follower = { t: 0, vec: new Phaser.Math.Vector2() };
     const path = new Phaser.Curves.Path(me._centerPos.x, me._centerPos.y);
@@ -325,15 +331,22 @@ export default class Phone {
 
     me._phoneTubeSprite.setInteractive();
     me._phoneTubeSprite.on("pointerover", () => {
-      me._phoneTubeSprite.setFrame(1);
+      if (me._state != Enums.PhoneState.DIGIT_SELECTED) {
+        me._phoneTubeSprite.setFrame(1);
+        Here.Audio.play("tubePickUp");
+      }
     });
 
     me._phoneTubeSprite.on("pointerout", () => {
-      me._phoneTubeSprite.setFrame(0);
+      if (me._state != Enums.PhoneState.DIGIT_SELECTED) {
+        me._phoneTubeSprite.setFrame(0);
+      }
     });
 
     me._phoneTubeSprite.on("pointerdown", () => {
-      me._onTubeClick();
+      if (me._state != Enums.PhoneState.DIGIT_SELECTED) {
+        me._onTubeClick();
+      }
     });
   }
 

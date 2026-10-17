@@ -36,9 +36,14 @@ export default class GameScene extends HereScene {
     Utils.loadImage("phoneLimiter");
     Utils.loadImage("dungeon");
 
+    // free sound from https://pixabay.com/
+
     Utils.loadWav("circleIncrease");
 
     Utils.loadMp3("circleDecrease");
+    Utils.loadMp3("tubePickUp");
+    Utils.loadMp3("tubePullDown");
+    Utils.loadMp3("walk");
   }
 
   create() {

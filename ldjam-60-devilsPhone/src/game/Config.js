@@ -8,8 +8,8 @@ export default class Config {
     ShowSceneLog: true,
     PlaySound: true,
     Random: false,
-    Level: true,
-    Duration: true,
+    Level: false,
+    Duration: false,
   };
 
   static Start = {
