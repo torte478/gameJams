@@ -51,9 +51,6 @@ export default class Phone {
   /** @type {Phaser.GameObjects.Container} */
   _container;
 
-  /** @type {Phaser.Math.Vector2} */
-  _walkCurvePos = null;
-
   constructor(digitResolvedCallback, tubeClickCallback, thisObj) {
     const me = this;
 
@@ -122,13 +119,6 @@ export default class Phone {
       }
       return;
     }
-
-    if (me._state === Enums.PhoneState.WALK) {
-      if (me._walkCurvePos != null) {
-        me._container.setPosition(me._walkCurvePos.x, me._walkCurvePos.y);
-      }
-      return;
-    }
   }
 
   closeGate(index) {
@@ -189,7 +179,6 @@ export default class Phone {
     }
 
     me._container.setPosition(me._centerPos.x, me._centerPos.y);
-    me._walkCurvePos = null;
 
     me._state = Enums.PhoneState.IDLE;
   }
@@ -209,7 +198,8 @@ export default class Phone {
       ease: "Linear",
       duration: duration,
       onUpdate: () => {
-        me._walkCurvePos = path.getPoint(follower.t, follower.vec);
+        const curvePos = path.getPoint(follower.t, follower.vec);
+        me._container.setPosition(curvePos.x, curvePos.y);
       },
     });
 
