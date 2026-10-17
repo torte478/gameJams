@@ -3,10 +3,12 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
+import GUI from "./GUI.js";
 
 export default class Phone {
   /** @type {Phaser.Math.Vector2} */
-  _inputDigitPos = new Phaser.Math.Vector2(600, 670);
+  _inputDigitPos = new Phaser.Math.Vector2(500 + 175, 550 + 150);
+  TODO;
 
   /** @type {Phaser.Math.Vector2} */
   _centerPos = new Phaser.Math.Vector2(500, 550);
@@ -29,8 +31,17 @@ export default class Phone {
   /** @type {Phaser.GameObjects.Image} */
   _frontSprite;
 
-  constructor() {
+  /** @type {GUI} */
+  _gui;
+
+  /**
+   *
+   * @param {GUI} gui
+   */
+  constructor(gui) {
     const me = this;
+
+    me._gui = gui;
 
     me._pointer = Here._.input.activePointer;
 
@@ -38,25 +49,26 @@ export default class Phone {
 
     me._background = Here._.add
       .image(me._centerPos.x, me._centerPos.y, "phoneBack")
+      .setScale(1.1)
       .setDepth(Consts.Depth.PhoneBack);
     me._frontSprite = Here._.add
       .image(me._centerPos.x, me._centerPos.y, "phoneFront")
       .setDepth(Consts.Depth.PhoneFront);
     me._limiter = Here._.add
-      .image(me._centerPos.x + 100, me._centerPos.y + 150, "phoneLimiter")
+      .image(me._centerPos.x + 130, me._centerPos.y + 200, "phoneLimiter")
       .setDepth(Consts.Depth.PhoneLimiter);
 
     const digitsPos = Utils.buildArray(10, null);
-    digitsPos[0] = { x: +160, y: 0 };
-    digitsPos[1] = { x: +130, y: -60 };
-    digitsPos[2] = { x: +80, y: -120 };
-    digitsPos[3] = { x: 0, y: -150 };
-    digitsPos[4] = { x: -80, y: -120 };
-    digitsPos[5] = { x: -130, y: -70 };
-    digitsPos[6] = { x: -160, y: 0 };
-    digitsPos[7] = { x: -140, y: +70 };
-    digitsPos[8] = { x: -80, y: +140 };
-    digitsPos[9] = { x: 0, y: +150 };
+    digitsPos[0] = { x: +175, y: 0 };
+    digitsPos[1] = { x: +150, y: -75 };
+    digitsPos[2] = { x: +80, y: -150 };
+    digitsPos[3] = { x: 0, y: -175 };
+    digitsPos[4] = { x: -80, y: -150 };
+    digitsPos[5] = { x: -160, y: -75 };
+    digitsPos[6] = { x: -175, y: 0 };
+    digitsPos[7] = { x: -160, y: +75 };
+    digitsPos[8] = { x: -80, y: +150 };
+    digitsPos[9] = { x: 0, y: +175 };
 
     me._digits = [];
     for (let i = 0; i < digitsPos.length; ++i) {
@@ -114,9 +126,10 @@ export default class Phone {
     const me = this;
 
     if (me._state === Enums.PhoneState.DIGIT_SELECTED) {
-      Utils.debugLog("Pointer down: " + me._selectedIndex);
-      me._selectedIndex = null;
+      const delta = Math.round((me._startAngle - me._currentAngle - 60) / 30); // 360 / 12 * 2
+      Utils.debugLog("RES: " + delta);
 
+      me._selectedIndex = null;
       me._startAngle = NaN;
       me._currentAngle = NaN;
       me._frontSprite.setAngle(0);
@@ -130,7 +143,6 @@ export default class Phone {
     const me = this;
 
     if (me._state === Enums.PhoneState.IDLE) {
-      Utils.debugLog("Click!: " + index);
       me._selectedIndex = index;
       me._startAngle = me._calcDeltaDeg();
       me._currentAngle = me._startAngle;

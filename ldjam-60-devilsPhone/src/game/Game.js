@@ -4,6 +4,7 @@ import Utils from "../framework/Utils.js";
 import Config from "./Config.js";
 import Consts from "./Consts.js";
 import Enums from "./Enums.js";
+import GUI from "./GUI.js";
 import Phone from "./Phone.js";
 
 export default class Game {
@@ -13,11 +14,15 @@ export default class Game {
   /** @type {Phone} */
   _phone;
 
+  /** @type {GUI} */
+  _gui;
+
   constructor() {
     const me = this;
 
     // init
-    me._phone = new Phone();
+    me._gui = new GUI();
+    me._phone = new Phone(me._gui);
 
     // control
     Here._.input.on("pointerup", (pointer) => {
