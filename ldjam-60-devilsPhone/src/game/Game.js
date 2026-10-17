@@ -49,16 +49,15 @@ export default class Game {
     )
       Here._.scene.restart({ isRestart: true });
 
-    me._gameLoop(time, deltaTime);
+    me._gameLoop(time, deltaTime / 1000);
 
     Utils.ifDebug(Config.Debug.ShowSceneLog, () => {
       const mouse = Here._.input.activePointer;
 
       let text =
         `mse: ${mouse.worldX | 0} ${mouse.worldY | 0}\n` +
-        `tme: ${(time / 1000) | 0} + ${deltaTime | 1}\n` +
-        `stt: ${me._phone._state}\n` +
-        `deg: ${me._phone._currentAngle | 0}`;
+        `tme: ${(time / 1000) | 0} + ${deltaTime | 0}\n` +
+        `stt: ${me._phone._state}\n`;
 
       me._log.setText(text);
     });
@@ -67,7 +66,7 @@ export default class Game {
   _gameLoop(time, deltaTime) {
     const me = this;
 
-    me._phone.update();
+    me._phone.update(deltaTime);
   }
 
   _onLeftMouseButtonReleased() {

@@ -53,11 +53,9 @@ export default class Phone {
       .setDepth(Consts.Depth.PhoneFront);
 
     me._limiter = Here._.add
-      .image(me._centerPos.x + 130, me._centerPos.y + 200, "phoneLimiter")
+      .image(550, 650, "phoneLimiter")
       .setDepth(Consts.Depth.PhoneLimiter)
-      .setVisible(false);
-
-    const digitsPos = Utils.buildArray(12, null);
+      .setOrigin(0, 0);
 
     const circle = new Phaser.Geom.Circle(
       me._centerPos.x,
@@ -102,18 +100,32 @@ export default class Phone {
     }
   }
 
-  update() {
+  update(deltaTime) {
     const me = this;
 
-    if (me._state !== Enums.PhoneState.DIGIT_SELECTED) {
+    if (me._state === Enums.PhoneState.DIGIT_SELECTED) {
+      const nextAngle = me._calcDeltaDeg();
+      const delta = me._currentAngle - nextAngle;
+      if (delta > 0 && delta < Config.Phone.MaxAnglePerFrame) {
+        me._frontSprite.setAngle(me._startAngle - nextAngle);
+        me._currentAngle = nextAngle;
+      }
       return;
     }
 
-    const nextAngle = me._calcDeltaDeg();
-    const delta = me._currentAngle - nextAngle;
-    if (delta > 0 && delta < Config.Phone.MaxAnglePerFrame) {
-      me._frontSprite.setAngle(me._startAngle - nextAngle);
-      me._currentAngle = nextAngle;
+    if (me._state === Enums.PhoneState.ROLLBACK) {
+      const currentAngle =
+        me._frontSprite.angle >= 0
+          ? me._frontSprite.angle
+          : me._frontSprite.angle + 360;
+      const nextAngle = currentAngle - Config.Phone.RollbackSpeed * deltaTime;
+      me._frontSprite.setAngle(nextAngle);
+
+      if (nextAngle < 0) {
+        me._frontSprite.setAngle(0);
+        me._state = Enums.PhoneState.IDLE;
+      }
+      return;
     }
   }
 
@@ -130,12 +142,10 @@ export default class Phone {
 
       me._onDigitResolvedCallback.call(me._thisObj, digit);
 
-      me._selectedIndex = null;
       me._startAngle = NaN;
       me._currentAngle = NaN;
-      me._frontSprite.setAngle(0);
-
-      me._state = Enums.PhoneState.IDLE;
+      me._selectedIndex = NaN;
+      me._state = Enums.PhoneState.ROLLBACK;
       return;
     }
   }

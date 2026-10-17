@@ -9,5 +9,6 @@ export default class Config {
 
   static Phone = {
     MaxAnglePerFrame: 30,
+    RollbackSpeed: 360,
   };
 }
