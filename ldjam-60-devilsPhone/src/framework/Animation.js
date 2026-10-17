@@ -4,7 +4,7 @@ export default class Animation {
   static init() {
     Here._.anims.create({
       key: "digitGateClose",
-      frames: Animation.getFrames("tiles", [13, 12, 11, 10]),
+      frames: Animation.getFrames("tiles", [12, 11, 10]),
       frameRate: 4,
       repeat: 0,
     });

@@ -7,7 +7,7 @@ import GUI from "./GUI.js";
 
 export default class Phone {
   /** @type {Phaser.Math.Vector2} */
-  _centerPos = new Phaser.Math.Vector2(500, 550);
+  _centerPos = new Phaser.Math.Vector2(500, 600);
 
   /** @type {Phaser.Math.Vector2} */
   _inputDigitPos;
@@ -48,6 +48,9 @@ export default class Phone {
   /** @type {Phaser.GameObjects.Sprite[]} */
   _digitGates;
 
+  /** @type {Phaser.GameObjects.Container} */
+  _container;
+
   constructor(digitResolvedCallback, tubeClickCallback, thisObj) {
     const me = this;
 
@@ -58,21 +61,35 @@ export default class Phone {
     me._pointer = Here._.input.activePointer;
 
     me._background = Here._.add
-      .image(me._centerPos.x, me._centerPos.y, "phoneBack")
-      .setScale(1)
+      .image(0, 0, "phoneBack")
+      .setScale(1.2)
       .setDepth(Consts.Depth.PhoneBack);
 
     me._frontSprite = Here._.add
-      .image(me._centerPos.x, me._centerPos.y, "phoneFront")
+      .image(0, 0, "phoneFront")
       .setDepth(Consts.Depth.PhoneFront);
 
     me._limiter = Here._.add
-      .image(550, 650, "phoneLimiter")
+      .image(50, 100, "phoneLimiter")
       .setDepth(Consts.Depth.PhoneLimiter)
       .setOrigin(0, 0);
 
     me._buildPhoneTube();
     me._buildButtons(me);
+
+    const containerChildren = [me._background];
+    for (let i = 0; i < me._digits.length; ++i) {
+      containerChildren.push(me._digits[i]);
+      containerChildren.push(me._digitGates[i]);
+    }
+
+    containerChildren.push(me._frontSprite);
+    containerChildren.push(me._limiter);
+    containerChildren.push(me._phoneTubeSprite);
+
+    me._container = Here._.add
+      .container(me._centerPos.x, me._centerPos.y, containerChildren)
+      .setDepth(0);
   }
 
   update(deltaTime) {
@@ -180,14 +197,13 @@ export default class Phone {
   _calcDeltaDeg() {
     const me = this;
 
-    const polarA = Math.atan2(
-      me._inputDigitPos.y - me._centerPos.y,
-      me._inputDigitPos.x - me._centerPos.x,
-    );
-    const polarB = Math.atan2(
-      me._pointer.worldY - me._centerPos.y,
+    const mousePos = new Phaser.Math.Vector2(
       me._pointer.worldX - me._centerPos.x,
+      me._pointer.worldY - me._centerPos.y,
     );
+
+    const polarA = Math.atan2(me._inputDigitPos.y, me._inputDigitPos.x);
+    const polarB = Math.atan2(mousePos.y, mousePos.x);
     const delta = polarA - polarB;
     const normalizedDelta =
       ((delta % Phaser.Math.PI2) + Phaser.Math.PI2) % Phaser.Math.PI2;
@@ -197,11 +213,7 @@ export default class Phone {
   _buildButtons() {
     const me = this;
 
-    const circle = new Phaser.Geom.Circle(
-      me._centerPos.x,
-      me._centerPos.y,
-      120,
-    );
+    const circle = new Phaser.Geom.Circle(0, 0, 120);
     const digitPositions = circle.getPoints(12);
     me._inputDigitPos = digitPositions[2];
 
@@ -252,12 +264,7 @@ export default class Phone {
   _buildPhoneTube() {
     const me = this;
 
-    me._phoneTubeSprite = Here._.add.image(
-      me._centerPos.x,
-      me._centerPos.y - 200,
-      "phoneTube",
-      0,
-    );
+    me._phoneTubeSprite = Here._.add.image(0, -250, "phoneTube", 0);
 
     me._phoneTubeSprite.setInteractive();
     me._phoneTubeSprite.on("pointerover", () => {
