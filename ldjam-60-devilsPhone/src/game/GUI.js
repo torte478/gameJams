@@ -72,7 +72,7 @@ export default class GUI {
     return Number(substr);
   }
 
-  startLevelEnter(duration, backward) {
+  startLevelEnter(duration, toMenu) {
     const me = this;
 
     me._leftText.setText("");
@@ -80,7 +80,7 @@ export default class GUI {
     me._mainText.setText("");
     me._backButton.setVisible(false);
 
-    me._dungeon.moveToNextRoom(duration, backward);
+    me._dungeon.moveToNextRoom(duration, toMenu);
   }
 
   finishLevelEnter(status) {

@@ -16,12 +16,12 @@ export default class Dungeon {
       .setDepth(Consts.Depth.Background);
   }
 
-  moveToNextRoom(duration, backward) {
+  moveToNextRoom(duration, toMenu) {
     const me = this;
 
     let scaleValues = [4, 0.33];
     let alphaValues = [1, 0];
-    if (backward) {
+    if (toMenu) {
       scaleValues = Utils.reverse(scaleValues);
       alphaValues = Utils.reverse(alphaValues);
     }

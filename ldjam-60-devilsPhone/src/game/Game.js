@@ -133,6 +133,7 @@ export default class Game {
     me._status.levelInfo = Config.Levels[levelIndex];
 
     me._gui.startLevelEnter(Config.Duration.LevelEnter, false);
+    me._phone.startLevelEnter(Config.Duration.LevelEnter);
     me._status.state = Enums.GameState.BUSY;
 
     Here._.time.delayedCall(
@@ -154,6 +155,7 @@ export default class Game {
     me._status.levelInfo = null;
 
     me._gui.startLevelEnter(Config.Duration.LevelEnter, true);
+    me._phone.startLevelEnter(Config.Duration.LevelEnter);
     me._status.state = Enums.GameState.BUSY;
 
     Here._.time.delayedCall(

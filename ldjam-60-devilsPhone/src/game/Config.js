@@ -24,6 +24,7 @@ export default class Config {
   static Phone = {
     MaxAnglePerFrame: 30,
     RollbackSpeed: 360,
+    WalkCurveCirlceRadius: 25,
   };
 
   /** @type {LevelInfo[]} */

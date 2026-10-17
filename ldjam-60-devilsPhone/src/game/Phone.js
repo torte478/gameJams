@@ -51,6 +51,9 @@ export default class Phone {
   /** @type {Phaser.GameObjects.Container} */
   _container;
 
+  /** @type {Phaser.Math.Vector2} */
+  _walkCurvePos = null;
+
   constructor(digitResolvedCallback, tubeClickCallback, thisObj) {
     const me = this;
 
@@ -119,6 +122,13 @@ export default class Phone {
       }
       return;
     }
+
+    if (me._state === Enums.PhoneState.WALK) {
+      if (me._walkCurvePos != null) {
+        me._container.setPosition(me._walkCurvePos.x, me._walkCurvePos.y);
+      }
+      return;
+    }
   }
 
   closeGate(index) {
@@ -177,6 +187,33 @@ export default class Phone {
     for (let i = 0; i < 10; ++i) {
       me.openGate(i);
     }
+
+    me._container.setPosition(me._centerPos.x, me._centerPos.y);
+    me._walkCurvePos = null;
+
+    me._state = Enums.PhoneState.IDLE;
+  }
+
+  startLevelEnter(duration) {
+    const me = this;
+
+    const follower = { t: 0, vec: new Phaser.Math.Vector2() };
+    const path = new Phaser.Curves.Path(me._centerPos.x, me._centerPos.y);
+    path.circleTo(Config.Phone.WalkCurveCirlceRadius);
+    path.moveTo(me._centerPos.x, me._centerPos.y);
+    path.circleTo(Config.Phone.WalkCurveCirlceRadius, true, 180);
+
+    Here._.tweens.add({
+      targets: follower,
+      t: 1,
+      ease: "Linear",
+      duration: duration,
+      onUpdate: () => {
+        me._walkCurvePos = path.getPoint(follower.t, follower.vec);
+      },
+    });
+
+    me._state = Enums.PhoneState.WALK;
   }
 
   _onDigitPointerDown(index) {

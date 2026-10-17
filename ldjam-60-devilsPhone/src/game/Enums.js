@@ -21,6 +21,6 @@ export default class Enums {
     IDLE: 0,
     DIGIT_SELECTED: 1,
     ROLLBACK: 2,
-    BUSY: 3,
+    WALK: 3,
   };
 }
